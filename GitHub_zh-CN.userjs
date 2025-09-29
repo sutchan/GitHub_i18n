@@ -1547,6 +1547,54 @@
         'Desktop notifications': '桌面通知',
         'Notification preferences': '通知偏好设置',
         
+        // ========== 通知类型 ==========
+        'Pull request review': '拉取请求审查',
+        'Issue comment': '问题评论',
+        'Commit comment': '提交评论',
+        'Pull request comment': '拉取请求评论',
+        'Mention': '提及',
+        'Assignment': '任务分配',
+        'Review requested': '请求审查',
+        'Status change': '状态变更',
+        'Repository activity': '仓库活动',
+        
+        // ========== 通知过滤选项 ==========
+        'Filter notifications': '筛选通知',
+        'Search notifications': '搜索通知',
+        'Reason': '原因',
+        'Type': '类型',
+        'Repository': '仓库',
+        'All repositories': '所有仓库',
+        
+        // ========== 通知状态和显示选项 ==========
+        'Read': '已读',
+        'Unread': '未读',
+        'Older notifications': '更早的通知',
+        'Earlier': '更早',
+        'Today': '今天',
+        'Yesterday': '昨天',
+        'This week': '本周',
+        'Last week': '上周',
+        'This month': '本月',
+        'Last month': '上月',
+        'This year': '今年',
+        
+        // ========== 通知内容动词和短语 ==========
+        'commented on': '评论了',
+        'reviewed': '审查了',
+        'mentioned you in': '在...中提到了你',
+        'assigned you to': '将你分配到',
+        'requested your review on': '请求你审查',
+        'opened': '开启了',
+        'closed': '关闭了',
+        'merged': '合并了',
+        'pushed to': '推送到',
+        'created branch': '创建了分支',
+        'created tag': '创建了标签',
+        'published': '发布了',
+        'released': '发行了',
+        'forked': '复刻了'
+        
         // ========== Dashboard页面 ==========
         'Dashboard': '仪表盘',
         'Top repositories': '常用仓库',
