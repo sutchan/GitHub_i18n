@@ -572,7 +572,7 @@
             })
             .then(content => {
                 // 从脚本内容中提取版本号
-                const versionMatch = content.match(/\/\/@version\s+(\S+)/);
+                const versionMatch = content.match(/\/\/\s*@version\s+(\S+)/);
                 if (versionMatch && versionMatch[1]) {
                     const latestVersion = versionMatch[1];
                     
