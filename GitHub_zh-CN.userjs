@@ -7,8 +7,8 @@
 // @match        https://github.com/*
 // @grant        none
 // @icon         https://github.githubassets.com/favicons/favicon.svg
-// @updateURL    https://github.com/Tanox/GitHub_i18n/raw/main/GitHub_zh-CN.userjs
-// @downloadURL  https://github.com/Tanox/GitHub_i18n/raw/main/GitHub_zh-CN.userjs
+// @updateURL    https://raw.githubusercontent.com/sutchan/GitHub_i18n/refs/heads/main/GitHub_zh-CN.userjs
+// @downloadURL  https://raw.githubusercontent.com/sutchan/GitHub_i18n/refs/heads/main/GitHub_zh-CN.userjs
 // ==/UserScript==
 
 /**
