@@ -20,6 +20,8 @@
 
     // ========== 配置项 ==========
     const CONFIG = {
+        // 当前脚本版本号（用于统一管理）
+        version: '1.5',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -33,7 +35,9 @@
             // 更新检测间隔（小时）
             intervalHours: 24,
             // GitHub 原始脚本 URL
-            scriptUrl: 'https://github.com/Tanox/GitHub_i18n/raw/main/GitHub_zh-CN.userjs'
+            scriptUrl: 'https://github.com/Tanox/GitHub_i18n/raw/main/GitHub_zh-CN.userjs',
+            // 是否启用自动版本号更新
+            autoUpdateVersion: true
         }
     };
 
@@ -530,7 +534,7 @@
         });
 
         if (CONFIG.debugMode) {
-            console.log('[GitHub_i18n] 已成功初始化，当前版本: 1.5');
+            console.log(`[GitHub_i18n] 已成功初始化，当前版本: ${CONFIG.version}`);
         }
     }
 
@@ -543,7 +547,7 @@
         
         try {
             // 获取当前版本
-            const currentVersion = GM_info?.script?.version || '1.5';
+            const currentVersion = CONFIG.version;
             
             // 获取上次检查时间
             const lastCheckTime = localStorage.getItem('GitHub_i18n_lastUpdateCheck');
@@ -583,6 +587,11 @@
                     // 比较版本号
                     if (isNewerVersion(latestVersion, currentVersion)) {
                         showUpdateNotification(latestVersion, currentVersion);
+                         
+                        // 如果启用了自动版本号更新，则更新本地版本记录
+                        if (CONFIG.updateCheck.autoUpdateVersion) {
+                            updateLocalVersion(latestVersion);
+                        }
                     }
                 }
             })
@@ -594,6 +603,25 @@
         } catch (error) {
             if (CONFIG.debugMode) {
                 console.error('[GitHub_i18n] 更新检查功能异常:', error);
+            }
+        }
+    }
+    
+    /**
+     * 更新本地存储的版本号
+     * @param {string} newVersion - 新版本号
+     */
+    function updateLocalVersion(newVersion) {
+        try {
+            // 存储新版本号到 localStorage
+            localStorage.setItem('GitHub_i18n_latestVersion', newVersion);
+            
+            if (CONFIG.debugMode) {
+                console.log(`[GitHub_i18n] 已更新本地版本号记录: ${CONFIG.version} → ${newVersion}`);
+            }
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub_i18n] 更新本地版本号失败:', error);
             }
         }
     }
@@ -682,9 +710,37 @@
     }
     
     /**
+     * 处理版本号自动升级
+     * @description 检查本地存储的版本号，实现自动升级逻辑
+     */
+    function handleVersionAutoUpgrade() {
+        try {
+            // 检查 localStorage 中是否有最新版本号记录
+            const storedLatestVersion = localStorage.getItem('GitHub_i18n_latestVersion');
+            
+            if (storedLatestVersion && CONFIG.updateCheck.autoUpdateVersion) {
+                // 比较存储的版本号和当前版本号
+                if (isNewerVersion(storedLatestVersion, CONFIG.version)) {
+                    if (CONFIG.debugMode) {
+                        console.log(`[GitHub_i18n] 检测到已通知的新版本: ${CONFIG.version} → ${storedLatestVersion}`);
+                        console.log(`[GitHub_i18n] 请访问脚本安装页面更新到最新版本`);
+                    }
+                }
+            }
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub_i18n] 版本自动升级处理失败:', error);
+            }
+        }
+    }
+    
+    /**
      * 启动脚本
      */
     function startScript() {
+        // 处理版本自动升级
+        handleVersionAutoUpgrade();
+        
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 init();
