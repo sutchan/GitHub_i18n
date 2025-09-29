@@ -25,7 +25,16 @@
         // 路由变化后翻译延迟时间（毫秒）
         routeChangeDelay: 400,
         // 是否启用调试日志
-        debugMode: false
+        debugMode: false,
+        // 更新检测配置
+        updateCheck: {
+            // 是否启用自动更新检测
+            enabled: true,
+            // 更新检测间隔（小时）
+            intervalHours: 24,
+            // GitHub 原始脚本 URL
+            scriptUrl: 'https://github.com/Tanox/GitHub_i18n/raw/main/GitHub_zh-CN.userjs'
+        }
     };
 
     // ========== 翻译词典 ==========
@@ -526,16 +535,174 @@
     }
 
     /**
+     * 检查脚本更新
+     * @description 自动检测GitHub上的最新版本，并在有更新时通知用户
+     */
+    function checkForUpdates() {
+        if (!CONFIG.updateCheck.enabled) return;
+        
+        try {
+            // 获取当前版本
+            const currentVersion = GM_info?.script?.version || '1.5';
+            
+            // 获取上次检查时间
+            const lastCheckTime = localStorage.getItem('GitHub_i18n_lastUpdateCheck');
+            const now = Date.now();
+            const intervalMs = CONFIG.updateCheck.intervalHours * 60 * 60 * 1000;
+            
+            // 如果距离上次检查未超过设定间隔，则跳过检查
+            if (lastCheckTime && now - parseInt(lastCheckTime) < intervalMs) {
+                if (CONFIG.debugMode) {
+                    console.log('[GitHub_i18n] 未到更新检测时间');
+                }
+                return;
+            }
+            
+            // 更新上次检查时间
+            localStorage.setItem('GitHub_i18n_lastUpdateCheck', now.toString());
+            
+            // 发送请求获取最新版本
+            fetch(CONFIG.updateCheck.scriptUrl, {
+                method: 'GET',
+                cache: 'no-cache'
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.text();
+            })
+            .then(content => {
+                // 从脚本内容中提取版本号
+                const versionMatch = content.match(/\/\/@version\s+(\S+)/);
+                if (versionMatch && versionMatch[1]) {
+                    const latestVersion = versionMatch[1];
+                    
+                    if (CONFIG.debugMode) {
+                        console.log(`[GitHub_i18n] 当前版本: ${currentVersion}, 最新版本: ${latestVersion}`);
+                    }
+                    
+                    // 比较版本号
+                    if (isNewerVersion(latestVersion, currentVersion)) {
+                        showUpdateNotification(latestVersion, currentVersion);
+                    }
+                }
+            })
+            .catch(error => {
+                if (CONFIG.debugMode) {
+                    console.error('[GitHub_i18n] 检查更新失败:', error);
+                }
+            });
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub_i18n] 更新检查功能异常:', error);
+            }
+        }
+    }
+    
+    /**
+     * 比较版本号，判断是否为新版本
+     * @param {string} latestVersion - 最新版本号
+     * @param {string} currentVersion - 当前版本号
+     * @returns {boolean} 是否为新版本
+     */
+    function isNewerVersion(latestVersion, currentVersion) {
+        try {
+            const latestParts = latestVersion.split('.').map(Number);
+            const currentParts = currentVersion.split('.').map(Number);
+            
+            // 比较每个版本部分
+            for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
+                const latest = latestParts[i] || 0;
+                const current = currentParts[i] || 0;
+                
+                if (latest > current) return true;
+                if (latest < current) return false;
+            }
+            return false; // 版本相同
+        } catch (error) {
+            // 版本格式异常时，直接比较字符串
+            return latestVersion !== currentVersion;
+        }
+    }
+    
+    /**
+     * 显示更新通知
+     * @param {string} latestVersion - 最新版本号
+     * @param {string} currentVersion - 当前版本号
+     */
+    function showUpdateNotification(latestVersion, currentVersion) {
+        // 创建通知元素
+        const notification = document.createElement('div');
+        notification.className = 'GitHub_i18n_update_notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #0366d6;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-size: 14px;
+            max-width: 400px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        `;
+        
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-2"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                <div>
+                    <div style="font-weight: 500;">GitHub 中文翻译脚本有更新</div>
+                    <div style="opacity: 0.9; margin-top: 2px;">版本 ${currentVersion} → ${latestVersion}</div>
+                </div>
+            </div>
+        `;
+        
+        // 点击通知跳转到安装页面
+        notification.addEventListener('click', () => {
+            window.open(CONFIG.updateCheck.scriptUrl, '_blank');
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        });
+        
+        // 自动关闭
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 15000);
+        
+        // 添加到页面
+        document.body.appendChild(notification);
+    }
+    
+    /**
      * 启动脚本
      */
     function startScript() {
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
+            document.addEventListener('DOMContentLoaded', () => {
+                init();
+                // 初始化后检查更新
+                if (CONFIG.updateCheck.enabled) {
+                    // 延迟检查，避免影响页面加载性能
+                    setTimeout(checkForUpdates, 5000);
+                }
+            });
         } else {
             init();
+            // 初始化后检查更新
+            if (CONFIG.updateCheck.enabled) {
+                // 延迟检查，避免影响页面加载性能
+                setTimeout(checkForUpdates, 5000);
+            }
         }
     }
-
     // 🕒 启动脚本
     startScript();
 
