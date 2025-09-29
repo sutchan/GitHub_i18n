@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.6.3
+// @version      1.6.4
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.6.3',
+        version: '1.6.4',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -43,6 +43,7 @@
 
     // ========== 翻译词典 ==========
     // 🔤 完整预定义翻译词典（覆盖导航、个人菜单、设置、组织、通知等）
+    // 结构：{英文词汇: 中文翻译}
     const TRANSLATION_DICT = {
         // ========== 顶部全局导航 ==========
         'Pull requests': '拉取请求',
@@ -1920,19 +1921,27 @@
         if (skipTags.includes(node.tagName)) return;
         if (node.closest?.('code, pre, .js-file-line, .commit-tease, .copy-button, .blob-code')) return;
 
-        for (let i = 0; i < node.childNodes.length; i++) {
-            const child = node.childNodes[i];
-            if (child.nodeType === Node.TEXT_NODE) {
-                const text = child.textContent.trim();
-                if (text && TRANSLATION_DICT.hasOwnProperty(text)) {
-                    // 仅替换匹配部分，保留前后空白（避免破坏布局）
-                    child.textContent = child.textContent.replace(text, TRANSLATION_DICT[text]);
-                    if (CONFIG.debugMode) {
-                        console.log(`[GitHub_i18n] 已翻译: "${text}" -> "${TRANSLATION_DICT[text]}"`);
+        // 使用循环而不是递归遍历，提高性能
+        const stack = [node];
+        while (stack.length > 0) {
+            const currentNode = stack.pop();
+            for (let i = 0; i < currentNode.childNodes.length; i++) {
+                const child = currentNode.childNodes[i];
+                if (child.nodeType === Node.TEXT_NODE) {
+                    const text = child.textContent.trim();
+                    if (text && TRANSLATION_DICT.hasOwnProperty(text)) {
+                        // 仅替换匹配部分，保留前后空白（避免破坏布局）
+                        child.textContent = child.textContent.replace(text, TRANSLATION_DICT[text]);
+                        if (CONFIG.debugMode) {
+                            console.log(`[GitHub_i18n] 已翻译: "${text}" -> "${TRANSLATION_DICT[text]}"`);
+                        }
+                    }
+                } else if (child.nodeType === Node.ELEMENT_NODE) {
+                    // 检查子节点是否需要跳过翻译
+                    if (!skipTags.includes(child.tagName) && !child.closest?.('code, pre, .js-file-line, .commit-tease, .copy-button, .blob-code')) {
+                        stack.push(child);
                     }
                 }
-            } else if (child.nodeType === Node.ELEMENT_NODE) {
-                replaceTextNodes(child);
             }
         }
     }
@@ -2089,7 +2098,6 @@
     /**
      * 比较版本号，判断是否为新版本
      * @param {string} latestVersion - 最新版本号
-     * @param {string} currentVersion - 当前版本号
      * @returns {boolean} 是否为新版本
      */
     function isNewerVersion(latestVersion, currentVersion) {
