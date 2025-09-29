@@ -1354,7 +1354,11 @@
         'Desktop notifications': '桌面通知',
         'Notification preferences': '通知偏好设置',
         
-        // ========== 新增翻译项 - Dashboard页面 ==========
+        // ========== Dashboard页面 ==========
+        'Dashboard': '仪表盘',
+        'Top repositories': '最常用仓库',
+        'Finding repository...': '查找仓库...',
+        'New': '新建仓库',
         'For you': '为你推荐',
         'All activity': '所有活动',
         'Following': '关注中',
