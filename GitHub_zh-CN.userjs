@@ -1549,9 +1549,10 @@
         
         // ========== Dashboard页面 ==========
         'Dashboard': '仪表盘',
-        'Top repositories': '最常用仓库',
+        'Top repositories': '常用仓库',
         'Find a repository...': '查找仓库...',
         'New': '新建',
+        'Latest changed': '最近修改',
         'For you': '为你推荐',
         'All activity': '所有活动',
         'Following': '关注中',
