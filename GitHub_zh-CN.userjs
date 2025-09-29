@@ -429,7 +429,11 @@
         'Open with': '使用...打开',
         'Print': '打印',
         'Keyboard shortcuts': '键盘快捷键',
-        'Log out': '登出'
+        'Log out': '登出',
+        
+        // ========== ActionList 相关翻译 ==========
+        'ActionList': '操作列表',
+        'prc-ActionList-ActionList-X4RiC': '操作列表组件'
     };
     /**
      * 安全替换文本节点（不破坏 HTML 结构和布局）
@@ -517,7 +521,7 @@
         });
 
         if (CONFIG.debugMode) {
-            console.log('[GitHub_i18n] 已成功初始化，当前版本: 1.4');
+            console.log('[GitHub_i18n] 已成功初始化，当前版本: 1.5');
         }
     }
 
