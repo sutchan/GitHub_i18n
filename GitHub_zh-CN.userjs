@@ -1594,7 +1594,7 @@
         'created tag': '创建了标签',
         'published': '发布了',
         'released': '发行了',
-        'forked': '复刻了'
+        'forked': '复刻了',
         
         // ========== Dashboard页面 ==========
         'Dashboard': '仪表盘',
@@ -1910,17 +1910,10 @@
         'Internal projects': '内部项目'
     };
     /**
-     * 安全替换文本节点（不破坏 HTML 结构和布局）
-     * @param {Node} node - 要处理的 DOM 节点
+     * 检查节点是否在不应翻译的区域内（兼容性更好的实现）
+     * @param {Node} element - 要检查的 DOM 元素
+     * @returns {boolean} - 是否在不应翻译的区域内
      */
-    function replaceTextNodes(node) {
-        if (!node || node.nodeType !== Node.ELEMENT_NODE) return;
-        
-        // 跳过不应翻译的区域
-        const skipTags = ['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'CODE', 'PRE', 'KBD'];
-        if (skipTags.includes(node.tagName)) return;
-        
-        // 检查节点是否在不应翻译的区域内（兼容性更好的实现）
     function isInSkippedRegion(element) {
         if (!element) return false;
         
@@ -1951,6 +1944,17 @@
         
         return false;
     }
+    
+    /**
+     * 安全替换文本节点（不破坏 HTML 结构和布局）
+     * @param {Node} node - 要处理的 DOM 节点
+     */
+    function replaceTextNodes(node) {
+        if (!node || node.nodeType !== Node.ELEMENT_NODE) return;
+        
+        // 跳过不应翻译的区域
+        const skipTags = ['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'CODE', 'PRE', 'KBD'];
+        if (skipTags.includes(node.tagName)) return;
         
         if (isInSkippedRegion(node)) return;
 
