@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.6.4
+// @version      1.6.5
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.6.4',
+        version: '1.6.5',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -1919,30 +1919,89 @@
         // 跳过不应翻译的区域
         const skipTags = ['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'CODE', 'PRE', 'KBD'];
         if (skipTags.includes(node.tagName)) return;
-        if (node.closest?.('code, pre, .js-file-line, .commit-tease, .copy-button, .blob-code')) return;
+        
+        // 检查节点是否在不应翻译的区域内（兼容性更好的实现）
+    function isInSkippedRegion(element) {
+        if (!element) return false;
+        
+        // 限制递归深度，避免栈溢出
+        const MAX_DEPTH = 10;
+        let currentElement = element;
+        let depth = 0;
+        
+        while (currentElement && depth < MAX_DEPTH) {
+            const parent = currentElement.parentElement;
+            if (!parent) break;
+            
+            // 检查常见的不应翻译的类
+            const skipClasses = ['js-file-line', 'commit-tease', 'copy-button', 'blob-code', 'react-code-text'];
+            if (parent.classList && parent.classList.length) {
+                for (const cls of skipClasses) {
+                    if (parent.classList.contains(cls)) return true;
+                }
+            }
+            
+            // 检查标签名
+            const skipParentTags = ['code', 'pre', 'textarea', 'input', 'script', 'style'];
+            if (skipParentTags.includes(parent.tagName.toLowerCase())) return true;
+            
+            currentElement = parent;
+            depth++;
+        }
+        
+        return false;
+    }
+        
+        if (isInSkippedRegion(node)) return;
 
-        // 使用循环而不是递归遍历，提高性能
-        const stack = [node];
-        while (stack.length > 0) {
-            const currentNode = stack.pop();
+        // 使用队列实现从左到右的广度优先遍历
+        const queue = [node];
+        while (queue.length > 0) {
+            const currentNode = queue.shift(); // 从队列头部取出节点
             for (let i = 0; i < currentNode.childNodes.length; i++) {
                 const child = currentNode.childNodes[i];
                 if (child.nodeType === Node.TEXT_NODE) {
-                    const text = child.textContent.trim();
-                    if (text && TRANSLATION_DICT.hasOwnProperty(text)) {
-                        // 仅替换匹配部分，保留前后空白（避免破坏布局）
-                        child.textContent = child.textContent.replace(text, TRANSLATION_DICT[text]);
-                        if (CONFIG.debugMode) {
-                            console.log(`[GitHub_i18n] 已翻译: "${text}" -> "${TRANSLATION_DICT[text]}"`);
+                    let textContent = child.textContent;
+                    let originalText = textContent;
+                    
+                    // 先尝试完全匹配
+                    const trimmedText = textContent.trim();
+                    if (trimmedText && TRANSLATION_DICT.hasOwnProperty(trimmedText)) {
+                        textContent = textContent.replace(trimmedText, TRANSLATION_DICT[trimmedText]);
+                        if (CONFIG.debugMode && textContent !== originalText) {
+                            console.log(`[GitHub_i18n] 已翻译: "${trimmedText}" -> "${TRANSLATION_DICT[trimmedText]}"`);
                         }
+                    } else {
+                        // 再尝试部分匹配（按长度降序排序，确保最长的匹配项优先）
+                        const sortedKeys = Object.keys(TRANSLATION_DICT).sort((a, b) => b.length - a.length);
+                        for (const key of sortedKeys) {
+                            if (key.length > 1 && textContent.includes(key)) {
+                                // 创建正则表达式，全局替换所有匹配项
+                                const regex = new RegExp(escapeRegExp(key), 'g');
+                                textContent = textContent.replace(regex, TRANSLATION_DICT[key]);
+                                if (CONFIG.debugMode) {
+                                    console.log(`[GitHub_i18n] 部分翻译: "${key}" -> "${TRANSLATION_DICT[key]}"`);
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 应用翻译后的文本
+                    if (textContent !== originalText) {
+                        child.textContent = textContent;
                     }
                 } else if (child.nodeType === Node.ELEMENT_NODE) {
                     // 检查子节点是否需要跳过翻译
-                    if (!skipTags.includes(child.tagName) && !child.closest?.('code, pre, .js-file-line, .commit-tease, .copy-button, .blob-code')) {
-                        stack.push(child);
+                    if (!skipTags.includes(child.tagName) && !isInSkippedRegion(child)) {
+                        queue.push(child);
                     }
                 }
             }
+        }
+        
+        // 辅助函数：转义正则表达式特殊字符
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
     }
 
@@ -2098,12 +2157,27 @@
     /**
      * 比较版本号，判断是否为新版本
      * @param {string} latestVersion - 最新版本号
+     * @param {string} currentVersion - 当前版本号
      * @returns {boolean} 是否为新版本
      */
     function isNewerVersion(latestVersion, currentVersion) {
         try {
-            const latestParts = latestVersion.split('.').map(Number);
-            const currentParts = currentVersion.split('.').map(Number);
+            // 安全检查
+            if (!latestVersion || !currentVersion) {
+                return false;
+            }
+            
+            const latestParts = latestVersion.split('.').map(part => {
+                // 处理非数字部分
+                const num = parseInt(part);
+                return isNaN(num) ? 0 : num;
+            });
+            
+            const currentParts = currentVersion.split('.').map(part => {
+                // 处理非数字部分
+                const num = parseInt(part);
+                return isNaN(num) ? 0 : num;
+            });
             
             // 比较每个版本部分
             for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
@@ -2113,10 +2187,24 @@
                 if (latest > current) return true;
                 if (latest < current) return false;
             }
-            return false; // 版本相同
+            
+            // 如果版本数字部分相同，但字符串不同，考虑预发布版本等情况
+            if (latestVersion !== currentVersion) {
+                // 更安全的字符串比较，避免特殊字符问题
+                return String(latestVersion).localeCompare(String(currentVersion)) > 0;
+            }
+            
+            return false; // 版本完全相同
         } catch (error) {
-            // 版本格式异常时，直接比较字符串
-            return latestVersion !== currentVersion;
+            if (CONFIG.debugMode) {
+                console.error('[GitHub_i18n] 版本比较出错:', error);
+            }
+            // 版本格式异常时，进行安全的字符串比较
+            try {
+                return String(latestVersion).localeCompare(String(currentVersion)) > 0;
+            } catch (e) {
+                return latestVersion !== currentVersion;
+            }
         }
     }
     
@@ -2126,55 +2214,105 @@
      * @param {string} currentVersion - 当前版本号
      */
     function showUpdateNotification(latestVersion, currentVersion) {
-        // 创建通知元素
-        const notification = document.createElement('div');
-        notification.className = 'GitHub_i18n_update_notification';
-        notification.style.cssText = `
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #0366d6;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 10000;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            font-size: 14px;
-            max-width: 400px;
-            cursor: pointer;
-            transition: opacity 0.3s;
-        `;
-        
-        notification.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-2"></path>
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                </svg>
-                <div>
-                    <div style="font-weight: 500;">GitHub 中文翻译脚本有更新</div>
-                    <div style="opacity: 0.9; margin-top: 2px;">版本 ${currentVersion} → ${latestVersion}</div>
+        try {
+            // 检查是否已经存在通知，避免重复显示
+            if (document.querySelector('.GitHub_i18n_update_notification')) {
+                return;
+            }
+            
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = 'GitHub_i18n_update_notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 70px; /* 避免被GitHub顶栏遮挡 */
+                right: 20px;
+                background: #0366d6;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                font-size: 14px;
+                max-width: 400px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            `;
+            
+            // 安全地转义版本号，避免XSS风险
+            const safeLatestVersion = latestVersion ? document.createTextNode(latestVersion).textContent : '未知';
+            const safeCurrentVersion = currentVersion ? document.createTextNode(currentVersion).textContent : '未知';
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-2"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                    <div>
+                        <div style="font-weight: 500;">GitHub 中文翻译脚本有更新</div>
+                        <div style="opacity: 0.9; margin-top: 2px;">版本 ${safeCurrentVersion} → ${safeLatestVersion}</div>
+                    </div>
                 </div>
-            </div>
-        `;
-        
-        // 点击通知跳转到安装页面
-        notification.addEventListener('click', () => {
-            window.open(CONFIG.updateCheck.scriptUrl, '_blank');
-            notification.style.opacity = '0';
-            setTimeout(() => notification.remove(), 300);
-        });
-        
-        // 自动关闭
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            setTimeout(() => notification.remove(), 300);
-        }, 15000);
-        
-        // 添加到页面
-        document.body.appendChild(notification);
+            `;
+            
+            // 点击通知跳转到安装页面
+            notification.addEventListener('click', () => {
+                try {
+                    if (CONFIG.updateCheck && CONFIG.updateCheck.scriptUrl) {
+                        window.open(CONFIG.updateCheck.scriptUrl, '_blank');
+                    }
+                } catch (error) {
+                    if (CONFIG.debugMode) {
+                        console.error('[GitHub_i18n] 打开更新链接失败:', error);
+                    }
+                } finally {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        try {
+                            if (notification.parentNode) {
+                                notification.parentNode.removeChild(notification);
+                            }
+                        } catch (e) {}
+                    }, 300);
+                }
+            });
+            
+            // 自动关闭
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    try {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    } catch (e) {}
+                }, 300);
+            }, 15000);
+            
+            // 安全地添加到页面
+            if (document.body) {
+                document.body.appendChild(notification);
+            }
+            
+            // 添加悬停效果
+            notification.addEventListener('mouseenter', () => {
+                notification.style.transform = 'translateY(-2px)';
+                notification.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            });
+            
+            notification.addEventListener('mouseleave', () => {
+                notification.style.transform = 'translateY(0)';
+                notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            });
+            
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub_i18n] 显示更新通知失败:', error);
+            }
+        }
     }
     
     /**
@@ -2206,24 +2344,43 @@
      * 启动脚本
      */
     function startScript() {
-        // 处理版本自动升级
-        handleVersionAutoUpgrade();
-        
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                init();
-                // 初始化后检查更新
-                if (CONFIG.updateCheck.enabled) {
-                    // 延迟检查，避免影响页面加载性能
-                    setTimeout(checkForUpdates, 5000);
+        try {
+            // 处理版本自动升级
+            handleVersionAutoUpgrade();
+            
+            // 检查文档是否已加载完成
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    try {
+                        init();
+                        // 初始化后检查更新
+                        if (CONFIG.updateCheck && CONFIG.updateCheck.enabled) {
+                            // 延迟检查，避免影响页面加载性能
+                            setTimeout(checkForUpdates, CONFIG.updateCheck.checkDelay || 5000);
+                        }
+                    } catch (error) {
+                        if (CONFIG.debugMode) {
+                            console.error('[GitHub_i18n] DOMContentLoaded 初始化失败:', error);
+                        }
+                    }
+                });
+            } else {
+                try {
+                    init();
+                    // 初始化后检查更新
+                    if (CONFIG.updateCheck && CONFIG.updateCheck.enabled) {
+                        // 延迟检查，避免影响页面加载性能
+                        setTimeout(checkForUpdates, CONFIG.updateCheck.checkDelay || 5000);
+                    }
+                } catch (error) {
+                    if (CONFIG.debugMode) {
+                        console.error('[GitHub_i18n] 直接初始化失败:', error);
+                    }
                 }
-            });
-        } else {
-            init();
-            // 初始化后检查更新
-            if (CONFIG.updateCheck.enabled) {
-                // 延迟检查，避免影响页面加载性能
-                setTimeout(checkForUpdates, 5000);
+            }
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub_i18n] 启动脚本失败:', error);
             }
         }
     }
