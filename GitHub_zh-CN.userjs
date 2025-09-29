@@ -346,7 +346,90 @@
         'Privacy': '隐私',
         'Security': '安全',
         'Team': '团队',
-        'Enterprise': '企业版'
+        'Enterprise': '企业版',
+
+        // ========== 仓库操作（扩展）==========
+        'Create repository': '创建仓库',
+        'Fork': '复刻',
+        'Watch': '关注',
+        'Star': '标星',
+        'Discard changes': '放弃更改',
+        'Commit changes': '提交更改',
+        'Sync fork': '同步复刻',
+        'Create new file': '创建新文件',
+        'Upload files': '上传文件',
+        'Find file': '查找文件',
+        'Go to file': '转到文件',
+        'Raw': '原始',
+        'Blame': '代码归属',
+        'History': '历史',
+        'Download': '下载',
+        'Copy': '复制',
+        'Permalink': '永久链接',
+        
+        // ========== Pull Request（扩展）==========
+        'Create pull request': '创建拉取请求',
+        'Merge pull request': '合并拉取请求',
+        'Squash and merge': '压缩并合并',
+        'Rebase and merge': '变基并合并',
+        'Resolve conflicts': '解决冲突',
+        'Review changes': '审查更改',
+        'Approved': '已批准',
+        'Changes requested': '请求更改',
+        
+        // ========== Issues（扩展）==========
+        'Comment': '评论',
+        'Close with comment': '带评论关闭',
+        'Assign yourself': '分配给自己',
+        'Lock conversation': '锁定会话',
+        'Unlock conversation': '解锁会话',
+        
+        // ========== 搜索与筛选（扩展）==========
+        'This repository': '当前仓库',
+        'All repositories': '所有仓库',
+        'In this organization': '在此组织中',
+        'Search in': '搜索范围',
+        'Sort by': '排序方式',
+        'Filter by': '筛选条件',
+        'Most stars': '最多标星',
+        'Most forks': '最多复刻',
+        'Recently updated': '最近更新',
+        'Language': '语言',
+        
+        // ========== 代码审查（扩展）==========
+        'Approve': '批准',
+        'Request changes': '请求更改',
+        'Comment': '评论',
+        'Viewed': '已查看',
+        'Hide whitespace': '隐藏空白',
+        'Show whitespace': '显示空白',
+        'Start review': '开始审查',
+        'Finish your review': '完成审查',
+        
+        // ========== 其他常用UI（扩展）==========
+        'Collaborators': '协作者',
+        'Invite a collaborator': '邀请协作者',
+        'Manage access': '管理访问权限',
+        'Compare': '比较',
+        'Insights': '洞察',
+        'Marketplace': '市场',
+        'Sponsor': '赞助',
+        'Settings': '设置',
+        'Toggle dark mode': '切换深色模式',
+        'Toggle light mode': '切换浅色模式',
+        'Default branch': '默认分支',
+        'Switch branches/tags': '切换分支/标签',
+        'Create branch': '创建分支',
+        'Create tag': '创建标签',
+        'Delete branch': '删除分支',
+        'Delete tag': '删除标签',
+        'Gitpod': 'Gitpod',
+        'Open in Visual Studio Code': '在 Visual Studio Code 中打开',
+        'Open in Visual Studio': '在 Visual Studio 中打开',
+        'Open with': '使用...打开',
+        'Print': '打印',
+        'Keyboard shortcuts': '键盘快捷键',
+        'Log out': '登出'
     };
     /**
      * 安全替换文本节点（不破坏 HTML 结构和布局）
