@@ -1,3 +1,4 @@
+.gitignore
 *.bak
 *.code-workspace
 test_*.js
