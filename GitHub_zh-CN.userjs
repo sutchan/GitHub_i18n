@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.5.9
+// @version      1.6.0
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.5.9',
+        version: '1.6.0',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -1343,6 +1343,126 @@
         'Trial': '试用',
         'Subscription': '订阅',
         'License': '许可证',
+        
+        // ========== 设置页面相关翻译项 ==========
+        // 组织设置页面
+        'Organizations': '组织',
+        'Your organizations': '你的组织',
+        'New organization': '新建组织',
+        'Organization billing': '组织账单',
+        'Organization security': '组织安全',
+        'Organization members': '组织成员',
+        'Organization repositories': '组织仓库',
+        
+        // 企业设置页面
+        'Enterprises': '企业',
+        'Enterprise accounts': '企业账户',
+        'Enterprise settings': '企业设置',
+        'Enterprise members': '企业成员',
+        'Enterprise policies': '企业策略',
+        'Enterprise security': '企业安全',
+        
+        // 交互限制设置页面
+        'Interaction limits': '交互限制',
+        'Temporary interaction limits': '临时交互限制',
+        'Limit interactions': '限制交互',
+        'Interaction expiry': '交互过期时间',
+        'Restrict to collaborators': '仅限协作者',
+        'Restrict to organization members': '仅限组织成员',
+        
+        // 代码审查限制设置页面
+        'Code review limits': '代码审查限制',
+        'Pull request review limits': '拉取请求审查限制',
+        'Review time limit': '审查时间限制',
+        'Reviewer assignment': '审查者分配',
+        'Auto-approve after': '自动批准时间',
+        
+        // Codespaces 设置页面
+        'Codespaces': '代码空间',
+        'Codespace configurations': '代码空间配置',
+        'Default machine type': '默认机器类型',
+        'Retention period': '保留期',
+        'Idle timeout': '空闲超时',
+        'Prebuild settings': '预构建设置',
+        'Codespace secrets': '代码空间密钥',
+        
+        // 模型设置页面
+        'Models': '模型',
+        'AI models': 'AI模型',
+        'Model configuration': '模型配置',
+        'Default model': '默认模型',
+        'Model permissions': '模型权限',
+        'Model usage': '模型使用情况',
+        
+        // 包设置页面
+        'Packages': '包',
+        'Package management': '包管理',
+        'Package visibility': '包可见性',
+        'Package deletion': '包删除',
+        'Package settings': '包设置',
+        
+        // Copilot 功能设置页面
+        'Copilot features': 'Copilot功能',
+        'Copilot settings': 'Copilot设置',
+        'Copilot coding agent': 'Copilot编码代理',
+        'Agent mode': '代理模式',
+        'Copilot chat': 'Copilot聊天',
+        'Inline suggestions': '行内建议',
+        
+        // Pages 设置页面
+        'Pages': 'Pages',
+        'GitHub Pages': 'GitHub Pages',
+        'Build and deployment': '构建与部署',
+        'Custom domains': '自定义域名',
+        'HTTPS enforcement': '强制HTTPS',
+        'Branch': '分支',
+        'Folder': '文件夹',
+        
+        // 回复设置页面
+        'Replies': '回复',
+        'Saved replies': '已保存回复',
+        'New saved reply': '新建已保存回复',
+        'Reply templates': '回复模板',
+        'Delete saved reply': '删除已保存回复',
+        
+        // 安全分析设置页面
+        'Security analysis': '安全分析',
+        'Code security': '代码安全',
+        'Security features': '安全功能',
+        'Dependabot alerts': 'Dependabot提醒',
+        'Code scanning': '代码扫描',
+        'Secret scanning': '密钥扫描',
+        'Security policy': '安全策略',
+        
+        // 安装设置页面
+        'Installations': '安装',
+        'GitHub Apps installations': 'GitHub应用安装',
+        'Manage installations': '管理安装',
+        'Installed apps': '已安装应用',
+        
+        // 安全日志设置页面
+        'Security log': '安全日志',
+        'Security events': '安全事件',
+        'Log search': '日志搜索',
+        'Log export': '日志导出',
+        'Event type': '事件类型',
+        'Actor': '操作人',
+        'Date range': '日期范围',
+        
+        // 赞助日志设置页面
+        'Sponsors log': '赞助日志',
+        'Sponsorship events': '赞助事件',
+        'Sponsor payments': '赞助付款',
+        'Sponsorship history': '赞助历史',
+        
+        // 应用设置页面
+        'Apps': '应用',
+        'GitHub Apps': 'GitHub应用',
+        'OAuth Apps': 'OAuth应用',
+        'Authorized apps': '已授权应用',
+        'Developer apps': '开发者应用',
+        'App permissions': '应用权限',
+        'App webhooks': '应用webhooks',
         
         // ========== 新增翻译项 - 开发相关术语 ==========
         'Repository': '仓库',
