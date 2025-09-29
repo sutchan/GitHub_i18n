@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
-// @namespace    https://github.com/Tanox/GitHub_i18n
-// @version      1.5.2
+// @namespace    https://github.com/sutchan/GitHub_i18n
+// @version      1.5.3
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.5.2',
+        version: '1.5.3',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -443,6 +443,122 @@
         'Print': '打印',
         'Keyboard shortcuts': '键盘快捷键',
         'Log out': '登出',
+        
+        // ========== 新增菜单翻译 ==========
+        // 仓库页面菜单
+        'Code': '代码',
+        'Issues': '问题',
+        'Pull requests': '拉取请求',
+        'Projects': '项目',
+        'Wiki': '维基',
+        'Security': '安全',
+        'Actions': '操作',
+        'Packages': '包',
+        'Environments': '环境',
+        
+        // Issues页面菜单
+        'Open': '开放',
+        'Closed': '已关闭',
+        'Labels': '标签',
+        'Milestones': '里程碑',
+        'Assignees': '经办人',
+        
+        // Pull Requests页面菜单
+        'All': '全部',
+        'Your pull requests': '您的拉取请求',
+        'Merged': '已合并',
+        
+        // 克隆菜单
+        'Clone': '克隆',
+        'HTTPS': 'HTTPS',
+        'SSH': 'SSH',
+        'GitHub CLI': 'GitHub 命令行',
+        'Open with GitHub Desktop': '用 GitHub Desktop 打开',
+        'Download ZIP': '下载 ZIP',
+        
+        // 分支/标签菜单
+        'Recent branches': '最近分支',
+        'Recent tags': '最近标签',
+        
+        // 文件操作菜单
+        'Delete file': '删除文件',
+        'Move file': '移动文件',
+        'Rename file': '重命名文件',
+        'View blame': '查看代码归属',
+        'View history': '查看历史',
+        
+        // 设置页面菜单
+        'General': '通用',
+        'Account': '账户',
+        'Notifications': '通知',
+        'Emails': '邮箱',
+        'Security': '安全',
+        'SSH and GPG keys': 'SSH和GPG密钥',
+        'Developer settings': '开发者设置',
+        'Billing': '账单',
+        'Plan': '计划',
+        
+        // 开发者设置
+        'Personal access tokens': '个人访问令牌',
+        'OAuth apps': 'OAuth应用',
+        'GitHub Apps': 'GitHub应用',
+        'Fine-grained tokens': '细粒度令牌',
+        
+        // 代码审查菜单
+        'Reviewers': '审查者',
+        'Assignees': '经办人',
+        'Labels': '标签',
+        'Projects': '项目',
+        'Milestone': '里程碑',
+        
+        // 洞察页面菜单
+        'Overview': '概览',
+        'Contributors': '贡献者',
+        'Traffic': '流量',
+        'Commits': '提交',
+        'Code frequency': '代码频率',
+        'Network': '网络',
+        'Dependency graph': '依赖图',
+        'Dependabot alerts': 'Dependabot提醒',
+        'Security insights': '安全洞察',
+        
+        // 其他常用术语
+        'Save': '保存',
+        'Cancel': '取消',
+        'Apply': '应用',
+        'Update': '更新',
+        'Delete': '删除',
+        'Create': '创建',
+        'Edit': '编辑',
+        'Preview': '预览',
+        'Commit message': '提交信息',
+        'Add file': '添加文件',
+        'Commit directly to the': '直接提交到',
+        'branch': '分支',
+        'Create a new branch for this commit and start a pull request': '为此提交创建新分支并开始拉取请求',
+        'Submit new issue': '提交新问题',
+        'Submit new pull request': '提交新拉取请求',
+        'Write': '编写',
+        'Preview': '预览',
+        'Attach files by dragging & dropping, uploading from your computer, or pasting from the clipboard.': '通过拖放、从计算机上传或从剪贴板粘贴附加文件。',
+        'Close issue': '关闭问题',
+        'Reopen issue': '重新打开问题',
+        'Close pull request': '关闭拉取请求',
+        'Reopen pull request': '重新打开拉取请求',
+        'Merge pull request': '合并拉取请求',
+        'Confirm merge': '确认合并',
+        'Delete branch': '删除分支',
+        'Delete branch after merge': '合并后删除分支',
+        'View pull request': '查看拉取请求',
+        'View commit': '查看提交',
+        'View issue': '查看问题',
+        'View file': '查看文件',
+        'View directory': '查看目录',
+        'Copy link': '复制链接',
+        'Copy raw content': '复制原始内容',
+        'Open raw': '打开原始内容',
+        'Open in new window': '在新窗口打开',
+        'Open in new tab': '在新标签页打开',
         
         // ========== ActionList 相关翻译 ==========
         'ActionList': '操作列表',
