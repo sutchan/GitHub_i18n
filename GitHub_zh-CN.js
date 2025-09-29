@@ -1,0 +1,415 @@
+// ==UserScript==
+// @name         GitHub 极速中文翻译（修复布局版）
+// @namespace    http://tampermonkey.net/
+// @version      1.3
+// @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，修复菜单垂直排列问题，零延迟、不破坏布局
+// @author       Qwen + You
+// @match        https://github.com/*
+// @grant        none
+// @icon         https://github.githubassets.com/favicons/favicon.svg
+// ==/UserScript==
+
+(function () {
+    'use strict';
+
+    // 🔤 完整预定义翻译词典（覆盖导航、个人菜单、设置、组织、通知等）
+const TRANSLATION_DICT = {
+    // ========== 顶部全局导航 ==========
+    'Pull requests': '拉取请求',
+    'Issues': '问题',
+    'Actions': '操作',
+    'Projects': '项目',
+    'Wiki': '维基',
+    'Security': '安全',
+    'Insights': '洞察',
+    'Settings': '设置',
+    'Code': '代码',
+    'Discussions': '讨论',
+    'Marketplace': '市场',
+    'Explore': '探索',
+    'Copilot': 'Copilot',
+    'Notifications': '通知',
+    'New repository': '新建仓库',
+    'Import repository': '导入仓库',
+    'New gist': '新建代码片段',
+    'New organization': '新建组织',
+    'New codespace': '新建 Codespace',
+    'Your profile': '个人资料',
+    'Your repositories': '你的仓库',
+    'Your stars': '你的标星',
+    'Your gists': '你的代码片段',
+    'Your codespaces': '你的 Codespaces',
+    'Your projects': '你的项目',
+    'Your organizations': '你的组织',
+    'Your notifications': '你的通知',
+    'Feature preview': '功能预览',
+    'Help': '帮助',
+    'Sign out': '退出登录',
+    'Signed in as': '已登录为',
+    'Dashboard': '仪表盘',
+
+    // ========== 仓库页主导航（UnderlineNav）==========
+    'Overview': '概览',
+    'Commits': '提交',
+    'Branches': '分支',
+    'Tags': '标签',
+    'Releases': '发布',
+    'Packages': '包',
+    'Environments': '环境',
+    'Contributors': '贡献者',
+    'Activity': '活动',
+    'Dependency graph': '依赖关系图',
+    'Dependabot': 'Dependabot',
+    'Code scanning': '代码扫描',
+    'Secret scanning': '密钥扫描',
+    'Audit log': '审计日志',
+    'Billing': '账单',
+    'Members': '成员',
+    'Teams': '团队',
+    'Custom properties': '自定义属性',
+    'Moderation settings': '审核设置',
+    'Installed GitHub Apps': '已安装的 GitHub 应用',
+    'Webhooks': 'Webhooks',
+    'Service hooks': '服务钩子',
+    'Deploy keys': '部署密钥',
+    'Self-hosted runners': '自托管运行器',
+    'Runner groups': '运行器组',
+    'Variables': '变量',
+    'Secrets': '密钥',
+    'Environments': '环境',
+    'Pages': 'Pages',
+    'Environments': '环境',
+    'Actions secrets': '操作密钥',
+    'Artifacts': '产物',
+    'Caches': '缓存',
+    'Workflows': '工作流',
+    'Runs': '运行记录',
+    'Summary': '摘要',
+    'Jobs': '任务',
+    'Logs': '日志',
+
+    // ========== 仓库操作菜单（右上角 "Code" 按钮下拉）==========
+    'Clone': '克隆',
+    'Open with GitHub Desktop': '使用 GitHub Desktop 打开',
+    'Open with Codespaces': '使用 Codespaces 打开',
+    'Download ZIP': '下载 ZIP',
+    'Local': '本地',
+    'GitHub CLI': 'GitHub CLI',
+    'HTTPS': 'HTTPS',
+    'GitHub CLI': 'GitHub CLI',
+    'Use SSH': '使用 SSH',
+    'Use HTTPS': '使用 HTTPS',
+
+    // ========== Issues / PR 操作菜单 ==========
+    'New issue': '新建问题',
+    'New pull request': '新建拉取请求',
+    'Assignees': '负责人',
+    'Labels': '标签',
+    'Projects': '项目',
+    'Milestone': '里程碑',
+    'Development': '开发',
+    'Linked pull requests': '关联的拉取请求',
+    'Convert to issue': '转换为问题',
+    'Close issue': '关闭问题',
+    'Reopen issue': '重新开启问题',
+    'Close pull request': '关闭拉取请求',
+    'Ready for review': '准备审核',
+    'Mark as draft': '标记为草稿',
+    'Reviewers': '审核人',
+    'Request review': '请求审核',
+    'Add reaction': '添加反应',
+    'Subscribe': '订阅',
+    'Unsubscribe': '取消订阅',
+
+    // ========== 个人主页标签 ==========
+    'Repositories': '仓库',
+    'Stars': '标星',
+    'Followers': '关注者',
+    'Following': '关注中',
+    'Sponsoring': '赞助中',
+    'Sponsors': '赞助者',
+    'Highlights': '亮点',
+    'Pinned': '置顶',
+
+    // ========== 设置页面主菜单（左侧边栏）==========
+    'Account': '账户',
+    'Profile': '个人资料',
+    'Account security': '账户安全',
+    'Sessions': '登录会话',
+    'SSH and GPG keys': 'SSH 和 GPG 密钥',
+    'Access tokens': '访问令牌',
+    'Sponsored developers': '赞助开发者',
+    'Organization memberships': '组织成员资格',
+    'Email': '邮箱',
+    'Public email': '公开邮箱',
+    'Business': '企业',
+    'Connected accounts': '已连接账户',
+    'Block users': '屏蔽用户',
+    'Delete account': '删除账户',
+    'Preferences': '偏好设置',
+    'Appearance': '外观',
+    'Accessibility': '无障碍',
+    'Notifications': '通知',
+    'Email notifications': '邮件通知',
+    'Watched repositories': '关注的仓库',
+    'Scheduled digests': '定期摘要',
+    'Integrations': '集成',
+    'Authorized OAuth Apps': '授权的 OAuth 应用',
+    'Authorized GitHub Apps': '授权的 GitHub 应用',
+    'Webhooks': 'Webhooks',
+    'Service hooks': '服务钩子',
+    'Billing & plans': '账单与计划',
+    'Developer settings': '开发者设置',
+    'Fine-grained personal access tokens': '精细个人访问令牌',
+    'Personal access tokens (classic)': '个人访问令牌（经典）',
+    'OAuth Apps': 'OAuth 应用',
+    'GitHub Apps': 'GitHub 应用',
+    'Codespaces': 'Codespaces',
+    'Copilot': 'Copilot',
+    'Pages': 'Pages',
+    'Actions': '操作',
+    'Packages': '包',
+    'Security log': '安全日志',
+
+    // ========== 组织设置菜单 ==========
+    'Organization settings': '组织设置',
+    'Profile': '资料',
+    'People': '成员',
+    'Teams': '团队',
+    'Billing': '账单',
+    'SAML SSO': 'SAML SSO',
+    'Audit log': '审计日志',
+    'Actions': '操作',
+    'Packages': '包',
+    'Secrets and variables': '密钥与变量',
+    'Codespaces': 'Codespaces',
+    'Pages': 'Pages',
+    'Webhooks': 'Webhooks',
+    'OAuth Apps': 'OAuth 应用',
+    'GitHub Apps': 'GitHub 应用',
+    'Installed GitHub Apps': '已安装的 GitHub 应用',
+    'Custom properties': '自定义属性',
+    'Member privileges': '成员权限',
+    'Third-party access': '第三方访问',
+    'Moderation settings': '审核设置',
+    'Repository defaults': '仓库默认设置',
+    'Repository roles': '仓库角色',
+    'Code security': '代码安全',
+    'Dependabot': 'Dependabot',
+    'Code scanning': '代码扫描',
+    'Secret scanning': '密钥扫描',
+    'Advanced security': '高级安全',
+    'Migration': '迁移',
+    'Blocked users': '被屏蔽用户',
+    'Domain settings': '域名设置',
+    'Enterprise': '企业',
+
+    // ========== 通知中心 ==========
+    'Unread': '未读',
+    'Participating': '参与的',
+    'All': '全部',
+    'Custom': '自定义',
+    'Mark all as read': '全部标记为已读',
+    'Mute thread': '静音此会话',
+    'Unmute thread': '取消静音',
+    'Save': '保存',
+    'Saved': '已保存',
+
+    // ========== 邮箱与密钥 ==========
+    'Email address': '邮箱地址',
+    'Primary email address': '主邮箱地址',
+    'Add email address': '添加邮箱地址',
+    'Verified': '已验证',
+    'Unverified': '未验证',
+    'Set as primary': '设为主邮箱',
+    'Make private': '设为私有',
+    'Make public': '设为公开',
+    'Resend email': '重新发送邮件',
+    'Remove': '移除',
+
+    'SSH keys': 'SSH 密钥',
+    'New SSH key': '新建 SSH 密钥',
+    'Title': '标题',
+    'Key': '密钥',
+    'Add SSH key': '添加 SSH 密钥',
+    'GPG keys': 'GPG 密钥',
+    'New GPG key': '新建 GPG 密钥',
+    'Add GPG key': '添加 GPG 密钥',
+    'Public key': '公钥',
+
+    // ========== 令牌 ==========
+    'Personal access tokens': '个人访问令牌',
+    'Fine-grained tokens': '精细令牌',
+    'Tokens (classic)': '经典令牌',
+    'Generate new token': '生成新令牌',
+    'Note': '备注',
+    'Expires': '过期时间',
+    'Token': '令牌',
+    'Configure': '配置',
+    'Regenerate': '重新生成',
+    'Revoke': '撤销',
+
+    // ========== Codespaces ==========
+    'Codespaces': 'Codespaces',
+    'New codespace': '新建 Codespace',
+    'Recent codespaces': '最近的 Codespaces',
+    'Dev containers': '开发容器',
+    'Settings': '设置',
+    'Preferences': '偏好设置',
+    'Features': '功能',
+    'Port forwarding': '端口转发',
+    'Visual Studio Code': 'Visual Studio Code',
+    'Browser': '浏览器',
+    'Start': '启动',
+    'Stop': '停止',
+    'Restart': '重启',
+    'Export': '导出',
+    'Delete codespace': '删除 Codespace',
+
+    // ========== 其他通用 UI ==========
+    'Public': '公开',
+    'Private': '私有',
+    'Internal': '内部',
+    'Visibility': '可见性',
+    'Description': '描述',
+    'Homepage': '主页',
+    'Website': '网站',
+    'Location': '位置',
+    'Company': '公司',
+    'Twitter username': 'Twitter 用户名',
+    'Pronouns': '代词',
+    'Bio': '简介',
+    'Update profile': '更新资料',
+    'Change your avatar': '更换头像',
+    'Upload a new photo': '上传新照片',
+    'Save changes': '保存更改',
+    'Cancel': '取消',
+    'Close': '关闭',
+    'Delete': '删除',
+    'Edit': '编辑',
+    'Rename': '重命名',
+    'Transfer': '转移',
+    'Danger Zone': '危险区域',
+    'Permanently delete': '永久删除',
+    'Are you sure?': '你确定吗？',
+    'Confirm': '确认',
+    'Search': '搜索',
+    'Filter': '筛选',
+    'Sort': '排序',
+    'Loading': '加载中',
+    'No results found': '未找到结果',
+    'Write': '撰写',
+    'Preview': '预览',
+    'Quote reply': '引用回复',
+    'React': '反应',
+    'View source': '查看源码',
+    'Jump to': '跳转到',
+    'Quickly navigate files': '快速导航文件',
+    'Recent activity': '最近活动',
+    'Popular repositories': '热门仓库',
+    'Topics': '主题',
+    'Collections': '合集',
+    'Templates': '模板',
+    'Archived': '已归档',
+    'Forked from': '复刻自',
+    'Mirror': '镜像',
+    'Template': '模板仓库',
+    'Sponsor': '赞助',
+    'Sponsor this project': '赞助此项目',
+    'Back this project': '支持此项目',
+    'Learn more': '了解更多',
+    'Documentation': '文档',
+    'API': 'API',
+    'Community': '社区',
+    'Support': '支持',
+    'Report abuse': '举报滥用',
+    'Contact GitHub': '联系 GitHub',
+    'Status': '状态',
+    'Training': '培训',
+    'Blog': '博客',
+    'About': '关于',
+    'Terms': '条款',
+    'Privacy': '隐私',
+    'Security': '安全',
+    'Team': '团队',
+    'Enterprise': '企业版'
+};
+    // 🛠️ 安全替换文本节点（不破坏 HTML 结构和布局）
+    function replaceTextNodes(node) {
+        if (!node || node.nodeType !== Node.ELEMENT_NODE) return;
+        // 跳过不应翻译的区域
+        if (['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'CODE', 'PRE', 'KBD'].includes(node.tagName)) return;
+        if (node.closest?.('code, pre, .js-file-line, .commit-tease, .copy-button, .blob-code')) return;
+
+        for (let i = 0; i < node.childNodes.length; i++) {
+            const child = node.childNodes[i];
+            if (child.nodeType === Node.TEXT_NODE) {
+                const text = child.textContent.trim();
+                if (text && TRANSLATION_DICT.hasOwnProperty(text)) {
+                    // 仅替换匹配部分，保留前后空白（避免破坏布局）
+                    child.textContent = child.textContent.replace(text, TRANSLATION_DICT[text]);
+                }
+            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                replaceTextNodes(child);
+            }
+        }
+    }
+
+    // 🚀 翻译关键区域
+    function translatePage() {
+        const selectors = [
+            '#header',                          // 顶部导航栏
+            '.Header-item--full',               // 中央菜单
+            '.HeaderMenu',                      // 个人下拉菜单容器
+            '.UnderlineNav',                    // 仓库页标签导航
+            '.dropdown-menu',                   // 所有下拉菜单
+            '.BorderGrid',                      // 设置页面网格
+            '.Box',                             // 设置项容器
+            '.menu-item',                       // 菜单项
+            '.js-selected-navigation-item',     // 选中项
+            '.Layout',                          // 通用布局容器
+            '.application-main'                 // 主内容区（保守使用）
+        ];
+
+        selectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                replaceTextNodes(el);
+            });
+        });
+    }
+
+    // 👂 监听动态内容
+    const observer = new MutationObserver(() => {
+        // 防抖 + 延迟确保元素渲染完成
+        clearTimeout(observer.timer);
+        observer.timer = setTimeout(translatePage, 200);
+    });
+
+    // 🚦 初始化
+    function init() {
+        translatePage();
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        // 监听 SPA 路由变化
+        const originalPushState = history.pushState;
+        history.pushState = function (...args) {
+            originalPushState.apply(this, args);
+            setTimeout(translatePage, 400);
+        };
+        window.addEventListener('popstate', () => {
+            setTimeout(translatePage, 400);
+        });
+    }
+
+    // 🕒 启动
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+})();
