@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.5.4
+// @version      1.5.5
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.5.4',
+        version: '1.5.5',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -564,7 +564,90 @@
         
         // ========== ActionList 相关翻译 ==========
         'ActionList': '操作列表',
-        'prc-ActionList-ActionList-X4RiC': '操作列表组件'
+        'prc-ActionList-ActionList-X4RiC': '操作列表组件',
+        
+        // ========== 新增翻译项 ==========
+        // 侧边栏相关
+        'Create': '创建',
+        'Explore': '探索',
+        'Mentions': '提及',
+        'Bookmarks': '书签',
+        'All activity': '所有活动',
+        'Custom feeds': '自定义动态',
+        'For you': '为你推荐',
+        
+        // 团队与项目
+        'Team': '团队',
+        'Team settings': '团队设置',
+        'Team members': '团队成员',
+        'Team repositories': '团队仓库',
+        'Team discussions': '团队讨论',
+        'Team projects': '团队项目',
+        
+        // 代码审查与协作
+        'Start a review': '开始审查',
+        'Review summary': '审查摘要',
+        'File changes': '文件变更',
+        'Outdated': '已过时',
+        'Resolve conversation': '解决会话',
+        'Reopen conversation': '重新开启会话',
+        
+        // 仓库管理
+        'Repository': '仓库',
+        'Manage repository': '管理仓库',
+        'Repository settings': '仓库设置',
+        'Collaborative development': '协作开发',
+        'Repository insights': '仓库洞察',
+        'Repository security': '仓库安全',
+        
+        // 项目与任务管理
+        'Add task': '添加任务',
+        'Task list': '任务列表',
+        'Project board': '项目看板',
+        'Automation': '自动化',
+        'Project settings': '项目设置',
+        
+        // 讨论区
+        'Start discussion': '开始讨论',
+        'Discussion categories': '讨论分类',
+        'Unanswered discussions': '未回复讨论',
+        'Popular discussions': '热门讨论',
+        
+        // 包管理
+        'Package registry': '包注册表',
+        'Package settings': '包设置',
+        'Package versions': '包版本',
+        'Package usage': '包使用情况',
+        
+        // 安全相关
+        'Security overview': '安全概览',
+        'Vulnerability alerts': '漏洞提醒',
+        'Security policy': '安全策略',
+        'Security advisories': '安全公告',
+        
+        // 高级功能
+        'Advanced settings': '高级设置',
+        'Experimental features': '实验性功能',
+        'Developer preview': '开发者预览',
+        'Early access': '抢先体验',
+        
+        // 其他常用术语
+        'Unassigned': '未分配',
+        'Unlabeled': '未标记',
+        'Milestone': '里程碑',
+        'Draft': '草稿',
+        'Ready': '准备就绪',
+        'Waiting for review': '等待审查',
+        'In progress': '进行中',
+        'Needs work': '需要改进',
+        'Approved': '已批准',
+        'Changes requested': '请求更改',
+        'Commented': '已评论',
+        'Add reviewer': '添加审查人',
+        'Add assignee': '添加经办人',
+        'Add label': '添加标签',
+        'Add to project': '添加到项目',
+        'Assign to milestone': '分配到里程碑'
     };
     /**
      * 安全替换文本节点（不破坏 HTML 结构和布局）
