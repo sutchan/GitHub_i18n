@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         GitHub 极速中文翻译（修复布局版）
-// @namespace    http://tampermonkey.net/
+// @name         GitHub 网站国际化之中文翻译
+// @namespace    https://github.com/Tanox/GitHub_i18n
 // @version      1.3
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，修复菜单垂直排列问题，零延迟、不破坏布局
-// @author       Qwen + You
-// @match        https://github.com/*
+// @author       Sut
+// @match        https://github.com/Tanox/GitHub_i18n
 // @grant        none
 // @icon         https://github.githubassets.com/favicons/favicon.svg
 // ==/UserScript==
