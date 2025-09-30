@@ -4,7 +4,7 @@
 
 [![GitHub license](https://img.shields.io/github/license/sutchan/GitHub_i18n?color=blue)](LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/sutchan/GitHub_i18n?display_name=tag&color=green)](https://github.com/sutchan/GitHub_i18n/releases)
-[![Userscript](https://img.shields.io/badge/Install-Tampermonkey-green?logo=tampermonkey)](https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.userjs)
+[![Userscript](https://img.shields.io/badge/Install-Tampermonkey-green?logo=tampermonkey)](https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js)
 
 ---
 
@@ -30,7 +30,7 @@
 ### 一键安装
 点击下方链接，Tampermonkey 将自动提示安装脚本：
 
-👉 [**安装最新版脚本**](https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.userjs)
+👉 [**安装最新版脚本**](https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js)
 
 > 💡 安装后刷新任意 GitHub 页面（如 `https://github.com`），即可看到中文界面。
 
@@ -103,7 +103,7 @@ A：可以在脚本的 `CONFIG.performance` 部分修改以下配置：
 - 如发现**漏翻**或**误翻**，请在 [问题](https://github.com/sutchan/GitHub_i18n/issues) 中反馈  
 - 如需**新增术语**，可直接修改 `TRANSLATION_DICT` 并提交 PR
 
-> 📌 脚本文件：[`GitHub_zh-CN.userjs`](GitHub_zh-CN.userjs)
+> 📌 脚本文件：[`GitHub_zh-CN.user.js`](GitHub_zh-CN.user.js)
 
 ---
 
@@ -113,5 +113,5 @@ A：可以在脚本的 `CONFIG.performance` 部分修改以下配置：
 
 ---
 
-Made with ❤️ by [SutChan](https://github.com/sutchan)  
+Made with ❤️ by [Sut](https://github.com/sutchan)  
 如果你觉得有用，欢迎 ⭐ Star 支持！
