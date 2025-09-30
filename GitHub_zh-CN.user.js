@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.6.8
+// @version      1.6.9
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.6.8',
+        version: '1.6.9',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -48,6 +48,46 @@
         // ========== 顶部全局导航 ==========
         'Pull requests': '拉取请求',
         'Issues': '问题',
+        'Skip to content': '跳转到内容',
+        'Search GitHub': '搜索 GitHub',
+        'New': '新建',
+        'Help': '帮助',
+        'Your profile': '个人资料',
+        'Sign out': '退出登录',
+        'Toggle navigation': '切换导航',
+        'Create': '创建',
+        'Explore': '探索',
+        'Marketplace': '市场',
+        'Notifications': '通知',
+        'Sponsor': '赞助',
+        'View all notifications': '查看所有通知',
+        'You have unread notifications': '你有未读通知',
+        'You have no unread notifications': '你没有未读通知',
+        'Expand all': '全部展开',
+        'Collapse all': '全部折叠',
+        'Read more': '阅读更多',
+        'GitHub': 'GitHub',
+        'GitHub Home': 'GitHub 首页',
+        'Enterprise': '企业版',
+        'Create repository': '创建仓库',
+        'Import repository': '导入仓库',
+        'New gist': '新建代码片段',
+        'New organization': '新建组织',
+        'New codespace': '新建 Codespace',
+        'Your repositories': '你的仓库',
+        'Your stars': '你的标星',
+        'Your gists': '你的代码片段',
+        'Your codespaces': '你的 Codespaces',
+        'Your projects': '你的项目',
+        'Your organizations': '你的组织',
+        'Your notifications': '你的通知',
+        'Feature preview': '功能预览',
+        'Accessibility': '无障碍',
+        'Skip to main content': '跳转到主内容',
+        'Skip to search': '跳转到搜索',
+        'Skip to footer': '跳转到页脚',
+        'Signed in as': '已登录为',
+        'Dashboard': '仪表盘',
         'Actions': '操作',
         'Projects': '项目',
         'Wiki': '维基',
