@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.7.3
+// @version      1.7.4
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.7.3',
+        version: '1.7.4',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -2652,7 +2652,7 @@
         'Organization export': '组织导出',
         'Organization deletion': '组织删除',
         'Organization transfer': '组织转移',
-        'Organization archive': '组织归档'
+        'Organization archive': '组织归档',
         
         // 企业设置页面
         'Enterprises': '企业',
@@ -2694,8 +2694,81 @@
         'Enterprise contact': '企业联系人',
         'Enterprise plan': '企业计划',
         'Enterprise members': '企业成员',
-        'Enterprise policies': '企业策略',
-        'Enterprise security': '企业安全',
+        // 企业设置页面额外补充项
+        'Enterprise name': '企业名称',
+        'Enterprise description': '企业描述',
+        'Enterprise website': '企业网站',
+        'Enterprise location': '企业位置',
+        'Enterprise email': '企业邮箱',
+        'Enterprise avatar': '企业头像',
+        'Enterprise visibility': '企业可见性',
+        'Enterprise default organization settings': '企业默认组织设置',
+        'Enterprise organization policies': '企业组织策略',
+        'Enterprise repository policies': '企业仓库策略',
+        'Enterprise user policies': '企业用户策略',
+        'Enterprise security policies': '企业安全策略',
+        'Enterprise compliance policies': '企业合规策略',
+        'Enterprise retention policies': '企业保留策略',
+        'Enterprise deletion policies': '企业删除策略',
+        'Enterprise backup policies': '企业备份策略',
+        'Enterprise recovery policies': '企业恢复策略',
+        'Enterprise migration policies': '企业迁移策略',
+        'Enterprise onboarding': '企业入职',
+        'Enterprise offboarding': '企业离职',
+        'Enterprise user lifecycle': '企业用户生命周期',
+        'Enterprise identity governance': '企业身份治理',
+        'Enterprise access control': '企业访问控制',
+        'Enterprise RBAC': '企业角色权限控制',
+        'Enterprise groups': '企业群组',
+        'Enterprise subgroups': '企业子群组',
+        'Enterprise nested groups': '企业嵌套群组',
+        'Enterprise group policies': '企业群组策略',
+        'Enterprise group management': '企业群组管理',
+        'Enterprise resource management': '企业资源管理',
+        'Enterprise budget management': '企业预算管理',
+        'Enterprise cost tracking': '企业成本跟踪',
+        'Enterprise usage analytics': '企业使用分析',
+        'Enterprise performance metrics': '企业性能指标',
+        'Enterprise productivity metrics': '企业生产力指标',
+        'Enterprise collaboration metrics': '企业协作指标',
+        'Enterprise developer velocity': '企业开发者速度',
+        'Enterprise code quality': '企业代码质量',
+        'Enterprise security posture': '企业安全态势',
+        'Enterprise compliance status': '企业合规状态',
+        'Enterprise reporting dashboard': '企业报告仪表盘',
+        'Enterprise custom reports': '企业自定义报告',
+        'Enterprise scheduled reports': '企业定期报告',
+        'Enterprise report sharing': '企业报告共享',
+        'Enterprise data export': '企业数据导出',
+        'Enterprise data retention': '企业数据保留',
+        'Enterprise data backup': '企业数据备份',
+        'Enterprise data recovery': '企业数据恢复',
+        'Enterprise disaster recovery': '企业灾难恢复',
+        'Enterprise business continuity': '企业业务连续性',
+        'Enterprise support tickets': '企业支持工单',
+        'Enterprise priority support': '企业优先支持',
+        'Enterprise dedicated support': '企业专属支持',
+        'Enterprise technical account manager': '企业技术客户经理',
+        'Enterprise success manager': '企业成功经理',
+        'Enterprise training': '企业培训',
+        'Enterprise documentation': '企业文档',
+        'Enterprise knowledge base': '企业知识库',
+        'Enterprise best practices': '企业最佳实践',
+        'Enterprise templates': '企业模板',
+        'Enterprise playbooks': '企业手册',
+        'Enterprise governance': '企业治理',
+        'Enterprise compliance audits': '企业合规审计',
+        'Enterprise security audits': '企业安全审计',
+        'Enterprise internal audits': '企业内部审计',
+        'Enterprise external audits': '企业外部审计',
+        'Enterprise audit reports': '企业审计报告',
+        'Enterprise audit trails': '企业审计轨迹',
+        'Enterprise audit logs management': '企业审计日志管理',
+        'Enterprise audit retention': '企业审计保留',
+        'Enterprise audit access': '企业审计访问',
+        'Enterprise audit permissions': '企业审计权限',
+        'Enterprise audit configuration': '企业审计配置',
+        'Enterprise audit settings': '企业审计设置',
         
         // 企业创建页面
         'Create an enterprise account': '创建企业账户',
