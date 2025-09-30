@@ -1964,7 +1964,7 @@
         'User activity': '用户活动',
         'User contributions': '用户贡献',
         'User permissions': '用户权限',
-        'User settings': '用户设置'
+        'User settings': '用户设置',
         'Milestones': '里程碑',
         'Projects': '项目',
         'Sort': '排序',
