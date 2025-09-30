@@ -731,7 +731,7 @@
         'Ready': '准备就绪',
         'Waiting for review': '等待审查',
         'In progress': '进行中',
-        'Needs work': '需要改进'
+        'Needs work': '需要改进',
         
         // ========== 新增翻译项 - 搜索与筛选 ==========
         'Clear all filters': '清除所有筛选条件',
@@ -745,14 +745,14 @@
         'Search wiki': '搜索维基',
         'Search commits': '搜索提交',
         'Search users': '搜索用户',
-        'Search topics': '搜索主题'
+        'Search topics': '搜索主题',
         
         // ========== 新增翻译项 - 文件查看器 ==========
         'Copy path': '复制路径',
         'Copy permalink': '复制永久链接',
         'Filename': '文件名',
         'Size': '大小',
-        'Last commit': '最后提交'
+        'Last commit': '最后提交',
         
         // ========== 新增翻译项 - 代码差异与合并 ==========
         'Files changed': '已更改文件',
@@ -787,7 +787,7 @@
         'Dependabot version updates': 'Dependabot版本更新',
         'Advanced security': '高级安全',
         'Environments': '环境',
-        'Teams': '团队'
+        'Teams': '团队',
         
         // ========== 新增翻译项 - 用户与个人资料 ==========
         'User': '用户',
@@ -797,7 +797,7 @@
         'Contribution settings': '贡献设置',
         'Edit bio': '编辑简介',
         'Update bio': '更新简介',
-        'View gists': '查看代码片段'
+        'View gists': '查看代码片段',
         
         // ========== 新增翻译项 - 市场与扩展 ==========
         'GitHub Marketplace': 'GitHub市场',
@@ -922,7 +922,7 @@
         'Suggest a feature': '建议功能',
         'Vote on features': '对功能投票',
         'Beta testing': 'Beta测试',
-        'Release notes': '发布说明'
+        'Release notes': '发布说明',
         
         // ========== 新增翻译项 - 活动日志与报告 ==========
         'Activity log': '活动日志',
@@ -2118,10 +2118,6 @@
         'User contributions': '用户贡献',
         'User permissions': '用户权限',
         'User settings': '用户设置',
-        'Milestones': '里程碑',
-        'Projects': '项目',
-        'Sort': '排序',
-        'Newest': '最新',
         'Oldest': '最早',
         'Most commented': '评论最多',
         'Least commented': '评论最少',
@@ -2142,8 +2138,6 @@
         'Mentioned you': '提及你',
         'Review requested': '请求你审查',
         'Draft': '草稿',
-        'Open': '开放',
-        'Closed': '已关闭',
         'Merged': '已合并',
         'All pull requests': '所有拉取请求',
         'Show all activity': '显示所有活动',
@@ -2173,7 +2167,6 @@
         'Age': '存在时间',
         'Last updated': '最后更新',
         'Created': '创建时间',
-        'Sort': '排序',
         'Direction': '方向',
         // ========== 拉取请求页面 - 筛选器值 ==========
         'No reviews': '无审查',
@@ -2510,46 +2503,13 @@
         'Confirm deletion': '确认删除',
         
         // ========== 新增翻译项 - 状态和标签 ==========
-        'Active': '活跃',
-        'Inactive': '不活跃',
-        'Online': '在线',
-        'Offline': '离线',
-        'Available': '可用',
-        'Unavailable': '不可用',
-        'Enabled': '已启用',
-        'Disabled': '已禁用',
-        'Visible': '可见',
-        'Hidden': '隐藏',
-        'Public': '公开',
-        'Private': '私有',
-        'Internal': '内部',
-        'Restricted': '受限',
-        'Unrestricted': '不受限',
-        'Limited': '有限',
-        'Unlimited': '无限',
-        'Default': '默认',
-        'Custom': '自定义',
-        'Standard': '标准',
-        'Premium': '高级',
-        'Basic': '基础',
-        'Advanced': '高级',
-        'Professional': '专业',
-        'Enterprise': '企业',
-        'Free': '免费',
-        'Paid': '付费',
         'Trial': '试用',
         'Subscription': '订阅',
         'License': '许可证',
         
         // ========== 设置页面相关翻译项 ==========
         // 组织设置页面
-        'Organizations': '组织',
-        'Your organizations': '你的组织',
         'New organization': '新建组织',
-        'Organization billing': '组织账单',
-        'Organization security': '组织安全',
-        'Organization members': '组织成员',
-        'Organization repositories': '组织仓库',
         // 组织设置页面补充项
         'Organization name': '组织名称',
         'Organization description': '组织描述',
@@ -2557,7 +2517,6 @@
         'Organization location': '组织位置',
         'Organization email': '组织邮箱',
         'Organization avatar': '组织头像',
-        'Organization visibility': '组织可见性',
         'Organization default repository permission': '组织默认仓库权限',
         'Organization base permissions': '组织基础权限',
         'Organization member can create repositories': '组织成员可创建仓库',
@@ -2570,7 +2529,6 @@
         'Organization invitations': '组织邀请',
         'Organization owners': '组织所有者',
         'Organization moderators': '组织审核者',
-        'Organization settings': '组织设置',
         'Organization general settings': '组织一般设置',
         'Organization member settings': '组织成员设置',
         'Organization repository settings': '组织仓库设置',
@@ -2588,11 +2546,8 @@
         
         // 企业设置页面
         'Enterprises': '企业',
-        'Enterprise accounts': '企业账户',
-        'Enterprise settings': '企业设置',
         // 企业设置页面补充项
         'Your enterprises': '你的企业',
-        'Enterprise accounts': '企业账户',
         'Enterprise dashboard': '企业仪表盘',
         'Enterprise organizations': '企业组织',
         'Enterprise repositories': '企业仓库',
@@ -2627,13 +2582,6 @@
         'Enterprise plan': '企业计划',
         'Enterprise members': '企业成员',
         // 企业设置页面额外补充项
-        'Enterprise name': '企业名称',
-        'Enterprise description': '企业描述',
-        'Enterprise website': '企业网站',
-        'Enterprise location': '企业位置',
-        'Enterprise email': '企业邮箱',
-        'Enterprise avatar': '企业头像',
-        'Enterprise visibility': '企业可见性',
         'Enterprise default organization settings': '企业默认组织设置',
         'Enterprise organization policies': '企业组织策略',
         'Enterprise repository policies': '企业仓库策略',
