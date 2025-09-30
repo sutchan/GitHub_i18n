@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.6.7
+// @version      1.6.8
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.6.7',
+        version: '1.6.8',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -255,7 +255,7 @@
         'Work together, achieve more': '协作共赢',
         'Collaborate with your teams, use management tools that sync with your projects, and code from anywhere—all on a single, integrated platform': '与团队协作，使用与项目同步的管理工具，随时随地编写代码——全部在一个集成平台上',
         'From startups to enterprises, GitHub scales with teams of any size in any industry': '从初创公司到企业，GitHub可随任何行业任何规模的团队扩展',
-        'Survey: The AI wave continues to grow on software development teams, 2024': '调查：2024年软件开发团队中的AI浪潮持续增长'
+        'Survey: The AI wave continues to grow on software development teams, 2024': '调查：2024年软件开发团队中的AI浪潮持续增长',
         'Saved': '已保存',
 
         // ========== 邮箱与密钥 ==========
