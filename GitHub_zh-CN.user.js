@@ -5179,9 +5179,245 @@
         return false;
     }
     
-    // 翻译缓存，用于存储已翻译的文本
-    const TRANSLATION_CACHE = new Map();
-    const MAX_CACHE_SIZE = 1000; // 缓存最大条目数
+    /**
+     * 翻译缓存模块
+     * @description 提供翻译结果的缓存管理功能，采用LRU缓存策略优化性能
+     */
+    const translationCache = {
+        // 存储翻译结果的缓存，使用Map实现
+        _cache: new Map(),
+        
+        // 存储访问顺序，用于LRU缓存策略
+        _accessOrder: [],
+        
+        // 缓存命中和未命中统计
+        _stats: {
+            hits: 0,
+            misses: 0,
+            totalLookups: 0
+        },
+        
+        // 缓存项的元数据，用于追踪使用频率和时间
+        _metadata: new Map(),
+        
+        /**
+         * 获取缓存的最大大小
+         * @returns {number} 缓存最大条目数
+         */
+        _getMaxSize() {
+            return CONFIG.performance.maxCacheSize || 1000;
+        },
+        
+        /**
+         * 检查是否存在缓存项
+         * @param {string} key - 缓存键
+         * @returns {boolean} 是否存在缓存项
+         */
+        has(key) {
+            const exists = this._cache.has(key);
+            this._stats.totalLookups++;
+            
+            if (exists) {
+                this._stats.hits++;
+                // 更新访问顺序（LRU策略）
+                this._updateAccessOrder(key);
+                // 更新使用次数和最后访问时间
+                this._updateMetadata(key);
+            } else {
+                this._stats.misses++;
+            }
+            
+            return exists;
+        },
+        
+        /**
+         * 获取缓存项
+         * @param {string} key - 缓存键
+         * @returns {string|null} 缓存的翻译结果或null
+         */
+        get(key) {
+            if (this.has(key)) {
+                return this._cache.get(key);
+            }
+            return null;
+        },
+        
+        /**
+         * 设置缓存项
+         * @param {string} key - 缓存键
+         * @param {string} value - 缓存的翻译结果
+         * @returns {boolean} 设置是否成功
+         */
+        set(key, value) {
+            if (typeof key !== 'string' || typeof value !== 'string') {
+                return false;
+            }
+            
+            try {
+                // 检查是否需要更新已存在的项
+                if (this._cache.has(key)) {
+                    this._cache.set(key, value);
+                    this._updateAccessOrder(key);
+                    this._updateMetadata(key);
+                } else {
+                    // 添加新缓存项
+                    this._cache.set(key, value);
+                    this._accessOrder.push(key);
+                    this._metadata.set(key, {
+                        usageCount: 1,
+                        lastAccessed: Date.now(),
+                        createdAt: Date.now()
+                    });
+                }
+                
+                // 限制缓存大小，实现LRU策略
+                this._trimCache();
+                
+                return true;
+            } catch (error) {
+                if (CONFIG.debugMode) {
+                    console.error('[GitHub_i18n] 翻译缓存设置失败:', error);
+                }
+                return false;
+            }
+        },
+        
+        /**
+         * 更新缓存项的访问顺序（LRU策略）
+         * @private
+         * @param {string} key - 缓存键
+         */
+        _updateAccessOrder(key) {
+            const index = this._accessOrder.indexOf(key);
+            if (index > -1) {
+                // 移除旧位置
+                this._accessOrder.splice(index, 1);
+                // 添加到末尾（最近访问）
+                this._accessOrder.push(key);
+            }
+        },
+        
+        /**
+         * 更新缓存项的元数据
+         * @private
+         * @param {string} key - 缓存键
+         */
+        _updateMetadata(key) {
+            const metadata = this._metadata.get(key);
+            if (metadata) {
+                metadata.usageCount++;
+                metadata.lastAccessed = Date.now();
+            }
+        },
+        
+        /**
+         * 修剪缓存，确保不超过最大大小限制
+         * @private
+         */
+        _trimCache() {
+            const maxSize = this._getMaxSize();
+            const overflow = this._cache.size - maxSize;
+            
+            if (overflow > 0) {
+                // 移除最久未访问的项
+                for (let i = 0; i < overflow; i++) {
+                    const oldestKey = this._accessOrder.shift();
+                    if (oldestKey) {
+                        this._cache.delete(oldestKey);
+                        this._metadata.delete(oldestKey);
+                    }
+                }
+            }
+        },
+        
+        /**
+         * 清除所有缓存项
+         */
+        clear() {
+            this._cache.clear();
+            this._accessOrder = [];
+            this._metadata.clear();
+            
+            // 重置统计信息
+            this._stats.hits = 0;
+            this._stats.misses = 0;
+            this._stats.totalLookups = 0;
+        },
+        
+        /**
+         * 获取缓存统计信息
+         * @returns {Object} 缓存统计数据
+         */
+        getStats() {
+            const hitRate = this._stats.totalLookups > 0 ? 
+                Math.round((this._stats.hits / this._stats.totalLookups) * 100) : 0;
+                
+            return {
+                size: this._cache.size,
+                maxSize: this._getMaxSize(),
+                hits: this._stats.hits,
+                misses: this._stats.misses,
+                totalLookups: this._stats.totalLookups,
+                hitRate: hitRate + '%'
+            };
+        },
+        
+        /**
+         * 导出缓存内容（用于调试）
+         * @returns {Array} 缓存项数组
+         */
+        exportCache() {
+            if (!CONFIG.debugMode) {
+                return []; // 非调试模式下不导出缓存
+            }
+            
+            const cacheItems = [];
+            this._cache.forEach((value, key) => {
+                const metadata = this._metadata.get(key);
+                cacheItems.push({
+                    key,
+                    value,
+                    metadata: metadata || {} // 确保总是有元数据对象
+                });
+            });
+            
+            return cacheItems;
+        },
+        
+        /**
+         * 移除指定时间之前的缓存项
+         * @param {number} timeThreshold - 时间阈值（毫秒）
+         * @returns {number} 移除的缓存项数量
+         */
+        removeStaleItems(timeThreshold = 3600000) { // 默认移除1小时前的项
+            const now = Date.now();
+            let removedCount = 0;
+            
+            // 找出所有过期的键
+            const staleKeys = [];
+            this._metadata.forEach((metadata, key) => {
+                if (now - metadata.lastAccessed > timeThreshold) {
+                    staleKeys.push(key);
+                }
+            });
+            
+            // 移除过期项
+            staleKeys.forEach(key => {
+                this._cache.delete(key);
+                this._metadata.delete(key);
+                const index = this._accessOrder.indexOf(key);
+                if (index > -1) {
+                    this._accessOrder.splice(index, 1);
+                }
+                removedCount++;
+            });
+            
+            return removedCount;
+        }
+    };
+    
+    // 翻译缓存，用于存储已翻译的文本（兼容旧API的引用）
+    const TRANSLATION_CACHE = translationCache;
     
     /**
      * 安全替换文本节点（不破坏 HTML 结构和布局）
