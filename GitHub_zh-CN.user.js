@@ -150,7 +150,7 @@
             issues: /\/[^/]+\/[^/]+\/issues/,
             pullRequests: /\/[^/]+\/[^/]+\/pull/,
             settings: /\/settings/,
-            dashboard: /^\/$|/(?:explore|notifications|stars|gists|codespaces|projects|organizations)$/
+            dashboard: /^\/$|\/(explore|notifications|stars|gists|codespaces|projects|organizations)$/
         }
     };
 
