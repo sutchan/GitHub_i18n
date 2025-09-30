@@ -1981,7 +1981,31 @@
             if (!parent) break;
             
             // 检查常见的不应翻译的类
-            const skipClasses = ['js-file-line', 'commit-tease', 'copy-button', 'blob-code', 'react-code-text'];
+            const skipClasses = [
+                'js-file-line',       // 代码文件行
+                'commit-tease',       // 提交信息预览
+                'copy-button',        // 复制按钮
+                'blob-code',          // 代码块
+                'react-code-text',    // React代码文本
+                'user-name',          // 用户名
+                'repo-name',          // 仓库名
+                'branch-name',        // 分支名
+                'file-path',          // 文件路径
+                'timestamp',          // 时间戳
+                'date',               // 日期
+                'markdown-body',      // Markdown内容
+                'commit-message',     // 提交信息
+                'issue-title',        // 问题标题
+                'pr-title',           // PR标题
+                'ref-name',           // 引用名称
+                'tag-name',           // 标签名称
+                'commit-sha',         // 提交SHA
+                'oid',                // 对象ID
+                'sha',                // SHA值
+                'url-link',           // URL链接
+                'email-address'       // 邮箱地址
+            ];
+            
             if (parent.classList && parent.classList.length) {
                 for (const cls of skipClasses) {
                     if (parent.classList.contains(cls)) return true;
