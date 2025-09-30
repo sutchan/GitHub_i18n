@@ -72,7 +72,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.7.6',
+        version: '1.7.7',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -102,6 +102,8 @@
             enableTranslationCache: true,
             // 是否启用翻译词典优化
             enableDictOptimization: true,
+            // 是否启用正则表达式优化
+            enableRegexOptimization: true,
             // 翻译缓存最大大小
             maxCacheSize: 1000,
             // 正则表达式缓存大小限制
@@ -5423,6 +5425,9 @@
     // 翻译缓存，用于存储已翻译的文本（兼容旧API的引用）
     const TRANSLATION_CACHE = translationCache;
     
+    // 正则表达式合并的翻译规则（全局变量，只在初始化时创建一次）
+    let regexMergedRules = [];
+    
     /**
      * 安全替换文本节点（不破坏 HTML 结构和布局）
      * @param {Node} node - 要处理的 DOM 节点
@@ -5458,14 +5463,36 @@
                         continue;
                     }
                     
-                    // 先尝试完全匹配
-                    const trimmedText = textContent.trim();
-                    if (trimmedText && TRANSLATION_DICT.hasOwnProperty(trimmedText)) {
-                        textContent = textContent.replace(trimmedText, TRANSLATION_DICT[trimmedText]);
-                        if (CONFIG.debugMode && textContent !== originalText) {
-                            console.log(`[GitHub_i18n] 已翻译: "${trimmedText}" -> "${TRANSLATION_DICT[trimmedText]}"`);
+                    // 首先尝试正则表达式规则匹配（如果启用了正则优化）
+                    if (CONFIG.performance.enableRegexOptimization !== false && regexMergedRules.length > 0) {
+                        for (const rule of regexMergedRules) {
+                            // 尝试对整行文本应用正则规则
+                            if (rule.pattern.test(textContent)) {
+                                const replacedText = textContent.replace(rule.pattern, rule.replacement);
+                                if (replacedText !== textContent) {
+                                    textContent = replacedText;
+                                    if (CONFIG.debugMode) {
+                                        console.log(`[GitHub_i18n] 正则匹配翻译: "${textContent}" -> "${replacedText}"`);
+                                    }
+                                    break; // 找到匹配的规则后就跳出循环
+                                }
+                            }
                         }
-                    } else if (CONFIG.performance.enablePartialMatch !== false) {
+                    }
+                    
+                    // 如果正则匹配没有完全翻译，尝试完全匹配
+                    if (textContent === originalText) {
+                        const trimmedText = textContent.trim();
+                        if (trimmedText && TRANSLATION_DICT.hasOwnProperty(trimmedText)) {
+                            textContent = textContent.replace(trimmedText, TRANSLATION_DICT[trimmedText]);
+                            if (CONFIG.debugMode && textContent !== originalText) {
+                                console.log(`[GitHub_i18n] 已翻译: "${trimmedText}" -> "${TRANSLATION_DICT[trimmedText]}"`);
+                            }
+                        }
+                    }
+                    
+                    // 如果完全匹配也没有翻译，尝试部分匹配
+                    if (textContent === originalText && CONFIG.performance.enablePartialMatch !== false) {
                         // 再尝试部分匹配（按长度降序排序，确保最长的匹配项优先）
                         // 只有当enablePartialMatch未设置为false时才执行
                         const sortedKeys = Object.keys(TRANSLATION_DICT).sort((a, b) => b.length - a.length);
@@ -5580,6 +5607,103 @@
     }
 
     /**
+     * 使用正则表达式合并相似的键值对
+     * @description 识别并合并具有相似模式的键值对，使用正则表达式减少词典大小
+     * @returns {Array} 包含正则表达式规则的数组
+     */
+    function createRegexMergedDict() {
+        const regexRules = [];
+        
+        // 定义常见的模式组
+        const patternGroups = [
+            {
+                // 时间范围模式
+                pattern: /^Last (\d+) (hours?|days?|weeks?|months?|years?)$/i,
+                replacement: "过去$1$2",
+                testKeys: ['Last 24 hours', 'Last 7 days', 'Last 30 days', 'Last 12 months']
+            },
+            {
+                // 贡献类型模式
+                pattern: /^(.*?) contributions$/i,
+                replacement: "$1贡献",
+                testKeys: ['Code contributions', 'Documentation contributions', 'Issue contributions']
+            },
+            {
+                // 贡献者类型模式
+                pattern: /^(.*?) contributors$/i,
+                replacement: "$1贡献者",
+                testKeys: ['Top contributors', 'Repository contributors', 'Organization contributors']
+            },
+            {
+                // 任务状态模式
+                pattern: /^(.*?) task$/i,
+                replacement: "$1任务",
+                testKeys: ['Completed task', 'In progress task', 'Pending task']
+            },
+            {
+                // 优先级模式
+                pattern: /^(.*?) priority$/i,
+                replacement: "$1优先级",
+                testKeys: ['Critical priority', 'High priority', 'Medium priority', 'Low priority']
+            },
+            {
+                // 截止日期模式
+                pattern: /^Due (today|tomorrow|\w+)$/i,
+                replacement: "截止$1",
+                testKeys: ['Due today', 'Due tomorrow', 'Due Monday']
+            }
+        ];
+        
+        try {
+            // 检查哪些模式组在实际词典中存在
+            const dictKeys = new Set(Object.keys(TRANSLATION_DICT));
+            let mergedCount = 0;
+            
+            patternGroups.forEach(group => {
+                // 检查该模式组是否有足够的键在词典中
+                const matchingKeys = group.testKeys.filter(key => dictKeys.has(key));
+                
+                if (matchingKeys.length >= 2) {
+                    // 验证替换逻辑是否正确
+                    const validReplacements = matchingKeys.every(key => {
+                        const match = key.match(group.pattern);
+                        if (!match) return false;
+                        
+                        // 生成替换文本
+                        let replacedText = group.replacement;
+                        match.slice(1).forEach((capture, index) => {
+                            replacedText = replacedText.replace(`$${index + 1}`, capture);
+                        });
+                        
+                        // 检查是否与实际翻译匹配
+                        return TRANSLATION_DICT[key] === replacedText;
+                    });
+                    
+                    if (validReplacements) {
+                        regexRules.push({
+                            pattern: group.pattern,
+                            replacement: group.replacement,
+                            matchedKeys: matchingKeys
+                        });
+                        mergedCount += matchingKeys.length;
+                    }
+                }
+            });
+            
+            if (CONFIG.debugMode && mergedCount > 0) {
+                console.log(`[GitHub_i18n] 正则表达式优化完成: 合并了 ${mergedCount} 个键，创建了 ${regexRules.length} 个规则`);
+            }
+            
+            return regexRules;
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub_i18n] 正则表达式优化失败:', error);
+            }
+            return [];
+        }
+    }
+    
+    /**
      * 合并重复的翻译字符串
      * @description 分析翻译词典，找出具有相同中文翻译的英文键，优化词典结构
      * @returns {Object} 优化后的翻译词典
@@ -5614,26 +5738,14 @@
                 }
             });
             
-            // 创建优化后的词典，使用正则表达式合并具有相同翻译的键
+            // 创建优化后的词典
             const optimizedDict = {};
             
             valueToKeysMap.forEach((keys, value) => {
-                if (keys.length === 1) {
-                    // 单个键直接添加
-                    optimizedDict[keys[0]] = value;
-                } else {
-                    // 多个键具有相同翻译，创建一个新的正则表达式键
-                    // 注意：在实际使用中，这个优化主要用于分析重复，真正的翻译逻辑仍然依赖原词典
-                    // 这里我们只记录优化信息，不实际修改词典结构以保持兼容性
-                    if (CONFIG.debugMode) {
-                        console.log(`[GitHub_i18n] 发现 ${keys.length} 个键共享相同翻译: "${value}"`);
-                    }
-                    
-                    // 仍保留原键值对以保持兼容性
-                    keys.forEach(key => {
-                        optimizedDict[key] = value;
-                    });
-                }
+                // 保留所有键值对以保持兼容性
+                keys.forEach(key => {
+                    optimizedDict[key] = value;
+                });
             });
             
             if (CONFIG.debugMode && duplicateCount > 0) {
@@ -5658,6 +5770,11 @@
         if (optimizedDict !== TRANSLATION_DICT) {
             // 替换为优化后的词典
             Object.assign(TRANSLATION_DICT, optimizedDict);
+        }
+        
+        // 初始化正则表达式规则
+        if (CONFIG.performance.enableRegexOptimization !== false) {
+            regexMergedRules = createRegexMergedDict();
         }
         
         // 初始翻译
