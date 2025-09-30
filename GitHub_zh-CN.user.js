@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.7.5
+// @version      1.7.6
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -18,10 +18,61 @@
 (function () {
     'use strict';
 
+    // ========== 工具函数模块 ==========
+    /**
+     * 工具函数集合
+     */
+    const utils = {
+        /**
+         * 节流函数，用于限制高频操作的执行频率
+         * @param {Function} func - 要节流的函数
+         * @param {number} limit - 限制时间（毫秒）
+         * @returns {Function} 节流后的函数
+         */
+        throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        },
+        
+        /**
+         * 转义正则表达式特殊字符
+         * @param {string} string - 要转义的字符串
+         * @returns {string} 转义后的字符串
+         */
+        escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        },
+        
+        /**
+         * 获取当前页面路径
+         * @returns {string} 当前页面路径
+         */
+        getCurrentPath() {
+            return window.location.pathname;
+        },
+        
+        /**
+         * 判断当前页面是否匹配某个路径模式
+         * @param {RegExp} pattern - 路径模式
+         * @returns {boolean} 是否匹配
+         */
+        isCurrentPathMatch(pattern) {
+            return pattern.test(this.getCurrentPath());
+        }
+    };
+
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.7.5',
+        version: '1.7.6',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -44,13 +95,56 @@
             // 是否启用深度DOM监听
             enableDeepObserver: false,
             // 是否启用部分匹配翻译
-        enablePartialMatch: false,
+            enablePartialMatch: false,
             // 单次加载的最大字典大小
             maxDictSize: 2000,
             // 是否使用翻译缓存
             enableTranslationCache: true,
             // 正则表达式缓存大小限制
-            regexCacheSize: 500
+            regexCacheSize: 500,
+            // 节流间隔
+            throttleInterval: 200
+        },
+        // 选择器常量
+        selectors: {
+            // 关键区域选择器
+            keyAreas: ['#header', '.application-main'],
+            // 翻译目标选择器
+            translationTargets: [
+                '#header',                          // 顶部导航栏
+                '.Header-item--full',               // 中央菜单
+                '.HeaderMenu',                      // 个人下拉菜单容器
+                '.UnderlineNav',                    // 仓库页标签导航
+                '.dropdown-menu',                   // 传统下拉菜单
+                '.SelectMenu',                      // GitHub现代下拉菜单
+                '.Popover-menu',                    // 弹出菜单
+                '.menu',                            // 通用菜单类
+                '.ActionList',                      // 操作列表菜单
+                '.BorderGrid',                      // 设置页面网格
+                '.Box',                             // 设置项容器
+                '.menu-item',                       // 菜单项
+                '.js-selected-navigation-item',     // 选中项
+                '.Layout',                          // 通用布局容器
+                '.application-main',                // 主内容区（保守使用）
+                '.js-menu-container'                // JavaScript生成的菜单容器
+            ],
+            // 弹出菜单选择器
+            popupMenus: [
+                '[aria-label="Menu"]',            // 带标签的菜单
+                '[role="menu"]',                 // 具有menu角色的元素
+                '.ReactModal__Content',            // React模态框
+                '.Overlay-backdrop',               // 覆盖层
+                '[data-component-type="dropdown"]' // 数据组件类型标记的下拉菜单
+            ]
+        },
+        // 页面路径模式
+        pagePatterns: {
+            search: /\/search/,
+            repository: /\/[^/]+\/[^/]+/,
+            issues: /\/[^/]+\/[^/]+\/issues/,
+            pullRequests: /\/[^/]+\/[^/]+\/pull/,
+            settings: /\/settings/,
+            dashboard: /^\/$|/(?:explore|notifications|stars|gists|codespaces|projects|organizations)$/
         }
     };
 
