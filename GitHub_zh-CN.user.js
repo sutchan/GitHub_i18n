@@ -1162,6 +1162,22 @@
         'Navigation style': '导航样式',
         'Contextual spacing': '上下文间距',
         'Tab size': '制表符大小',
+        'Simplified navigation': '简化导航',
+        'Show navigation icons': '显示导航图标',
+        'Show tooltips': '显示工具提示',
+        'Focus mode': '专注模式',
+        'Font size': '字体大小',
+        'Default font': '默认字体',
+        'Monospace font': '等宽字体',
+        'Custom font': '自定义字体',
+        'Font weight': '字体粗细',
+        'Line height': '行高',
+        'Code font size': '代码字体大小',
+        'Code line height': '代码行高',
+        'Code tab size': '代码制表符大小',
+        'Scrollbar style': '滚动条样式',
+        'Render whitespace': '显示空白字符',
+        'Render line endings': '显示行结束符'
         
         // ========== 新增翻译项 - Copilot功能设置 ==========
         'GitHub Copilot': 'GitHub Copilot',
