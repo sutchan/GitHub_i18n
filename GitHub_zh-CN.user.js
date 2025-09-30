@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.6.11
+// @version 1.6.12
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.6.11',
+        version: '1.6.12',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -1432,6 +1432,23 @@
         'Enterprise members': '企业成员',
         'Enterprise policies': '企业策略',
         'Enterprise security': '企业安全',
+        
+        // 企业创建页面
+        'Create an enterprise account': '创建企业账户',
+        'Enterprise name': '企业名称',
+        'Contact email': '联系邮箱',
+        'Enterprise URL slug': '企业URL标识符',
+        'Company or organization': '公司或组织',
+        'Enterprise size': '企业规模',
+        'Industry': '行业',
+        'Terms of Service': '服务条款',
+        'Privacy Policy': '隐私政策',
+        'Create enterprise': '创建企业',
+        'Already have an enterprise account': '已有企业账户',
+        'Enterprise owners': '企业所有者',
+        'Enterprise profile': '企业资料',
+        
+        // 企业设置页面 (原内容继续)
         
         // 交互限制设置页面
         'Interaction limits': '交互限制',
