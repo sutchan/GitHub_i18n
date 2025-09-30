@@ -1177,7 +1177,7 @@
         'Code tab size': '代码制表符大小',
         'Scrollbar style': '滚动条样式',
         'Render whitespace': '显示空白字符',
-        'Render line endings': '显示行结束符'
+        'Render line endings': '显示行结束符',
         
         // ========== 新增翻译项 - Copilot功能设置 ==========
         'GitHub Copilot': 'GitHub Copilot',
