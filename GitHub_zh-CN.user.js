@@ -770,17 +770,6 @@
     
     // 初始化翻译词典（按需加载）
     const TRANSLATION_DICT = translationModule.getTranslationDict();
-        'Primary email address': '主邮箱地址',
-        'Add email address': '添加邮箱地址',
-        'Verified': '已验证',
-        'Unverified': '未验证',
-        'Set as primary': '设为主邮箱',
-        'Make private': '设为私有',
-        'Make public': '设为公开',
-        'Resend email': '重新发送邮件',
-        'Remove': '移除',
-
-        'SSH keys': 'SSH 密钥',
         'New SSH key': '新建 SSH 密钥',
         'Title': '标题',
         'Key': '密钥',
