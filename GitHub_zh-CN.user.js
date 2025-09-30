@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.6.15
+// @version 1.6.16
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.6.15',
+        version: '1.6.16',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -1998,6 +1998,41 @@
         'Filter by topic': '按主题筛选',
         'Filter by license': '按许可证筛选',
         'Sort by': '排序方式',
+        
+        // ========== 创建仓库页面 ==========
+        'Create a new repository': '创建一个新仓库',
+        'Owner': '所有者',
+        'Repository name': '仓库名称',
+        'Description': '描述',
+        '(optional)': '（可选）',
+        'Public': '公开',
+        'Private': '私有',
+        'Initialize this repository with': '使用以下内容初始化仓库',
+        'Add a README file': '添加 README 文件',
+        'Add .gitignore': '添加 .gitignore',
+        'Choose a license': '选择许可证',
+        'Create repository': '创建仓库',
+        'Import code': '导入代码',
+        'Import a repository': '导入一个仓库',
+        'Repository template': '仓库模板',
+        'Select template': '选择模板',
+        'Include all branches': '包含所有分支',
+        'Gitignore template': 'Gitignore 模板',
+        'License template': '许可证模板',
+        'Repository visibility': '仓库可见性',
+        'Create in organization': '在组织中创建',
+        'Advanced settings': '高级设置',
+        'Automatically delete head branches': '自动删除源分支',
+        'Enable discussions': '启用讨论',
+        'Enable issues': '启用问题',
+        'Enable projects': '启用项目',
+        'Enable wiki': '启用维基',
+        'Add topics': '添加主题',
+        'Choose a template': '选择一个模板',
+        'Template description': '模板描述',
+        'Popular templates': '热门模板',
+        'Personal templates': '个人模板',
+        'Organization templates': '组织模板',
         'Most stars': '最多标星',
         'Most forks': '最多复刻',
         'Most recent': '最新',
