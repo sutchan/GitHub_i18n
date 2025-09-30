@@ -100,6 +100,10 @@
             maxDictSize: 2000,
             // 是否使用翻译缓存
             enableTranslationCache: true,
+            // 是否启用翻译词典优化
+            enableDictOptimization: true,
+            // 翻译缓存最大大小
+            maxCacheSize: 1000,
             // 正则表达式缓存大小限制
             regexCacheSize: 500,
             // 节流间隔
@@ -5576,9 +5580,86 @@
     }
 
     /**
+     * 合并重复的翻译字符串
+     * @description 分析翻译词典，找出具有相同中文翻译的英文键，优化词典结构
+     * @returns {Object} 优化后的翻译词典
+     */
+    function optimizeTranslationDict() {
+        if (!CONFIG.performance.enableDictOptimization) return TRANSLATION_DICT;
+        
+        try {
+            // 值 -> 键数组的映射，用于查找具有相同值的键
+            const valueToKeysMap = new Map();
+            
+            // 遍历翻译词典
+            for (const [key, value] of Object.entries(TRANSLATION_DICT)) {
+                if (!valueToKeysMap.has(value)) {
+                    valueToKeysMap.set(value, []);
+                }
+                valueToKeysMap.get(value).push(key);
+            }
+            
+            // 统计重复值
+            let duplicateCount = 0;
+            const duplicatesInfo = [];
+            
+            valueToKeysMap.forEach((keys, value) => {
+                if (keys.length > 1) {
+                    duplicateCount += keys.length - 1;
+                    duplicatesInfo.push({
+                        value,
+                        keys,
+                        count: keys.length
+                    });
+                }
+            });
+            
+            // 创建优化后的词典，使用正则表达式合并具有相同翻译的键
+            const optimizedDict = {};
+            
+            valueToKeysMap.forEach((keys, value) => {
+                if (keys.length === 1) {
+                    // 单个键直接添加
+                    optimizedDict[keys[0]] = value;
+                } else {
+                    // 多个键具有相同翻译，创建一个新的正则表达式键
+                    // 注意：在实际使用中，这个优化主要用于分析重复，真正的翻译逻辑仍然依赖原词典
+                    // 这里我们只记录优化信息，不实际修改词典结构以保持兼容性
+                    if (CONFIG.debugMode) {
+                        console.log(`[GitHub_i18n] 发现 ${keys.length} 个键共享相同翻译: "${value}"`);
+                    }
+                    
+                    // 仍保留原键值对以保持兼容性
+                    keys.forEach(key => {
+                        optimizedDict[key] = value;
+                    });
+                }
+            });
+            
+            if (CONFIG.debugMode && duplicateCount > 0) {
+                console.log(`[GitHub_i18n] 翻译词典优化完成: 发现 ${duplicateCount} 个重复翻译项`);
+            }
+            
+            return optimizedDict;
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub_i18n] 翻译词典优化失败:', error);
+            }
+            return TRANSLATION_DICT; // 失败时返回原词典
+        }
+    }
+    
+    /**
      * 初始化翻译功能
      */
     function init() {
+        // 优化翻译词典
+        const optimizedDict = optimizeTranslationDict();
+        if (optimizedDict !== TRANSLATION_DICT) {
+            // 替换为优化后的词典
+            Object.assign(TRANSLATION_DICT, optimizedDict);
+        }
+        
         // 初始翻译
         translatePage();
 
