@@ -2736,7 +2736,7 @@
         'Copilot feedback': 'Copilot反馈',
         'Copilot help': 'Copilot帮助',
         'Copilot documentation': 'Copilot文档',
-        'Copilot learning resources': 'Copilot学习资源'
+        'Copilot learning resources': 'Copilot学习资源',
         'Copilot chat': 'Copilot聊天',
         'Inline suggestions': '行内建议',
         
