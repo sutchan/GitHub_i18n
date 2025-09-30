@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.6.14
+// @version 1.6.15
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.6.14',
+        version: '1.6.15',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -283,6 +283,14 @@
         'Mute thread': '静音此会话',
         'Unmute thread': '取消静音',
         'Save': '保存',
+        'Notifications are updating': '通知正在更新',
+        'Notifications updated': '通知已更新',
+        'No notifications': '暂无通知',
+        'Forked the repository': '复刻了仓库',
+        'Starred the repository': '标星了仓库',
+        'Watched the repository': '关注了仓库',
+        'Unstarred the repository': '取消标星仓库',
+        'Unwatched the repository': '取消关注仓库',
         
         // ========== GitHub 主页特定翻译项 ==========
         'Join the world’s most widely adopted AI-powered developer platform': '加入世界上采用最广泛的AI驱动开发者平台',
@@ -773,17 +781,7 @@
         'Suggested reviewers': '推荐审查者',
         
         // ========== 新增翻译项 - 通知中心 ==========
-        'All notifications': '所有通知',
-        'Unread notifications': '未读通知',
-        'Participating notifications': '参与的通知',
-        'Saved notifications': '已保存的通知',
-        'Mark as read': '标记为已读',
-        'Mark as unread': '标记为未读',
-        'Save notification': '保存通知',
-        'Unsave notification': '取消保存',
-        'Mute notifications': '静音通知',
-        'Unmute notifications': '取消静音通知',
-        'Notification settings': '通知设置',
+
         
         // ========== 新增翻译项 - 仓库设置 ==========
         'Options': '选项',
@@ -1638,17 +1636,7 @@
         
         // ========== 新增翻译项 - 通知相关术语 ==========
         'Notifications': '通知',
-        'All notifications': '所有通知',
-        'Unread notifications': '未读通知',
-        'Participating notifications': '参与的通知',
-        'Saved notifications': '已保存的通知',
-        'Mark as read': '标记为已读',
-        'Mark as unread': '标记为未读',
-        'Save notification': '保存通知',
-        'Unsave notification': '取消保存',
-        'Mute notifications': '静音通知',
-        'Unmute notifications': '取消静音',
-        'Notification settings': '通知设置',
+
         'Email notifications': '邮件通知',
         'Web notifications': '网页通知',
         'Mobile notifications': '移动通知',
@@ -2207,7 +2195,7 @@
         'All activity types': '所有活动类型',
         'All repositories': '所有仓库',
         'All teams': '所有团队',
-        'All organizations': '所有组织',
+        'All repositories': '所有仓库',
         'Public repositories': '公共仓库',
         'Private repositories': '私有仓库',
         'Internal repositories': '内部仓库',
@@ -2218,7 +2206,102 @@
         'Organization discussions': '组织讨论',
         'Public projects': '公共项目',
         'Private projects': '私有项目',
-        'Internal projects': '内部项目'
+        'Internal projects': '内部项目',
+        // ========== 通知页面特定翻译项 ==========
+        'Notifications are being fetched': '正在获取通知',
+        'No matching notifications': '没有匹配的通知',
+        'Notifications marked as read': '通知已标记为已读',
+        'Notifications saved': '通知已保存',
+        'Notifications unsaved': '通知已取消保存',
+        'Notifications muted': '通知已静音',
+        'Notifications unmuted': '通知已取消静音',
+        'Notifications settings updated': '通知设置已更新',
+        'Notification preferences saved': '通知偏好设置已保存',
+        'Notification delivery settings': '通知送达设置',
+        'Notification sound': '通知声音',
+        'Notification badges': '通知标记',
+        'Desktop notifications': '桌面通知',
+        'Mobile push notifications': '移动推送通知',
+        'Email notifications': '邮件通知',
+        'Web notifications': '网页通知',
+        'Notification digest': '通知摘要',
+        'Daily digest': '每日摘要',
+        'Weekly digest': '每周摘要',
+        'Skip digest': '跳过摘要',
+        'Notification frequency': '通知频率',
+        'Immediate': '立即',
+        'Hourly': '每小时',
+        'Daily': '每日',
+        'Weekly': '每周',
+        'Monthly': '每月',
+        'Never': '从不',
+        'Notification filters': '通知筛选器',
+        'Custom filters': '自定义筛选器',
+        'Create custom filter': '创建自定义筛选器',
+        'Edit filter': '编辑筛选器',
+        'Delete filter': '删除筛选器',
+        'Filter by repository': '按仓库筛选',
+        'Filter by type': '按类型筛选',
+        'Filter by status': '按状态筛选',
+        'Filter by date': '按日期筛选',
+        'Filter by author': '按作者筛选',
+        'Filter by assignee': '按经办人筛选',
+        'Filter by label': '按标签筛选',
+        'Filter by milestone': '按里程碑筛选',
+        'Filter by project': '按项目筛选',
+        'Filter by language': '按语言筛选',
+        'Filter by topic': '按主题筛选',
+        'Filter by license': '按许可证筛选',
+        'Filter by star count': '按标星数量筛选',
+        'Filter by fork count': '按复刻数量筛选',
+        'Filter by last updated': '按最后更新时间筛选',
+        'Filter by created': '按创建时间筛选',
+        'Filter by size': '按大小筛选',
+        'Filter by activity': '按活动筛选',
+        'Filter by contributions': '按贡献筛选',
+        'Filter by involvement': '按参与度筛选',
+        'Filter by reaction': '按反应筛选',
+        'Filter by comment': '按评论筛选',
+        'Filter by review': '按审查筛选',
+        'Filter by mention': '按提及筛选',
+        'Filter by assignment': '按分配筛选',
+        'Filter by subscription': '按订阅筛选',
+        'Filter by watching': '按关注筛选',
+        'Filter by starring': '按标星筛选',
+        'Filter by forking': '按复刻筛选',
+        'Filter by following': '按关注用户筛选',
+        'Filter by collaborator': '按协作者筛选',
+        'Filter by member': '按成员筛选',
+        'Filter by owner': '按所有者筛选',
+        'Filter by admin': '按管理员筛选',
+        'Filter by maintainer': '按维护者筛选',
+        'Filter by contributor': '按贡献者筛选',
+        'Filter by guest': '按访客筛选',
+        'Filter by role': '按角色筛选',
+        'Filter by permission': '按权限筛选',
+        'Filter by access': '按访问权限筛选',
+        'Filter by visibility': '按可见性筛选',
+        'Filter by branch': '按分支筛选',
+        'Filter by tag': '按标签筛选',
+        'Filter by commit': '按提交筛选',
+        'Filter by pull request': '按拉取请求筛选',
+        'Filter by issue': '按问题筛选',
+        'Filter by discussion': '按讨论筛选',
+        'Filter by project': '按项目筛选',
+        'Filter by wiki': '按维基筛选',
+        'Filter by action': '按操作筛选',
+        'Filter by package': '按包筛选',
+        'Filter by security': '按安全筛选',
+        'Filter by insight': '按洞察筛选',
+        'Filter by page': '按页面筛选',
+        'Filter by codespace': '按代码空间筛选',
+        'Filter by gist': '按代码片段筛选',
+        'Filter by marketplace': '按市场筛选',
+        'Filter by sponsor': '按赞助筛选',
+        'Filter by sponsorship': '按赞助关系筛选',
+        'Filter by organization': '按组织筛选',
+        'Filter by team': '按团队筛选',
+        'Filter by user': '按用户筛选'
     };
     /**
      * 检查节点是否在不应翻译的区域内（兼容性更好的实现）
