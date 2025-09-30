@@ -863,6 +863,7 @@
         'OK': '确定',
         'Yes': '是',
         'No': '否',
+        'No results': '没有结果',
         'Submit': '提交',
         'Apply': '应用',
         'Reset': '重置',
