@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.6.12
+// @version 1.6.13
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.6.12',
+        version: '1.6.13',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -332,10 +332,10 @@
         'Regenerate': '重新生成',
         'Revoke': '撤销',
 
-        // ========== Codespaces ==========
-        'Codespaces': 'Codespaces',
-        'New codespace': '新建 Codespace',
-        'Recent codespaces': '最近的 Codespaces',
+        // ========== 代码空间 (Codespaces) ==========
+        'Codespaces': '代码空间',
+        'New codespace': '新建代码空间',
+        'Recent codespaces': '最近的代码空间',
         'Dev containers': '开发容器',
         'Settings': '设置',
         'Preferences': '偏好设置',
@@ -347,7 +347,27 @@
         'Stop': '停止',
         'Restart': '重启',
         'Export': '导出',
-        'Delete codespace': '删除 Codespace',
+        'Delete codespace': '删除代码空间',
+        'Create codespace': '创建代码空间',
+        'View codespaces': '查看代码空间',
+        'Your codespaces': '你的代码空间',
+        'Open with Codespaces': '使用代码空间打开',
+        'Codespace name': '代码空间名称',
+        'Repository': '仓库',
+        'Branch': '分支',
+        'Machine type': '机器类型',
+        'Region': '区域',
+        'Timeout': '超时时间',
+        'Dotfiles': '点文件',
+        'Editor': '编辑器',
+        'Extensions': '扩展',
+        'Environment variables': '环境变量',
+        'Git config': 'Git配置',
+        'Prebuilds': '预构建',
+        'Billing': '账单',
+        'Usage': '使用情况',
+        'Limits': '限制',
+        'Access controls': '访问控制',
 
         // ========== 其他通用 UI ==========
         'Public': '公开',
