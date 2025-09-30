@@ -663,7 +663,6 @@
         
         // ========== 新增翻译项 ==========
         // 侧边栏相关
-        'Create': '创建',
         'Explore': '探索',
         'Mentions': '提及',
         'Bookmarks': '书签',
@@ -700,7 +699,6 @@
         'Task list': '任务列表',
         'Project board': '项目看板',
         'Automation': '自动化',
-        'Project settings': '项目设置',
         
         // 讨论区
         'Start discussion': '开始讨论',
@@ -729,25 +727,14 @@
         // 其他常用术语
         'Unassigned': '未分配',
         'Unlabeled': '未标记',
-        'Milestone': '里程碑',
         'Draft': '草稿',
         'Ready': '准备就绪',
         'Waiting for review': '等待审查',
         'In progress': '进行中',
-        'Needs work': '需要改进',
-        'Approved': '已批准',
-        'Changes requested': '请求更改',
-        'Commented': '已评论',
-        'Add reviewer': '添加审查人',
-        'Add assignee': '添加经办人',
-        'Add label': '添加标签',
-        'Add to project': '添加到项目',
-        'Assign to milestone': '分配到里程碑',
+        'Needs work': '需要改进'
         
         // ========== 新增翻译项 - 搜索与筛选 ==========
-        'Search results': '搜索结果',
         'Clear all filters': '清除所有筛选条件',
-        'No matches found': '未找到匹配项',
         'Showing': '显示',
         'of': '共',
         'results for': '个结果，搜索',
@@ -758,21 +745,14 @@
         'Search wiki': '搜索维基',
         'Search commits': '搜索提交',
         'Search users': '搜索用户',
-        'Search topics': '搜索主题',
+        'Search topics': '搜索主题'
         
         // ========== 新增翻译项 - 文件查看器 ==========
-        'File': '文件',
-        'Code': '代码',
-        'Blame': '代码归属',
-        'History': '历史',
-        'Raw': '原始',
-        'Download': '下载',
         'Copy path': '复制路径',
         'Copy permalink': '复制永久链接',
-        'Permalink': '永久链接',
         'Filename': '文件名',
         'Size': '大小',
-        'Last commit': '最后提交',
+        'Last commit': '最后提交'
         
         // ========== 新增翻译项 - 代码差异与合并 ==========
         'Files changed': '已更改文件',
@@ -798,51 +778,26 @@
         
         // ========== 新增翻译项 - 仓库设置 ==========
         'Options': '选项',
-        'Manage access': '管理访问权限',
-        'Branches': '分支',
-        'Tags': '标签',
-        'Releases': '发布',
-        'Actions': '操作',
-        'Secrets': '密钥',
-        'Variables': '变量',
-        'Webhooks': 'Webhooks',
         'Deploy keys': '部署密钥',
-        'Collaborators': '协作者',
         'Templates': '模板',
         'Code security': '代码安全',
         'Code scanning': '代码扫描',
         'Secret scanning': '密钥扫描',
-        'Dependency graph': '依赖图',
-        'Dependabot alerts': 'Dependabot提醒',
         'Dependabot security updates': 'Dependabot安全更新',
         'Dependabot version updates': 'Dependabot版本更新',
         'Advanced security': '高级安全',
-        'Pages': 'Pages',
-        'Packages': '包',
         'Environments': '环境',
-        'Teams': '团队',
-        'Audit log': '审计日志',
-        'Billing & plans': '账单与计划',
+        'Teams': '团队'
         
         // ========== 新增翻译项 - 用户与个人资料 ==========
         'User': '用户',
-        'Profile': '资料',
         'Activity': '活动',
         'Public contributions': '公开贡献',
         'Private contributions': '私有贡献',
         'Contribution settings': '贡献设置',
-        'Edit profile': '编辑资料',
-        'Change avatar': '更换头像',
         'Edit bio': '编辑简介',
         'Update bio': '更新简介',
-        'View followers': '查看关注者',
-        'View following': '查看关注中',
-        'View repositories': '查看仓库',
-        'View stars': '查看标星',
-        'View gists': '查看代码片段',
-        'View codespaces': '查看Codespaces',
-        'View projects': '查看项目',
-        'View organizations': '查看组织',
+        'View gists': '查看代码片段'
         
         // ========== 新增翻译项 - 市场与扩展 ==========
         'GitHub Marketplace': 'GitHub市场',
