@@ -4949,32 +4949,152 @@
         'Filter by user': '按用户筛选'
     };
     /**
-     * 预编译常用正则表达式的缓存
+     * 正则表达式处理模块
+     * @description 提供正则表达式的创建、缓存和管理功能，采用LRU缓存策略优化性能
      */
-    const REGEX_CACHE = new Map();
+    const regexModule = {
+        // 存储编译后的正则表达式的缓存，使用Map实现
+        _cache: new Map(),
+        
+        // 存储访问顺序，用于LRU缓存策略
+        _accessOrder: [],
+        
+        // 常用预编译正则表达式，避免重复创建
+        _precompiledPatterns: {
+            // 文件路径相关模式
+            filePath: /[\w\-\.]+\/[\w\-\.\/]+/g,
+            // URL链接模式
+            url: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g,
+            // 邮箱地址模式
+            email: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+            // 提交SHA模式
+            commitSha: /[0-9a-f]{7,40}/g
+        },
+        
+        /**
+         * 转义正则表达式特殊字符
+         * @param {string} string - 需要转义的字符串
+         * @returns {string} 转义后的安全字符串
+         */
+        escapeRegExp(string) {
+            try {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            } catch (error) {
+                if (CONFIG.debugMode) {
+                    console.error('[GitHub_i18n] 正则表达式转义失败:', error);
+                }
+                return string; // 发生错误时返回原字符串
+            }
+        },
+        
+        /**
+         * 获取预编译的常用正则表达式
+         * @param {string} patternName - 预定义模式名称
+         * @returns {RegExp|null} 预编译的正则表达式或null
+         */
+        getPrecompiledPattern(patternName) {
+            return this._precompiledPatterns[patternName] || null;
+        },
+        
+        /**
+         * 获取或创建正则表达式
+         * @param {string} pattern - 正则表达式模式
+         * @param {string} flags - 正则表达式标志，默认为'g'
+         * @returns {RegExp} 编译后的正则表达式
+         */
+        getRegex(pattern, flags = 'g') {
+            if (!pattern || typeof pattern !== 'string') {
+                return new RegExp('', flags); // 安全返回空正则
+            }
+            
+            // 使用模式+标志作为缓存键，以支持不同标志的相同模式
+            const cacheKey = `${pattern}:${flags}`;
+            
+            // 检查缓存中是否已存在
+            if (this._cache.has(cacheKey)) {
+                // 更新访问顺序（LRU策略）
+                this._updateAccessOrder(cacheKey);
+                return this._cache.get(cacheKey);
+            }
+            
+            try {
+                // 创建新的正则表达式
+                const escapedPattern = this.escapeRegExp(pattern);
+                const regex = new RegExp(escapedPattern, flags);
+                
+                // 存储到缓存
+                this._cache.set(cacheKey, regex);
+                this._accessOrder.push(cacheKey);
+                
+                // 限制缓存大小，实现LRU策略
+                this._trimCache();
+                
+                return regex;
+            } catch (error) {
+                if (CONFIG.debugMode) {
+                    console.error('[GitHub_i18n] 正则表达式创建失败:', error);
+                }
+                return new RegExp(this.escapeRegExp(pattern), flags); // 尝试安全降级
+            }
+        },
+        
+        /**
+         * 更新缓存项的访问顺序（LRU策略）
+         * @private
+         * @param {string} cacheKey - 缓存键
+         */
+        _updateAccessOrder(cacheKey) {
+            const index = this._accessOrder.indexOf(cacheKey);
+            if (index > -1) {
+                // 移除旧位置
+                this._accessOrder.splice(index, 1);
+                // 添加到末尾（最近访问）
+                this._accessOrder.push(cacheKey);
+            }
+        },
+        
+        /**
+         * 修剪缓存，确保不超过最大大小限制
+         * @private
+         */
+        _trimCache() {
+            const maxSize = CONFIG.performance.regexCacheSize || 200;
+            while (this._cache.size > maxSize) {
+                // 移除最久未访问的项（访问顺序数组的第一个元素）
+                const oldestKey = this._accessOrder.shift();
+                if (oldestKey) {
+                    this._cache.delete(oldestKey);
+                }
+            }
+        },
+        
+        /**
+         * 清除正则表达式缓存
+         */
+        clearCache() {
+            this._cache.clear();
+            this._accessOrder = [];
+        },
+        
+        /**
+         * 获取缓存统计信息
+         * @returns {Object} 缓存统计数据
+         */
+        getCacheStats() {
+            return {
+                size: this._cache.size,
+                maxSize: CONFIG.performance.regexCacheSize || 200
+            };
+        }
+    };
     
     /**
-     * 获取或创建正则表达式
+     * 获取或创建正则表达式（兼容旧API的包装函数）
      * @param {string} pattern - 正则表达式模式
      * @returns {RegExp} 编译后的正则表达式
      */
     function getRegex(pattern) {
-        if (!REGEX_CACHE.has(pattern)) {
-            // 辅助函数：转义正则表达式特殊字符
-            function escapeRegExp(string) {
-                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            }
-            
-            REGEX_CACHE.set(pattern, new RegExp(escapeRegExp(pattern), 'g'));
-            
-            // 限制缓存大小，防止内存泄漏
-            if (REGEX_CACHE.size > CONFIG.performance.regexCacheSize) {
-                // 删除最早添加的缓存项
-                const firstKey = REGEX_CACHE.keys().next().value;
-                REGEX_CACHE.delete(firstKey);
-            }
-        }
-        return REGEX_CACHE.get(pattern);
+        return regexModule.getRegex(pattern);
     }
     
     /**
