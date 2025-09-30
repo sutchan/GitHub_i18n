@@ -770,24 +770,6 @@
     
     // 初始化翻译词典（按需加载）
     const TRANSLATION_DICT = translationModule.getTranslationDict();
-        'Your codespaces': '你的 Codespaces',
-        'Your projects': '你的项目',
-        'Your organizations': '你的组织',
-        'Your notifications': '你的通知',
-        'Feature preview': '功能预览',
-        'Help': '帮助',
-        'Sign out': '退出登录',
-        'Signed in as': '已登录为',
-        'Dashboard': '仪表盘',
-
-        // ========== 仓库页主导航（UnderlineNav）==========
-        'Overview': '概览',
-        'Commits': '提交',
-        'Branches': '分支',
-        'Tags': '标签',
-        'Releases': '发布',
-        'Packages': '包',
-        'Environments': '环境',
         'Contributors': '贡献者',
         'Activity': '活动',
         'Dependency graph': '依赖关系图',
