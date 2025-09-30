@@ -770,26 +770,6 @@
     
     // 初始化翻译词典（按需加载）
     const TRANSLATION_DICT = translationModule.getTranslationDict();
-        'Watched the repository': '关注了仓库',
-        'Unstarred the repository': '取消标星仓库',
-        'Unwatched the repository': '取消关注仓库',
-        
-        // ========== GitHub 主页特定翻译项 ==========
-        'Join the world’s most widely adopted AI-powered developer platform': '加入世界上采用最广泛的AI驱动开发者平台',
-        'Build and ship software on a single, collaborative platform': '在单一协作平台上构建和发布软件',
-        'Code quickly and more securely with GitHub Copilot embedded throughout your workflows': '通过嵌入工作流的GitHub Copilot快速且更安全地编写代码',
-        'Accelerate performance': '提升性能',
-        'With GitHub Copilot embedded throughout the platform, you can simplify your toolchain, automate tasks, and improve the developer experience': '通过整个平台嵌入的GitHub Copilot，您可以简化工具链，自动化任务并改善开发者体验',
-        'Built-in application security where found means fixed': '内置应用安全，发现即修复',
-        'Use AI to find and fix vulnerabilities—freeing your teams to ship more secure software faster': '使用AI查找和修复漏洞，让您的团队更快地发布更安全的软件',
-        'Work together, achieve more': '协作共赢',
-        'Collaborate with your teams, use management tools that sync with your projects, and code from anywhere—all on a single, integrated platform': '与团队协作，使用与项目同步的管理工具，随时随地编写代码——全部在一个集成平台上',
-        'From startups to enterprises, GitHub scales with teams of any size in any industry': '从初创公司到企业，GitHub可随任何行业任何规模的团队扩展',
-        'Survey: The AI wave continues to grow on software development teams, 2024': '调查：2024年软件开发团队中的AI浪潮持续增长',
-        'Saved': '已保存',
-
-        // ========== 邮箱与密钥 ==========
-        'Email address': '邮箱地址',
         'Primary email address': '主邮箱地址',
         'Add email address': '添加邮箱地址',
         'Verified': '已验证',
