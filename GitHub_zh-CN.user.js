@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.7.1',
+        version: '1.7.2',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -38,6 +38,19 @@
             scriptUrl: 'https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.userjs',
             // 是否启用自动版本号更新
             autoUpdateVersion: true
+        },
+        // 性能优化配置
+        performance: {
+            // 是否启用深度DOM监听
+            enableDeepObserver: false,
+            // 是否启用部分匹配翻译
+            enablePartialMatch: true,
+            // 单次加载的最大字典大小
+            maxDictSize: 2000,
+            // 是否使用翻译缓存
+            enableTranslationCache: true,
+            // 正则表达式缓存大小限制
+            regexCacheSize: 500
         }
     };
 
@@ -3899,6 +3912,35 @@
         'Filter by user': '按用户筛选'
     };
     /**
+     * 预编译常用正则表达式的缓存
+     */
+    const REGEX_CACHE = new Map();
+    
+    /**
+     * 获取或创建正则表达式
+     * @param {string} pattern - 正则表达式模式
+     * @returns {RegExp} 编译后的正则表达式
+     */
+    function getRegex(pattern) {
+        if (!REGEX_CACHE.has(pattern)) {
+            // 辅助函数：转义正则表达式特殊字符
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+            
+            REGEX_CACHE.set(pattern, new RegExp(escapeRegExp(pattern), 'g'));
+            
+            // 限制缓存大小，防止内存泄漏
+            if (REGEX_CACHE.size > CONFIG.performance.regexCacheSize) {
+                // 删除最早添加的缓存项
+                const firstKey = REGEX_CACHE.keys().next().value;
+                REGEX_CACHE.delete(firstKey);
+            }
+        }
+        return REGEX_CACHE.get(pattern);
+    }
+    
+    /**
      * 检查节点是否在不应翻译的区域内（兼容性更好的实现）
      * @param {Node} element - 要检查的 DOM 元素
      * @returns {boolean} - 是否在不应翻译的区域内
@@ -3906,10 +3948,19 @@
     function isInSkippedRegion(element) {
         if (!element) return false;
         
+        // 快速检查 - 先检查元素自身是否有跳过标记
+        if (element.dataset.translated === 'skip') return true;
+        
         // 限制递归深度，避免栈溢出
         const MAX_DEPTH = 10;
         let currentElement = element;
         let depth = 0;
+        
+        // 缓存查询结果，避免重复检查相同元素
+        const cacheKey = element.getAttribute('data-skip-cache-key');
+        if (cacheKey && cacheKey === element.textContent) {
+            return element.dataset.skipRegion === 'true';
+        }
         
         while (currentElement && depth < MAX_DEPTH) {
             const parent = currentElement.parentElement;
@@ -3943,20 +3994,37 @@
             
             if (parent.classList && parent.classList.length) {
                 for (const cls of skipClasses) {
-                    if (parent.classList.contains(cls)) return true;
+                    if (parent.classList.contains(cls)) {
+                        // 缓存结果
+                        element.setAttribute('data-skip-cache-key', element.textContent);
+                        element.dataset.skipRegion = 'true';
+                        return true;
+                    }
                 }
             }
             
             // 检查标签名
             const skipParentTags = ['code', 'pre', 'textarea', 'input', 'script', 'style'];
-            if (skipParentTags.includes(parent.tagName.toLowerCase())) return true;
+            if (skipParentTags.includes(parent.tagName.toLowerCase())) {
+                // 缓存结果
+                element.setAttribute('data-skip-cache-key', element.textContent);
+                element.dataset.skipRegion = 'true';
+                return true;
+            }
             
             currentElement = parent;
             depth++;
         }
         
+        // 缓存结果
+        element.setAttribute('data-skip-cache-key', element.textContent);
+        element.dataset.skipRegion = 'false';
         return false;
     }
+    
+    // 翻译缓存，用于存储已翻译的文本
+    const TRANSLATION_CACHE = new Map();
+    const MAX_CACHE_SIZE = 1000; // 缓存最大条目数
     
     /**
      * 安全替换文本节点（不破坏 HTML 结构和布局）
@@ -3970,6 +4038,9 @@
         if (skipTags.includes(node.tagName)) return;
         
         if (isInSkippedRegion(node)) return;
+        
+        // 检查是否已经翻译过
+        if (node.dataset.translated === 'true') return;
 
         // 使用队列实现从左到右的广度优先遍历
         const queue = [node];
@@ -3981,6 +4052,15 @@
                     let textContent = child.textContent;
                     let originalText = textContent;
                     
+                    // 检查翻译缓存
+                    if (TRANSLATION_CACHE.has(textContent)) {
+                        const cachedResult = TRANSLATION_CACHE.get(textContent);
+                        if (cachedResult !== textContent) {
+                            child.textContent = cachedResult;
+                        }
+                        continue;
+                    }
+                    
                     // 先尝试完全匹配
                     const trimmedText = textContent.trim();
                     if (trimmedText && TRANSLATION_DICT.hasOwnProperty(trimmedText)) {
@@ -3988,13 +4068,14 @@
                         if (CONFIG.debugMode && textContent !== originalText) {
                             console.log(`[GitHub_i18n] 已翻译: "${trimmedText}" -> "${TRANSLATION_DICT[trimmedText]}"`);
                         }
-                    } else {
+                    } else if (CONFIG.performance.enablePartialMatch !== false) {
                         // 再尝试部分匹配（按长度降序排序，确保最长的匹配项优先）
+                        // 只有当enablePartialMatch未设置为false时才执行
                         const sortedKeys = Object.keys(TRANSLATION_DICT).sort((a, b) => b.length - a.length);
                         for (const key of sortedKeys) {
                             if (key.length > 1 && textContent.includes(key)) {
-                                // 创建正则表达式，全局替换所有匹配项
-                                const regex = new RegExp(escapeRegExp(key), 'g');
+                                // 使用缓存的正则表达式
+                                const regex = getRegex(key);
                                 textContent = textContent.replace(regex, TRANSLATION_DICT[key]);
                                 if (CONFIG.debugMode) {
                                     console.log(`[GitHub_i18n] 部分翻译: "${key}" -> "${TRANSLATION_DICT[key]}"`);
@@ -4007,6 +4088,14 @@
                     if (textContent !== originalText) {
                         child.textContent = textContent;
                     }
+                    
+                    // 存入缓存，限制缓存大小
+                    if (TRANSLATION_CACHE.size >= MAX_CACHE_SIZE) {
+                        // 删除最早添加的条目
+                        const firstKey = TRANSLATION_CACHE.keys().next().value;
+                        TRANSLATION_CACHE.delete(firstKey);
+                    }
+                    TRANSLATION_CACHE.set(originalText, textContent);
                 } else if (child.nodeType === Node.ELEMENT_NODE) {
                     // 检查子节点是否需要跳过翻译
                     if (!skipTags.includes(child.tagName) && !isInSkippedRegion(child)) {
@@ -4016,10 +4105,8 @@
             }
         }
         
-        // 辅助函数：转义正则表达式特殊字符
-        function escapeRegExp(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        }
+        // 标记已翻译的节点
+        node.dataset.translated = 'true';
     }
 
     /**
@@ -4086,6 +4173,20 @@
         }
     }
 
+    // 节流函数，用于限制高频操作的执行频率
+    function throttle(func, limit) {
+        let inThrottle;
+        return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    }
+
     /**
      * 初始化翻译功能
      */
@@ -4093,17 +4194,52 @@
         // 初始翻译
         translatePage();
 
+        // 设置节流版的翻译函数
+        const throttledTranslatePage = throttle(() => {
+            translatePage();
+        }, CONFIG.performance.throttleInterval || 200);
+
         // 设置 MutationObserver 监听动态内容变化
-        const observer = new MutationObserver(() => {
+        const observer = new MutationObserver((mutations) => {
             // 防抖 + 延迟确保元素渲染完成
             clearTimeout(observer.timer);
-            observer.timer = setTimeout(translatePage, CONFIG.debounceDelay);
+            observer.timer = setTimeout(() => {
+                // 性能优化：如果启用了深度观察器限制，则只处理关键区域的变化
+                if (CONFIG.performance.enableDeepObserver === false) {
+                    // 只处理关键区域的变化
+                    const hasRelevantMutation = mutations.some(mutation => {
+                        const target = mutation.target;
+                        // 检查是否在关键区域内
+                        const keyAreas = document.querySelectorAll('#header, .application-main');
+                        for (const area of keyAreas) {
+                            if (area.contains(target)) return true;
+                        }
+                        return false;
+                    });
+                    
+                    if (hasRelevantMutation) {
+                        throttledTranslatePage();
+                    }
+                } else {
+                    throttledTranslatePage();
+                }
+            }, CONFIG.debounceDelay);
         });
 
-        // 开始监听
-        observer.observe(document.body, {
+        // 开始监听 - 优化监听配置
+        const observeConfig = {
             childList: true,
-            subtree: true
+            subtree: CONFIG.performance.enableDeepObserver !== false, // 可以通过配置禁用深度监听
+            characterData: CONFIG.performance.observeTextChanges === true // 可选的文本变化监听
+        };
+        
+        // 优化：只监听关键区域而不是整个body
+        const observeTargets = CONFIG.performance.enableDeepObserver === false 
+            ? document.querySelectorAll('#header, .application-main') 
+            : [document.body];
+        
+        observeTargets.forEach(target => {
+            if (target) observer.observe(target, observeConfig);
         });
 
         // 监听 SPA 路由变化
@@ -4397,10 +4533,83 @@
     }
     
     /**
+     * 性能监控工具
+     */
+    const performanceMonitor = {
+        startTime: null,
+        measures: new Map(),
+        
+        start() {
+            this.startTime = performance.now();
+        },
+        
+        measure(label) {
+            if (!this.startTime) return;
+            const endTime = performance.now();
+            const duration = endTime - this.startTime;
+            this.measures.set(label, duration);
+            if (CONFIG.performance.enableLogging === true) {
+                console.log(`[GitHub_i18n] 性能监控 - ${label}: ${duration.toFixed(2)}ms`);
+            }
+        },
+        
+        reset() {
+            this.startTime = null;
+        }
+    };
+
+    /**
+     * 延迟加载非关键功能
+     */
+    function loadNonCriticalFeatures() {
+        try {
+            // 只有在配置启用的情况下才执行
+            if (CONFIG.performance.loadNonCriticalFeatures !== false) {
+                // 延迟加载功能列表
+                const deferredFeatures = [
+                    {
+                        name: 'updateCheck',
+                        condition: () => CONFIG.updateCheck && CONFIG.updateCheck.enabled,
+                        callback: () => checkForUpdates(),
+                        delay: CONFIG.updateCheck.checkDelay || 5000
+                    }
+                ];
+                
+                // 按配置的延迟时间执行每个功能
+                deferredFeatures.forEach(feature => {
+                    if (feature.condition()) {
+                        setTimeout(() => {
+                            try {
+                                if (CONFIG.performance.enableLogging === true) {
+                                    console.log(`[GitHub_i18n] 延迟加载功能: ${feature.name}`);
+                                }
+                                feature.callback();
+                            } catch (error) {
+                                if (CONFIG.debugMode) {
+                                    console.error(`[GitHub_i18n] 延迟加载功能 ${feature.name} 失败:`, error);
+                                }
+                            }
+                        }, feature.delay);
+                    }
+                });
+            }
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub_i18n] 延迟加载非关键功能失败:', error);
+            }
+        }
+    }
+
+    /**
      * 启动脚本
      */
     function startScript() {
         try {
+            // 开始性能监控
+            if (CONFIG.performance.enableLogging === true) {
+                performanceMonitor.start();
+            }
+            
             // 处理版本自动升级
             handleVersionAutoUpgrade();
             
@@ -4409,11 +4618,14 @@
                 document.addEventListener('DOMContentLoaded', () => {
                     try {
                         init();
-                        // 初始化后检查更新
-                        if (CONFIG.updateCheck && CONFIG.updateCheck.enabled) {
-                            // 延迟检查，避免影响页面加载性能
-                            setTimeout(checkForUpdates, CONFIG.updateCheck.checkDelay || 5000);
+                        
+                        // 记录初始化性能
+                        if (CONFIG.performance.enableLogging === true) {
+                            performanceMonitor.measure('初始化完成');
                         }
+                        
+                        // 延迟加载非关键功能
+                        loadNonCriticalFeatures();
                     } catch (error) {
                         if (CONFIG.debugMode) {
                             console.error('[GitHub_i18n] DOMContentLoaded 初始化失败:', error);
@@ -4423,11 +4635,14 @@
             } else {
                 try {
                     init();
-                    // 初始化后检查更新
-                    if (CONFIG.updateCheck && CONFIG.updateCheck.enabled) {
-                        // 延迟检查，避免影响页面加载性能
-                        setTimeout(checkForUpdates, CONFIG.updateCheck.checkDelay || 5000);
+                    
+                    // 记录初始化性能
+                    if (CONFIG.performance.enableLogging === true) {
+                        performanceMonitor.measure('初始化完成');
                     }
+                    
+                    // 延迟加载非关键功能
+                    loadNonCriticalFeatures();
                 } catch (error) {
                     if (CONFIG.debugMode) {
                         console.error('[GitHub_i18n] 直接初始化失败:', error);
