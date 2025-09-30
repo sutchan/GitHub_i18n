@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.6.6
+// @version      1.6.7
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -22,7 +22,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.6.6',
+        version: '1.6.7',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -2019,13 +2019,18 @@
             '.Header-item--full',               // 中央菜单
             '.HeaderMenu',                      // 个人下拉菜单容器
             '.UnderlineNav',                    // 仓库页标签导航
-            '.dropdown-menu',                   // 所有下拉菜单
+            '.dropdown-menu',                   // 传统下拉菜单
+            '.SelectMenu',                      // GitHub现代下拉菜单
+            '.Popover-menu',                    // 弹出菜单
+            '.menu',                            // 通用菜单类
+            '.ActionList',                      // 操作列表菜单
             '.BorderGrid',                      // 设置页面网格
             '.Box',                             // 设置项容器
             '.menu-item',                       // 菜单项
             '.js-selected-navigation-item',     // 选中项
             '.Layout',                          // 通用布局容器
-            '.application-main'                 // 主内容区（保守使用）
+            '.application-main',                // 主内容区（保守使用）
+            '.js-menu-container'                // JavaScript生成的菜单容器
         ];
 
         // 优化：合并选择器查询以提高性能
@@ -2033,6 +2038,40 @@
         document.querySelectorAll(combinedSelector).forEach(el => {
             replaceTextNodes(el);
         });
+        
+        // 额外处理：专门针对弹出菜单的处理，确保及时翻译
+        handlePopupMenus();
+    }
+    
+    /**
+     * 专门处理弹出菜单的翻译
+     * @description 针对GitHub动态生成的弹出菜单进行额外处理，确保它们能够被及时翻译
+     */
+    function handlePopupMenus() {
+        try {
+            // 查找所有可能是弹出菜单的元素
+            const popupSelectors = [
+                '[aria-label="Menu"]',            // 带标签的菜单
+                '[role="menu"]',                 // 具有menu角色的元素
+                '.ReactModal__Content',            // React模态框
+                '.Overlay-backdrop',               // 覆盖层
+                '[data-component-type="dropdown"]' // 数据组件类型标记的下拉菜单
+            ];
+            
+            popupSelectors.forEach(selector => {
+                document.querySelectorAll(selector).forEach(menu => {
+                    // 检查是否已经翻译过，避免重复翻译
+                    if (!menu.dataset.translated) {
+                        replaceTextNodes(menu);
+                        menu.dataset.translated = 'true';
+                    }
+                });
+            });
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub_i18n] 处理弹出菜单失败:', error);
+            }
+        }
     }
 
     /**
