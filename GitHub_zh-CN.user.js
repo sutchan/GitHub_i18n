@@ -770,24 +770,6 @@
     
     // 初始化翻译词典（按需加载）
     const TRANSLATION_DICT = translationModule.getTranslationDict();
-        'Blocked users': '被屏蔽用户',
-        'Domain settings': '域名设置',
-        'Enterprise': '企业',
-
-        // ========== 通知中心 ==========
-        'Unread': '未读',
-        'Participating': '参与的',
-        'All': '全部',
-        'Custom': '自定义',
-        'Mark all as read': '全部标记为已读',
-        'Mute thread': '静音此会话',
-        'Unmute thread': '取消静音',
-        'Save': '保存',
-        'Notifications are updating': '通知正在更新',
-        'Notifications updated': '通知已更新',
-        'No notifications': '暂无通知',
-        'Forked the repository': '复刻了仓库',
-        'Starred the repository': '标星了仓库',
         'Watched the repository': '关注了仓库',
         'Unstarred the repository': '取消标星仓库',
         'Unwatched the repository': '取消关注仓库',
