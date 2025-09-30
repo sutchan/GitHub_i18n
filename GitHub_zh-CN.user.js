@@ -2195,7 +2195,7 @@
         'All activity types': '所有活动类型',
         'All repositories': '所有仓库',
         'All teams': '所有团队',
-        'All repositories': '所有仓库',
+        'All organizations': '所有组织',
         'Public repositories': '公共仓库',
         'Private repositories': '私有仓库',
         'Internal repositories': '内部仓库',
