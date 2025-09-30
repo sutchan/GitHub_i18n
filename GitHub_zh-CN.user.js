@@ -1889,7 +1889,7 @@
         'Notification previews': '通知预览',
         'Notification snippets': '通知片段',
         'Notification details expanded': '通知详情已展开',
-        'Notification details collapsed': '通知详情已折叠'}]}}}
+        'Notification details collapsed': '通知详情已折叠',
         'created tag': '创建了标签',
         'published': '发布了',
         'released': '发行了',
