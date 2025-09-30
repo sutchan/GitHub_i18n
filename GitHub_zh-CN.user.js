@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.7.4
+// @version      1.7.5
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -21,7 +21,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.7.4',
+        version: '1.7.5',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -44,7 +44,7 @@
             // 是否启用深度DOM监听
             enableDeepObserver: false,
             // 是否启用部分匹配翻译
-            enablePartialMatch: true,
+        enablePartialMatch: false,
             // 单次加载的最大字典大小
             maxDictSize: 2000,
             // 是否使用翻译缓存
