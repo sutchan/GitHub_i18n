@@ -771,24 +771,6 @@
     // 初始化翻译词典（按需加载）
     const TRANSLATION_DICT = translationModule.getTranslationDict();
         'Codespaces': 'Codespaces',
-        'Copilot': 'Copilot',
-        'Pages': 'Pages',
-        'Actions': '操作',
-        'Packages': '包',
-        'Security log': '安全日志',
-
-        // ========== 组织设置菜单 ==========
-        'Organization settings': '组织设置',
-        'Profile': '资料',
-        'People': '成员',
-        'Teams': '团队',
-        'Billing': '账单',
-        'SAML SSO': 'SAML SSO',
-        'Audit log': '审计日志',
-        'Actions': '操作',
-        'Packages': '包',
-        'Secrets and variables': '密钥与变量',
-        'Codespaces': 'Codespaces',
         'Pages': 'Pages',
         'Webhooks': 'Webhooks',
         'OAuth Apps': 'OAuth 应用',
