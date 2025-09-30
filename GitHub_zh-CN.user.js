@@ -5482,13 +5482,8 @@
                         child.textContent = textContent;
                     }
                     
-                    // 存入缓存，限制缓存大小
-                    if (TRANSLATION_CACHE.size >= MAX_CACHE_SIZE) {
-                        // 删除最早添加的条目
-                        const firstKey = TRANSLATION_CACHE.keys().next().value;
-                        TRANSLATION_CACHE.delete(firstKey);
-                    }
-                    TRANSLATION_CACHE.set(originalText, textContent);
+                    // 存入缓存，translationCache内部会自动处理大小限制
+                    translationCache.set(originalText, textContent);
                 } else if (child.nodeType === Node.ELEMENT_NODE) {
                     // 检查子节点是否需要跳过翻译
                     if (!skipTags.includes(child.tagName) && !isInSkippedRegion(child)) {
