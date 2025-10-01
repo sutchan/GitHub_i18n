@@ -770,10 +770,6 @@
     
     // 初始化翻译词典（按需加载）
     const TRANSLATION_DICT = translationModule.getTranslationDict();
-        'Start': '启动',
-        'Stop': '停止',
-        'Restart': '重启',
-        'Export': '导出',
         'Delete codespace': '删除代码空间',
         'Create codespace': '创建代码空间',
         'View codespaces': '查看代码空间',
