@@ -770,21 +770,6 @@
     
     // 初始化翻译词典（按需加载）
     const TRANSLATION_DICT = translationModule.getTranslationDict();
-        'Title': '标题',
-        'Key': '密钥',
-        'Add SSH key': '添加 SSH 密钥',
-        'GPG keys': 'GPG 密钥',
-        'New GPG key': '新建 GPG 密钥',
-        'Add GPG key': '添加 GPG 密钥',
-        'Public key': '公钥',
-
-        // ========== 令牌 ==========
-        'Personal access tokens': '个人访问令牌',
-        'Fine-grained tokens': '精细令牌',
-        'Tokens (classic)': '经典令牌',
-        'Generate new token': '生成新令牌',
-        'Note': '备注',
-        'Expires': '过期时间',
         'Token': '令牌',
         'Configure': '配置',
         'Regenerate': '重新生成',
