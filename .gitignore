@@ -13,3 +13,5 @@ GitHub_zh-CN.user.js.backup_before_fetch
 *.backup
 github_settings_fetcher.js
 *.backup_before_settings_fetch
+/node_modules
+*.json
