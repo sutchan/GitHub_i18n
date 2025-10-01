@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.8.0
+// @version      1.8.1
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -98,7 +98,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.8.0',
+        version: '1.8.1',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -947,21 +947,18 @@
                     let originalText = node.nodeValue;
                     let translatedText = originalText;
                     
-                    // 尝试使用翻译词典进行替换
-                    TRANSLATION_DICT.forEach((translation, original) => {
-                        const regex = new RegExp(utils.escapeRegExp(original), 'gi');
-                        if (regex.test(translatedText)) {
-                            translatedText = translatedText.replace(regex, match => {
-                                // 保持原始大小写（简单实现）
-                                if (match === match.toUpperCase()) {
-                                    return translation.toUpperCase();
-                                } else if (match.charAt(0) === match.charAt(0).toUpperCase()) {
-                                    return translation.charAt(0).toUpperCase() + translation.slice(1);
-                                }
-                                return translation;
-                            });
+                    // 尝试使用翻译词典进行替换 - 仅完全匹配时才翻译
+                    if (TRANSLATION_DICT.has(translatedText)) {
+                        translatedText = TRANSLATION_DICT.get(translatedText);
+                    } else if (TRANSLATION_DICT.has(translatedText.toLowerCase())) {
+                        // 检查小写形式的完全匹配，保持原始大小写
+                        const lowerCaseTranslation = TRANSLATION_DICT.get(translatedText.toLowerCase());
+                        if (translatedText === translatedText.toUpperCase()) {
+                            translatedText = lowerCaseTranslation.toUpperCase();
+                        } else if (translatedText.charAt(0) === translatedText.charAt(0).toUpperCase()) {
+                            translatedText = lowerCaseTranslation.charAt(0).toUpperCase() + lowerCaseTranslation.slice(1);
                         }
-                    });
+                    }
                     
                     // 如果文本被翻译了，更新节点值
                     if (translatedText !== originalText) {
