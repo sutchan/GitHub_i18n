@@ -114,7 +114,7 @@
         // 选择器常量
         selectors: {
             // 关键区域选择器
-            keyAreas: ['#header', '.application-main'],
+            keyAreas: ['#header', '.application-main', '.js-repo-nav', '#repository-details-container'],
             // 翻译目标选择器
             translationTargets: [
                 '#header',                          // 顶部导航栏
@@ -132,7 +132,9 @@
                 '.js-selected-navigation-item',     // 选中项
                 '.Layout',                          // 通用布局容器
                 '.application-main',                // 主内容区（保守使用）
-                '.js-menu-container'                // JavaScript生成的菜单容器
+                '.js-menu-container',               // JavaScript生成的菜单容器
+                '.js-repo-nav',                     // 仓库导航栏
+                '.repository-details-container'     // 仓库详情容器
             ],
             // 弹出菜单选择器
             popupMenus: [
