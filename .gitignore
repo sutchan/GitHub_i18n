@@ -3,3 +3,4 @@
 /.trae
 *.code-workspace
 github_string_fetcher.js
+*.bak
