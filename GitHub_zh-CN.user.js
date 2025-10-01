@@ -437,7 +437,12 @@
             'Deploy keys': '部署密钥'
         },
         
-        // 仪表板页面翻译
+        //
+    // 设置页面翻译
+    settings: {
+    },
+    
+    // 页面翻译
         dashboard: {
 
             'Contributions': '贡献',

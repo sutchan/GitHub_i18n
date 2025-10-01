@@ -11,3 +11,5 @@ GitHub_zh-CN.user.js.backup_before_fetch
 .trae/rules/project_rules.md
 /docs
 *.backup
+github_settings_fetcher.js
+*.backup_before_settings_fetch
