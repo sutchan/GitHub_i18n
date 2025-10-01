@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.8.5
+// @version      1.8.6
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -32,7 +32,7 @@
         }
         
         // 如果无法从注释中读取，返回默认版本号
-        return '1.8.4';
+        return '1.8.5';
     }
 
     // ========== 工具函数模块 ==========
@@ -177,7 +177,11 @@
                 '.application-main',                // 主内容区（保守使用）
                 '.js-menu-container',               // JavaScript生成的菜单容器
                 '.js-repo-nav',                     // 仓库导航栏
-                '.repository-details-container'     // 仓库详情容器
+                '.repository-details-container',    // 仓库详情容器
+                '.Overlay-body',                    // 覆盖层内容区域
+                '.AppHeader-globalBar-end',         // 应用头部全局栏末端
+                '.p-2',                             // 2单位内边距容器
+                '.footer'                           // 页脚区域
             ],
             // 弹出菜单选择器
             popupMenus: [
