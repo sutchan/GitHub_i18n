@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.8.3
+// @version      1.8.4
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -98,7 +98,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.8.3',
+        version: '1.8.4',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -339,7 +339,40 @@
             'Enterprise platform': '企业平台',
             'AI-powered developer platform': 'AI 驱动的开发者平台',
             'Saved searches': '已保存的搜索',
-            'Use saved searches to filter your results more quickly': '使用已保存的搜索更快地筛选结果'
+            'Use saved searches to filter your results more quickly': '使用已保存的搜索更快地筛选结果',
+            // Actions页面相关
+            'Actions secrets and variables': '操作密钥和变量',
+            'Workflow runs': '工作流程运行',
+            'Workflow files': '工作流程文件',
+            'New workflow': '新建工作流程',
+            'Disable Actions': '禁用操作',
+            'Enable local actions only': '仅启用本地操作',
+            'Enable all actions': '启用所有操作',
+            // Security页面相关
+            'Security overview': '安全概览',
+            'Vulnerability alerts': '漏洞警报',
+            'Code scanning': '代码扫描',
+            'Secret scanning': '密钥扫描',
+            'Dependabot': 'Dependabot',
+            'Security policy': '安全策略',
+            'Security advisories': '安全建议',
+            // Projects页面相关
+            'Project boards': '项目看板',
+            'Project settings': '项目设置',
+            'Project collaborators': '项目协作者',
+            'New column': '新建列',
+            'Add cards': '添加卡片',
+            'New project board': '新建项目看板',
+            // Settings页面相关
+            'Repository settings': '仓库设置',
+            'Organization settings': '组织设置',
+            'User settings': '用户设置',
+            'Billing settings': '账单设置',
+            'Notifications settings': '通知设置',
+            'Access management': '访问管理',
+            'Integrations': '集成',
+            'Webhooks': 'Web钩子',
+            'Deploy keys': '部署密钥'
         },
         
         // 仪表板页面翻译
@@ -368,6 +401,7 @@
             'New organization': '新建组织',
             'New project': '新建项目',
             'New gist': '新建代码片段',
+            'New workflow': '新建工作流程',
             'Recently updated': '最近更新',
             'Most active': '最活跃',
             'Top languages': '热门语言',
