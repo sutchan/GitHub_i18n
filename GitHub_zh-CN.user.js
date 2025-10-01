@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.7.6
+// @version      1.7.7
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -770,29 +770,7 @@
     
     // 初始化翻译词典（按需加载）
     const TRANSLATION_DICT = translationModule.getTranslationDict();
-        'Delete codespace': '删除代码空间',
-        'Create codespace': '创建代码空间',
-        'View codespaces': '查看代码空间',
-        'Your codespaces': '你的代码空间',
-        'Open with Codespaces': '使用代码空间打开',
-        'Codespace name': '代码空间名称',
-        'Repository': '仓库',
-        'Branch': '分支',
-        'Machine type': '机器类型',
-        'Region': '区域',
-        'Timeout': '超时时间',
-        'Dotfiles': '点文件',
-        'Editor': '编辑器',
-        'Extensions': '扩展',
-        'Environment variables': '环境变量',
-        'Git config': 'Git配置',
-        'Prebuilds': '预构建',
-        'Billing': '账单',
-        'Usage': '使用情况',
-        'Limits': '限制',
-        'Access controls': '访问控制',
-
-        // ========== 其他通用 UI ==========
+         // ========== 其他通用 UI ==========
         'Public': '公开',
         'Private': '私有',
         'Internal': '内部',
