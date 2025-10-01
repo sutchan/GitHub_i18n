@@ -3,3 +3,4 @@
 *.code-workspace
 test_*.js
 advanced_redundancy_checker.js
+analyze_dict.js
