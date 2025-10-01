@@ -770,22 +770,6 @@
     
     // 初始化翻译词典（按需加载）
     const TRANSLATION_DICT = translationModule.getTranslationDict();
-        'Token': '令牌',
-        'Configure': '配置',
-        'Regenerate': '重新生成',
-        'Revoke': '撤销',
-
-        // ========== 代码空间 (Codespaces) ==========
-        'Codespaces': '代码空间',
-        'New codespace': '新建代码空间',
-        'Recent codespaces': '最近的代码空间',
-        'Dev containers': '开发容器',
-        'Settings': '设置',
-        'Preferences': '偏好设置',
-        'Features': '功能',
-        'Port forwarding': '端口转发',
-        'Visual Studio Code': 'Visual Studio Code',
-        'Browser': '浏览器',
         'Start': '启动',
         'Stop': '停止',
         'Restart': '重启',
