@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.7.9
+// @version      1.8.0
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -98,7 +98,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.7.9',
+        version: '1.8.0',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -294,7 +294,49 @@
             'LinkedIn': 'LinkedIn',
             'YouTube': 'YouTube',
             'Facebook': 'Facebook',
-            'Instagram': 'Instagram'
+            'Instagram': 'Instagram',
+            // 新增GitHub功能产品
+            'GitHub Copilot': 'GitHub Copilot',
+            'GitHub Spark': 'GitHub Spark',
+            'GitHub Models': 'GitHub Models',
+            'GitHub Advanced Security': 'GitHub 高级安全',
+            'Code Review': '代码审阅',
+            'Code Search': '代码搜索',
+            'Build and deploy intelligent apps': '构建和部署智能应用',
+            'Manage and compare prompts': '管理和比较提示词',
+            'Find and fix vulnerabilities': '发现并修复漏洞',
+            'Automate any workflow': '自动化任何工作流程',
+            'Instant dev environments': '即时开发环境',
+            'Plan and track work': '规划和跟踪工作',
+            'Manage code changes': '管理代码变更',
+            'Collaborate outside of code': '在代码外协作',
+            'Find more, search less': '查找更多，搜索更少',
+            // Pulse页面相关
+            'Active pull requests': '活跃的拉取请求',
+            'Active issues': '活跃的问题',
+            'Merged pull requests': '已合并的拉取请求',
+            'Open pull requests': '打开的拉取请求',
+            'Closed issues': '已关闭的问题',
+            'New issues': '新问题',
+            'Top Committers': '顶级贡献者',
+            'releases published': '已发布的版本',
+            // 其他新增字符串
+            'Overview': '概览',
+            'Learning Pathways': '学习路径',
+            'Events & Webinars': '活动与网络研讨会',
+            'Ebooks & Whitepapers': '电子书与白皮书',
+            'Customer Stories': '客户案例',
+            'Partners': '合作伙伴',
+            'Executive Insights': '高管洞察',
+            'GitHub Sponsors': 'GitHub 赞助商',
+            'The ReadME Project': 'README 项目',
+            'Enterprise platform': '企业平台',
+            'AI-powered developer platform': 'AI 驱动的开发者平台',
+            'View all features': '查看所有功能',
+            'Saved searches': '已保存的搜索',
+            'Use saved searches to filter your results more quickly': '使用已保存的搜索更快地筛选结果',
+            'Provide feedback': '提供反馈',
+            'Sign up': '注册'
         },
         
         // 仪表板页面翻译
