@@ -109,7 +109,7 @@ A：可以在脚本的 `CONFIG.performance` 部分修改以下配置：
 
 ## 📜 许可证
 
-本项目基于 [GNU General Public License v2.0](LICENSE) 开源，确保软件的自由共享与修改。
+本项目基于 [GNU General Public License v2.0](LICENSE) 开源， 确保软件的自由共享与修改。
 
 ---
 
