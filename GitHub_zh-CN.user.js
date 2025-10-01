@@ -770,7 +770,6 @@
     
     // 初始化翻译词典（按需加载）
     const TRANSLATION_DICT = translationModule.getTranslationDict();
-        'New SSH key': '新建 SSH 密钥',
         'Title': '标题',
         'Key': '密钥',
         'Add SSH key': '添加 SSH 密钥',
