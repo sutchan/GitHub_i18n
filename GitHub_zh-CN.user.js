@@ -312,6 +312,136 @@
 // 初始化翻译词典（按需加载）（按需加载）
 const TRANSLATION_DICT = translationModule.getTranslationDict();
 
+/**
+ * 启动翻译脚本
+ * 功能：实现页面翻译的核心逻辑，包括DOM元素查找和文本替换
+ */
+function startScript() {
+    /**
+     * 翻译指定的DOM元素
+     * @param {HTMLElement} element - 要翻译的DOM元素
+     */
+    function translateElement(element) {
+        if (!element || !element.childNodes || !TRANSLATION_DICT.size) return;
+        
+        // 遍历子节点进行翻译
+        Array.from(element.childNodes).forEach(node => {
+            // 只处理文本节点
+            if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim()) {
+                let originalText = node.nodeValue;
+                let translatedText = originalText;
+                
+                // 尝试使用翻译词典进行替换
+                TRANSLATION_DICT.forEach((translation, original) => {
+                    const regex = new RegExp(utils.escapeRegExp(original), 'gi');
+                    if (regex.test(translatedText)) {
+                        translatedText = translatedText.replace(regex, match => {
+                            // 保持原始大小写（简单实现）
+                            if (match === match.toUpperCase()) {
+                                return translation.toUpperCase();
+                            } else if (match.charAt(0) === match.charAt(0).toUpperCase()) {
+                                return translation.charAt(0).toUpperCase() + translation.slice(1);
+                            }
+                            return translation;
+                        });
+                    }
+                });
+                
+                // 如果文本被翻译了，更新节点值
+                if (translatedText !== originalText) {
+                    node.nodeValue = translatedText;
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                // 递归处理子元素，但跳过一些不需要翻译的元素
+                const tagName = node.tagName.toLowerCase();
+                if (!['script', 'style', 'code', 'pre', 'textarea'].includes(tagName)) {
+                    translateElement(node);
+                }
+            }
+        });
+    }
+    
+    /**
+     * 翻译整个页面
+     */
+    function translatePage() {
+        if (CONFIG.debugMode) {
+            console.log('[GitHub 中文翻译] 开始翻译页面...');
+        }
+        
+        // 遍历关键区域进行翻译
+        CONFIG.selectors.keyAreas.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => translateElement(element));
+        });
+        
+        if (CONFIG.debugMode) {
+            console.log('[GitHub 中文翻译] 页面翻译完成');
+        }
+    }
+    
+    /**
+     * 设置路由变化监听
+     * GitHub 使用 PJAX 实现无刷新导航，需要监听路由变化
+     */
+    function setupRouteChangeObserver() {
+        // 监听 popstate 事件
+        window.addEventListener('popstate', () => {
+            setTimeout(() => {
+                translationModule.resetCache();
+                translatePage();
+            }, CONFIG.routeChangeDelay);
+        });
+        
+        // 监听 DOM 变化，处理动态加载的内容
+        if (CONFIG.performance.enableDeepObserver) {
+            const observer = new MutationObserver(utils.throttle((mutations) => {
+                mutations.forEach(mutation => {
+                    if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                        mutation.addedNodes.forEach(node => {
+                            if (node.nodeType === Node.ELEMENT_NODE) {
+                                translateElement(node);
+                            }
+                        });
+                    }
+                });
+            }, CONFIG.performance.throttleInterval));
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+    }
+    
+    /**
+     * 初始化脚本
+     */
+    function init() {
+        try {
+            // 执行初始翻译
+            translatePage();
+            
+            // 设置路由变化监听
+            setupRouteChangeObserver();
+            
+            if (CONFIG.debugMode) {
+                console.log(`[GitHub 中文翻译] 脚本 v${CONFIG.version} 初始化成功`);
+            }
+        } catch (error) {
+            console.error('[GitHub 中文翻译] 脚本初始化失败:', error);
+        }
+    }
+    
+    // 当DOM加载完成后初始化
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        // 如果DOM已经加载完成，直接初始化
+        init();
+    }
+}
+
     // 🕒 启动脚本
     startScript();
 
