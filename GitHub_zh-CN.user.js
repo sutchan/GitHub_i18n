@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.8.7
+// @version      1.8.8
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -440,6 +440,53 @@
         //
     // 设置页面翻译
     settings: {
+        'Public profile': '待翻译: Public profile',
+        'Danger zone': '待翻译: Danger zone',
+        'Delete this repository': '待翻译: Delete this repository',
+        'Transfer ownership': '待翻译: Transfer ownership',
+        'Accessibility': '待翻译: Accessibility',
+        'Keyboard shortcuts': '待翻译: Keyboard shortcuts',
+        'Underscores in links': '待翻译: Underscores in links',
+        'Notifications': '待翻译: Notifications',
+        'Permanently delete this repository. This cannot be undone.': '待翻译: Permanently delete this repository. This cannot be undone.',
+        'Transfer ownership of this repository to another user or organization.': '待翻译: Transfer ownership of this repository to another user or organization.',
+        'Save changes': '待翻译: Save changes',
+        'Transfer': '待翻译: Transfer',
+        'More options': '待翻译: More options',
+        'Name': '待翻译: Name',
+        'Public email': '待翻译: Public email',
+        'Bio': '待翻译: Bio',
+        'Available for hire': '待翻译: Available for hire',
+        'Enable keyboard shortcuts': '待翻译: Enable keyboard shortcuts',
+        'Disable keyboard shortcuts': '待翻译: Disable keyboard shortcuts',
+        'Underline links': '待翻译: Underline links',
+        'Default notification settings': '待翻译: Default notification settings',
+        'Include your unread notifications in the daily digest email': '待翻译: Include your unread notifications in the daily digest email',
+        'Only receive notifications for threads I participate in': '待翻译: Only receive notifications for threads I participate in',
+        'Don\'t show my email': '待翻译: Don\'t show my email',
+        'user@example.com': '待翻译: user@example.com',
+        'Watch': '待翻译: Watch',
+        'Star': '待翻译: Star',
+        'Fork': '待翻译: Fork',
+        'None': '待翻译: None',
+        'Edit your profile information to be displayed publicly.': '待翻译: Edit your profile information to be displayed publicly.',
+        'These settings may have serious effects on your account.': '待翻译: These settings may have serious effects on your account.',
+        'Customize your GitHub experience for accessibility needs.': '待翻译: Customize your GitHub experience for accessibility needs.',
+        'Control how and when you receive notifications.': '待翻译: Control how and when you receive notifications.',
+        'All activity': '待翻译: All activity',
+        'Code': '待翻译: Code',
+        'Issues': '待翻译: Issues',
+        'Pull requests': '待翻译: Pull requests',
+        'Copy link': '待翻译: Copy link',
+        'Report abuse': '待翻译: Report abuse',
+        'Block user': '待翻译: Block user',
+        'Web': '待翻译: Web',
+        'Email': '待翻译: Email',
+        'Mobile': '待翻译: Mobile',
+        'Recent activity': '待翻译: Recent activity',
+        'Your recent contributions and interactions.': '待翻译: Your recent contributions and interactions.',
+        'Enter your name': '待翻译: Enter your name',
+        'Tell us a little about yourself': '待翻译: Tell us a little about yourself',
     },
     
     // 页面翻译

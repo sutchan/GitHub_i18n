@@ -16,3 +16,6 @@ github_settings_fetcher.js
 /node_modules
 *.json
 *.html
+*.backup_before_local_extract
+local_settings_extractor.js
+debug/mock_github_settings_html_extracted_strings.txt
