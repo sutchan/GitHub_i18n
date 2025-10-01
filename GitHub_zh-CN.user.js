@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.8.2
+// @version      1.8.3
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -98,7 +98,7 @@
     // ========== 配置项 ==========
     const CONFIG = {
         // 当前脚本版本号（用于统一管理）
-        version: '1.8.2',
+        version: '1.8.3',
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
@@ -312,14 +312,11 @@
             'Collaborate outside of code': '在代码外协作',
             'Find more, search less': '查找更多，搜索更少',
             // Issues和Pull Requests页面相关
-             'Welcome to pull requests!': '欢迎使用拉取请求！',
-             'Pull requests help you collaborate on code with other people.': '拉取请求帮助您与他人协作开发代码。',
-             'As pull requests are created, they\'ll appear here in a searchable and filterable list.': '当创建拉取请求时，它们会显示在此处的可搜索和可筛选列表中。',
-             'To get started, you should create a pull request.': '要开始使用，请创建一个拉取请求。',
-             'ProTip! Follow long discussions with comments:>50.': '提示！使用 comments:>50 跟踪较长的讨论。',
-             'View all features': '查看所有功能',
-             'Provide feedback': '提供反馈',
-              'Sign up': '注册',
+            'Welcome to pull requests!': '欢迎使用拉取请求！',
+            'Pull requests help you collaborate on code with other people.': '拉取请求帮助您与他人协作开发代码。',
+            'As pull requests are created, they\'ll appear here in a searchable and filterable list.': '当创建拉取请求时，它们会显示在此处的可搜索和可筛选列表中。',
+            'To get started, you should create a pull request.': '要开始使用，请创建一个拉取请求。',
+            'ProTip! Follow long discussions with comments:>50.': '提示！使用 comments:>50 跟踪较长的讨论。',
             // Pulse页面相关
             'Active pull requests': '活跃的拉取请求',
             'Active issues': '活跃的问题',
@@ -341,11 +338,8 @@
             'The ReadME Project': 'README 项目',
             'Enterprise platform': '企业平台',
             'AI-powered developer platform': 'AI 驱动的开发者平台',
-            'View all features': '查看所有功能',
             'Saved searches': '已保存的搜索',
-            'Use saved searches to filter your results more quickly': '使用已保存的搜索更快地筛选结果',
-            'Provide feedback': '提供反馈',
-            'Sign up': '注册'
+            'Use saved searches to filter your results more quickly': '使用已保存的搜索更快地筛选结果'
         },
         
         // 仪表板页面翻译
