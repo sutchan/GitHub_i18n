@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.8.6
+// @version      1.8.7
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -32,7 +32,7 @@
         }
         
         // 如果无法从注释中读取，返回默认版本号
-        return '1.8.5';
+        return '1.8.7';
     }
 
     // ========== 工具函数模块 ==========
@@ -349,7 +349,7 @@
             'Contact us': '联系我们',
             'Terms': '条款',
             'Privacy': '隐私',
-            'Security': '安全',
+
             'Status': '状态',
             'Blog': '博客',
             'Twitter': 'Twitter',
@@ -439,37 +439,31 @@
         
         // 仪表板页面翻译
         dashboard: {
-            'Overview': '概览',
-            'Repositories': '仓库',
-            'Activity': '活动',
+
             'Contributions': '贡献',
-            'Popular repositories': '热门仓库',
+
             'Recent activity': '最近活动',
             'Starred repositories': '已标星仓库',
-            'Your profile': '你的个人资料',
-            'Your organizations': '你的组织',
+
             'Welcome to your dashboard': '欢迎来到你的仪表板',
             'Quick actions': '快速操作',
             'Jump back in': '继续工作',
             'All activity': '所有活动',
-            'Following': '关注中',
+
             'For you': '为你推荐',
             'Discover repositories': '发现仓库',
             'Your top repositories': '你的热门仓库',
             'Popular among your followers': '你的关注者中热门',
             'Recent repositories': '最近仓库',
-            'Create repository': '创建仓库',
+
             'Import repository': '导入仓库',
-            'New organization': '新建组织',
-            'New project': '新建项目',
-            'New gist': '新建代码片段',
-            'New workflow': '新建工作流程',
+
             'Recently updated': '最近更新',
             'Most active': '最活跃',
             'Top languages': '热门语言',
             'Show more': '显示更多',
             'Hide': '隐藏',
-            'View all': '查看全部',
+
             'Last 30 days': '过去30天',
             'Last 90 days': '过去90天',
             'Last 12 months': '过去12个月',
@@ -486,14 +480,13 @@
         // 通知页面翻译
         notifications: {
             'All notifications': '所有通知',
-            'Unread': '未读',
+
             'Participating': '参与',
             'Mentioned': '被提及',
-            'Pull requests': '拉取请求',
-            'Issues': '问题',
+
             'Commits': '提交',
             'Mark all as read': '全部标记为已读',
-            'Save': '保存',
+
             'Mute': '静音',
             'Repository': '仓库',
             'Reason': '原因',
@@ -537,23 +530,21 @@
             'There are a number of entry points to spin up a Codespaces environment, including:': '有多种方式可以启动代码空间环境，包括：',
             'Codespaces cannot be self-hosted.': '代码空间无法自行托管。',
             'enable Codespaces in an organization in our docs': '在我们的文档中了解如何在组织中启用代码空间',
-            'Create codespace': '创建代码空间',
-            'Your codespaces': '你的代码空间',
+
             'Recent codespaces': '最近的代码空间',
             'Active codespaces': '活跃的代码空间',
             'Stopped codespaces': '已停止的代码空间',
             'New codespace': '新建代码空间',
-            'Settings': '设置',
+
             'Billing': '账单',
             'Machine type': '机器类型',
             'Region': '地区',
             'Timeout': '超时时间',
-            'Edit': '编辑',
-            'Delete': '删除',
+
             'Stop': '停止',
             'Restart': '重启',
             'Rename': '重命名',
-            'Share': '分享',
+
             'Open in browser': '在浏览器中打开',
             'Open in VS Code': '在VS Code中打开',
             'Open in JetBrains': '在JetBrains中打开',
@@ -568,44 +559,33 @@
         
         // 搜索页面翻译
         search: {
-            'Search GitHub': '搜索 GitHub',
+
             'Advanced search': '高级搜索',
             'No results found': '未找到结果',
             'Clear': '清除',
             'Filters': '筛选器',
-            'Sort': '排序',
+
             'Type': '类型',
             'Language': '语言',
             'More options': '更多选项',
-            'Code': '代码',
-            'Commits': '提交',
-            'Issues': '问题',
-            'Pull requests': '拉取请求',
+
             'Users': '用户',
-            'Repositories': '仓库',
+
             'Topics': '主题',
             'Wikis': '维基',
-            'Projects': '项目',
-            'Marketplace': '应用市场',
-            'Discussions': '讨论',
-            'Packages': '包',
-            'Settings': '设置',
-            'Saved searches': '已保存的搜索',
+
             'Save this search': '保存此搜索',
             'Name': '名称',
             'Description': '描述',
             'README': 'README',
             'License': '许可证',
-            'Topics': '主题',
+
             'Size': '大小',
-            'Forks': '复刻',
-            'Stars': '标星',
-            'Watchers': '关注者',
-            'Updated': '更新时间',
+
             'Created': '创建时间',
-            'Commits': '提交',
+
             'Contributors': '贡献者',
-            'Language': '语言',
+
             'Written in': '使用',
             'Pushed': '推送时间',
             'Last commit': '最后提交',
@@ -626,13 +606,11 @@
             'Quarter': '季度',
             'All time': '所有时间',
             'Just now': '刚刚',
-            'Today': '今天',
-            'Yesterday': '昨天',
-            'This week': '本周',
+
             'Last week': '上周',
-            'This month': '本月',
+
             'Last month': '上月',
-            'This year': '今年',
+
             'Last year': '去年',
             'Any': '任意',
             'None': '无',
@@ -666,7 +644,7 @@
             'Reopened': '已重新打开',
             'Assigned to': '分配给',
             'Created by': '由谁创建',
-            'Mentioned': '被提及',
+
             'Commented by': '评论者',
             'Reviewed by': '审阅者',
             'Approved by': '批准者',
@@ -690,26 +668,14 @@
             'of': '共',
             'per page': '每页',
             'Previous': '上一页',
-            'Next': '下一页',
+
             'First': '第一页',
             'Last': '最后一页'
         },
         
         // 仓库页面翻译
         repository: {
-            'Code': '代码',
-            'Issues': '问题',
-            'Pull requests': '拉取请求',
-            'Actions': '操作',
-            'Projects': '项目',
-            'Wiki': '维基',
-            'Security': '安全',
-            'Insights': '洞察',
-            'Settings': '设置',
-            'Discussions': '讨论',
-            'Packages': '包',
-            'Sponsor': '赞助',
-            'Share': '分享',
+
             'Star': '标星',
             'Fork': '复刻',
             'Watch': '关注',
@@ -717,63 +683,51 @@
             'Starred': '已标星',
             'Watching': '关注中',
             'Unstar': '取消标星',
-            'Clone': '克隆',
-            'Download ZIP': '下载ZIP',
-            'Open with': '打开方式',
-            'About': '关于',
+
             'Readme': 'README',
-            'License': '许可证',
-            'Contributors': '贡献者',
+
             'Languages': '语言',
-            'Commits': '提交',
+
             'Branches': '分支',
             'Tags': '标签',
             'Releases': '发布',
-            'Packages': '包',
+
             'Environments': '环境',
             'Deployments': '部署',
-            'Insights': '洞察',
-            'Activity': '活动',
+
             'Network': '网络',
             'Graphs': '图表',
-            'Community': '社区',
+
             'Health': '健康',
-            'Security': '安全',
+
             'Vulnerabilities': '漏洞',
             'Dependabot alerts': 'Dependabot 警报',
             'Code scanning alerts': '代码扫描警报',
             'Secret scanning alerts': '密钥扫描警报',
             'Licenses': '许可证',
-            'Settings': '设置',
+
             'General': '通用',
             'Access': '访问',
-            'Branches': '分支',
-            'Tags': '标签',
-            'Releases': '发布',
+
             'Collaborators': '协作者',
-            'Teams': '团队',
-            'Projects': '项目',
-            'Webhooks': 'Web钩子',
-            'Deploy keys': '部署密钥',
+
             'Secrets': '密钥',
             'Variables': '变量',
-            'Actions': '操作',
-            'Pages': '页面',
-            'Wiki': '维基',
+
             'Security & analysis': '安全与分析',
             'Moderation': '审核',
             'Merge': '合并',
             'Squash and merge': '压缩并合并',
             'Rebase and merge': '变基并合并',
-            'Close': '关闭',
+
             'Reopen': '重新打开',
-            'Draft': '草稿',
+
             'Ready for review': '准备审阅',
             'Review changes': '审阅更改',
             'View changes': '查看更改',
             'Compare': '比较',
             'Files changed': '已更改文件',
-            'Commits': '提交',
+
             'Checks': '检查',
             'Conversation': '对话',
             'Summary': '摘要',
@@ -782,7 +736,7 @@
             'Assignees': '经办人',
             'Labels': '标签',
             'Milestone': '里程碑',
-            'Projects': '项目',
+
             'Linked pull requests': '关联的拉取请求',
             'Comment': '评论',
             'Comment as': '以...身份评论',
@@ -791,7 +745,7 @@
             'Delete comment': '删除评论',
             'Copy link': '复制链接',
             'Quote reply': '引用回复',
-            'Hide': '隐藏',
+
             'Show': '显示',
             'Resolve': '解决',
             'Unresolve': '取消解决',
@@ -800,10 +754,10 @@
             'Review': '审阅',
             'Approve': '批准',
             'Request changes': '请求更改',
-            'Comment': '评论',
+
             'Submit review': '提交审阅',
             'Outdated': '过时',
-            'New': '新建',
+
             'Old': '旧',
             'Expand': '展开',
             'Collapse': '折叠',
@@ -815,55 +769,23 @@
             'Previous file': '上一个文件',
             'Next file': '下一个文件',
             'Jump to': '跳转到',
-            'File': '文件',
-            'Line': '行',
+
             'Search': '搜索',
             'Find': '查找',
             'Replace': '替换',
             'Find next': '查找下一个',
             'Find previous': '查找上一个',
             'Replace all': '全部替换',
-            'Case sensitive': '区分大小写',
+
             'Whole word': '全字匹配',
             'Regular expression': '正则表达式',
             'Selection': '选择',
             'Document': '文档',
-            'All': '全部',
+
             'Match case': '匹配大小写',
             'Wrap around': '循环搜索',
-            'Incremental search': '增量搜索',
-            'New file': '新建文件',
-            'Upload files': '上传文件',
-            'Find or create a file': '查找或创建文件',
-            'Find a file': '查找文件',
-            'Go to file': '转到文件',
-            'Add file': '添加文件',
-            'Commit changes': '提交更改',
-            'History': '历史',
-            'Blame': '追责',
-            'Raw': '原始',
-            'Delete': '删除',
-            'Edit': '编辑',
-            'Copy': '复制',
-            'Save': '保存',
-            'Close': '关闭',
-            'Apply': '应用',
-            'Cancel': '取消',
-            'Confirm': '确认',
-            'Back': '返回',
-            'Next': '下一步',
-            'Skip': '跳过',
-            'Done': '完成',
-            'Filter': '筛选',
-            'Sort': '排序',
-            'New': '新建',
-            'All': '全部',
-            'Unread': '未读',
-            'Read': '已读',
-            'Recent': '最近',
-            'Popular': '热门',
-            'Trending': '趋势'
-        },
+            'Incremental search': '增量搜索'
+},
         
         // 按需创建最终翻译词典（使用Map替代对象字面量以提高性能）
         createTranslationMap() {

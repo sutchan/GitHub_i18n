@@ -5,10 +5,9 @@ test_*.js
 advanced_redundancy_checker.js
 analyze_dict.js
 clean_and_fetch_translations.js
-fix_formatting.js
-fix_syntax_errors.js
-fix_translation_dict.js
+fix_*.js
 github_string_fetcher.js
 GitHub_zh-CN.user.js.backup_before_fetch
 .trae/rules/project_rules.md
 /docs
+*.backup
