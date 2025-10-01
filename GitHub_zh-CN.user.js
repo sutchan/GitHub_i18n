@@ -247,7 +247,7 @@
             'Applications': '应用程序',
             'Developer settings': '开发者设置',
             'About GitHub': '关于 GitHub',
-            'Switch user': '切换用户'
+            'Switch user': '切换用户',
             // 基础UI元素
             'Dashboard': '仪表板',
             'Profile': '个人资料',
