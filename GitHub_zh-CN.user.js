@@ -18,6 +18,23 @@
 (function () {
     'use strict';
 
+    // 从用户脚本头部注释中提取版本号
+    function getVersionFromComment() {
+        // 获取当前脚本内容
+        const scriptContent = document.querySelector('script[src*="GitHub_zh-CN.user.js"]')?.textContent || '';
+        
+        if (scriptContent) {
+            // 匹配@version注释行
+            const versionMatch = scriptContent.match(/\/\/\s*@version\s+([\d.]+)/);
+            if (versionMatch && versionMatch[1]) {
+                return versionMatch[1];
+            }
+        }
+        
+        // 如果无法从注释中读取，返回默认版本号
+        return '1.8.4';
+    }
+
     // ========== 工具函数模块 ==========
     /**
      * 工具函数集合
@@ -97,8 +114,8 @@
 
     // ========== 配置项 ==========
     const CONFIG = {
-        // 当前脚本版本号（用于统一管理）
-        version: '1.8.4',
+        // 当前脚本版本号（从用户脚本头部注释中自动读取）
+        version: getVersionFromComment(),
         // 翻译延迟时间（毫秒）
         debounceDelay: 200,
         // 路由变化后翻译延迟时间（毫秒）
