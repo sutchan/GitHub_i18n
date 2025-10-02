@@ -22,7 +22,7 @@
     function getVersionFromComment() {
         // 获取当前脚本内容
         const scriptContent = document.querySelector('script[src*="GitHub_zh-CN.user.js"]')?.textContent || '';
-        
+
         if (scriptContent) {
             // 匹配@version注释行
             const versionMatch = scriptContent.match(/\/\/\s*@version\s+([\d.]+)/);
@@ -30,7 +30,7 @@
                 return versionMatch[1];
             }
         }
-        
+
         // 如果无法从注释中读取，返回默认版本号
         return '1.8.7';
     }
@@ -58,7 +58,7 @@
                 }
             };
         },
-        
+
         /**
          * 转义正则表达式特殊字符
          * @param {string} string - 要转义的字符串
@@ -67,7 +67,7 @@
         escapeRegExp(string) {
             return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         },
-        
+
         /**
          * 获取当前页面路径
          * @returns {string} 当前页面路径
@@ -75,7 +75,7 @@
         getCurrentPath() {
             return window.location.pathname;
         },
-        
+
         /**
          * 判断当前页面是否匹配某个路径模式
          * @param {RegExp} pattern - 路径模式
@@ -84,7 +84,7 @@
         isCurrentPathMatch(pattern) {
             return pattern.test(this.getCurrentPath());
         },
-        
+
         /**
          * 收集页面中的文本节点，用于抓取新的翻译字符串
          * @param {HTMLElement} element - 要收集文本的根元素
@@ -94,7 +94,7 @@
          */
         collectTextNodes(element, collectedTexts, minLength = 2, maxLength = 100) {
             if (!element || !element.childNodes) return;
-            
+
             Array.from(element.childNodes).forEach(node => {
                 if (node.nodeType === Node.TEXT_NODE) {
                     const text = node.nodeValue.trim();
@@ -129,9 +129,24 @@
             // 更新检测间隔（小时）
             intervalHours: 24,
             // GitHub 原始脚本 URL
-            scriptUrl: 'https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.userjs',
+            scriptUrl: 'https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js',
             // 是否启用自动版本号更新
             autoUpdateVersion: true
+        },
+        // 外部翻译配置
+        externalTranslation: {
+            // 是否启用外部翻译
+            enabled: true,
+            // 使用外部翻译的最小字符串长度（短于这个长度的字符串只用词典翻译）
+            minLength: 20,
+            // 使用外部翻译的最大字符串长度（超过这个长度的字符串不翻译）
+            maxLength: 500,
+            // 外部翻译请求超时时间（毫秒）
+            timeout: 3000,
+            // 翻译请求间隔（毫秒）
+            requestInterval: 500,
+            // 翻译缓存大小限制
+            cacheSize: 500
         },
         // 性能优化配置
         performance: {
@@ -209,6 +224,67 @@
      * 功能：按页面类型组织翻译词典，支持按需加载
      */
     const translationModule = {
+        // 外部翻译缓存
+        externalTranslationCache: new Map(),
+        // 上次外部翻译请求时间
+        lastTranslationRequestTime: 0,
+
+        /**
+         * 调用外部翻译API（如谷歌翻译）
+         * @param {string} text - 要翻译的文本
+         * @returns {Promise<string>} 翻译后的文本
+         */
+        async translateExternal(text) {
+            // 检查缓存
+            if (this.externalTranslationCache.has(text)) {
+                return this.externalTranslationCache.get(text);
+            }
+
+            // 检查是否启用外部翻译及文本长度是否符合要求
+            if (!CONFIG.externalTranslation.enabled ||
+                text.length < CONFIG.externalTranslation.minLength ||
+                text.length > CONFIG.externalTranslation.maxLength) {
+                return text;
+            }
+
+            // 限制请求频率
+            const now = Date.now();
+            const timeSinceLastRequest = now - this.lastTranslationRequestTime;
+            if (timeSinceLastRequest < CONFIG.externalTranslation.requestInterval) {
+                await new Promise(resolve => setTimeout(resolve, CONFIG.externalTranslation.requestInterval - timeSinceLastRequest));
+            }
+            this.lastTranslationRequestTime = Date.now();
+
+            try {
+                // 这里使用一个简单的翻译API实现，实际使用时需要替换为真实的API调用
+                // 注意：在用户脚本环境中，直接调用外部API可能会受到CORS限制
+                // 实际使用时可能需要配置代理服务器或使用支持CORS的翻译服务
+                const encodedText = encodeURIComponent(text);
+
+                // 这里模拟API调用，返回一个Promise
+                // 在实际项目中，应该替换为真实的翻译API调用
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        // 模拟翻译结果，实际应该从API响应中获取
+                        const translatedText = `[外部翻译] ${text}`;
+
+                        // 存入缓存
+                        if (this.externalTranslationCache.size >= CONFIG.externalTranslation.cacheSize) {
+                            // 如果缓存已满，删除最早的一项
+                            const firstKey = this.externalTranslationCache.keys().next().value;
+                            this.externalTranslationCache.delete(firstKey);
+                        }
+                        this.externalTranslationCache.set(text, translatedText);
+
+                        resolve(translatedText);
+                    }, 500); // 模拟网络延迟
+                });
+            } catch (error) {
+                console.error('[GitHub 中文翻译] 外部翻译请求失败:', error);
+                return text; // 翻译失败时返回原文
+            }
+        },
+
         // 核心功能翻译
         core: {
             // 基础菜单项目
@@ -436,7 +512,7 @@
             'Webhooks': 'Web钩子',
             'Deploy keys': '部署密钥'
         },
-        
+
         //
     // 设置页面翻译
     settings: {
@@ -488,7 +564,7 @@
         'Enter your name': '待翻译: Enter your name',
         'Tell us a little about yourself': '待翻译: Tell us a little about yourself',
     },
-    
+
     // 页面翻译
         dashboard: {
 
@@ -528,7 +604,7 @@
             'Saturday': '星期六',
             'Sunday': '星期日'
         },
-        
+
         // 通知页面翻译
         notifications: {
             'All notifications': '所有通知',
@@ -564,7 +640,7 @@
             'No unread notifications': '没有未读通知',
             'No notifications': '没有通知'
         },
-        
+
         // 代码空间页面翻译
         codespaces: {
             'Codespaces': '代码空间',
@@ -608,7 +684,7 @@
             'Starting': '启动中',
             'Failed': '失败'
         },
-        
+
         // 搜索页面翻译
         search: {
 
@@ -724,7 +800,7 @@
             'First': '第一页',
             'Last': '最后一页'
         },
-        
+
         // 仓库页面翻译
         repository: {
 
@@ -837,14 +913,14 @@
             'Match case': '匹配大小写',
             'Wrap around': '循环搜索',
             'Incremental search': '增量搜索'
-},
-        
+        },
+
         // 按需创建最终翻译词典（使用Map替代对象字面量以提高性能）
         createTranslationMap() {
             // 根据当前页面选择需要加载的词典模块
             const currentPath = utils.getCurrentPath();
             const selectedModules = ['core'];
-            
+
             if (CONFIG.pagePatterns.search.test(currentPath)) {
                 selectedModules.push('search');
             } else if (CONFIG.pagePatterns.dashboard.test(currentPath)) {
@@ -857,7 +933,7 @@
             } else if (CONFIG.pagePatterns.repository.test(currentPath)) {
                 selectedModules.push('repository');
             }
-            
+
             // 创建合并后的翻译Map
             const translationMap = new Map();
             selectedModules.forEach(moduleName => {
@@ -868,10 +944,10 @@
                     }
                 }
             });
-            
+
             return translationMap;
         },
-        
+
         // 获取合并后的翻译词典
         getTranslationDict() {
             // 缓存翻译词典，避免重复创建
@@ -880,7 +956,7 @@
             }
             return this.cachedDict;
         },
-        
+
         // 重置缓存（用于路由变化时重新加载词典）
         resetCache() {
             this.cachedDict = null;
@@ -900,7 +976,7 @@
          */
         collectStrings(showInConsole = false) {
             const collectedTexts = new Set();
-            
+
             // 从关键区域收集文本
             CONFIG.selectors.keyAreas.forEach(selector => {
                 const elements = document.querySelectorAll(selector);
@@ -908,21 +984,21 @@
                     utils.collectTextNodes(element, collectedTexts);
                 });
             });
-            
+
             if (showInConsole && collectedTexts.size > 0) {
                 console.log(`[GitHub 中文翻译] 收集到 ${collectedTexts.size} 个字符串：`);
                 console.log([...collectedTexts].sort());
-                
+
                 // 生成可直接用于翻译词典的格式
                 const formattedStrings = [...collectedTexts].sort()
-                    .map(text => `'${text.replace(/'/g, "\\'")}': '待翻译：${text.replace(/'/g, "\\'")}'`) 
+                    .map(text => `'${text.replace(/'/g, "\\'")}': '待翻译：${text.replace(/'/g, "\\'")}'`)
                     .join(',\n    ');
                 console.log('\n可直接复制到翻译词典的格式：\n{\n    ' + formattedStrings + '\n}');
             }
-            
+
             return collectedTexts;
         },
-        
+
         /**
          * 检查当前页面上未翻译的字符串
          * @param {boolean} showInConsole - 是否在控制台显示未翻译的字符串
@@ -932,28 +1008,28 @@
             const allTexts = this.collectStrings(false);
             const translationDict = translationModule.getTranslationDict();
             const untranslatedTexts = new Set();
-            
+
             // 检查哪些文本还没有翻译
             allTexts.forEach(text => {
                 if (!translationDict.has(text)) {
                     untranslatedTexts.add(text);
                 }
             });
-            
+
             if (showInConsole && untranslatedTexts.size > 0) {
                 console.log(`[GitHub 中文翻译] 发现 ${untranslatedTexts.size} 个未翻译的字符串：`);
                 console.log([...untranslatedTexts].sort());
-                
+
                 // 生成可直接用于翻译词典的格式
                 const formattedStrings = [...untranslatedTexts].sort()
-                    .map(text => `'${text.replace(/'/g, "\\'")}': '待翻译：${text.replace(/'/g, "\\'")}'`) 
+                    .map(text => `'${text.replace(/'/g, "\\'")}': '待翻译：${text.replace(/'/g, "\\'")}'`)
                     .join(',\n    ');
                 console.log('\n可直接复制到翻译词典的格式：\n{\n    ' + formattedStrings + '\n}');
             }
-            
+
             return untranslatedTexts;
         },
-        
+
         /**
          * 导出当前页面的翻译状态报告
          * @param {boolean} showInConsole - 是否在控制台显示报告
@@ -964,7 +1040,7 @@
             const translationDict = translationModule.getTranslationDict();
             const translatedTexts = new Set();
             const untranslatedTexts = new Set();
-            
+
             allTexts.forEach(text => {
                 if (translationDict.has(text)) {
                     translatedTexts.add(text);
@@ -972,7 +1048,7 @@
                     untranslatedTexts.add(text);
                 }
             });
-            
+
             const report = {
                 page: window.location.href,
                 totalStrings: allTexts.size,
@@ -982,7 +1058,7 @@
                 translatedStrings: [...translatedTexts].sort(),
                 untranslatedStrings: [...untranslatedTexts].sort()
             };
-            
+
             if (showInConsole) {
                 console.log('[GitHub 中文翻译] 当前页面翻译状态报告：');
                 console.log(`页面: ${report.page}`);
@@ -993,7 +1069,7 @@
                 console.log('\n未翻译的字符串：');
                 console.log(report.untranslatedStrings);
             }
-            
+
             return report;
         }
     };
@@ -1007,19 +1083,81 @@
      */
     function startScript() {
         /**
-         * 翻译指定的DOM元素
+         * 翻译指定的DOM元素（异步版本，支持外部翻译）
+         * @param {HTMLElement} element - 要翻译的DOM元素
+         * @returns {Promise<void>} 翻译完成的Promise
+         */
+        async function translateElementAsync(element) {
+            if (!element || !element.childNodes) return;
+
+            // 遍历子节点进行翻译
+            const promises = Array.from(element.childNodes).map(async node => {
+                // 只处理文本节点
+                if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim()) {
+                    let originalText = node.nodeValue;
+                    let translatedText = originalText;
+
+                    // 尝试使用翻译词典进行替换 - 仅完全匹配时才翻译
+                    if (TRANSLATION_DICT.has(translatedText)) {
+                        translatedText = TRANSLATION_DICT.get(translatedText);
+                    } else if (TRANSLATION_DICT.has(translatedText.toLowerCase())) {
+                        // 检查小写形式的完全匹配，保持原始大小写
+                        const lowerCaseTranslation = TRANSLATION_DICT.get(translatedText.toLowerCase());
+                        if (translatedText === translatedText.toUpperCase()) {
+                            translatedText = lowerCaseTranslation.toUpperCase();
+                        } else if (translatedText.charAt(0) === translatedText.charAt(0).toUpperCase()) {
+                            translatedText = lowerCaseTranslation.charAt(0).toUpperCase() + lowerCaseTranslation.slice(1);
+                        }
+                    } else if (CONFIG.externalTranslation.enabled) {
+                        // 词典中没有匹配项，检查是否需要使用外部翻译
+                        const trimmedText = translatedText.trim();
+                        if (trimmedText.length >= CONFIG.externalTranslation.minLength &&
+                            trimmedText.length <= CONFIG.externalTranslation.maxLength) {
+                            // 调用外部翻译API
+                            translatedText = await translationModule.translateExternal(trimmedText);
+
+                            // 如果外部翻译成功（返回值与原文不同），则更新节点值
+                            if (translatedText !== trimmedText) {
+                                // 保留原始文本中的空白字符
+                                const leadingSpaces = originalText.match(/^\s*/)[0];
+                                const trailingSpaces = originalText.match(/\s*$/)[0];
+                                node.nodeValue = leadingSpaces + translatedText + trailingSpaces;
+                                return;
+                            }
+                        }
+                    }
+
+                    // 如果文本被翻译了，更新节点值
+                    if (translatedText !== originalText) {
+                        node.nodeValue = translatedText;
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    // 递归处理子元素，但跳过一些不需要翻译的元素
+                    const tagName = node.tagName.toLowerCase();
+                    if (!['script', 'style', 'code', 'pre', 'textarea'].includes(tagName)) {
+                        await translateElementAsync(node);
+                    }
+                }
+            });
+
+            // 等待所有翻译任务完成
+            await Promise.all(promises);
+        }
+
+        /**
+         * 翻译指定的DOM元素（同步版本，兼容原有代码）
          * @param {HTMLElement} element - 要翻译的DOM元素
          */
         function translateElement(element) {
             if (!element || !element.childNodes || !TRANSLATION_DICT.size) return;
-            
+
             // 遍历子节点进行翻译
             Array.from(element.childNodes).forEach(node => {
                 // 只处理文本节点
                 if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim()) {
                     let originalText = node.nodeValue;
                     let translatedText = originalText;
-                    
+
                     // 尝试使用翻译词典进行替换 - 仅完全匹配时才翻译
                     if (TRANSLATION_DICT.has(translatedText)) {
                         translatedText = TRANSLATION_DICT.get(translatedText);
@@ -1032,7 +1170,7 @@
                             translatedText = lowerCaseTranslation.charAt(0).toUpperCase() + lowerCaseTranslation.slice(1);
                         }
                     }
-                    
+
                     // 如果文本被翻译了，更新节点值
                     if (translatedText !== originalText) {
                         node.nodeValue = translatedText;
@@ -1046,26 +1184,50 @@
                 }
             });
         }
-        
+
         /**
-         * 翻译整个页面
+         * 翻译整个页面（异步版本，支持外部翻译）
+         */
+        async function translatePageAsync() {
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 开始翻译页面...');
+            }
+
+            // 遍历关键区域进行翻译
+            const promises = CONFIG.selectors.keyAreas.map(async selector => {
+                const elements = document.querySelectorAll(selector);
+                for (const element of elements) {
+                    await translateElementAsync(element);
+                }
+            });
+
+            // 等待所有翻译任务完成
+            await Promise.all(promises);
+
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 页面翻译完成');
+            }
+        }
+
+        /**
+         * 翻译整个页面（同步版本，兼容原有代码）
          */
         function translatePage() {
             if (CONFIG.debugMode) {
                 console.log('[GitHub 中文翻译] 开始翻译页面...');
             }
-            
+
             // 遍历关键区域进行翻译
             CONFIG.selectors.keyAreas.forEach(selector => {
                 const elements = document.querySelectorAll(selector);
                 elements.forEach(element => translateElement(element));
             });
-            
+
             if (CONFIG.debugMode) {
                 console.log('[GitHub 中文翻译] 页面翻译完成');
             }
         }
-        
+
         /**
          * 设置路由变化监听
          * GitHub 使用 PJAX 实现无刷新导航，需要监听路由变化
@@ -1075,42 +1237,61 @@
             window.addEventListener('popstate', () => {
                 setTimeout(() => {
                     translationModule.resetCache();
-                    translatePage();
+                    if (CONFIG.externalTranslation.enabled) {
+                        translatePageAsync();
+                    } else {
+                        translatePage();
+                    }
                 }, CONFIG.routeChangeDelay);
             });
-            
+
             // 监听 DOM 变化，处理动态加载的内容
             if (CONFIG.performance.enableDeepObserver) {
-                const observer = new MutationObserver(utils.throttle((mutations) => {
+                // 为支持异步翻译，创建一个异步版本的处理函数
+                const asyncProcessMutations = async (mutations) => {
+                    const promises = [];
                     mutations.forEach(mutation => {
                         if (mutation.addedNodes && mutation.addedNodes.length > 0) {
                             mutation.addedNodes.forEach(node => {
                                 if (node.nodeType === Node.ELEMENT_NODE) {
-                                    translateElement(node);
+                                    if (CONFIG.externalTranslation.enabled) {
+                                        promises.push(translateElementAsync(node));
+                                    } else {
+                                        translateElement(node);
+                                    }
                                 }
                             });
                         }
                     });
+                    await Promise.all(promises);
+                };
+
+                const observer = new MutationObserver(utils.throttle(async (mutations) => {
+                    await asyncProcessMutations(mutations);
                 }, CONFIG.performance.throttleInterval));
-                
+
                 observer.observe(document.body, {
                     childList: true,
                     subtree: true
                 });
             }
         }
-        
+
         /**
          * 初始化脚本
          */
-        function init() {
+        async function init() {
             try {
-                // 执行初始翻译
-                translatePage();
-                
+                // 执行初始翻译，根据配置选择同步或异步翻译
+                if (CONFIG.externalTranslation.enabled) {
+                    await translatePageAsync();
+                } else {
+                    translatePage();
+                }
+
                 // 设置路由变化监听
                 setupRouteChangeObserver();
-                
+
                 if (CONFIG.debugMode) {
                     console.log(`[GitHub 中文翻译] 脚本 v${CONFIG.version} 初始化成功`);
                     // 在调试模式下，提供字符串抓取工具到全局作用域
@@ -1125,10 +1306,12 @@
                 console.error('[GitHub 中文翻译] 脚本初始化失败:', error);
             }
         }
-        
+
         // 当DOM加载完成后初始化
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
+            document.addEventListener('DOMContentLoaded', async () => {
+                await init();
+            });
         } else {
             // 如果DOM已经加载完成，直接初始化
             init();
