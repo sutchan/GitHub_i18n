@@ -256,18 +256,37 @@
             this.lastTranslationRequestTime = Date.now();
 
             try {
-                // 这里使用一个简单的翻译API实现，实际使用时需要替换为真实的API调用
-                // 注意：在用户脚本环境中，直接调用外部API可能会受到CORS限制
-                // 实际使用时可能需要配置代理服务器或使用支持CORS的翻译服务
+                // 这里实现真实的外部翻译API调用
+                // 使用FreeTranslator API，这是一个支持CORS的免费翻译服务
                 const encodedText = encodeURIComponent(text);
+                const apiUrl = `https://api.freetranslator.tech/api/v1/translate?q=${encodedText}&source=en&target=zh`;
 
-                // 这里模拟API调用，返回一个Promise
-                // 在实际项目中，应该替换为真实的翻译API调用
-                return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        // 模拟翻译结果，实际应该从API响应中获取
-                        const translatedText = `[外部翻译] ${text}`;
+                // 创建AbortController来支持超时
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), CONFIG.externalTranslation.timeout);
 
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP错误: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // 处理翻译结果
+                    let translatedText = text; // 默认返回原文
+                    if (data && data.translatedText) {
+                        translatedText = data.translatedText;
+                        
                         // 存入缓存
                         if (this.externalTranslationCache.size >= CONFIG.externalTranslation.cacheSize) {
                             // 如果缓存已满，删除最早的一项
@@ -275,12 +294,19 @@
                             this.externalTranslationCache.delete(firstKey);
                         }
                         this.externalTranslationCache.set(text, translatedText);
+                    }
 
-                        resolve(translatedText);
-                    }, 500); // 模拟网络延迟
-                });
+                    return translatedText;
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        console.error('[GitHub 中文翻译] 外部翻译请求超时');
+                    } else {
+                        console.error('[GitHub 中文翻译] 外部翻译请求失败:', error);
+                    }
+                    return text; // 翻译失败时返回原文
+                }
             } catch (error) {
-                console.error('[GitHub 中文翻译] 外部翻译请求失败:', error);
+                console.error('[GitHub 中文翻译] 外部翻译请求异常:', error);
                 return text; // 翻译失败时返回原文
             }
         },
