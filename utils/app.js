@@ -333,6 +333,17 @@ async function saveConfig() {
         const ignoreWords = document.getElementById('ignoreWords').value.split(',').map(word => word.trim()).filter(word => word.length > 0);
         const ignorePatterns = document.getElementById('ignorePatterns').value.split('\n').map(pattern => pattern.trim()).filter(pattern => pattern.length > 0);
         const includePatterns = document.getElementById('includePatterns').value.split('\n').map(pattern => pattern.trim()).filter(pattern => pattern.length > 0);
+        
+        // 用户脚本设置
+        const enableExternalTranslation = document.getElementById('enableExternalTranslation').checked;
+        const externalTranslationMinLength = parseInt(document.getElementById('externalTranslationMinLength').value);
+        const externalTranslationMaxLength = parseInt(document.getElementById('externalTranslationMaxLength').value);
+        const externalTranslationTimeout = parseInt(document.getElementById('externalTranslationTimeout').value);
+        const externalTranslationDelay = parseInt(document.getElementById('externalTranslationDelay').value);
+        const routeChangeDelay = parseInt(document.getElementById('routeChangeDelay').value);
+        const throttleInterval = parseInt(document.getElementById('throttleInterval').value);
+        const enableUpdateCheck = document.getElementById('enableUpdateCheck').checked;
+        const enableDeepDomObserver = document.getElementById('enableDeepDomObserver').checked;
 
         // 验证配置数据
         if (!userScriptPath || !backupDir) {
@@ -345,6 +356,23 @@ async function saveConfig() {
 
         if (isNaN(maxStringLength) || maxStringLength < minStringLength) {
             throw new Error('最大字符串长度必须大于或等于最小字符串长度');
+        }
+
+        // 用户脚本设置验证
+        if (isNaN(externalTranslationMinLength) || externalTranslationMinLength < 1) {
+            throw new Error('外部翻译最小长度必须大于0');
+        }
+
+        if (isNaN(externalTranslationMaxLength) || externalTranslationMaxLength < externalTranslationMinLength) {
+            throw new Error('外部翻译最大长度必须大于或等于最小长度');
+        }
+
+        if (isNaN(routeChangeDelay) || routeChangeDelay < 0) {
+            throw new Error('路由变化延迟必须大于或等于0');
+        }
+
+        if (isNaN(throttleInterval) || throttleInterval < 0) {
+            throw new Error('节流间隔必须大于或等于0');
         }
 
         const config = {
@@ -362,7 +390,16 @@ async function saveConfig() {
             exactMatchOnly,
             ignoreWords,
             ignorePatterns,
-            includePatterns
+            includePatterns,
+            enableExternalTranslation,
+            externalTranslationMinLength,
+            externalTranslationMaxLength,
+            externalTranslationTimeout,
+            externalTranslationDelay,
+            routeChangeDelay,
+            throttleInterval,
+            enableUpdateCheck,
+            enableDeepDomObserver
         };
 
         const response = await fetch(`${API_BASE_URL}/api/config`, {
@@ -434,7 +471,16 @@ async function loadConfig() {
                     exactMatchOnly: false,
                     ignoreWords: [],
                     ignorePatterns: [],
-                    includePatterns: []
+                    includePatterns: [],
+                    enableExternalTranslation: true,
+                    externalTranslationMinLength: 2,
+                    externalTranslationMaxLength: 500,
+                    externalTranslationTimeout: 10000,
+                    externalTranslationDelay: 500,
+                    routeChangeDelay: 500,
+                    throttleInterval: 200,
+                    enableUpdateCheck: true,
+                    enableDeepDomObserver: true
                 };
 
                 // 合并配置并填充表单
@@ -455,6 +501,17 @@ async function loadConfig() {
                 document.getElementById('ignoreWords').value = (mergedConfig.ignoreWords || defaults.ignoreWords).join(', ');
                 document.getElementById('ignorePatterns').value = (mergedConfig.ignorePatterns || defaults.ignorePatterns).join('\n');
                 document.getElementById('includePatterns').value = (mergedConfig.includePatterns || defaults.includePatterns).join('\n');
+                
+                // 填充用户脚本设置
+                document.getElementById('enableExternalTranslation').checked = mergedConfig.enableExternalTranslation;
+                document.getElementById('externalTranslationMinLength').value = mergedConfig.externalTranslationMinLength;
+                document.getElementById('externalTranslationMaxLength').value = mergedConfig.externalTranslationMaxLength;
+                document.getElementById('externalTranslationTimeout').value = mergedConfig.externalTranslationTimeout;
+                document.getElementById('externalTranslationDelay').value = mergedConfig.externalTranslationDelay;
+                document.getElementById('routeChangeDelay').value = mergedConfig.routeChangeDelay;
+                document.getElementById('throttleInterval').value = mergedConfig.throttleInterval;
+                document.getElementById('enableUpdateCheck').checked = mergedConfig.enableUpdateCheck;
+                document.getElementById('enableDeepDomObserver').checked = mergedConfig.enableDeepDomObserver;
 
                 // 成功加载，退出循环
                 return;
