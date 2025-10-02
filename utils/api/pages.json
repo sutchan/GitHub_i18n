@@ -1,0 +1,107 @@
+[
+  {
+    "url": "https://github.com",
+    "selector": "body",
+    "module": "global"
+  },
+  {
+    "url": "https://github.com/settings/profile",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/notifications",
+    "selector": "body",
+    "module": "notifications"
+  },
+  {
+    "url": "https://github.com/explore",
+    "selector": "body",
+    "module": "explore"
+  },
+  {
+    "url": "https://github.com/search",
+    "selector": "body",
+    "module": "search"
+  },
+  {
+    "url": "https://github.com/marketplace",
+    "selector": "body",
+    "module": "marketplace"
+  },
+  {
+    "url": "https://github.com/settings/applications",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/security",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/billing",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/keys",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/repositories",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/new",
+    "selector": "body",
+    "module": "repository"
+  },
+  {
+    "url": "https://github.com/pulls",
+    "selector": "body",
+    "module": "pulls"
+  },
+  {
+    "url": "https://github.com/issues",
+    "selector": "body",
+    "module": "issues"
+  },
+  {
+    "url": "https://github.com/gist",
+    "selector": "body",
+    "module": "gist"
+  },
+  {
+    "url": "https://github.com/settings/ssh/new",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/notifications",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/organizations/new",
+    "selector": "body",
+    "module": "organization"
+  },
+  {
+    "url": "https://github.com/explore",
+    "selector": "body",
+    "module": "global"
+  },
+  {
+    "url": "https://github.com/marketplace",
+    "selector": "body",
+    "module": "global"
+  },
+  {
+    "url": "https://github.com/mcp",
+    "selector": "body",
+    "module": "global"
+  }
+]

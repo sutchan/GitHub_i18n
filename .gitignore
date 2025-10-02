@@ -4,3 +4,4 @@
 *.code-workspace
 github_string_fetcher.js
 *.bak
+/utils/node_modules
