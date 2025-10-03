@@ -587,8 +587,9 @@ function isStringUsedInScript(scriptContent, text) {
   }
   
   try {
-    // 转义正则特殊字符
-    const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // 对文本进行转义，使其可以在正则表达式中使用
+    // 改进的转义逻辑，确保所有正则表达式特殊字符都被正确转义
+    const escapedText = text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
     
     // 匹配字符串作为完整标识符、属性名、参数值等
     // 这包括：函数调用参数、赋值、字符串拼接等场景
@@ -605,9 +606,15 @@ function isStringUsedInScript(scriptContent, text) {
     
     // 检查是否匹配任何模式
     for (const pattern of patterns) {
-      const regex = new RegExp(pattern, 'g');
-      if (regex.test(scriptContent)) {
-        return true;
+      try {
+        const regex = new RegExp(pattern, 'g');
+        if (regex.test(scriptContent)) {
+          return true;
+        }
+      } catch (regexError) {
+        // 如果单个正则表达式出错，继续尝试下一个模式
+        log('debug', `正则表达式模式出错: ${pattern}`, regexError);
+        continue;
       }
     }
     

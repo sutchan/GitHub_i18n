@@ -1,51 +1,56 @@
 {
-  "extractedCount": 486,
+  "extractedCount": 0,
   "addedCount": 0,
-  "lastUpdate": "2025/10/2 19:12:10",
-  "lastRunStatus": "success",
-  "runCount": 1,
+  "lastUpdate": "2025/10/3 13:19:48",
+  "lastRunStatus": "failed",
+  "runCount": 3,
   "success": true,
   "skippedCount": 0,
-  "errorCount": 10,
-  "startTime": "2025-10-02T08:29:25.245Z",
-  "endTime": "2025-10-02T11:12:10.134Z",
+  "errorCount": 12,
+  "startTime": "2025-10-03T04:49:44.911Z",
+  "endTime": "2025-10-03T04:57:22.566Z",
   "modules": {
-    "global": {
-      "extracted": 157,
-      "added": 0
-    },
     "settings": {
       "extracted": 16,
-      "added": 0
-    },
-    "notifications": {
-      "extracted": 16,
-      "added": 0
-    },
-    "search": {
-      "extracted": 86,
-      "added": 0
-    },
-    "marketplace": {
-      "extracted": 201,
-      "added": 0
-    },
-    "explore": {
-      "extracted": 302,
       "added": 0
     },
     "repository": {
       "extracted": 16,
       "added": 0
+    },
+    "organization": {
+      "extracted": 16,
+      "added": 0
+    },
+    "global": {
+      "extracted": 120,
+      "added": 0
+    },
+    "mcp": {
+      "extracted": 253,
+      "added": 0
     }
   },
-  "totalProcessingTime": "9764.89",
+  "totalProcessingTime": "457.71",
   "runHistory": [
     {
-      "timestamp": "2025-10-02T11:12:10.166Z",
+      "timestamp": "2025-10-03T05:19:48.665Z",
+      "status": "failed",
+      "extractedCount": 0,
+      "addedCount": 0
+    },
+    {
+      "timestamp": "2025-10-03T04:57:22.719Z",
       "status": "success",
-      "extractedCount": 486,
+      "extractedCount": 290,
+      "addedCount": 0
+    },
+    {
+      "timestamp": "2025-10-03T04:57:22.654Z",
+      "status": "success",
+      "extractedCount": 290,
       "addedCount": 0
     }
-  ]
+  ],
+  "processingTime": "457.65"
 }

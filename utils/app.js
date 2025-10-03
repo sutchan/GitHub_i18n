@@ -16,13 +16,40 @@ document.addEventListener('DOMContentLoaded', function() {
     bindEvents();
 });
 
+// 显示用户脚本设置模态框
+function showUserScriptModal() {
+    const modal = document.getElementById('userScriptSettingsModal');
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.querySelector('.scale-95').classList.replace('scale-95', 'scale-100');
+    }, 10);
+}
+
+// 隐藏用户脚本设置模态框
+function hideUserScriptModal() {
+    const modal = document.getElementById('userScriptSettingsModal');
+    modal.querySelector('.scale-100').classList.replace('scale-100', 'scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 200);
+}
+
 // 绑定事件
 function bindEvents() {
     // 操作按钮事件
     document.getElementById('runBtn').addEventListener('click', runTool);
     document.getElementById('stopBtn').addEventListener('click', stopTool);
-    document.getElementById('saveConfigBtn').addEventListener('click', saveConfig);
+    document.getElementById('saveConfigBtn').addEventListener('click', function() {
+        // 滚动到用户脚本设置面板
+        document.getElementById('userScriptSettings').scrollIntoView({ behavior: 'smooth' });
+    });
+    document.getElementById('saveSettingsBtn').addEventListener('click', saveConfig);
+    document.getElementById('savePagesBtn').addEventListener('click', savePagesConfig);
     document.getElementById('resetConfigBtn').addEventListener('click', resetConfig);
+    
+    // 用户脚本设置按钮事件
+    document.getElementById('saveUserScriptSettingsBtn').addEventListener('click', saveUserScriptSettings);
+    document.getElementById('resetUserScriptConfigBtn').addEventListener('click', resetUserScriptConfig);
 
     // 页面管理事件
     document.getElementById('addPageBtn').addEventListener('click', showAddPageModal);
@@ -35,6 +62,12 @@ function bindEvents() {
     // 帮助事件
     document.getElementById('helpBtn').addEventListener('click', showHelpModal);
     document.getElementById('closeHelpBtn').addEventListener('click', hideHelpModal);
+
+    // 用户脚本设置入口事件
+    document.getElementById('userScriptSettingsBtn').addEventListener('click', function() {
+        // 滚动到用户脚本设置面板
+        document.getElementById('userScriptSettings').scrollIntoView({ behavior: 'smooth' });
+    });
 
     // 查看备份
     document.getElementById('viewBackupBtn').addEventListener('click', viewBackup);
@@ -77,8 +110,8 @@ async function runTool() {
     }
 }
 
-// 服务器基础URL - 使用正确的端口3000
-const API_BASE_URL = 'http://localhost:3000';
+// 服务器基础URL - 使用正确的端口3004
+const API_BASE_URL = 'http://localhost:3004';
 
 // 检查服务器状态
 async function checkServerStatus() {
@@ -314,6 +347,121 @@ function clearLog() {
     logContainer.innerHTML = '<div class="text-gray-500">日志将显示在这里...</div>';
 }
 
+// 保存用户脚本设置
+async function saveUserScriptSettings() {
+    try {
+        // 获取用户脚本设置表单值
+        const enableExternalTranslation = document.getElementById('scriptExternalTranslation').checked;
+        const externalTranslationMinLength = parseInt(document.getElementById('scriptMinTranslationLength').value);
+        const externalTranslationMaxLength = parseInt(document.getElementById('scriptMaxTranslationLength').value);
+        const externalTranslationTimeout = parseInt(document.getElementById('scriptTranslationTimeout').value);
+        const externalTranslationDelay = parseInt(document.getElementById('scriptRequestDelay').value);
+        const routeChangeDelay = parseInt(document.getElementById('scriptRouteChangeDelay').value);
+        const throttleInterval = parseInt(document.getElementById('scriptThrottleInterval').value);
+        const enableUpdateCheck = document.getElementById('scriptCheckUpdate').checked;
+        const enableDeepDomObserver = document.getElementById('scriptEnableDeepObserver').checked;
+
+        // 验证用户脚本设置
+        if (isNaN(externalTranslationMinLength) || externalTranslationMinLength < 1) {
+            throw new Error('外部翻译最小长度必须大于0');
+        }
+
+        if (isNaN(externalTranslationMaxLength) || externalTranslationMaxLength < externalTranslationMinLength) {
+            throw new Error('外部翻译最大长度必须大于或等于最小长度');
+        }
+
+        if (isNaN(routeChangeDelay) || routeChangeDelay < 0) {
+            throw new Error('路由变化延迟必须大于或等于0');
+        }
+
+        if (isNaN(throttleInterval) || throttleInterval < 0) {
+            throw new Error('节流间隔必须大于或等于0');
+        }
+
+        // 构建用户脚本设置配置
+        const userScriptConfig = {
+            enableExternalTranslation,
+            externalTranslationMinLength,
+            externalTranslationMaxLength,
+            externalTranslationTimeout,
+            externalTranslationDelay,
+            routeChangeDelay,
+            throttleInterval,
+            enableUpdateCheck,
+            enableDeepDomObserver
+        };
+
+        // 使用带超时的fetch
+        const fetchWithTimeout = (url, options = {}, timeout = 5000) => {
+            return new Promise((resolve, reject) => {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                    reject(new Error(`请求超时: ${timeout}ms后未响应`));
+                }, timeout);
+                
+                fetch(url, { ...options, signal: controller.signal })
+                    .then(response => {
+                        clearTimeout(timeoutId);
+                        resolve(response);
+                    })
+                    .catch(error => {
+                        clearTimeout(timeoutId);
+                        reject(error);
+                    });
+            });
+        };
+        
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/config`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                // 保留其他配置不变，只更新用户脚本设置
+                ...(await loadConfigSilently()),
+                ...userScriptConfig
+            })
+        }, 5000);
+
+        if (!response.ok) {
+            throw new Error(`服务器响应错误: ${response.status} ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+            addLog('用户脚本设置已保存', 'success');
+            return Promise.resolve();
+        } else {
+            addLog(`保存用户脚本设置失败: ${result.message || '未知错误'}`, 'error');
+            return Promise.reject(result.message || '未知错误');
+        }
+    } catch (error) {
+        addLog(`保存用户脚本设置时发生错误: ${error}`, 'error');
+        return Promise.reject(error);
+    }
+}
+
+// 静默加载配置，用于保存用户脚本设置时保留其他配置
+async function loadConfigSilently() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/config`, {
+            method: 'GET',
+            timeout: 3000
+        });
+
+        if (!response.ok) {
+            throw new Error(`服务器响应错误: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('静默加载配置失败:', error);
+        return {};
+    }
+}
+
 // 保存配置
 async function saveConfig() {
     try {
@@ -335,15 +483,15 @@ async function saveConfig() {
         const includePatterns = document.getElementById('includePatterns').value.split('\n').map(pattern => pattern.trim()).filter(pattern => pattern.length > 0);
         
         // 用户脚本设置
-        const enableExternalTranslation = document.getElementById('enableExternalTranslation').checked;
-        const externalTranslationMinLength = parseInt(document.getElementById('externalTranslationMinLength').value);
-        const externalTranslationMaxLength = parseInt(document.getElementById('externalTranslationMaxLength').value);
-        const externalTranslationTimeout = parseInt(document.getElementById('externalTranslationTimeout').value);
-        const externalTranslationDelay = parseInt(document.getElementById('externalTranslationDelay').value);
-        const routeChangeDelay = parseInt(document.getElementById('routeChangeDelay').value);
-        const throttleInterval = parseInt(document.getElementById('throttleInterval').value);
-        const enableUpdateCheck = document.getElementById('enableUpdateCheck').checked;
-        const enableDeepDomObserver = document.getElementById('enableDeepDomObserver').checked;
+        const enableExternalTranslation = document.getElementById('scriptExternalTranslation').checked;
+        const externalTranslationMinLength = parseInt(document.getElementById('scriptMinTranslationLength').value);
+        const externalTranslationMaxLength = parseInt(document.getElementById('scriptMaxTranslationLength').value);
+        const externalTranslationTimeout = parseInt(document.getElementById('scriptTranslationTimeout').value);
+        const externalTranslationDelay = parseInt(document.getElementById('scriptRequestDelay').value);
+        const routeChangeDelay = parseInt(document.getElementById('scriptRouteChangeDelay').value);
+        const throttleInterval = parseInt(document.getElementById('scriptThrottleInterval').value);
+        const enableUpdateCheck = document.getElementById('scriptCheckUpdate').checked;
+        const enableDeepDomObserver = document.getElementById('scriptEnableDeepObserver').checked;
 
         // 验证配置数据
         if (!userScriptPath || !backupDir) {
@@ -402,14 +550,34 @@ async function saveConfig() {
             enableDeepDomObserver
         };
 
-        const response = await fetch(`${API_BASE_URL}/api/config`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(config),
-                    timeout: 5000
-                });
+        // 使用带超时的fetch
+        const fetchWithTimeout = (url, options = {}, timeout = 5000) => {
+            return new Promise((resolve, reject) => {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                    reject(new Error(`请求超时: ${timeout}ms后未响应`));
+                }, timeout);
+                
+                fetch(url, { ...options, signal: controller.signal })
+                    .then(response => {
+                        clearTimeout(timeoutId);
+                        resolve(response);
+                    })
+                    .catch(error => {
+                        clearTimeout(timeoutId);
+                        reject(error);
+                    });
+            });
+        };
+        
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/config`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(config)
+        }, 5000);
 
         if (!response.ok) {
             throw new Error(`服务器响应错误: ${response.status} ${response.statusText}`);
@@ -439,10 +607,30 @@ async function loadConfig() {
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/config`, {
-                    method: 'GET',
-                    timeout: 3000
-                });
+                // 使用带超时的fetch
+                const fetchWithTimeout = (url, options = {}, timeout = 3000) => {
+                    return new Promise((resolve, reject) => {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => {
+                            controller.abort();
+                            reject(new Error(`请求超时: ${timeout}ms后未响应`));
+                        }, timeout);
+                        
+                        fetch(url, { ...options, signal: controller.signal })
+                            .then(response => {
+                                clearTimeout(timeoutId);
+                                resolve(response);
+                            })
+                            .catch(error => {
+                                clearTimeout(timeoutId);
+                                reject(error);
+                            });
+                    });
+                };
+                
+                const response = await fetchWithTimeout(`${API_BASE_URL}/api/config`, {
+                    method: 'GET'
+                }, 3000);
 
                 if (!response.ok) {
                     throw new Error(`服务器响应错误: ${response.status}`);
@@ -503,15 +691,15 @@ async function loadConfig() {
                 document.getElementById('includePatterns').value = (mergedConfig.includePatterns || defaults.includePatterns).join('\n');
                 
                 // 填充用户脚本设置
-                document.getElementById('enableExternalTranslation').checked = mergedConfig.enableExternalTranslation;
-                document.getElementById('externalTranslationMinLength').value = mergedConfig.externalTranslationMinLength;
-                document.getElementById('externalTranslationMaxLength').value = mergedConfig.externalTranslationMaxLength;
-                document.getElementById('externalTranslationTimeout').value = mergedConfig.externalTranslationTimeout;
-                document.getElementById('externalTranslationDelay').value = mergedConfig.externalTranslationDelay;
-                document.getElementById('routeChangeDelay').value = mergedConfig.routeChangeDelay;
-                document.getElementById('throttleInterval').value = mergedConfig.throttleInterval;
-                document.getElementById('enableUpdateCheck').checked = mergedConfig.enableUpdateCheck;
-                document.getElementById('enableDeepDomObserver').checked = mergedConfig.enableDeepDomObserver;
+                document.getElementById('scriptExternalTranslation').checked = mergedConfig.enableExternalTranslation;
+                document.getElementById('scriptMinTranslationLength').value = mergedConfig.externalTranslationMinLength;
+                document.getElementById('scriptMaxTranslationLength').value = mergedConfig.externalTranslationMaxLength;
+                document.getElementById('scriptTranslationTimeout').value = mergedConfig.externalTranslationTimeout;
+                document.getElementById('scriptRequestDelay').value = mergedConfig.externalTranslationDelay;
+                document.getElementById('scriptRouteChangeDelay').value = mergedConfig.routeChangeDelay;
+                document.getElementById('scriptThrottleInterval').value = mergedConfig.throttleInterval;
+                document.getElementById('scriptCheckUpdate').checked = mergedConfig.enableUpdateCheck;
+                document.getElementById('scriptEnableDeepObserver').checked = mergedConfig.enableDeepDomObserver;
 
                 // 成功加载，退出循环
                 return;
@@ -700,6 +888,25 @@ function resetConfig() {
 
         // 保存默认配置
         saveConfig();
+    }
+}
+
+// 重置用户脚本配置
+function resetUserScriptConfig() {
+    if (confirm('确定要重置用户脚本设置吗？')) {
+        // 使用用户脚本默认配置
+        document.getElementById('scriptExternalTranslation').checked = true;
+        document.getElementById('scriptMinTranslationLength').value = 20;
+        document.getElementById('scriptMaxTranslationLength').value = 500;
+        document.getElementById('scriptTranslationTimeout').value = 3000;
+        document.getElementById('scriptRequestDelay').value = 500;
+        document.getElementById('scriptRouteChangeDelay').value = 500;
+        document.getElementById('scriptThrottleInterval').value = 100;
+        document.getElementById('scriptCheckUpdate').checked = true;
+        document.getElementById('scriptEnableDeepObserver').checked = true;
+
+        // 保存默认用户脚本配置
+        saveUserScriptSettings();
     }
 }
 
@@ -918,3 +1125,44 @@ window.addEventListener('beforeunload', function() {
         eventSource.close();
     }
 });
+
+// 保存所有页面配置
+async function savePagesConfig() {
+    try {
+        // 获取当前表格中的所有页面配置
+        const tableRows = document.querySelectorAll('#pagesTableBody tr[data-index]');
+        const pages = Array.from(tableRows).map((row, index) => {
+            const cells = row.querySelectorAll('td');
+            return {
+                url: cells[0].textContent,
+                selector: cells[1].textContent,
+                module: cells[2].textContent
+            };
+        });
+
+        // 保存到服务器
+        const saveResponse = await fetch(`${API_BASE_URL}/api/pages`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(pages),
+            timeout: 5000
+        });
+
+        if (!saveResponse.ok) {
+            throw new Error(`服务器响应错误: ${saveResponse.status} ${saveResponse.statusText}`);
+        }
+
+        const saveResult = await saveResponse.json();
+
+        if (saveResult.success) {
+            // 显示成功消息
+            addLog('GitHub页面配置已保存', 'success');
+        } else {
+            addLog(`保存页面配置失败: ${saveResult.message || '未知错误'}`, 'error');
+        }
+    } catch (error) {
+        addLog(`保存页面配置时发生错误: ${error}`, 'error');
+    }
+}

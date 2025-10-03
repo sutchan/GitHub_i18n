@@ -1,14 +1,15 @@
-const express = require('express');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const path = require('path');
 const { exec } = require('child_process');
+const express = require('express');
 
 // 导入共享工具函数
 const { log, updateStatsAfterRun, validateConfig } = require('./utils');
 
 const app = express();
-const PORT = 3000;
+// 配置端口号
+const PORT = 3004;
 
 // 中间件设置
 app.use(express.json());
@@ -383,7 +384,11 @@ app.get('/api/run', (req, res) => {
     // 检查是否已有运行中的进程
     if (runningProcess) {
         console.warn('工具已经在运行中，拒绝新的请求');
-        res.write(`data: {"type":"error","message":"工具已经在运行中，请先停止当前运行的任务"}\n\n`);
+        const messageData = JSON.stringify({
+            type: 'error',
+            message: '工具已经在运行中，请先停止当前运行的任务'
+        });
+        res.write(`data: ${messageData}\n\n`);
         res.end();
         return;
     }
@@ -398,79 +403,102 @@ app.get('/api/run', (req, res) => {
         console.log('已创建临时统计文件');
     } catch (error) {
         console.error('创建临时统计文件失败:', error.message);
-        res.write(`data: {"type":"error","message":"创建临时统计文件失败: ${error.message.replace(/"/g, '\\"')}"}\n\n`);
+        const messageData = JSON.stringify({
+            type: 'error',
+            message: `创建临时统计文件失败: ${error.message}`
+        });
+        res.write(`data: ${messageData}\n\n`);
         res.end();
         return;
     }
-
     // 发送开始消息
-        res.write(`data: {"type":"start","message":"工具正在启动..."}\n\n`);
+    const messageData = JSON.stringify({
+        type: 'start',
+        message: '工具正在启动...'
+    });
+    res.write(`data: ${messageData}\n\n`);
 
-        try {
-            // 运行auto_string_updater.js
-            console.log(`准备运行: node ${AUTO_STRING_UPDATER_PATH}`);
-            console.log(`当前工作目录: ${__dirname}`);
-            runningProcess = exec(`node ${AUTO_STRING_UPDATER_PATH}`, {
-                cwd: __dirname,
-                // 设置合理的超时时间（例如，10分钟）
-                timeout: 600000
-            });
-            console.log(`子进程已创建: ${runningProcess.pid}`);
+    try {
+        // 运行auto_string_updater.js
+        console.log(`准备运行: node ${AUTO_STRING_UPDATER_PATH}`);
+        console.log(`当前工作目录: ${__dirname}`);
+        runningProcess = exec(`node ${AUTO_STRING_UPDATER_PATH}`, {
+            cwd: __dirname,
+            // 设置合理的超时时间（例如，10分钟）
+            timeout: 600000
+        });
+        console.log(`子进程已创建: ${runningProcess.pid}`);
 
-            log('info', `已启动子进程: ${runningProcess.pid}`);
+        log('info', `已启动子进程: ${runningProcess.pid}`);
 
         // 处理stdout
-            runningProcess.stdout.on('data', (data) => {
-                try {
-                    const lines = data.toString().split('\n');
-                    lines.forEach(line => {
-                        if (line.trim()) {
-                            const escapedMessage = line.trim().replace(/"/g, '\\"').replace(/\\n/g, '\\\\n');
-                            log('debug', `子进程输出: ${line.trim()}`);
-                            res.write(`data: {"type":"log","message":"${escapedMessage}"}\n\n`);
-                        }
-                    });
-                } catch (error) {
-                    log('error', '处理子进程输出时出错:', error);
-                }
-            });
+        runningProcess.stdout.on('data', (data) => {
+            try {
+                const lines = data.toString().split('\n');
+                lines.forEach(line => {
+                    if (line.trim()) {
+                        log('debug', `子进程输出: ${line.trim()}`);
+                        // 使用JSON.stringify确保所有特殊字符都被正确转义
+                        const messageData = JSON.stringify({
+                            type: 'log',
+                            message: line.trim()
+                        });
+                        res.write(`data: ${messageData}\n\n`);
+                    }
+                });
+            } catch (error) {
+                log('error', '处理子进程输出时出错:', error);
+            }
+        });
 
         // 处理stderr
-            runningProcess.stderr.on('data', (data) => {
-                try {
-                    const lines = data.toString().split('\n');
-                    lines.forEach(line => {
-                        if (line.trim()) {
-                            const escapedMessage = line.trim().replace(/"/g, '\\"').replace(/\\n/g, '\\\\n');
-                            log('error', `子进程错误: ${line.trim()}`);
-                            res.write(`data: {"type":"error","message":"${escapedMessage}"}\n\n`);
-                        }
-                    });
-                } catch (error) {
-                    log('error', '处理子进程错误时出错:', error);
-                }
-            });
+        runningProcess.stderr.on('data', (data) => {
+            try {
+                const lines = data.toString().split('\n');
+                lines.forEach(line => {
+                    if (line.trim()) {
+                        log('error', `子进程错误: ${line.trim()}`);
+                        // 使用JSON.stringify确保所有特殊字符都被正确转义
+                        const messageData = JSON.stringify({
+                            type: 'error',
+                            message: line.trim()
+                        });
+                        res.write(`data: ${messageData}\n\n`);
+                    }
+                });
+            } catch (error) {
+                log('error', '处理子进程错误时出错:', error);
+            }
+        });
 
         // 处理进程结束
-            runningProcess.on('close', (code) => {
-                runningProcess = null;
-                log('info', `子进程已退出，退出码: ${code}`);
+        runningProcess.on('close', (code) => {
+            runningProcess = null;
+            log('info', `子进程已退出，退出码: ${code}`);
 
-                // 更新统计数据
-                updateStatsAfterRun(code === 0 ? 'success' : 'failed', null, STATS_PATH, path.join(__dirname, 'temp_stats.json'))
-                    .then(() => {
-                        log('debug', '统计数据已更新');
-                    })
-                    .catch((error) => {
-                        log('error', '更新统计数据失败:', error);
-                    });
+            // 更新统计数据
+            updateStatsAfterRun(code === 0 ? 'success' : 'failed', null, STATS_PATH, path.join(__dirname, 'temp_stats.json'))
+                .then(() => {
+                    log('debug', '统计数据已更新');
+                })
+                .catch((error) => {
+                    log('error', '更新统计数据失败:', error);
+                });
 
             try {
+                let messageData;
                 if (code === 0) {
-                    res.write(`data: {"type":"complete","message":"工具运行完成"}\n\n`);
+                    messageData = JSON.stringify({
+                        type: 'complete',
+                        message: '工具运行完成'
+                    });
                 } else {
-                    res.write(`data: {"type":"error","message":"工具运行失败，退出码: ${code}"}\n\n`);
+                    messageData = JSON.stringify({
+                        type: 'error',
+                        message: `工具运行失败，退出码: ${code}`
+                    });
                 }
+                res.write(`data: ${messageData}\n\n`);
             } catch (error) {
                 console.error('发送完成消息时出错:', error.message);
             }
@@ -480,59 +508,65 @@ app.get('/api/run', (req, res) => {
         });
 
         // 处理进程错误
-            runningProcess.on('error', (error) => {
-                log('error', `子进程发生错误: ${error.message}`);
-                runningProcess = null;
-                
-                try {
-                    res.write(`data: {"type":"error","message":"子进程执行错误: ${error.message.replace(/"/g, '\\"')}"}\n\n`);
-                } catch (e) {
-                    log('error', '发送错误消息时出错:', e);
-                }
-                
-                // 更新统计数据为失败
-                updateStatsAfterRun('failed', null, STATS_PATH, path.join(__dirname, 'temp_stats.json'))
-                    .then(() => {
-                        log('debug', '统计数据已更新为失败状态');
-                    })
-                    .catch((e) => {
-                        log('error', '更新统计数据失败:', e);
-                    });
+        runningProcess.on('error', (error) => {
+            log('error', `子进程发生错误: ${error.message}`);
+            runningProcess = null;
+            
+            try {
+                const messageData = JSON.stringify({
+                    type: 'error',
+                    message: `子进程执行错误: ${error.message}`
+                });
+                res.write(`data: ${messageData}\n\n`);
+            } catch (e) {
+                log('error', '发送错误消息时出错:', e);
+            }
+            
+            // 更新统计数据为失败
+            updateStatsAfterRun('failed', null, STATS_PATH, path.join(__dirname, 'temp_stats.json'))
+                .then(() => {
+                    log('debug', '统计数据已更新为失败状态');
+                })
+                .catch((e) => {
+                    log('error', '更新统计数据失败:', e);
+                });
             
             res.end();
         });
 
         // 处理连接关闭
-            req.on('close', () => {
-                if (runningProcess) {
-                    log('info', '客户端断开连接，正在终止子进程');
-                    try {
-                        // 在Windows上，需要使用taskkill来终止进程树
-                        if (process.platform === 'win32') {
-                            exec(`taskkill /F /PID ${runningProcess.pid} /T`, (error) => {
-                                if (error) {
-                                    log('error', '终止Windows进程时出错:', error);
-                                } else {
-                                    log('debug', '已成功终止Windows进程');
-                                }
-                            });
-                        } else {
-                            // 在非Windows系统上使用kill方法
-                            const killed = runningProcess.kill();
-                            log('debug', `终止进程结果: ${killed ? '成功' : '失败'}`);
-                        }
-                    } catch (error) {
-                        log('error', '终止进程时出错:', error);
+        req.on('close', () => {
+            if (runningProcess) {
+                log('info', '客户端断开连接，正在终止子进程');
+                try {
+                    // 在Windows上，需要使用taskkill来终止进程树
+                    if (process.platform === 'win32') {
+                        exec(`taskkill /F /PID ${runningProcess.pid} /T`, (error) => {
+                            if (error) {
+                                log('error', '终止Windows进程时出错:', error);
+                            } else {
+                                log('debug', '已成功终止Windows进程');
+                            }
+                        });
+                    } else {
+                        // 在Unix-like系统上，使用kill命令
+                        process.kill(runningProcess.pid, 'SIGTERM');
                     }
-                    runningProcess = null;
+                } catch (error) {
+                    log('error', '终止子进程时出错:', error);
                 }
-            });
+            }
+        });
     } catch (error) {
-            log('error', '启动子进程失败:', error);
-            runningProcess = null;
-            res.write(`data: {"type":"error","message":"启动工具失败: ${error.message.replace(/"/g, '\\"')}"}\n\n`);
-            res.end();
-        }
+        log('error', '启动子进程失败:', error);
+        runningProcess = null;
+        const messageData = JSON.stringify({
+            type: 'error',
+            message: `启动工具失败: ${error.message}`
+        });
+        res.write(`data: ${messageData}\n\n`);
+        res.end();
+    }
 });
 
 /**

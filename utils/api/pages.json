@@ -90,17 +90,12 @@
     "module": "organization"
   },
   {
-    "url": "https://github.com/explore",
-    "selector": "body",
-    "module": "global"
-  },
-  {
-    "url": "https://github.com/marketplace",
-    "selector": "body",
-    "module": "global"
-  },
-  {
     "url": "https://github.com/mcp",
+    "selector": "body",
+    "module": "mcp"
+  },
+  {
+    "url": "https://github.com/sutchan",
     "selector": "body",
     "module": "global"
   }

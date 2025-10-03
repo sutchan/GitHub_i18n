@@ -19,5 +19,14 @@
     "HTTPS"
   ],
   "ignorePatterns": [],
-  "includePatterns": []
+  "includePatterns": [],
+  "enableExternalTranslation": false,
+  "externalTranslationMinLength": 2,
+  "externalTranslationMaxLength": 500,
+  "externalTranslationTimeout": 10000,
+  "externalTranslationDelay": 500,
+  "routeChangeDelay": 500,
+  "throttleInterval": 200,
+  "enableUpdateCheck": true,
+  "enableDeepDomObserver": true
 }
