@@ -39,10 +39,7 @@ function bindEvents() {
     // 操作按钮事件
     document.getElementById('runBtn').addEventListener('click', runTool);
     document.getElementById('stopBtn').addEventListener('click', stopTool);
-    document.getElementById('saveConfigBtn').addEventListener('click', function() {
-        // 滚动到用户脚本设置面板
-        document.getElementById('userScriptSettings').scrollIntoView({ behavior: 'smooth' });
-    });
+    document.getElementById('saveConfigBtn').addEventListener('click', showUserScriptModal);
     document.getElementById('saveSettingsBtn').addEventListener('click', saveConfig);
     document.getElementById('savePagesBtn').addEventListener('click', savePagesConfig);
     document.getElementById('resetConfigBtn').addEventListener('click', resetConfig);
@@ -64,10 +61,10 @@ function bindEvents() {
     document.getElementById('closeHelpBtn').addEventListener('click', hideHelpModal);
 
     // 用户脚本设置入口事件
-    document.getElementById('userScriptSettingsBtn').addEventListener('click', function() {
-        // 滚动到用户脚本设置面板
-        document.getElementById('userScriptSettings').scrollIntoView({ behavior: 'smooth' });
-    });
+    document.getElementById('userScriptSettingsBtn').addEventListener('click', showUserScriptModal);
+    
+    // 用户脚本设置模态框事件
+    document.getElementById('closeUserScriptModalBtn').addEventListener('click', hideUserScriptModal);
 
     // 查看备份
     document.getElementById('viewBackupBtn').addEventListener('click', viewBackup);
