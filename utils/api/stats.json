@@ -1,68 +1,7 @@
 {
   "extractedCount": 0,
   "addedCount": 0,
-  "lastUpdate": "2025/10/3 13:28:07",
-  "lastRunStatus": "failed",
-  "runCount": 5,
-  "success": true,
-  "skippedCount": 0,
-  "errorCount": 12,
-  "startTime": "2025-10-03T04:49:44.911Z",
-  "endTime": "2025-10-03T04:57:22.566Z",
-  "modules": {
-    "settings": {
-      "extracted": 16,
-      "added": 0
-    },
-    "repository": {
-      "extracted": 16,
-      "added": 0
-    },
-    "organization": {
-      "extracted": 16,
-      "added": 0
-    },
-    "global": {
-      "extracted": 120,
-      "added": 0
-    },
-    "mcp": {
-      "extracted": 253,
-      "added": 0
-    }
-  },
-  "totalProcessingTime": "457.71",
-  "runHistory": [
-    {
-      "timestamp": "2025-10-03T05:28:07.041Z",
-      "status": "failed",
-      "extractedCount": 0,
-      "addedCount": 0
-    },
-    {
-      "timestamp": "2025-10-03T05:27:00.980Z",
-      "status": "failed",
-      "extractedCount": 0,
-      "addedCount": 0
-    },
-    {
-      "timestamp": "2025-10-03T05:19:48.665Z",
-      "status": "failed",
-      "extractedCount": 0,
-      "addedCount": 0
-    },
-    {
-      "timestamp": "2025-10-03T04:57:22.719Z",
-      "status": "success",
-      "extractedCount": 290,
-      "addedCount": 0
-    },
-    {
-      "timestamp": "2025-10-03T04:57:22.654Z",
-      "status": "success",
-      "extractedCount": 290,
-      "addedCount": 0
-    }
-  ],
-  "processingTime": "457.65"
+  "lastUpdate": null,
+  "lastRunStatus": "idle",
+  "runCount": 0
 }

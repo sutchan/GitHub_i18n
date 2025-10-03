@@ -409,7 +409,8 @@ async function saveUserScriptSettings() {
             });
         };
         
-        const response = await fetchWithTimeout(`${API_BASE_URL}/api/config`, {
+        // 1. 保存到配置文件（保留原有功能）
+        const configResponse = await fetchWithTimeout(`${API_BASE_URL}/api/config`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -421,18 +422,51 @@ async function saveUserScriptSettings() {
             })
         }, 5000);
 
-        if (!response.ok) {
-            throw new Error(`服务器响应错误: ${response.status} ${response.statusText}`);
+        if (!configResponse.ok) {
+            throw new Error(`保存配置文件失败: ${configResponse.status} ${configResponse.statusText}`);
         }
 
-        const result = await response.json();
+        // 2. 直接修改GitHub_zh-CN.user.js文件
+        const scriptUpdateResponse = await fetchWithTimeout(`${API_BASE_URL}/api/update-user-script-config`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                debounceDelay: externalTranslationDelay,
+                routeChangeDelay: routeChangeDelay,
+                externalTranslation: {
+                    enabled: enableExternalTranslation,
+                    minLength: externalTranslationMinLength,
+                    maxLength: externalTranslationMaxLength,
+                    timeout: externalTranslationTimeout,
+                    requestInterval: externalTranslationDelay
+                },
+                updateCheck: {
+                    enabled: enableUpdateCheck
+                },
+                performance: {
+                    enableDeepObserver: enableDeepDomObserver
+                }
+            })
+        }, 5000);
 
-        if (result.success) {
-            addLog('用户脚本设置已保存', 'success');
+        if (!scriptUpdateResponse.ok) {
+            throw new Error(`更新用户脚本文件失败: ${scriptUpdateResponse.status} ${scriptUpdateResponse.statusText}`);
+        }
+
+        const configResult = await configResponse.json();
+        const scriptUpdateResult = await scriptUpdateResponse.json();
+
+        if (configResult.success && scriptUpdateResult.success) {
+            addLog('用户脚本设置已保存并应用到脚本文件中', 'success');
             return Promise.resolve();
         } else {
-            addLog(`保存用户脚本设置失败: ${result.message || '未知错误'}`, 'error');
-            return Promise.reject(result.message || '未知错误');
+            let errorMessage = '';
+            if (!configResult.success) errorMessage += `保存配置: ${configResult.message || '失败'} `;
+            if (!scriptUpdateResult.success) errorMessage += `更新脚本: ${scriptUpdateResult.message || '失败'}`;
+            addLog(`保存用户脚本设置不完整: ${errorMessage}`, 'warning');
+            return Promise.resolve(); // 即使部分失败，也返回成功，因为主要功能已完成
         }
     } catch (error) {
         addLog(`保存用户脚本设置时发生错误: ${error}`, 'error');

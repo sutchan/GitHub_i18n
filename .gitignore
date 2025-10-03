@@ -5,3 +5,6 @@
 github_string_fetcher.js
 *.bak
 /utils/node_modules
+/.vscode
+/.vscode
+/.vscode

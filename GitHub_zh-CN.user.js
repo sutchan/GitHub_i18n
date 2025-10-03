@@ -216,7 +216,7 @@
             settings: /\/settings/,
             dashboard: /^\/$|\/(explore|notifications|stars|gists|codespaces|projects|organizations|dashboard)$/
         }
-    };
+    }; // ========== 配置项结束 ==========
 
     // ========== 翻译词典模块 ==========
     /**

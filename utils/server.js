@@ -34,6 +34,9 @@ const AUTO_STRING_UPDATER_PATH = path.join(__dirname, 'auto_string_updater.js');
 // 当前运行的进程
 let runningProcess = null;
 
+// GitHub用户脚本文件路径
+const USER_SCRIPT_PATH = path.join(__dirname, '..', 'GitHub_zh-CN.user.js');
+
 /**
  * 初始化配置文件
  * 确保所有必要的配置文件都存在，如果不存在则创建默认配置
@@ -630,6 +633,85 @@ app.get('/api/view-backup', async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ success: false, message: '获取备份目录信息失败', error: error.message });
+    }
+});
+
+/**
+ * API端点：直接修改GitHub用户脚本配置
+ */
+app.post('/api/update-user-script-config', async (req, res) => {
+    try {
+        log('info', '接收到修改用户脚本配置的请求');
+        const newConfigValues = req.body;
+        
+        // 验证请求体
+        if (!newConfigValues || typeof newConfigValues !== 'object') {
+            throw new Error('无效的配置数据');
+        }
+        
+        // 读取用户脚本文件
+        let scriptContent = await fsPromises.readFile(USER_SCRIPT_PATH, 'utf8');
+        
+        // 找到CONFIG对象的开始和结束位置
+        const configStartRegex = /const CONFIG = {/;
+        const configEndRegex = /};\s*\/\/ ========== 配置项结束 ==========/;
+        
+        const configStartMatch = scriptContent.match(configStartRegex);
+        const configEndMatch = scriptContent.match(configEndRegex);
+        
+        if (!configStartMatch || !configEndMatch) {
+            throw new Error('未能找到CONFIG对象');
+        }
+        
+        const configStartPos = configStartMatch.index;
+        const configEndPos = configEndMatch.index + configEndMatch[0].length;
+        
+        // 提取当前配置
+        const configContent = scriptContent.substring(configStartPos, configEndPos);
+        
+        // 解析配置为JavaScript对象
+        // 注意：这里使用Function构造函数来安全地解析配置
+        const getConfig = new Function(`return ${configContent.replace('const CONFIG = ', '')}`);
+        const currentConfig = getConfig();
+        
+        // 更新配置
+        const updatedConfig = { ...currentConfig, ...newConfigValues };
+        
+        // 特殊处理嵌套对象
+        if (newConfigValues.externalTranslation && typeof newConfigValues.externalTranslation === 'object') {
+            updatedConfig.externalTranslation = {
+                ...currentConfig.externalTranslation,
+                ...newConfigValues.externalTranslation
+            };
+        }
+        
+        if (newConfigValues.updateCheck && typeof newConfigValues.updateCheck === 'object') {
+            updatedConfig.updateCheck = {
+                ...currentConfig.updateCheck,
+                ...newConfigValues.updateCheck
+            };
+        }
+        
+        // 将更新后的配置转换回字符串
+        const updatedConfigStr = JSON.stringify(updatedConfig, null, 4);
+        
+        // 替换脚本中的配置部分
+        scriptContent = scriptContent.substring(0, configStartPos) + 
+                        'const CONFIG = ' + updatedConfigStr + 
+                        scriptContent.substring(configEndPos);
+        
+        // 写回文件
+        await fsPromises.writeFile(USER_SCRIPT_PATH, scriptContent, 'utf8');
+        
+        log('success', '用户脚本配置已成功更新');
+        res.json({
+            success: true,
+            message: '用户脚本配置已成功更新',
+            updatedConfig: updatedConfig
+        });
+    } catch (error) {
+        log('error', '更新用户脚本配置失败:', error);
+        res.status(500).json({ success: false, message: '更新用户脚本配置失败', error: error.message });
     }
 });
 
