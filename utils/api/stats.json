@@ -1,9 +1,9 @@
 {
   "extractedCount": 0,
   "addedCount": 0,
-  "lastUpdate": "2025/10/3 13:19:48",
+  "lastUpdate": "2025/10/3 13:28:07",
   "lastRunStatus": "failed",
-  "runCount": 3,
+  "runCount": 5,
   "success": true,
   "skippedCount": 0,
   "errorCount": 12,
@@ -33,6 +33,18 @@
   },
   "totalProcessingTime": "457.71",
   "runHistory": [
+    {
+      "timestamp": "2025-10-03T05:28:07.041Z",
+      "status": "failed",
+      "extractedCount": 0,
+      "addedCount": 0
+    },
+    {
+      "timestamp": "2025-10-03T05:27:00.980Z",
+      "status": "failed",
+      "extractedCount": 0,
+      "addedCount": 0
+    },
     {
       "timestamp": "2025-10-03T05:19:48.665Z",
       "status": "failed",

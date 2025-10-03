@@ -20,7 +20,7 @@
   ],
   "ignorePatterns": [],
   "includePatterns": [],
-  "enableExternalTranslation": true,
+  "enableExternalTranslation": false,
   "externalTranslationMinLength": 20,
   "externalTranslationMaxLength": 500,
   "externalTranslationTimeout": 3000,
