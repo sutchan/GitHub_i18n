@@ -1,8 +1,7 @@
 /.trae
 /.vscode
-/api
+/utils/api
 /docs
-/auto_string_updater
 /utils
 *.code-workspace
 *.bak
