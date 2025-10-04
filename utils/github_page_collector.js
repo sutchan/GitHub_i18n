@@ -1,7 +1,7 @@
 // github_page_collector.js
 // 用于从GitHub网站收集主要页面URL并更新页面配置文件
 // 作者: SutChan
-// 版本: 1.0.0
+// 版本: 1.8.16
 
 const fs = require('fs').promises;
 const path = require('path');

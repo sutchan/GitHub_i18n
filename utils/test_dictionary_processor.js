@@ -1,6 +1,6 @@
-// 词典处理工具测试文件
+// 词典处理器测试模块
 // 作者: SutChan
-// 版本: 1.0.0
+// 版本: 1.8.16
 
 const { 
   extractDictionaryFromUserScript,

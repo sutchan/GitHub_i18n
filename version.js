@@ -1,4 +1,3 @@
-// 版本管理文件
 // 作者: SutChan
 // 此文件用于统一管理GitHub自动化字符串更新工具的版本信息
 
@@ -6,13 +5,20 @@
  * 当前工具版本号
  * @type {string}
  */
-export const VERSION = '1.8.15';
+export const VERSION = '1.8.16';
 
 /**
  * 版本历史记录
  * @type {Array<{version: string, date: string, changes: string[]}>}
  */
 export const VERSION_HISTORY = [
+  {
+    version: '1.8.16',
+    date: '2023-12-17',
+    changes: [
+      '清理项目冗余文件'
+    ]
+  },
   {
     version: '1.8.15',
     date: '2023-12-16',

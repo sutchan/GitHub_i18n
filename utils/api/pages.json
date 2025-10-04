@@ -403,5 +403,10 @@
     "url": "https://github.com/orgs",
     "selector": "body",
     "module": "global"
+  },
+  {
+    "url": "https://github.com/sutchan/GitHub_i18n",
+    "selector": "body",
+    "module": "global"
   }
 ]

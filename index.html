@@ -20,7 +20,7 @@
         </div>
         <div class="flex flex-col sm:flex-row sm:items-center gap-1">
           <h1 class="text-xl md:text-2xl font-bold text-dark">GitHub自动化字符串更新工具</h1>
-          <span class="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">v1.8.15</span>
+          <span class="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">v1.8.16</span>
         </div>
       </div>
       <div class="flex items-center space-x-4">
@@ -105,24 +105,25 @@
               <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
                 <div class="flex items-center space-x-4">
                   <div class="flex items-center space-x-2">
-                    <button id="resetConfigBtn" type="button"
-                      class="text-gray-500 hover:text-gray-700 text-sm transition-colors">
-                      <i class="fa fa-refresh mr-1"></i>重置
-                    </button>
-                  </div>
-                  <div class="flex items-center space-x-2 ml-4">
                     <span class="text-sm text-gray-700">简单模式</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" id="advancedModeToggle" class="sr-only peer">
-                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    <label class="relative inline-flex items-center cursor-pointer toggle-switch">
+                      <input type="checkbox" id="advancedModeToggle" class="sr-only">
+                      <div class="toggle-bg w-12 h-6 bg-gray-200 rounded-full transition-colors duration-300 ease-in-out"></div>
+                      <div class="toggle-dot absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ease-in-out"></div>
                     </label>
                     <span class="text-sm text-gray-700">高级模式</span>
                   </div>
                 </div>
-                <button id="saveSettingsBtn" type="button"
-                  class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
-                  <i class="fa fa-save mr-1"></i>保存
-                </button>
+                <div class="flex items-center space-x-3">
+                  <button id="resetConfigBtn" type="button"
+                    class="text-gray-500 hover:text-gray-700 text-sm transition-colors">
+                    <i class="fa fa-refresh mr-1"></i>重置
+                  </button>
+                  <button id="saveSettingsBtn" type="button"
+                    class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
+                    <i class="fa fa-save mr-1"></i>保存
+                  </button>
+                </div>
               </div>
 
               <!-- 基本设置 - 简单模式和高级模式都显示 -->
@@ -250,37 +251,63 @@
             <div class="flex justify-between items-center mb-4">
               <h2 class="text-lg font-semibold text-gray-800">GitHub页面配置</h2>
               <div class="flex space-x-2">
-                <button id="savePagesBtn" type="button"
-                  class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
-                  <i class="fa fa-save mr-1"></i>保存
-                </button>
                 <button id="addPageBtn" type="button"
                   class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
                   <i class="fa fa-plus mr-1"></i>添加页面
+                </button>
+                <button id="savePagesBtn" type="button"
+                  class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
+                  <i class="fa fa-save mr-1"></i>保存
                 </button>
               </div>
             </div>
             
             <!-- 搜索框和批量操作 -->
-            <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
-              <div class="relative w-full md:w-auto">
-                <input type="text" id="pagesSearch" placeholder="搜索URL..." 
-                  class="w-full md:w-64 px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none input-focus">
-                <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+              <!-- 搜索框 -->
+              <div class="relative w-full md:w-auto flex-grow md:flex-grow-0">
+                <div class="relative flex items-center">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fa fa-search text-gray-400 transition-colors duration-300 group-hover:text-secondary"></i>
+                  </div>
+                  <input type="text" id="pagesSearch" placeholder="搜索URL..." 
+                    class="w-full md:w-80 px-4 py-2.5 pl-10 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary input-focus transition-all duration-300 group">
+                  <button id="clearSearchBtn" type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors duration-300 opacity-0 pointer-events-none" aria-label="清除搜索">
+                    <i class="fa fa-times-circle"></i>
+                  </button>
+                </div>
+                <!-- 搜索建议容器 -->
+                <div id="searchSuggestions" class="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto hidden search-suggestions">
+                  <!-- 搜索建议将通过JavaScript动态添加 -->
+                </div>
               </div>
+              
+              <!-- 批量操作按钮组 -->
               <div class="flex items-center space-x-2">
-                <button id="importPagesBtn" type="button" 
-                  class="text-secondary hover:text-secondary/80 px-3 py-1.5 rounded-md text-sm border border-secondary/30 hover:bg-secondary/5 transition-colors">
-                  <i class="fa fa-upload mr-1"></i>导入
-                </button>
-                <button id="exportPagesBtn" type="button" 
-                  class="text-secondary hover:text-secondary/80 px-3 py-1.5 rounded-md text-sm border border-secondary/30 hover:bg-secondary/5 transition-colors">
-                  <i class="fa fa-download mr-1"></i>导出
-                </button>
-                <button id="deleteSelectedPagesBtn" type="button" 
-                  class="text-danger hover:text-danger/80 px-3 py-1.5 rounded-md text-sm border border-danger/30 hover:bg-danger/5 transition-colors" disabled>
-                  <i class="fa fa-trash mr-1"></i>删除所选
-                </button>
+                <!-- 批量操作下拉菜单 -->
+                <div class="relative group">
+                  <button id="batchOperationsBtn" type="button" 
+                    class="flex items-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm transition-colors duration-300">
+                    <i class="fa fa-cog mr-2"></i>批量操作
+                    <i class="fa fa-chevron-down ml-2 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+                  </button>
+                  <!-- 下拉菜单 -->
+                  <div id="batchOperationsMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden hidden batch-menu">
+                    <button id="importPagesBtn" type="button" 
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center">
+                      <i class="fa fa-upload w-5 text-center mr-2 text-secondary"></i>导入配置
+                    </button>
+                    <button id="exportPagesBtn" type="button" 
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center">
+                      <i class="fa fa-download w-5 text-center mr-2 text-secondary"></i>导出配置
+                    </button>
+                    <div class="border-t border-gray-200 my-1"></div>
+                    <button id="deleteSelectedPagesBtn" type="button" 
+                      class="w-full text-left px-4 py-2 text-sm text-danger hover:bg-red-50 transition-colors flex items-center" disabled>
+                      <i class="fa fa-trash w-5 text-center mr-2"></i>删除所选
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -291,20 +318,20 @@
                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
                       <input type="checkbox" id="selectAllPages" class="rounded border-gray-300 text-primary focus:ring-primary/50">
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable-column" data-sort="url">
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable-column" data-sort="url" style="width: 45%;">
                       URL
                       <i class="fa fa-sort ml-1 text-gray-400"></i>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable-column" data-sort="selector">
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable-column" data-sort="selector" style="width: 25%;">
                       选择器
                       <i class="fa fa-sort ml-1 text-gray-400"></i>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable-column" data-sort="module">
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable-column" data-sort="module" style="width: 20%;">
                       模块
                       <i class="fa fa-sort ml-1 text-gray-400"></i>
                     </th>
                     <th scope="col"
-                      class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                      class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 10%;">操作</th>
                   </tr>
                 </thead>
                 <tbody id="pagesTableBody" class="bg-white divide-y divide-gray-200">
@@ -330,10 +357,6 @@
                         <button type="button" class="text-danger hover:text-danger/80 delete-page transition-colors"
                           aria-label="删除">
                           <i class="fa fa-trash"></i>
-                        </button>
-                        <button type="button" class="text-secondary hover:text-secondary/80 ml-3 test-page transition-colors"
-                          aria-label="测试" data-url="https://github.com/settings/profile">
-                          <i class="fa fa-external-link"></i>
                         </button>
                         <button type="button" class="text-secondary hover:text-secondary/80 ml-3 test-page transition-colors"
                           aria-label="测试" data-url="https://github.com">

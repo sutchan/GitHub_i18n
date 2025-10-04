@@ -1,7 +1,7 @@
 // auto_string_updater.js
 // 用于自动化从GitHub网站抓取字符串并更新翻译词典的工具
 // 作者: SutChan
-// 版本: 1.8.12
+// 版本: 1.8.16
 
 const fs = require('fs').promises;
 const path = require('path');

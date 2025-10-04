@@ -1,7 +1,7 @@
 const fs = require('fs');
 // Web服务器模块，提供字符串抓取工具的操作界面和API
 // 作者: SutChan
-// 版本: 1.8.13
+// 版本: 1.8.16
 
 const fsPromises = require('fs').promises;
 const path = require('path');

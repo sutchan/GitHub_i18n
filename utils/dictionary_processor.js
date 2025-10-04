@@ -1,6 +1,6 @@
-// 词典处理翻译工具
+// 词典处理工具
 // 作者: SutChan
-// 版本: 1.0.0
+// 版本: 1.8.16
 
 const fs = require('fs').promises;
 const path = require('path');
