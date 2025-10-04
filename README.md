@@ -1,4 +1,4 @@
-# GitHub 中文翻译项目
+# GitHub 中文本地化解决方案
 
 > 🌐 一套完整的 GitHub 中文本地化解决方案，包含轻量、安全、高性能的油猴（Tampermonkey）翻译脚本和强大的自动化字符串更新工具。
 
@@ -70,16 +70,25 @@ npm install
 
 #### 方法一：通过 HTML 界面操作（推荐）
 
-1. 启动服务器
+1. 进入 utils 目录
+   ```bash
+   cd utils
+   ```
+2. 安装依赖（首次使用）
+   ```bash
+   npm install
+   ```
+3. 启动服务器
    ```bash
    npm run server
    ```
-2. 打开浏览器，访问 http://localhost:3000
-3. 在界面中配置参数并点击 "开始抓取" 按钮
+4. 打开浏览器，访问 http://localhost:3000
+5. 在界面中配置参数并点击 "开始抓取" 按钮
 
 #### 方法二：命令行方式
 
 ```bash
+cd utils
 node auto_string_updater.js
 # 或使用 npm 脚本
 npm start
