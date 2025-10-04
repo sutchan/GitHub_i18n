@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 从localStorage恢复上次运行的日志
     restoreLogsFromLocalStorage();
+    
+    // 设置页面表单验证
+    setupPageFormValidation();
 });
 
 // 显示用户脚本设置模态框
@@ -139,6 +142,74 @@ function bindEvents() {
     
     // 重置工具状态
     document.getElementById('resetStatusBtn').addEventListener('click', resetToolStatus);
+    
+    // URL列表优化功能事件
+    // 搜索过滤
+    const searchInput = document.getElementById('pageSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', filterPagesByUrl);
+    }
+
+    // 高级模式切换事件
+    const advancedModeToggle = document.getElementById('advancedModeToggle');
+    if (advancedModeToggle) {
+        // 从localStorage加载上次的模式设置
+        const isAdvancedMode = localStorage.getItem('advancedMode') === 'true';
+        advancedModeToggle.checked = isAdvancedMode;
+        
+        // 初始应用模式
+        toggleAdvancedMode(isAdvancedMode);
+        
+        // 添加切换事件监听
+        advancedModeToggle.addEventListener('change', function() {
+            const isAdvanced = this.checked;
+            // 保存到localStorage
+            localStorage.setItem('advancedMode', isAdvanced);
+            // 应用模式切换
+            toggleAdvancedMode(isAdvanced);
+        });
+    }
+    
+    // 全选/取消全选
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', selectAllPages);
+    }
+    
+    // 批量删除
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    if (deleteSelectedBtn) {
+        deleteSelectedBtn.addEventListener('click', deleteSelectedPages);
+    }
+    
+    // 批量导入
+    const importPagesBtn = document.getElementById('importPagesBtn');
+    if (importPagesBtn) {
+        importPagesBtn.addEventListener('click', function() {
+            document.getElementById('importPagesFile').click();
+        });
+    }
+    
+    // 导入文件选择
+    const importFileInput = document.getElementById('importPagesFile');
+    if (importFileInput) {
+        importFileInput.addEventListener('change', importPages);
+    }
+    
+    // 批量导出
+    const exportPagesBtn = document.getElementById('exportPagesBtn');
+    if (exportPagesBtn) {
+        exportPagesBtn.addEventListener('click', exportPages);
+    }
+    
+    // 表格排序
+    const tableHeaders = document.querySelectorAll('#pagesTable th.sortable');
+    tableHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const column = this.getAttribute('data-column');
+            sortPagesTable(column);
+        });
+    });
 }
 
 // 切换工具状态（开始/停止）
@@ -1060,7 +1131,7 @@ async function loadPagesConfig() {
 
                 // 检查是否为空数组，显示友好的空状态提示
                 if (pages.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">没有配置的页面，请点击"添加页面"按钮添加新页面</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">没有配置的页面，请点击"添加页面"按钮添加新页面</td></tr>';
                 } else {
                     pages.forEach((page, index) => {
                         // 验证每个页面配置的必需字段
@@ -1071,16 +1142,35 @@ async function loadPagesConfig() {
 
                         const newRow = document.createElement('tr');
                         newRow.setAttribute('data-index', index);
+                        newRow.setAttribute('data-url', escapeHTML(page.url));
+                        newRow.setAttribute('data-selector', escapeHTML(page.selector));
+                        newRow.setAttribute('data-module', escapeHTML(page.module));
+                        newRow.className = 'hover:bg-gray-50 transition-colors';
                         newRow.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${escapeHTML(page.url)}</td>
+                            <td class="px-4 py-4 whitespace-nowrap">
+                                <input type="checkbox" class="page-checkbox rounded border-gray-300 text-primary focus:ring-primary/50">
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900">
+                                <div class="flex items-center">
+                                    <div class="max-w-md overflow-hidden text-ellipsis whitespace-nowrap relative" title="${escapeHTML(page.url)}">
+                                        ${escapeHTML(page.url)}
+                                    </div>
+                                    <button class="ml-2 text-gray-400 hover:text-primary copy-url transition-colors" data-url="${escapeHTML(page.url)}" aria-label="复制URL">
+                                        <i class="fa fa-copy"></i>
+                                    </button>
+                                </div>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.selector)}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.module)}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-primary hover:text-primary/80 mr-3 edit-page">
+                                <button class="text-primary hover:text-primary/80 mr-3 edit-page transition-colors" aria-label="编辑">
                                     <i class="fa fa-pencil"></i>
                                 </button>
-                                <button class="text-danger hover:text-danger/80 delete-page">
+                                <button class="text-danger hover:text-danger/80 delete-page transition-colors" aria-label="删除">
                                     <i class="fa fa-trash"></i>
+                                </button>
+                                <button class="text-secondary hover:text-secondary/80 ml-3 test-page transition-colors" aria-label="测试" data-url="${escapeHTML(page.url)}">
+                                    <i class="fa fa-external-link"></i>
                                 </button>
                             </td>
                         `;
@@ -1093,6 +1183,18 @@ async function loadPagesConfig() {
 
                         newRow.querySelector('.delete-page').addEventListener('click', function() {
                             deletePage(index);
+                        });
+
+                        newRow.querySelector('.copy-url').addEventListener('click', function() {
+                            copyUrlToClipboard(this.getAttribute('data-url'));
+                        });
+
+                        newRow.querySelector('.test-page').addEventListener('click', function() {
+                            testPageUrl(this.getAttribute('data-url'));
+                        });
+
+                        newRow.querySelector('.page-checkbox').addEventListener('change', function() {
+                            updateSelectedPagesStatus();
                         });
                     });
                 }
@@ -1224,6 +1326,113 @@ function showEditPageModal(index) {
 function hidePageModal() {
     document.getElementById('pageModal').classList.add('hidden');
     document.getElementById('pageModal').removeAttribute('data-edit-index');
+    
+    // 清除所有错误提示
+    clearFieldErrors();
+}
+
+// 检查URL是否存在重复
+async function hasDuplicateUrl(url, editIndex) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/pages`, {
+            method: 'GET',
+            timeout: 3000
+        });
+
+        if (!response.ok) {
+            throw new Error(`获取页面配置失败: ${response.status}`);
+        }
+
+        let pages = await response.json();
+        // 确保pages是数组
+        if (!Array.isArray(pages)) {
+            pages = [];
+        }
+
+        // 检查URL是否已存在（除了编辑的当前项）
+        const duplicateIndex = pages.findIndex((page, index) =>
+            page.url === url && (editIndex === null || index != editIndex)
+        );
+
+        return duplicateIndex !== -1;
+    } catch (error) {
+        // 如果获取失败，抛出错误
+        throw error;
+    }
+}
+
+// 显示字段错误
+function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    
+    // 清除之前的错误
+    clearFieldError(fieldId);
+    
+    // 添加错误样式
+    field.classList.add('border-danger', 'focus:ring-danger');
+    
+    // 添加错误消息
+    const errorSpan = document.createElement('span');
+    errorSpan.className = 'block text-danger text-xs mt-1';
+    errorSpan.textContent = message;
+    errorSpan.id = `${fieldId}Error`;
+    
+    field.parentNode.appendChild(errorSpan);
+}
+
+// 清除单个字段错误
+function clearFieldError(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    
+    // 移除错误样式
+    field.classList.remove('border-danger', 'focus:ring-danger');
+    
+    // 移除错误消息
+    const errorSpan = document.getElementById(`${fieldId}Error`);
+    if (errorSpan && errorSpan.parentNode === field.parentNode) {
+        field.parentNode.removeChild(errorSpan);
+    }
+}
+
+// 清除所有字段错误
+function clearFieldErrors() {
+    const fields = ['pageUrl', 'pageSelector', 'pageModule'];
+    fields.forEach(fieldId => clearFieldError(fieldId));
+}
+
+// 为URL输入框添加实时检查功能
+function setupPageFormValidation() {
+    const pageUrl = document.getElementById('pageUrl');
+    if (pageUrl) {
+        // 当URL输入框失去焦点时进行验证
+        pageUrl.addEventListener('blur', async function() {
+            const url = this.value.trim();
+            if (url) {
+                clearFieldError('pageUrl');
+                
+                // 验证URL格式
+                try {
+                    new URL(url);
+                } catch (e) {
+                    showFieldError('pageUrl', '请输入有效的GitHub URL');
+                    return;
+                }
+                
+                // 检查URL是否重复
+                try {
+                    const editIndex = document.getElementById('pageModal').getAttribute('data-edit-index');
+                    if (await hasDuplicateUrl(url, editIndex)) {
+                        showFieldError('pageUrl', '该GitHub URL已存在于配置中');
+                    }
+                } catch (checkError) {
+                    // 检查失败时不显示错误，由保存时的检查处理
+                    console.warn('实时URL重复检查失败:', checkError);
+                }
+            }
+        });
+    }
 }
 
 // 保存页面配置
@@ -1234,19 +1443,19 @@ async function savePage() {
 
     // 验证输入
     if (!url) {
-        alert('请填写GitHub页面URL');
+        showFieldError('pageUrl', '请填写GitHub页面URL');
         document.getElementById('pageUrl').focus();
         return;
     }
 
     if (!selector) {
-        alert('请填写选择器');
+        showFieldError('pageSelector', '请填写选择器');
         document.getElementById('pageSelector').focus();
         return;
     }
 
     if (!module) {
-        alert('请填写模块名称');
+        showFieldError('pageModule', '请填写模块名称');
         document.getElementById('pageModule').focus();
         return;
     }
@@ -1255,9 +1464,21 @@ async function savePage() {
     try {
         new URL(url);
     } catch (e) {
-        alert('请输入有效的GitHub URL');
+        showFieldError('pageUrl', '请输入有效的GitHub URL');
         document.getElementById('pageUrl').focus();
         return;
+    }
+    
+    // 在前端进行初步的URL重复检查（提升用户体验）
+    try {
+        if (await hasDuplicateUrl(url, document.getElementById('pageModal').getAttribute('data-edit-index'))) {
+            showFieldError('pageUrl', '该GitHub URL已存在于配置中');
+            document.getElementById('pageUrl').focus();
+            return;
+        }
+    } catch (checkError) {
+        // 如果检查失败，继续流程，让后端进行最终验证
+        console.warn('前端URL重复检查失败，继续保存流程:', checkError);
     }
 
     // 检查是否是编辑模式
@@ -1584,4 +1805,367 @@ async function resetToolStatus() {
     } catch (error) {
         addLog(`重置工具状态时发生错误: ${error}`, 'error');
     }
+}
+
+// URL列表优化功能函数
+
+// 复制URL到剪贴板
+function copyUrlToClipboard(url) {
+    navigator.clipboard.writeText(url).then(() => {
+        // 显示临时提示
+        const tempAlert = document.createElement('div');
+        tempAlert.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50 transition-opacity duration-300';
+        tempAlert.textContent = 'URL已复制到剪贴板';
+        document.body.appendChild(tempAlert);
+        
+        // 2秒后自动消失
+        setTimeout(() => {
+            tempAlert.classList.add('opacity-0');
+            setTimeout(() => {
+                document.body.removeChild(tempAlert);
+            }, 300);
+        }, 2000);
+    }).catch(err => {
+        console.error('复制URL失败:', err);
+        addLog('复制URL失败，请手动复制', 'error');
+    });
+}
+
+// 测试页面URL
+function testPageUrl(url) {
+    // 在新标签页中打开URL进行测试
+    window.open(url, '_blank');
+}
+
+// 根据URL搜索过滤页面
+function filterPagesByUrl() {
+    const searchTerm = this.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('#pagesTableBody tr[data-url]');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const url = row.getAttribute('data-url').toLowerCase();
+        if (url.includes(searchTerm)) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // 显示过滤结果数量
+    const filterCount = document.getElementById('filterCount');
+    if (filterCount) {
+        filterCount.textContent = `显示 ${visibleCount} 项`;
+    }
+    
+    // 如果没有可见行，显示空状态
+    const emptyState = document.getElementById('pagesEmptyState');
+    if (emptyState) {
+        emptyState.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
+    }
+}
+
+// 全选/取消全选页面
+function selectAllPages() {
+    const isChecked = this.checked;
+    const checkboxes = document.querySelectorAll('.page-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        // 只处理可见行的复选框
+        const row = checkbox.closest('tr');
+        if (row && row.style.display !== 'none') {
+            checkbox.checked = isChecked;
+        }
+    });
+    
+    updateSelectedPagesStatus();
+}
+
+// 更新已选择页面状态
+function updateSelectedPagesStatus() {
+    const checkboxes = document.querySelectorAll('.page-checkbox:not(:disabled)');
+    const checkedBoxes = document.querySelectorAll('.page-checkbox:checked');
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    
+    // 更新全选复选框状态
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = checkboxes.length > 0 && checkboxes.length === checkedBoxes.length;
+        selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
+    }
+    
+    // 更新批量删除按钮状态
+    if (deleteSelectedBtn) {
+        if (checkedBoxes.length > 0) {
+            deleteSelectedBtn.removeAttribute('disabled');
+            deleteSelectedBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+            deleteSelectedBtn.setAttribute('disabled', 'disabled');
+            deleteSelectedBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    }
+}
+
+// 批量删除选中的页面
+async function deleteSelectedPages() {
+    const checkedBoxes = document.querySelectorAll('.page-checkbox:checked');
+    
+    if (checkedBoxes.length === 0) {
+        alert('请先选择要删除的页面');
+        return;
+    }
+    
+    if (!confirm(`确定要删除选中的 ${checkedBoxes.length} 个页面配置吗？`)) {
+        return;
+    }
+    
+    try {
+        // 获取当前页面配置
+        const response = await fetch(`${API_BASE_URL}/api/pages`);
+        let pages = await response.json();
+        
+        // 收集要删除的索引
+        const indicesToDelete = [];
+        checkedBoxes.forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            const index = parseInt(row.getAttribute('data-index'));
+            if (!isNaN(index)) {
+                indicesToDelete.push(index);
+            }
+        });
+        
+        // 按降序排序索引，避免删除时索引错乱
+        indicesToDelete.sort((a, b) => b - a);
+        
+        // 删除选中的页面
+        indicesToDelete.forEach(index => {
+            pages.splice(index, 1);
+        });
+        
+        // 保存到服务器
+        const saveResponse = await fetch(`${API_BASE_URL}/api/pages`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(pages),
+            timeout: 5000
+        });
+        
+        if (!saveResponse.ok) {
+            throw new Error(`服务器响应错误: ${saveResponse.status} ${saveResponse.statusText}`);
+        }
+        
+        const saveResult = await saveResponse.json();
+        
+        if (saveResult.success) {
+            // 重新加载页面配置
+            await loadPagesConfig();
+            
+            // 显示成功消息
+            addLog(`已成功删除 ${checkedBoxes.length} 个页面配置`, 'success');
+        } else {
+            addLog(`批量删除页面失败: ${saveResult.message || '未知错误'}`, 'error');
+        }
+    } catch (error) {
+        addLog(`批量删除页面时发生错误: ${error}`, 'error');
+    }
+}
+
+// 导入页面配置
+async function importPages(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        return;
+    }
+    
+    // 验证文件类型
+    if (!file.name.endsWith('.json')) {
+        alert('请选择JSON格式的文件');
+        return;
+    }
+    
+    try {
+        // 读取文件内容
+        const content = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = e => reject(new Error('文件读取失败'));
+            reader.readAsText(file);
+        });
+        
+        // 解析JSON
+        let importedPages = JSON.parse(content);
+        
+        // 验证数据格式
+        if (!Array.isArray(importedPages)) {
+            throw new Error('导入的文件格式错误，期望数组');
+        }
+        
+        // 验证每个页面配置
+        importedPages.forEach((page, index) => {
+            if (!page.url || !page.selector || !page.module) {
+                throw new Error(`第${index + 1}个页面配置缺少必需字段`);
+            }
+        });
+        
+        // 获取现有页面配置
+        const response = await fetch(`${API_BASE_URL}/api/pages`);
+        let currentPages = await response.json();
+        
+        // 合并配置（去重）
+        const existingUrls = new Set(currentPages.map(page => page.url));
+        const newPages = importedPages.filter(page => !existingUrls.has(page.url));
+        const mergedPages = [...currentPages, ...newPages];
+        
+        // 保存合并后的配置
+        const saveResponse = await fetch(`${API_BASE_URL}/api/pages`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mergedPages),
+            timeout: 5000
+        });
+        
+        if (!saveResponse.ok) {
+            throw new Error(`服务器响应错误: ${saveResponse.status} ${saveResponse.statusText}`);
+        }
+        
+        const saveResult = await saveResponse.json();
+        
+        if (saveResult.success) {
+            // 重新加载页面配置
+            await loadPagesConfig();
+            
+            // 显示成功消息
+            addLog(`成功导入 ${newPages.length} 个新页面配置`, 'success');
+            if (newPages.length < importedPages.length) {
+                addLog(`已跳过 ${importedPages.length - newPages.length} 个重复的页面配置`, 'info');
+            }
+        } else {
+            addLog(`导入页面配置失败: ${saveResult.message || '未知错误'}`, 'error');
+        }
+    } catch (error) {
+        addLog(`导入页面配置时发生错误: ${error}`, 'error');
+        alert(`导入失败: ${error.message}`);
+    } finally {
+        // 清空文件输入，允许重复选择同一文件
+        event.target.value = '';
+    }
+}
+
+// 导出页面配置
+async function exportPages() {
+    try {
+        // 获取当前页面配置
+        const response = await fetch(`${API_BASE_URL}/api/pages`);
+        const pages = await response.json();
+        
+        // 验证数据
+        if (!Array.isArray(pages) || pages.length === 0) {
+            alert('没有可导出的页面配置');
+            return;
+        }
+        
+        // 创建JSON字符串
+        const jsonString = JSON.stringify(pages, null, 2);
+        
+        // 创建Blob和下载链接
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `github_pages_config_${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        
+        // 清理
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+        
+        addLog('页面配置已成功导出', 'success');
+    } catch (error) {
+        addLog(`导出页面配置时发生错误: ${error}`, 'error');
+    }
+}
+
+// 表格排序功能
+function sortPagesTable(column) {
+    const tableBody = document.getElementById('pagesTableBody');
+    const rows = Array.from(tableBody.querySelectorAll('tr[data-index]'));
+    
+    // 获取当前排序方向
+    const header = document.querySelector(`th[data-column="${column}"]`);
+    const isAscending = header.getAttribute('data-sort') !== 'asc';
+    
+    // 重置所有表头排序状态
+    document.querySelectorAll('#pagesTable th').forEach(th => {
+        th.removeAttribute('data-sort');
+        th.querySelector('.sort-indicator')?.remove();
+    });
+    
+    // 设置当前表头排序状态
+    header.setAttribute('data-sort', isAscending ? 'asc' : 'desc');
+    
+    // 添加排序指示器
+    const indicator = document.createElement('span');
+    indicator.className = 'sort-indicator ml-1';
+    indicator.innerHTML = isAscending ? '<i class="fa fa-sort-asc"></i>' : '<i class="fa fa-sort-desc"></i>';
+    header.appendChild(indicator);
+    
+    // 根据列名排序
+    rows.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch (column) {
+            case 'url':
+                aValue = a.getAttribute('data-url').toLowerCase();
+                bValue = b.getAttribute('data-url').toLowerCase();
+                break;
+            case 'selector':
+                aValue = a.getAttribute('data-selector').toLowerCase();
+                bValue = b.getAttribute('data-selector').toLowerCase();
+                break;
+            case 'module':
+                aValue = a.getAttribute('data-module').toLowerCase();
+                bValue = b.getAttribute('data-module').toLowerCase();
+                break;
+            default:
+                return 0;
+        }
+        
+        if (aValue < bValue) return isAscending ? -1 : 1;
+        if (aValue > bValue) return isAscending ? 1 : -1;
+        return 0;
+    });
+    
+    // 重新插入排序后的行
+    rows.forEach(row => tableBody.appendChild(row));
+}
+
+// 切换高级模式显示
+function toggleAdvancedMode(isAdvanced) {
+    // 获取所有高级配置区域
+    const advancedSections = document.querySelectorAll('.config-section-advanced');
+    
+    // 根据模式显示或隐藏高级配置项
+    advancedSections.forEach(section => {
+        if (isAdvanced) {
+            section.classList.remove('hidden');
+        } else {
+            section.classList.add('hidden');
+        }
+    });
+    
+    // 添加过渡动画效果
+    setTimeout(() => {
+        advancedSections.forEach(section => {
+            section.classList.toggle('opacity-0', !isAdvanced);
+            section.classList.toggle('opacity-100', isAdvanced);
+        });
+    }, 10);
 }

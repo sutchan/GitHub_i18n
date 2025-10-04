@@ -41,6 +41,34 @@
     .fade-in {
         animation: fadeIn 0.3s ease-in;
     }
+    /* 高级配置区域过渡动画 */
+    .config-section-advanced {
+        transition: all 0.3s ease-in-out;
+        opacity: 1;
+    }
+    .config-section-advanced.hidden {
+        display: none;
+    }
+    .config-section-advanced.opacity-0 {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    .config-section-advanced.opacity-100 {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* 模式切换开关样式 */
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
     /* 进度条动画效果 */
     .progress-bar {
         position: relative;
@@ -102,4 +130,14 @@
     50% {
         opacity: 0.8;
     }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
