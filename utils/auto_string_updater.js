@@ -1,7 +1,7 @@
 // auto_string_updater.js
 // 用于自动化从GitHub网站抓取字符串并更新翻译词典的工具
 // 作者: SutChan
-// 版本: 1.8.11
+// 版本: 1.8.12
 
 const fs = require('fs').promises;
 const path = require('path');
@@ -10,6 +10,7 @@ const https = require('https');
 
 // 导入共享工具函数
 const { updateStatsAfterRun, validateConfig, processPagesInBatches, sleep, formatNumber } = require('./utils');
+const { saveExtractedStringsToDictionary } = require('./dictionary_processor');
 
 
 
@@ -26,8 +27,7 @@ function log(level, message, details = null) {
   
   // 只输出级别大于等于当前设置的日志
   if (messageLevel <= currentLevel) {
-    const timestamp = new Date().toISOString();
-    let logMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
+    let logMessage = `[${level.toUpperCase()}] ${message}`;
     
     if (details) {
       if (details instanceof Error) {
@@ -56,7 +56,6 @@ function log(level, message, details = null) {
       type: 'log',
       level: level,
       message: message,
-      timestamp: new Date().toISOString(),
       hasDetails: !!details
     });
   }
@@ -77,6 +76,8 @@ const DEFAULT_CONFIG = {
   debugMode: false,
   logLevel: 'info', // error, warn, info, debug
   debugOutputFile: '../debug/fetched_strings.json',
+  saveDownloadedPages: false, // 是否保存下载的原始HTML页面
+  downloadedPagesDir: '../debug/pages', // 下载页面保存目录
   exactMatchOnly: true, // 只翻译全文匹配的字符串
   ignoreWords: ['GitHub', 'API', 'URL', 'HTTP', 'HTTPS'], // 忽略的单词列表
   ignorePatterns: [], // 忽略的正则表达式模式列表
@@ -148,6 +149,22 @@ async function loadConfig() {
     // 验证页面配置
     if (GITHUB_PAGES && Array.isArray(GITHUB_PAGES)) {
       log('info', `已加载 ${GITHUB_PAGES.length} 个GitHub页面配置`);
+      
+      // 过滤掉可能需要认证的特定用户URL
+      GITHUB_PAGES = GITHUB_PAGES.filter(page => {
+        const isUserSpecific = page.url.includes('/created_by/') || 
+                             page.url.includes('/assigned/') || 
+                             page.url.includes('/mentioned/') || 
+                             page.url.includes('/following/');
+        
+        if (isUserSpecific) {
+          log('debug', `跳过可能需要认证的特定用户页面: ${page.url}`);
+          return false;
+        }
+        return true;
+      });
+      
+      log('info', `过滤后剩余 ${GITHUB_PAGES.length} 个可访问的GitHub页面配置`);
     } else {
       throw new Error('pages.json 格式错误，应为数组');
     }
@@ -966,6 +983,16 @@ async function main() {
         }
         
         const html = await downloadPage(page.url);
+        
+        // 如果配置了保存下载页面，则保存HTML内容
+        if (CONFIG.saveDownloadedPages) {
+          const fileName = `${page.module}_${new URL(page.url).hostname}_${path.basename(new URL(page.url).pathname).replace(/[^a-zA-Z0-9_-]/g, '_') || 'index'}.html`;
+          const savePath = path.resolve(__dirname, CONFIG.downloadedPagesDir, fileName);
+          await fs.mkdir(path.dirname(savePath), { recursive: true });
+          await fs.writeFile(savePath, html, 'utf8');
+          log('debug', `已保存下载页面到: ${savePath}`);
+        }
+        
         const strings = extractStrings(html, page.module);
         
         // 更新模块统计
@@ -1000,15 +1027,19 @@ async function main() {
     const progressCallback = (progressInfo) => {
       // 发送进度信息到父进程
       if (isChildProcess) {
-        process.send({
-          type: 'progress',
-          progress: progressInfo.progress,
-          processed: progressInfo.processed,
-          total: progressInfo.total,
-          currentUrl: progressInfo.currentUrl,
-          elapsedTime: progressInfo.elapsedTime,
-          remainingTime: progressInfo.remainingTime
-        });
+        try {
+          process.send({
+            type: 'progress',
+            progress: progressInfo.progress,
+            processed: progressInfo.processed,
+            total: progressInfo.total,
+            currentUrl: progressInfo.currentUrl,
+            elapsedTime: progressInfo.elapsedTime,
+            remainingTime: progressInfo.remainingTime
+          });
+        } catch (sendError) {
+          log('warn', `发送进度信息到父进程失败: ${sendError.message}`);
+        }
       }
       
       // 输出进度到控制台
@@ -1017,12 +1048,12 @@ async function main() {
       }
     };
     
-    // 批量并行处理页面
+    // 批量并行处理页面，降低并发数并增加请求延迟，避免触发GitHub的请求限制
     const allStrings = await processPagesInBatches(
       GITHUB_PAGES,
       processPage,
-      CONFIG.concurrentRequests || 3, // 使用配置中的并发数或默认值
-      CONFIG.requestDelay || 1000,    // 使用配置中的延迟时间或默认值
+      Math.min(CONFIG.concurrentRequests || 3, 2), // 限制最大并发数为2
+      Math.max(CONFIG.requestDelay || 1000, 2000), // 增加最小请求延迟到2000ms
       CONFIG.maxRetries || 3,         // 使用配置中的最大重试次数
       progressCallback                // 进度回调函数
     );
@@ -1051,6 +1082,16 @@ async function main() {
     
     // 保存调试信息
     await saveDebugInfo(uniqueStrings);
+    
+    // 保存提取的字符串到JSON词典文件
+    try {
+      log('info', '开始将提取的字符串保存到JSON词典文件...');
+      await saveExtractedStringsToDictionary(uniqueStrings);
+      log('info', '已成功将提取的字符串保存到JSON词典文件');
+    } catch (error) {
+      log('error', '保存提取的字符串到JSON词典文件失败:', error);
+      // 即使保存失败，也继续执行后续流程
+    }
     
     // 发送提取完成信息
     if (isChildProcess) {
@@ -1142,16 +1183,30 @@ async function main() {
     
     // 通知父进程处理失败
     if (isChildProcess) {
-      process.send({
-        type: 'error',
-        success: false,
-        message: error.message,
-        errorCount: STATS.errorCount,
-        stats: failureStats
-      });
+      try {
+        process.send({
+          type: 'error',
+          success: false,
+          message: error.message,
+          errorCount: STATS.errorCount,
+          stats: failureStats
+        });
+      } catch (sendError) {
+        log('warn', `发送错误信息到父进程失败: ${sendError.message}`);
+      }
     }
     
-    process.exit(1);
+    // 增加错误代码识别
+    let exitCode = 1;
+    if (error.message.includes('ECONNRESET') || error.message.includes('ETIMEDOUT')) {
+      log('error', '网络连接错误，可能是GitHub限制了请求频率');
+      exitCode = 2; // 网络错误代码
+    } else if (error.message.includes('403') || error.message.includes('429')) {
+      log('error', 'GitHub API限制，请求被拒绝');
+      exitCode = 3; // API限制代码
+    }
+    
+    process.exit(exitCode);
   }
 }
 

@@ -1,5 +1,30 @@
 // 当前的SSE连接
+// Web界面交互逻辑模块
+// 作者: SutChan
+// 版本: 1.8.15
+
 let eventSource = null;
+
+// 全局的带超时的fetch函数
+function fetchWithTimeout(url, options = {}, timeout = 5000) {
+    return new Promise((resolve, reject) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+            controller.abort();
+            reject(new Error(`请求超时: ${timeout}ms后未响应`));
+        }, timeout);
+        
+        fetch(url, { ...options, signal: controller.signal })
+            .then(response => {
+                clearTimeout(timeoutId);
+                resolve(response);
+            })
+            .catch(error => {
+                clearTimeout(timeoutId);
+                reject(error);
+            });
+    });
+}
 
 // 初始化页面
 document.addEventListener('DOMContentLoaded', function() {
@@ -14,6 +39,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 绑定事件
     bindEvents();
+
+    // 初始化选项卡功能
+    initTabs();
+    
+    // 从localStorage恢复上次运行的日志
+    restoreLogsFromLocalStorage();
 });
 
 // 显示用户脚本设置模态框
@@ -34,11 +65,48 @@ function hideUserScriptModal() {
     }, 200);
 }
 
+// 选项卡切换功能
+function initTabs() {
+    const tabConfig = document.getElementById('tabConfig');
+    const tabPages = document.getElementById('tabPages');
+    const tabConfigContent = document.getElementById('tabConfigContent');
+    const tabPagesContent = document.getElementById('tabPagesContent');
+
+    // 配置设置选项卡点击事件
+    tabConfig.addEventListener('click', function() {
+        // 激活配置选项卡
+        tabConfig.classList.add('text-secondary', 'border-secondary');
+        tabConfig.classList.remove('text-gray-500', 'border-transparent', 'hover:border-gray-300');
+        
+        // 取消激活页面选项卡
+        tabPages.classList.remove('text-secondary', 'border-secondary');
+        tabPages.classList.add('text-gray-500', 'border-transparent', 'hover:border-gray-300');
+        
+        // 显示配置内容，隐藏页面内容
+        tabConfigContent.classList.remove('hidden');
+        tabPagesContent.classList.add('hidden');
+    });
+
+    // GitHub页面配置选项卡点击事件
+    tabPages.addEventListener('click', function() {
+        // 激活页面选项卡
+        tabPages.classList.add('text-secondary', 'border-secondary');
+        tabPages.classList.remove('text-gray-500', 'border-transparent', 'hover:border-gray-300');
+        
+        // 取消激活配置选项卡
+        tabConfig.classList.remove('text-secondary', 'border-secondary');
+        tabConfig.classList.add('text-gray-500', 'border-transparent', 'hover:border-gray-300');
+        
+        // 显示页面内容，隐藏配置内容
+        tabPagesContent.classList.remove('hidden');
+        tabConfigContent.classList.add('hidden');
+    });
+}
+
 // 绑定事件
 function bindEvents() {
     // 操作按钮事件
-    document.getElementById('runBtn').addEventListener('click', runTool);
-    document.getElementById('stopBtn').addEventListener('click', stopTool);
+    document.getElementById('toggleBtn').addEventListener('click', toggleTool);
     document.getElementById('saveConfigBtn').addEventListener('click', showUserScriptModal);
     document.getElementById('saveSettingsBtn').addEventListener('click', saveConfig);
     document.getElementById('savePagesBtn').addEventListener('click', savePagesConfig);
@@ -68,6 +136,21 @@ function bindEvents() {
 
     // 查看备份
     document.getElementById('viewBackupBtn').addEventListener('click', viewBackup);
+    
+    // 重置工具状态
+    document.getElementById('resetStatusBtn').addEventListener('click', resetToolStatus);
+}
+
+// 切换工具状态（开始/停止）
+async function toggleTool() {
+    const toggleBtn = document.getElementById('toggleBtn');
+    
+    // 根据按钮文本判断当前状态
+    if (toggleBtn.innerHTML.includes('开始')) {
+        await runTool();
+    } else {
+        await stopTool();
+    }
 }
 
 // 运行工具
@@ -86,9 +169,11 @@ async function runTool() {
         // 更新状态
         updateStatus('running');
 
-        // 禁用运行按钮，启用停止按钮
-        document.getElementById('runBtn').disabled = true;
-        document.getElementById('stopBtn').disabled = false;
+        // 更新按钮状态：显示停止状态
+        const toggleBtn = document.getElementById('toggleBtn');
+        toggleBtn.innerHTML = '<i class="fa fa-stop mr-2"></i>停止抓取';
+        toggleBtn.classList.remove('bg-primary', 'hover:bg-primary/90');
+        toggleBtn.classList.add('bg-danger', 'hover:bg-danger/90');
 
         // 清空日志
         clearLog();
@@ -102,8 +187,10 @@ async function runTool() {
         addLog(`配置保存失败: ${error}`, 'error');
         // 确保UI状态正确
         updateStatus('stopped');
-        document.getElementById('runBtn').disabled = false;
-        document.getElementById('stopBtn').disabled = true;
+        const toggleBtn = document.getElementById('toggleBtn');
+        toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+        toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
+        toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
     }
 }
 
@@ -128,27 +215,37 @@ function startEventSource() {
     // 关闭之前的连接
     if (eventSource) {
         eventSource.close();
+        eventSource = null; // 确保设置为null
     }
 
     // 创建新的SSE连接
     try {
         eventSource = new EventSource(`${API_BASE_URL}/api/run`);
 
-        // 设置连接超时计时器
+        // 设置连接超时计时器 - 增加到5分钟，避免长时间运行的任务被过早终止
         const connectionTimeout = setTimeout(() => {
             if (eventSource && eventSource.readyState === EventSource.CONNECTING) {
                 addLog('连接超时，请检查服务器状态', 'error');
                 eventSource.close();
+                eventSource = null; // 确保设置为null
                 updateStatus('stopped');
-                document.getElementById('runBtn').disabled = false;
-                document.getElementById('stopBtn').disabled = true;
+                const toggleBtn = document.getElementById('toggleBtn');
+                toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+                toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
+                toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
             }
-        }, 10000);
+        }, 300000); // 5分钟 = 300000毫秒
 
         // 连接成功处理
         eventSource.onopen = function() {
             clearTimeout(connectionTimeout);
             addLog('已连接到服务器', 'info');
+            
+            // 再次确认按钮状态
+            const toggleBtn = document.getElementById('toggleBtn');
+            toggleBtn.innerHTML = '<i class="fa fa-stop mr-2"></i>停止抓取';
+            toggleBtn.classList.remove('bg-primary', 'hover:bg-primary/90');
+            toggleBtn.classList.add('bg-danger', 'hover:bg-danger/90');
         };
 
         // 处理消息事件
@@ -178,16 +275,27 @@ function startEventSource() {
                         // 更新状态
                         updateStatus('completed');
 
-                        // 启用运行按钮，禁用停止按钮
-                        document.getElementById('runBtn').disabled = false;
-                        document.getElementById('stopBtn').disabled = true;
+                        // 更新按钮状态：显示开始状态
+                        const toggleBtn = document.getElementById('toggleBtn');
+                        toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+                        toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
+                        toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
 
                         // 关闭SSE连接
-                        eventSource.close();
+                        if (eventSource) {
+                            eventSource.close();
+                            eventSource = null;
+                        }
                         break;
                 }
             } catch (e) {
                 addLog(`解析服务器消息失败: ${e}`, 'error');
+                // 出错时确保按钮状态正确
+                updateStatus('stopped');
+                const toggleBtn = document.getElementById('toggleBtn');
+                toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+                toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
+                toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
             }
         };
 
@@ -203,33 +311,48 @@ function startEventSource() {
             // 更新状态
             updateStatus('stopped');
 
-            // 启用运行按钮，禁用停止按钮
-            document.getElementById('runBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
+            // 更新按钮状态：显示开始状态
+            const toggleBtn = document.getElementById('toggleBtn');
+            toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+            toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
+            toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
 
             // 关闭SSE连接
             if (eventSource) {
                 eventSource.close();
+                eventSource = null;
             }
         };
     } catch (e) {
         addLog(`创建SSE连接失败: ${e}`, 'error');
         updateStatus('stopped');
-        document.getElementById('runBtn').disabled = false;
-        document.getElementById('stopBtn').disabled = true;
+        const toggleBtn = document.getElementById('toggleBtn');
+        toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+        toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
+        toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
+        eventSource = null;
     }
 }
 
 // 停止工具
 async function stopTool() {
     try {
+        // 先更新UI状态，表示正在停止
+        updateStatus('stopping');
+        addLog('正在停止工具...', 'info');
+
         // 发送停止请求到服务器
         const response = await fetch(`${API_BASE_URL}/api/stop`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            timeout: 5000 // 增加超时时间到5秒
         });
+
+        if (!response.ok) {
+            throw new Error(`服务器响应错误: ${response.status} ${response.statusText}`);
+        }
 
         const result = await response.json();
         if (result.success) {
@@ -238,24 +361,31 @@ async function stopTool() {
             addLog(`停止命令发送失败: ${result.message || '未知错误'}`, 'error');
         }
     } catch (error) {
-        addLog(`发送停止命令时发生错误: ${error}`, 'error');
+        addLog(`发送停止命令时发生错误: ${error}`, 'warning');
+        addLog('尝试直接关闭连接...', 'info');
+    } finally {
+        // 无论请求是否成功，都确保关闭SSE连接
+        if (eventSource) {
+            try {
+                eventSource.close();
+            } catch (closeError) {
+                console.warn('关闭SSE连接时发生错误:', closeError);
+            }
+            eventSource = null; // 确保设置为null以防止后续访问
+        }
+
+        // 更新状态为已停止
+        updateStatus('stopped');
+
+        // 更新按钮状态：显示开始状态
+        const toggleBtn = document.getElementById('toggleBtn');
+        toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+        toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
+        toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
+
+        // 添加日志
+        addLog('工具已停止');
     }
-
-    // 关闭SSE连接
-    if (eventSource) {
-        eventSource.close();
-        eventSource = null;
-    }
-
-    // 更新状态
-    updateStatus('stopped');
-
-    // 启用运行按钮，禁用停止按钮
-    document.getElementById('runBtn').disabled = false;
-    document.getElementById('stopBtn').disabled = true;
-
-    // 添加日志
-    addLog('工具已停止');
 }
 
 // 更新状态
@@ -268,6 +398,11 @@ function updateStatus(status) {
             indicator.className = 'w-3 h-3 rounded-full bg-secondary';
             statusText.className = 'text-sm text-secondary';
             statusText.textContent = '运行中';
+            break;
+        case 'stopping':
+            indicator.className = 'w-3 h-3 rounded-full bg-warning';
+            statusText.className = 'text-sm text-warning';
+            statusText.textContent = '停止中';
             break;
         case 'stopped':
             indicator.className = 'w-3 h-3 rounded-full bg-danger';
@@ -283,6 +418,25 @@ function updateStatus(status) {
             indicator.className = 'w-3 h-3 rounded-full bg-gray-300';
             statusText.className = 'text-sm text-gray-500';
             statusText.textContent = '就绪';
+    }
+}
+
+// 更新进度条和进度文本
+function updateProgress(progress, processed, total) {
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const progressDetails = document.getElementById('progressDetails');
+    
+    if (progressBar) {
+        progressBar.style.width = `${progress}%`;
+    }
+    
+    if (progressText) {
+        progressText.textContent = `${progress}%`;
+    }
+    
+    if (progressDetails) {
+        progressDetails.textContent = `${processed}/${total} 页面`;
     }
 }
 
@@ -316,8 +470,12 @@ function addLog(message, type = 'normal') {
             logEntry.className = 'text-gray-800';
     }
 
-    // 添加时间戳
-    const timestamp = new Date().toLocaleTimeString();
+    // 添加时间戳（使用精简格式）
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    const timestamp = `${hours}:${minutes}:${seconds}`;
     logEntry.textContent = `[${timestamp}] ${message}`;
 
     // 移除初始提示
@@ -336,16 +494,97 @@ function addLog(message, type = 'normal') {
 
     // 滚动到底部
     logContainer.scrollTop = logContainer.scrollHeight;
+    
+    // 保存日志到localStorage
+    saveLogToLocalStorage(message, type, timestamp);
+}
+
+// 保存日志到localStorage
+function saveLogToLocalStorage(message, type, timestamp) {
+    try {
+        // 获取现有的日志数组
+        let logs = JSON.parse(localStorage.getItem('lastRunLogs') || '[]');
+        
+        // 添加新日志条目
+        logs.push({
+            message: message,
+            type: type,
+            timestamp: timestamp,
+            datetime: new Date().toISOString()
+        });
+        
+        // 限制保存的日志数量
+        const maxSavedLogs = 500;
+        if (logs.length > maxSavedLogs) {
+            logs = logs.slice(-maxSavedLogs);
+        }
+        
+        // 保存回localStorage
+        localStorage.setItem('lastRunLogs', JSON.stringify(logs));
+    } catch (error) {
+        console.error('保存日志到localStorage失败:', error);
+    }
+}
+
+// 从localStorage恢复日志
+function restoreLogsFromLocalStorage() {
+    try {
+        const logs = JSON.parse(localStorage.getItem('lastRunLogs') || '[]');
+        
+        if (logs.length > 0) {
+            const logContainer = document.getElementById('logContainer');
+            logContainer.innerHTML = ''; // 清空初始提示
+            
+            logs.forEach(log => {
+                const logEntry = document.createElement('div');
+                
+                // 设置样式
+                switch(log.type) {
+                    case 'error':
+                        logEntry.className = 'text-danger';
+                        break;
+                    case 'success':
+                        logEntry.className = 'text-secondary';
+                        break;
+                    case 'info':
+                        logEntry.className = 'text-primary';
+                        break;
+                    case 'warning':
+                        logEntry.className = 'text-warning';
+                        break;
+                    default:
+                        logEntry.className = 'text-gray-800';
+                }
+                
+                // 设置内容
+                logEntry.textContent = `[${log.timestamp}] ${log.message}`;
+                logContainer.appendChild(logEntry);
+            });
+            
+            // 滚动到底部
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+    } catch (error) {
+        console.error('从localStorage恢复日志失败:', error);
+    }
 }
 
 // 清空日志
 function clearLog() {
     const logContainer = document.getElementById('logContainer');
     logContainer.innerHTML = '<div class="text-gray-500">日志将显示在这里...</div>';
+    
+    // 同时清空localStorage中的日志
+    try {
+        localStorage.removeItem('lastRunLogs');
+    } catch (error) {
+        console.error('清空localStorage中的日志失败:', error);
+    }
 }
 
 // 保存用户脚本设置
 async function saveUserScriptSettings() {
+    console.log('saveUserScriptSettings函数被调用');
     try {
         // 获取用户脚本设置表单值
         const enableExternalTranslation = document.getElementById('scriptExternalTranslation').checked;
@@ -387,6 +626,9 @@ async function saveUserScriptSettings() {
             enableUpdateCheck,
             enableDeepDomObserver
         };
+        console.log('构建的用户脚本配置:', userScriptConfig);
+
+        console.log('准备发送请求到/api/config');
 
         // 使用带超时的fetch
         const fetchWithTimeout = (url, options = {}, timeout = 5000) => {
@@ -426,6 +668,8 @@ async function saveUserScriptSettings() {
             throw new Error(`保存配置文件失败: ${configResponse.status} ${configResponse.statusText}`);
         }
 
+        console.log('准备发送请求到/api/update-user-script-config');
+
         // 2. 直接修改GitHub_zh-CN.user.js文件
         const scriptUpdateResponse = await fetchWithTimeout(`${API_BASE_URL}/api/update-user-script-config`, {
             method: 'POST',
@@ -457,6 +701,8 @@ async function saveUserScriptSettings() {
 
         const configResult = await configResponse.json();
         const scriptUpdateResult = await scriptUpdateResponse.json();
+        console.log('请求成功完成，配置结果:', configResult);
+        console.log('请求成功完成，脚本更新结果:', scriptUpdateResult);
 
         if (configResult.success && scriptUpdateResult.success) {
             addLog('用户脚本设置已保存并应用到脚本文件中', 'success');
@@ -469,6 +715,7 @@ async function saveUserScriptSettings() {
             return Promise.resolve(); // 即使部分失败，也返回成功，因为主要功能已完成
         }
     } catch (error) {
+        console.error('保存用户脚本设置时发生错误:', error);
         addLog(`保存用户脚本设置时发生错误: ${error}`, 'error');
         return Promise.reject(error);
     }
@@ -811,39 +1058,44 @@ async function loadPagesConfig() {
                     throw new Error('页面配置格式错误: 期望数组但收到其他类型');
                 }
 
-                pages.forEach((page, index) => {
-                    // 验证每个页面配置的必需字段
-                    if (!page.url || !page.selector || !page.module) {
-                        console.warn(`页面配置 ${index} 缺少必需字段:`, page);
-                        return;
-                    }
+                // 检查是否为空数组，显示友好的空状态提示
+                if (pages.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">没有配置的页面，请点击"添加页面"按钮添加新页面</td></tr>';
+                } else {
+                    pages.forEach((page, index) => {
+                        // 验证每个页面配置的必需字段
+                        if (!page.url || !page.selector || !page.module) {
+                            console.warn(`页面配置 ${index} 缺少必需字段:`, page);
+                            return;
+                        }
 
-                    const newRow = document.createElement('tr');
-                    newRow.setAttribute('data-index', index);
-                    newRow.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${escapeHTML(page.url)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.selector)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.module)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-primary hover:text-primary/80 mr-3 edit-page">
-                                <i class="fa fa-pencil"></i>
-                            </button>
-                            <button class="text-danger hover:text-danger/80 delete-page">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    tableBody.appendChild(newRow);
+                        const newRow = document.createElement('tr');
+                        newRow.setAttribute('data-index', index);
+                        newRow.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${escapeHTML(page.url)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.selector)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.module)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button class="text-primary hover:text-primary/80 mr-3 edit-page">
+                                    <i class="fa fa-pencil"></i>
+                                </button>
+                                <button class="text-danger hover:text-danger/80 delete-page">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        tableBody.appendChild(newRow);
 
-                    // 绑定事件
-                    newRow.querySelector('.edit-page').addEventListener('click', function() {
-                        showEditPageModal(index);
+                        // 绑定事件
+                        newRow.querySelector('.edit-page').addEventListener('click', function() {
+                            showEditPageModal(index);
+                        });
+
+                        newRow.querySelector('.delete-page').addEventListener('click', function() {
+                            deletePage(index);
+                        });
                     });
-
-                    newRow.querySelector('.delete-page').addEventListener('click', function() {
-                        deletePage(index);
-                    });
-                });
+                }
 
                 // 更新页面计数
                 updatePagesCount();
@@ -1015,7 +1267,7 @@ async function savePage() {
         // 确保先获取最新的页面配置
         let pages = [];
         try {
-            const response = await fetch('/api/pages', {
+            const response = await fetch(`${API_BASE_URL}/api/pages`, {
                 method: 'GET',
                 timeout: 3000
             });
@@ -1030,12 +1282,14 @@ async function savePage() {
                 pages = [];
             }
         } catch (getError) {
-            addLog(`获取现有页面配置失败，将创建新列表: ${getError}`, 'warning');
+            addLog(`获取现有页面配置失败: ${getError}`, 'error');
+            alert('获取现有页面配置失败，请刷新页面重试');
+            return;
         }
 
         // 检查URL是否已存在（除了编辑的当前项）
         const duplicateIndex = pages.findIndex((page, index) =>
-            page.url === url && editIndex !== null && index != editIndex
+            page.url === url && (editIndex === null || index != editIndex)
         );
 
         if (duplicateIndex !== -1) {
@@ -1102,7 +1356,7 @@ async function deletePage(index) {
             pages.splice(index, 1);
 
             // 保存到服务器
-            const saveResponse = await fetch('/api/pages', {
+            const saveResponse = await fetch(`${API_BASE_URL}/api/pages`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1145,10 +1399,88 @@ function hideHelpModal() {
 
 // 查看备份
 function viewBackup() {
-    // 在实际应用中，这里可以实现打开备份目录的功能
-    const backupDir = document.getElementById('backupDir').value;
-    alert(`备份文件保存在: ${backupDir}\n\n在实际环境中，可以实现打开备份目录的功能。`);
+    // 首先尝试通过API获取备份目录路径
+    fetchWithTimeout(`${API_BASE_URL}/api/open-backup-dir`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }, 10000) // 10秒超时
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP错误! 状态码: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // 无论服务器返回什么状态，都显示备份路径对话框
+        // 因为由于浏览器安全限制，无法直接从浏览器打开文件系统
+        showBackupPathDialog(data.backupDir || '../backups');
+    })
+    .catch(error => {
+        console.error('获取备份目录路径时出错:', error);
+        addLog(`获取备份目录路径时发生错误: ${error.message || error}`, 'error');
+        showBackupPathDialog('../backups');
+    });
 }
+
+// 显示备份路径对话框，提供复制功能
+function showBackupPathDialog(path) {
+    const dialog = document.createElement('div');
+    dialog.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/50';
+    dialog.innerHTML = `
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h3 class="text-xl font-semibold mb-4">备份目录路径</h3>
+            <div class="flex mb-4">
+                <input type="text" value="${escapeHTML(path)}" readonly 
+                       class="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-secondary" 
+                       id="backupPathInput">
+                <button id="copyBackupPathBtn" 
+                        class="bg-secondary text-white px-4 py-2 rounded-r-md hover:bg-secondary/80 transition-colors">
+                    复制
+                </button>
+            </div>
+            <p class="text-sm text-gray-500 mb-4">
+                由于浏览器安全限制，无法直接打开文件系统。请手动导航到上述目录查看备份文件。
+            </p>
+            <div class="flex justify-end">
+                <button id="closeBackupDialogBtn" 
+                        class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors">
+                    关闭
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(dialog);
+    
+    // 绑定复制按钮事件
+    dialog.querySelector('#copyBackupPathBtn').addEventListener('click', function() {
+        const input = dialog.querySelector('#backupPathInput');
+        input.select();
+        document.execCommand('copy');
+        
+        // 显示复制成功提示
+        this.textContent = '已复制!';
+        setTimeout(() => {
+            this.textContent = '复制';
+        }, 2000);
+    });
+    
+    // 绑定关闭按钮事件
+    dialog.querySelector('#closeBackupDialogBtn').addEventListener('click', function() {
+        document.body.removeChild(dialog);
+    });
+    
+    // 点击外部区域关闭对话框
+    dialog.addEventListener('click', function(event) {
+        if (event.target === dialog) {
+            document.body.removeChild(dialog);
+        }
+    });
+}
+
+
 
 // 页面关闭时确保关闭SSE连接
 window.addEventListener('beforeunload', function() {
@@ -1195,5 +1527,61 @@ async function savePagesConfig() {
         }
     } catch (error) {
         addLog(`保存页面配置时发生错误: ${error}`, 'error');
+    }
+}
+
+// 重置工具状态
+async function resetToolStatus() {
+    try {
+        // 显示确认对话框
+        if (!confirm('确定要重置工具状态吗？这将清除当前的运行锁，允许重新开始抓取字符串。')) {
+            return;
+        }
+        
+        // 检查服务器状态
+        const serverStatus = await checkServerStatus();
+        if (!serverStatus) {
+            addLog('服务器连接失败，请检查服务器是否正常运行', 'error');
+            return;
+        }
+        
+        // 调用重置API
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/reset`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            timeout: 5000
+        });
+        
+        if (!response.ok) {
+            throw new Error(`服务器响应错误: ${response.status} ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // 重置UI状态
+            updateStatus('stopped');
+            updateProgress(0, 0, 0);
+            
+            // 确保按钮状态正确
+            const toggleBtn = document.getElementById('toggleBtn');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+                toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
+                toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
+            }
+            
+            // 显示成功消息
+            addLog('工具状态已成功重置', 'success');
+            
+            // 重新检查服务器状态
+            setTimeout(checkServerStatus, 1000);
+        } else {
+            addLog(`重置工具状态失败: ${result.message || '未知错误'}`, 'error');
+        }
+    } catch (error) {
+        addLog(`重置工具状态时发生错误: ${error}`, 'error');
     }
 }

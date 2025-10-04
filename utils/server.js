@@ -1,7 +1,11 @@
 const fs = require('fs');
+// Web服务器模块，提供字符串抓取工具的操作界面和API
+// 作者: SutChan
+// 版本: 1.8.13
+
 const fsPromises = require('fs').promises;
 const path = require('path');
-const { exec } = require('child_process');
+const { exec, execFile } = require('child_process');
 const express = require('express');
 
 // 导入共享工具函数
@@ -16,9 +20,27 @@ app.use(express.json());
 
 // 添加CORS支持，允许所有来源的请求
 app.use((req, res, next) => {
+    // 设置CORS头部
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    
+    // 处理预检请求（OPTIONS）
+    if (req.method === 'OPTIONS') {
+        // 预检请求需要快速响应200 OK状态码
+        return res.status(200).end();
+    }
+    
+    next();
+});
+
+// 请求日志中间件 - 记录所有请求
+app.use((req, res, next) => {
+    log('debug', `接收到请求: ${req.method} ${req.path}`);
+    // 对于POST请求，可以打印请求体的大小，但不打印具体内容以保护隐私
+    if (req.method === 'POST') {
+        log('debug', `请求类型: POST, 内容类型: ${req.headers['content-type']}`);
+    }
     next();
 });
 
@@ -91,8 +113,30 @@ async function initializeConfig() {
 
         try {
             // 检查统计文件是否存在
-            await fs.access(STATS_PATH);
+            await fsPromises.access(STATS_PATH);
             log('info', '统计文件已存在');
+            
+            // 检查文件内容是否有效
+            const statsContent = await fsPromises.readFile(STATS_PATH, 'utf8');
+            try {
+                const stats = JSON.parse(statsContent);
+                // 验证必要字段是否存在
+                if (!stats.extractedCount || !stats.addedCount || stats.lastUpdate === undefined) {
+                    throw new Error('统计数据格式不正确');
+                }
+            } catch (parseError) {
+                // 如果文件存在但内容无效，重新创建默认统计文件
+                log('warn', '统计文件内容无效，重新创建:', parseError.message);
+                const defaultStats = {
+                    extractedCount: 0,
+                    addedCount: 0,
+                    lastUpdate: null,
+                    lastRunStatus: 'idle',
+                    runCount: 0
+                };
+                await fsPromises.writeFile(STATS_PATH, JSON.stringify(defaultStats, null, 2));
+                log('info', '已重新创建默认统计文件');
+            }
         } catch (error) {
             // 如果不存在，创建默认统计文件
             const defaultStats = {
@@ -242,9 +286,10 @@ function validatePageConfigs(pages) {
         return errors;
     }
     
-    // 验证数组长度
+    // 允许空数组（用户可能删除所有页面配置）
+    // 但为了避免误操作，添加日志记录
     if (pages.length === 0) {
-        errors.push('页面配置数组不能为空');
+        log('warn', '接收到空的页面配置数组');
     }
     
     // 验证每个页面配置项
@@ -540,24 +585,19 @@ app.get('/api/run', (req, res) => {
         // 处理连接关闭
         req.on('close', () => {
             if (runningProcess) {
-                log('info', '客户端断开连接，正在终止子进程');
-                try {
-                    // 在Windows上，需要使用taskkill来终止进程树
-                    if (process.platform === 'win32') {
-                        exec(`taskkill /F /PID ${runningProcess.pid} /T`, (error) => {
-                            if (error) {
-                                log('error', '终止Windows进程时出错:', error);
-                            } else {
-                                log('debug', '已成功终止Windows进程');
-                            }
-                        });
-                    } else {
-                        // 在Unix-like系统上，使用kill命令
-                        process.kill(runningProcess.pid, 'SIGTERM');
+                // 当客户端断开连接时，不再立即终止子进程，让它在后台继续运行
+                // 这样即使页面关闭，字符串抓取任务仍然能够完成
+                log('info', '客户端断开连接，但子进程将在后台继续运行');
+                
+                // 设置一个定时器，让进程继续运行5分钟后再检查状态
+                // 如果进程已经完成，就不需要处理；如果仍在运行，重置runningProcess状态
+                setTimeout(() => {
+                    if (runningProcess) {
+                        log('warn', '子进程长时间运行，可能已卡住，重置runningProcess状态');
+                        // 注意：这里只重置状态，不终止进程，避免影响正在执行的抓取任务
+                        runningProcess = null;
                     }
-                } catch (error) {
-                    log('error', '终止子进程时出错:', error);
-                }
+                }, 300000); // 5分钟
             }
         });
     } catch (error) {
@@ -575,7 +615,7 @@ app.get('/api/run', (req, res) => {
 /**
  * API端点：停止工具
  */
-app.get('/api/stop', (req, res) => {
+app.post('/api/stop', (req, res) => {
     if (runningProcess) {
         log('info', `尝试停止运行中的子进程: ${runningProcess.pid}`);
         
@@ -610,8 +650,68 @@ app.get('/api/stop', (req, res) => {
             res.json({ success: false, message: '停止工具失败', error: error.message });
         }
     } else {
-        log('debug', '没有运行中的工具进程');
-        res.json({ success: true, message: '工具未在运行' });
+        log('info', '没有运行中的工具进程');
+        res.json({ success: true, message: '没有运行中的工具进程' });
+    }
+});
+
+/**
+ * API端点：重置工具状态（用于强制重置运行状态）
+ */
+app.post('/api/reset', (req, res) => {
+    try {
+        // 检查是否有运行中的进程
+        if (runningProcess) {
+            log('warn', `重置状态前检测到运行中的进程 ${runningProcess.pid}，尝试终止它`);
+            
+            // 尝试终止进程
+            if (process.platform === 'win32') {
+                if (runningProcess && runningProcess.pid) {
+                    const pidToKill = runningProcess.pid; // 保存pid，防止回调执行前runningProcess被修改
+                    exec(`taskkill /F /PID ${pidToKill} /T`, (error) => {
+                        if (error) {
+                            log('error', `终止进程失败: ${error.message}`);
+                        } else {
+                            log('info', `进程 ${pidToKill} 已终止`);
+                        }
+                        
+                        // 无论是否成功终止，都重置runningProcess状态
+                        runningProcess = null;
+                        log('info', '工具状态已重置');
+                        res.json({ success: true, message: '工具状态已重置' });
+                    });
+                } else {
+                    // 如果runningProcess为null或没有pid，则直接重置状态
+                    runningProcess = null;
+                    log('info', '工具状态已重置');
+                    res.json({ success: true, message: '工具状态已重置' });
+                }
+            } else {
+                // 非Windows平台
+                try {
+                    process.kill(runningProcess.pid, 'SIGTERM');
+                    log('info', `已向进程 ${runningProcess.pid} 发送终止信号`);
+                } catch (error) {
+                    log('error', `终止进程失败: ${error.message}`);
+                }
+                
+                // 重置状态
+                runningProcess = null;
+                log('info', '工具状态已重置');
+                res.json({ success: true, message: '工具状态已重置' });
+            }
+        } else {
+            // 没有运行中的进程，直接重置状态
+            runningProcess = null;
+            log('info', '工具状态已重置');
+            res.json({ success: true, message: '工具状态已重置' });
+        }
+    } catch (error) {
+        log('error', `重置工具状态时发生错误: ${error.message}`);
+        res.status(500).json({
+            success: false,
+            message: `重置失败: ${error.message}`
+        });
     }
 });
 
@@ -637,6 +737,47 @@ app.get('/api/view-backup', async (req, res) => {
 });
 
 /**
+ * API端点：获取备份目录路径
+ * 不再尝试直接打开文件资源管理器，而是返回路径信息由前端处理
+ */
+app.get('/api/open-backup-dir', async (req, res) => {
+    try {
+        const config = JSON.parse(await fsPromises.readFile(CONFIG_PATH, 'utf8'));
+        const backupDir = path.resolve(__dirname, config.backupDir || '../backups');
+        
+        // 确保备份目录存在
+        try {
+            await fsPromises.access(backupDir, fs.constants.F_OK | fs.constants.R_OK);
+        } catch (accessError) {
+            // 如果目录不存在，尝试创建
+            await fsPromises.mkdir(backupDir, { recursive: true });
+        }
+        
+        log('info', `已获取备份目录路径: ${backupDir}`);
+        
+        // 直接返回备份目录路径，由前端决定如何向用户展示
+        res.json({
+            success: true,
+            message: '已获取备份目录路径',
+            backupDir: backupDir
+        });
+    } catch (error) {
+        log('error', '获取备份目录路径时出错:', error.message);
+        res.status(500).json({ 
+            success: false, 
+            message: '获取备份目录路径失败', 
+            error: error.message 
+        });
+    }
+});
+
+// 测试端点 - 用于验证服务器是否能正常接收请求
+app.get('/api/test-endpoint', (req, res) => {
+    log('debug', '测试端点被调用');
+    res.json({ success: true, message: '测试端点工作正常' });
+});
+
+/**
  * API端点：直接修改GitHub用户脚本配置
  */
 app.post('/api/update-user-script-config', async (req, res) => {
@@ -649,30 +790,148 @@ app.post('/api/update-user-script-config', async (req, res) => {
             throw new Error('无效的配置数据');
         }
         
-        // 读取用户脚本文件
-        let scriptContent = await fsPromises.readFile(USER_SCRIPT_PATH, 'utf8');
+        // 调试文件路径
+        log('debug', '用户脚本文件路径:', USER_SCRIPT_PATH);
+        log('debug', '当前工作目录:', process.cwd());
         
-        // 找到CONFIG对象的开始和结束位置
-        const configStartRegex = /const CONFIG = {/;
-        const configEndRegex = /};\s*\/\/ ========== 配置项结束 ==========/;
-        
-        const configStartMatch = scriptContent.match(configStartRegex);
-        const configEndMatch = scriptContent.match(configEndRegex);
-        
-        if (!configStartMatch || !configEndMatch) {
-            throw new Error('未能找到CONFIG对象');
+        // 检查文件是否存在
+        try {
+            await fsPromises.access(USER_SCRIPT_PATH, fs.constants.F_OK);
+            log('debug', '用户脚本文件存在');
+        } catch (err) {
+            log('error', '用户脚本文件不存在:', err.message);
         }
         
+        // 读取用户脚本文件
+        let scriptContent = await fsPromises.readFile(USER_SCRIPT_PATH, 'utf8');
+        log('debug', '用户脚本文件读取成功，文件大小:', scriptContent.length, '字节');
+        
+        // 找到CONFIG对象的开始和结束位置（使用更健壮的正则表达式）
+        const configStartRegex = /const\s+CONFIG\s*=\s*(?:{|"|'|`)/;
+        // 更灵活的结束标记正则，支持没有分号结尾的JSON风格对象
+        const configEndRegex = /};?\s*(?:\/\/\s*={2,}|$)/;
+        
+        const configStartMatch = scriptContent.match(configStartRegex);
+        let configEndMatch = scriptContent.match(configEndRegex);
+        
+        log('debug', 'CONFIG开始匹配结果:', configStartMatch ? `找到匹配，位置: ${configStartMatch.index}` : '未找到');
+        log('debug', 'CONFIG结束匹配结果:', configEndMatch ? `找到匹配，位置: ${configEndMatch.index}` : '未找到');
+        
+        // 如果开始标记找到但结束标记未找到，尝试不同的结束标记模式
+        if (configStartMatch && !configEndMatch) {
+            const fallbackPatterns = [
+                /}\s*(?=\/\/|\/\*|const|let|var|function|\}|\(|$|\r|\n)/,  // 支持没有分号的结束标记
+                /}\s*;?\s*\/\//,  // 支持分号后跟着注释
+                /"\s*}\s*";?/,  // JSON字符串格式的结束
+                /}\s*";?/       // 另一种JSON字符串格式的结束
+            ];
+            
+            for (const pattern of fallbackPatterns) {
+                const fallbackMatch = scriptContent.match(pattern);
+                if (fallbackMatch) {
+                    log('debug', `使用备选结束标记模式: ${pattern.toString()}`);
+                    configEndMatch = fallbackMatch;
+                    break;
+                }
+            }
+        }
+        
+        if (!configStartMatch) {
+            log('error', '未能找到CONFIG对象开始标记');
+            // 打印文件开头部分以帮助调试
+            log('debug', '文件开头内容:', scriptContent.substring(0, 300));
+            // 搜索CONFIG关键词的所有出现位置
+            const configMatches = [];
+            let match;
+            const searchRegex = /CONFIG/g;
+            while ((match = searchRegex.exec(scriptContent)) !== null) {
+                configMatches.push(match.index);
+            }
+            log('debug', `文件中CONFIG关键词的位置: ${configMatches.join(', ')}`);
+            throw new Error('未能找到CONFIG对象开始标记');
+        }
+        
+        if (!configEndMatch) {
+            log('error', '未能找到CONFIG对象结束标记');
+            // 打印CONFIG对象开始位置附近的内容以帮助调试
+            const startContext = Math.max(0, configStartMatch.index - 50);
+            const endContext = Math.min(scriptContent.length, configStartMatch.index + 500);
+            log('debug', 'CONFIG对象开始位置附近内容:', scriptContent.substring(startContext, endContext));
+            throw new Error('未能找到CONFIG对象结束标记');
+        }
+
         const configStartPos = configStartMatch.index;
         const configEndPos = configEndMatch.index + configEndMatch[0].length;
         
         // 提取当前配置
         const configContent = scriptContent.substring(configStartPos, configEndPos);
         
-        // 解析配置为JavaScript对象
-        // 注意：这里使用Function构造函数来安全地解析配置
-        const getConfig = new Function(`return ${configContent.replace('const CONFIG = ', '')}`);
-        const currentConfig = getConfig();
+        // 特殊处理：从用户脚本头部注释中提取版本号
+        let version = '1.8.7'; // 默认版本号
+        const versionMatch = scriptContent.match(/\/\/\s*@version\s+([\d.]+)/);
+        if (versionMatch && versionMatch[1]) {
+            version = versionMatch[1];
+        }
+        
+        // 安全地解析配置，避免执行其中的函数
+        // 1. 先提取配置对象内容（不包含函数调用）
+        let configObjectStr = configContent.replace('const CONFIG = ', '');
+        
+        // 2. 创建一个安全的解析环境
+        // 定义一个模拟的getVersionFromComment函数
+        const mockGetVersionFromComment = function() {
+            return version;
+        };
+        
+        // 3. 使用try-catch安全地解析配置
+        let currentConfig;
+        try {
+            // 注意：这里使用Function构造函数来安全地解析配置
+            const getConfig = new Function('getVersionFromComment', `return ${configObjectStr}`);
+            currentConfig = getConfig(mockGetVersionFromComment);
+        } catch (e) {
+            log('warning', '解析配置对象失败，使用默认配置:', e.message);
+            // 使用默认配置作为后备
+            currentConfig = {
+                version: version,
+                debounceDelay: 200,
+                routeChangeDelay: 400,
+                debugMode: false,
+                updateCheck: {
+                    enabled: true,
+                    intervalHours: 24,
+                    scriptUrl: 'https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js',
+                    autoUpdateVersion: true
+                },
+                externalTranslation: {
+                    enabled: true,
+                    minLength: 20,
+                    maxLength: 500,
+                    timeout: 3000,
+                    requestInterval: 500,
+                    cacheSize: 500
+                },
+                performance: {
+                    enableDeepObserver: false,
+                    enablePartialMatch: false,
+                    maxDictSize: 2000,
+                    enableTranslationCache: true
+                },
+                // 添加其他必要的默认配置项
+                selectors: {
+                    primary: [],
+                    popupMenus: []
+                },
+                pagePatterns: {
+                    search: /\/search/,
+                    repository: /\/[^/]+\/[^/]+/,
+                    issues: /\/[^/]+\/[^/]+\/issues/,
+                    pullRequests: /\/[^/]+\/[^/]+\/pull/,
+                    settings: /\/settings/,
+                    dashboard: /^\/$|\/(explore|notifications|stars|gists|codespaces|projects|organizations|dashboard)$/
+                }
+            };
+        }
         
         // 更新配置
         const updatedConfig = { ...currentConfig, ...newConfigValues };
@@ -690,6 +949,18 @@ app.post('/api/update-user-script-config', async (req, res) => {
                 ...currentConfig.updateCheck,
                 ...newConfigValues.updateCheck
             };
+        }
+        
+        if (newConfigValues.performance && typeof newConfigValues.performance === 'object') {
+            updatedConfig.performance = {
+                ...currentConfig.performance,
+                ...newConfigValues.performance
+            };
+        }
+        
+        // 确保version属性保持不变或使用新提供的值
+        if (!newConfigValues.version) {
+            updatedConfig.version = version;
         }
         
         // 将更新后的配置转换回字符串

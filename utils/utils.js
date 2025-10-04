@@ -19,19 +19,17 @@ function log(level, message, error = null) {
     error: 3
   };
 
-  // 默认日志级别为info
-  const currentLevel = process.env.LOG_LEVEL || 'info';
+  // 开发环境下显示所有日志
+  // 生产环境可以通过环境变量设置日志级别
+  const currentLevel = 'debug'; // 临时改为debug级别以显示所有调试信息
 
   // 如果当前日志级别低于设置的级别，则不输出
-  if (levels[level] < levels[currentLevel]) {
-    return;
-  }
+  // if (levels[level] < levels[currentLevel]) {
+  //   return;
+  // }
 
-  // 格式化时间戳
-  const timestamp = new Date().toISOString();
-
-  // 构建基础日志消息
-  let logMessage = `${timestamp} [${level.toUpperCase()}] ${message}`;
+  // 构建基础日志消息（不包含时间戳，因为前端会添加）
+  let logMessage = `[${level.toUpperCase()}] ${message}`;
 
   // 如果有错误对象，添加错误详情
   if (error instanceof Error) {

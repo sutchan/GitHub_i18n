@@ -11,6 +11,11 @@
   .content-auto {
     content-visibility: auto;
   }
+  /* 减小的日志字体大小 */
+  .log-text {
+    font-size: 0.8rem;
+    line-height: 1.1;
+  }
   .card-shadow {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;

@@ -5,14 +5,29 @@
     "module": "global"
   },
   {
-    "url": "https://github.com/settings/profile",
+    "url": "https://github.com/actions",
     "selector": "body",
-    "module": "settings"
+    "module": "actions"
   },
   {
-    "url": "https://github.com/notifications",
+    "url": "https://github.com/codespaces",
     "selector": "body",
-    "module": "notifications"
+    "module": "codespaces"
+  },
+  {
+    "url": "https://github.com/codespaces/new",
+    "selector": "body",
+    "module": "codespaces"
+  },
+  {
+    "url": "https://github.com/collections",
+    "selector": "body",
+    "module": "explore"
+  },
+  {
+    "url": "https://github.com/enterprise",
+    "selector": "body",
+    "module": "global"
   },
   {
     "url": "https://github.com/explore",
@@ -20,9 +35,59 @@
     "module": "explore"
   },
   {
-    "url": "https://github.com/search",
+    "url": "https://github.com/following",
     "selector": "body",
-    "module": "search"
+    "module": "global"
+  },
+  {
+    "url": "https://github.com/gist",
+    "selector": "body",
+    "module": "gist"
+  },
+  {
+    "url": "https://github.com/github/github",
+    "selector": "body",
+    "module": "repository"
+  },
+  {
+    "url": "https://github.com/github/github/issues",
+    "selector": "body",
+    "module": "repository"
+  },
+  {
+    "url": "https://github.com/github/github/pulls",
+    "selector": "body",
+    "module": "repository"
+  },
+  {
+    "url": "https://github.com/hiring",
+    "selector": "body",
+    "module": "global"
+  },
+  {
+    "url": "https://github.com/issues",
+    "selector": "body",
+    "module": "issues"
+  },
+  {
+    "url": "https://github.com/issues/assigned",
+    "selector": "body",
+    "module": "issues"
+  },
+  {
+    "url": "https://github.com/issues/created_by/sutchan",
+    "selector": "body",
+    "module": "issues"
+  },
+  {
+    "url": "https://github.com/labels",
+    "selector": "body",
+    "module": "global"
+  },
+  {
+    "url": "https://github.com/learn",
+    "selector": "body",
+    "module": "global"
   },
   {
     "url": "https://github.com/marketplace",
@@ -30,12 +95,112 @@
     "module": "marketplace"
   },
   {
+    "url": "https://github.com/marketplace/stars",
+    "selector": "body",
+    "module": "marketplace"
+  },
+  {
+    "url": "https://github.com/mcp",
+    "selector": "body",
+    "module": "mcp"
+  },
+  {
+    "url": "https://github.com/new",
+    "selector": "body",
+    "module": "repository"
+  },
+  {
+    "url": "https://github.com/notifications",
+    "selector": "body",
+    "module": "notifications"
+  },
+  {
+    "url": "https://github.com/notifications/unread",
+    "selector": "body",
+    "module": "notifications"
+  },
+  {
+    "url": "https://github.com/organizations/new",
+    "selector": "body",
+    "module": "organization"
+  },
+  {
+    "url": "https://github.com/orgs",
+    "selector": "body",
+    "module": "organization"
+  },
+  {
+    "url": "https://github.com/orgs/github",
+    "selector": "body",
+    "module": "organization"
+  },
+  {
+    "url": "https://github.com/orgs/github/repositories",
+    "selector": "body",
+    "module": "repository"
+  },
+  {
+    "url": "https://github.com/orgs/new",
+    "selector": "body",
+    "module": "organization"
+  },
+  {
+    "url": "https://github.com/projects",
+    "selector": "body",
+    "module": "projects"
+  },
+  {
+    "url": "https://github.com/pulls",
+    "selector": "body",
+    "module": "pulls"
+  },
+  {
+    "url": "https://github.com/pulls/assigned",
+    "selector": "body",
+    "module": "pulls"
+  },
+  {
+    "url": "https://github.com/pulls/review-requested",
+    "selector": "body",
+    "module": "pulls"
+  },
+  {
+    "url": "https://github.com/search",
+    "selector": "body",
+    "module": "search"
+  },
+  {
+    "url": "https://github.com/search/advanced",
+    "selector": "body",
+    "module": "search"
+  },
+  {
+    "url": "https://github.com/security",
+    "selector": "body",
+    "module": "security"
+  },
+  {
+    "url": "https://github.com/settings/access",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/account",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/appearance",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
     "url": "https://github.com/settings/applications",
     "selector": "body",
     "module": "settings"
   },
   {
-    "url": "https://github.com/settings/security",
+    "url": "https://github.com/settings/apps/authorizations",
     "selector": "body",
     "module": "settings"
   },
@@ -45,37 +210,62 @@
     "module": "settings"
   },
   {
+    "url": "https://github.com/settings/blocks",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/copilot",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/developer-experience",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/developers",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/emails",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/features",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/installations",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/interactions",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
     "url": "https://github.com/settings/keys",
     "selector": "body",
     "module": "settings"
   },
   {
-    "url": "https://github.com/settings/repositories",
+    "url": "https://github.com/settings/linked-accounts",
     "selector": "body",
     "module": "settings"
   },
   {
-    "url": "https://github.com/new",
+    "url": "https://github.com/settings/locations",
     "selector": "body",
-    "module": "repository"
+    "module": "settings"
   },
   {
-    "url": "https://github.com/pulls",
-    "selector": "body",
-    "module": "pulls"
-  },
-  {
-    "url": "https://github.com/issues",
-    "selector": "body",
-    "module": "issues"
-  },
-  {
-    "url": "https://github.com/gist",
-    "selector": "body",
-    "module": "gist"
-  },
-  {
-    "url": "https://github.com/settings/ssh/new",
+    "url": "https://github.com/settings/name",
     "selector": "body",
     "module": "settings"
   },
@@ -85,17 +275,132 @@
     "module": "settings"
   },
   {
-    "url": "https://github.com/organizations/new",
+    "url": "https://github.com/settings/password",
     "selector": "body",
-    "module": "organization"
+    "module": "settings"
   },
   {
-    "url": "https://github.com/mcp",
+    "url": "https://github.com/settings/personal-access-tokens/new",
     "selector": "body",
-    "module": "mcp"
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/profile",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/profile/edit",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/public-key/new",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/reminders",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/repositories",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/security",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/shortcuts",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/social",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/ssh",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/ssh/new",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/starred-repos",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/subscriptions",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/teams",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/undo-alert",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/settings/verified-emails",
+    "selector": "body",
+    "module": "settings"
+  },
+  {
+    "url": "https://github.com/sponsors",
+    "selector": "body",
+    "module": "global"
+  },
+  {
+    "url": "https://github.com/sponsors/discover",
+    "selector": "body",
+    "module": "global"
+  },
+  {
+    "url": "https://github.com/stars",
+    "selector": "body",
+    "module": "global"
   },
   {
     "url": "https://github.com/sutchan",
+    "selector": "body",
+    "module": "global"
+  },
+  {
+    "url": "https://github.com/team",
+    "selector": "body",
+    "module": "global"
+  },
+  {
+    "url": "https://github.com/topics",
+    "selector": "body",
+    "module": "explore"
+  },
+  {
+    "url": "https://github.com/trending",
+    "selector": "body",
+    "module": "explore"
+  },
+  {
+    "url": "https://github.com/sponsors/accounts",
+    "selector": "body",
+    "module": "sponsors"
+  },
+  {
+    "url": "https://github.com/orgs",
     "selector": "body",
     "module": "global"
   }

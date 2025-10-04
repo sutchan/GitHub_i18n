@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.8.14
+// @version      1.8.21
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -114,109 +114,1003 @@
 
     // ========== 配置项 ==========
     const CONFIG = {
-        // 当前脚本版本号（从用户脚本头部注释中自动读取）
-        version: getVersionFromComment(),
-        // 翻译延迟时间（毫秒）
-        debounceDelay: 200,
-        // 路由变化后翻译延迟时间（毫秒）
-        routeChangeDelay: 400,
-        // 是否启用调试日志
-        debugMode: false,
-        // 更新检测配置
-        updateCheck: {
-            // 是否启用自动更新检测
-            enabled: true,
-            // 更新检测间隔（小时）
-            intervalHours: 24,
-            // GitHub 原始脚本 URL
-            scriptUrl: 'https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js',
-            // 是否启用自动版本号更新
-            autoUpdateVersion: true
+    "version": "1.8.20",
+    "debounceDelay": 500,
+    "routeChangeDelay": 500,
+    "debugMode": false,
+    "updateCheck": {
+        "enabled": true,
+        "intervalHours": 24,
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "autoUpdateVersion": true
+    },
+    "externalTranslation": {
+        "enabled": true,
+        "minLength": 20,
+        "maxLength": 500,
+        "timeout": 3000,
+        "requestInterval": 500,
+        "cacheSize": 500
+    },
+    "performance": {
+        "enableDeepObserver": true,
+        "enablePartialMatch": false,
+        "maxDictSize": 2000,
+        "enableTranslationCache": true
+    },
+    "selectors": {
+        "primary": [],
+        "popupMenus": []
+    },
+    "pagePatterns": {
+        "search": {},
+        "repository": {},
+        "issues": {},
+        "pullRequests": {},
+        "settings": {},
+        "dashboard": {}
+    }
+} 工具函数模块 ==========
+    /**
+     * 工具函数集合
+     */
+    const utils = {
+        /**
+         * 节流函数，用于限制高频操作的执行频率
+         * @param {Function} func - 要节流的函数
+         * @param {number} limit - 限制时间（毫秒）
+         * @returns {Function} 节流后的函数
+         */
+        throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
         },
-        // 外部翻译配置
-        externalTranslation: {
-            // 是否启用外部翻译
-            enabled: true,
-            // 使用外部翻译的最小字符串长度（短于这个长度的字符串只用词典翻译）
-            minLength: 20,
-            // 使用外部翻译的最大字符串长度（超过这个长度的字符串不翻译）
-            maxLength: 500,
-            // 外部翻译请求超时时间（毫秒）
-            timeout: 3000,
-            // 翻译请求间隔（毫秒）
-            requestInterval: 500,
-            // 翻译缓存大小限制
-            cacheSize: 500
+
+        /**
+         * 转义正则表达式特殊字符
+         * @param {string} string - 要转义的字符串
+         * @returns {string} 转义后的字符串
+         */
+        escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         },
-        // 性能优化配置
-        performance: {
-            // 是否启用深度DOM监听
-            enableDeepObserver: false,
-            // 是否启用部分匹配翻译
-            enablePartialMatch: false,
-            // 单次加载的最大字典大小
-            maxDictSize: 2000,
-            // 是否使用翻译缓存
-            enableTranslationCache: true,
-            // 是否启用翻译词典优化
-            enableDictOptimization: true,
-            // 是否启用正则表达式优化
-            enableRegexOptimization: true,
-            // 翻译缓存最大大小
-            maxCacheSize: 1000,
-            // 正则表达式缓存大小限制
-            regexCacheSize: 500,
-            // 节流间隔
-            throttleInterval: 200
+
+        /**
+         * 获取当前页面路径
+         * @returns {string} 当前页面路径
+         */
+        getCurrentPath() {
+            return window.location.pathname;
         },
-        // 选择器常量
-        selectors: {
-            // 关键区域选择器
-            keyAreas: ['#header', '.application-main', '.js-repo-nav', '#repository-details-container'],
-            // 翻译目标选择器
-            translationTargets: [
-                '#header',                          // 顶部导航栏
-                '.Header-item--full',               // 中央菜单
-                '.HeaderMenu',                      // 个人下拉菜单容器
-                '.UnderlineNav',                    // 仓库页标签导航
-                '.dropdown-menu',                   // 传统下拉菜单
-                '.SelectMenu',                      // GitHub现代下拉菜单
-                '.Popover-menu',                    // 弹出菜单
-                '.menu',                            // 通用菜单类
-                '.ActionList',                      // 操作列表菜单
-                '.BorderGrid',                      // 设置页面网格
-                '.Box',                             // 设置项容器
-                '.menu-item',                       // 菜单项
-                '.js-selected-navigation-item',     // 选中项
-                '.Layout',                          // 通用布局容器
-                '.application-main',                // 主内容区（保守使用）
-                '.js-menu-container',               // JavaScript生成的菜单容器
-                '.js-repo-nav',                     // 仓库导航栏
-                '.repository-details-container',    // 仓库详情容器
-                '.Overlay-body',                    // 覆盖层内容区域
-                '.AppHeader-globalBar-end',         // 应用头部全局栏末端
-                '.p-2',                             // 2单位内边距容器
-                '.footer'                           // 页脚区域
-            ],
-            // 弹出菜单选择器
-            popupMenus: [
-                '[aria-label="Menu"]',            // 带标签的菜单
-                '[role="menu"]',                 // 具有menu角色的元素
-                '.ReactModal__Content',            // React模态框
-                '.Overlay-backdrop',               // 覆盖层
-                '[data-component-type="dropdown"]' // 数据组件类型标记的下拉菜单
-            ]
+
+        /**
+         * 判断当前页面是否匹配某个路径模式
+         * @param {RegExp} pattern - 路径模式
+         * @returns {boolean} 是否匹配
+         */
+        isCurrentPathMatch(pattern) {
+            return pattern.test(this.getCurrentPath());
         },
-        // 页面路径模式
-        pagePatterns: {
-            search: /\/search/,
-            repository: /\/[^/]+\/[^/]+/,
-            issues: /\/[^/]+\/[^/]+\/issues/,
-            pullRequests: /\/[^/]+\/[^/]+\/pull/,
-            settings: /\/settings/,
-            dashboard: /^\/$|\/(explore|notifications|stars|gists|codespaces|projects|organizations|dashboard)$/
+
+        /**
+         * 收集页面中的文本节点，用于抓取新的翻译字符串
+         * @param {HTMLElement} element - 要收集文本的根元素
+         * @param {Set<string>} collectedTexts - 收集到的文本集合
+         * @param {number} minLength - 最小文本长度
+         * @param {number} maxLength - 最大文本长度
+         */
+        collectTextNodes(element, collectedTexts, minLength = 2, maxLength = 100) {
+            if (!element || !element.childNodes) return;
+
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue.trim();
+                    if (text && text.length >= minLength && text.length <= maxLength && !/^[\s\d]+$/.test(text)) {
+                        collectedTexts.add(text);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = node.tagName.toLowerCase();
+                    // 跳过不需要收集的元素类型
+                    if (!['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'].includes(tagName)) {
+                        this.collectTextNodes(node, collectedTexts, minLength, maxLength);
+                    }
+                }
+            });
         }
-    }; // ========== 配置项结束 ==========
+    };
+
+    // ========== 配置项 ==========
+    const CONFIG = {
+    "version": "1.8.20",
+    "debounceDelay": 500,
+    "routeChangeDelay": 500,
+    "debugMode": false,
+    "updateCheck": {
+        "enabled": true,
+        "intervalHours": 24,
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "autoUpdateVersion": true
+    },
+    "externalTranslation": {
+        "enabled": true,
+        "minLength": 20,
+        "maxLength": 500,
+        "timeout": 3000,
+        "requestInterval": 500,
+        "cacheSize": 500
+    },
+    "performance": {
+        "enableDeepObserver": true,
+        "enablePartialMatch": false,
+        "maxDictSize": 2000,
+        "enableTranslationCache": true
+    },
+    "selectors": {
+        "primary": [],
+        "popupMenus": []
+    },
+    "pagePatterns": {
+        "search": {},
+        "repository": {},
+        "issues": {},
+        "pullRequests": {},
+        "settings": {},
+        "dashboard": {}
+    }
+} 工具函数模块 ==========
+    /**
+     * 工具函数集合
+     */
+    const utils = {
+        /**
+         * 节流函数，用于限制高频操作的执行频率
+         * @param {Function} func - 要节流的函数
+         * @param {number} limit - 限制时间（毫秒）
+         * @returns {Function} 节流后的函数
+         */
+        throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        },
+
+        /**
+         * 转义正则表达式特殊字符
+         * @param {string} string - 要转义的字符串
+         * @returns {string} 转义后的字符串
+         */
+        escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        },
+
+        /**
+         * 获取当前页面路径
+         * @returns {string} 当前页面路径
+         */
+        getCurrentPath() {
+            return window.location.pathname;
+        },
+
+        /**
+         * 判断当前页面是否匹配某个路径模式
+         * @param {RegExp} pattern - 路径模式
+         * @returns {boolean} 是否匹配
+         */
+        isCurrentPathMatch(pattern) {
+            return pattern.test(this.getCurrentPath());
+        },
+
+        /**
+         * 收集页面中的文本节点，用于抓取新的翻译字符串
+         * @param {HTMLElement} element - 要收集文本的根元素
+         * @param {Set<string>} collectedTexts - 收集到的文本集合
+         * @param {number} minLength - 最小文本长度
+         * @param {number} maxLength - 最大文本长度
+         */
+        collectTextNodes(element, collectedTexts, minLength = 2, maxLength = 100) {
+            if (!element || !element.childNodes) return;
+
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue.trim();
+                    if (text && text.length >= minLength && text.length <= maxLength && !/^[\s\d]+$/.test(text)) {
+                        collectedTexts.add(text);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = node.tagName.toLowerCase();
+                    // 跳过不需要收集的元素类型
+                    if (!['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'].includes(tagName)) {
+                        this.collectTextNodes(node, collectedTexts, minLength, maxLength);
+                    }
+                }
+            });
+        }
+    };
+
+    // ========== 配置项 ==========
+    const CONFIG = {
+    "version": "1.8.20",
+    "debounceDelay": 500,
+    "routeChangeDelay": 500,
+    "debugMode": false,
+    "updateCheck": {
+        "enabled": true,
+        "intervalHours": 24,
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "autoUpdateVersion": true
+    },
+    "externalTranslation": {
+        "enabled": true,
+        "minLength": 20,
+        "maxLength": 500,
+        "timeout": 3000,
+        "requestInterval": 500,
+        "cacheSize": 500
+    },
+    "performance": {
+        "enableDeepObserver": true,
+        "enablePartialMatch": false,
+        "maxDictSize": 2000,
+        "enableTranslationCache": true
+    },
+    "selectors": {
+        "primary": [],
+        "popupMenus": []
+    },
+    "pagePatterns": {
+        "search": {},
+        "repository": {},
+        "issues": {},
+        "pullRequests": {},
+        "settings": {},
+        "dashboard": {}
+    }
+} 工具函数模块 ==========
+    /**
+     * 工具函数集合
+     */
+    const utils = {
+        /**
+         * 节流函数，用于限制高频操作的执行频率
+         * @param {Function} func - 要节流的函数
+         * @param {number} limit - 限制时间（毫秒）
+         * @returns {Function} 节流后的函数
+         */
+        throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        },
+
+        /**
+         * 转义正则表达式特殊字符
+         * @param {string} string - 要转义的字符串
+         * @returns {string} 转义后的字符串
+         */
+        escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        },
+
+        /**
+         * 获取当前页面路径
+         * @returns {string} 当前页面路径
+         */
+        getCurrentPath() {
+            return window.location.pathname;
+        },
+
+        /**
+         * 判断当前页面是否匹配某个路径模式
+         * @param {RegExp} pattern - 路径模式
+         * @returns {boolean} 是否匹配
+         */
+        isCurrentPathMatch(pattern) {
+            return pattern.test(this.getCurrentPath());
+        },
+
+        /**
+         * 收集页面中的文本节点，用于抓取新的翻译字符串
+         * @param {HTMLElement} element - 要收集文本的根元素
+         * @param {Set<string>} collectedTexts - 收集到的文本集合
+         * @param {number} minLength - 最小文本长度
+         * @param {number} maxLength - 最大文本长度
+         */
+        collectTextNodes(element, collectedTexts, minLength = 2, maxLength = 100) {
+            if (!element || !element.childNodes) return;
+
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue.trim();
+                    if (text && text.length >= minLength && text.length <= maxLength && !/^[\s\d]+$/.test(text)) {
+                        collectedTexts.add(text);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = node.tagName.toLowerCase();
+                    // 跳过不需要收集的元素类型
+                    if (!['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'].includes(tagName)) {
+                        this.collectTextNodes(node, collectedTexts, minLength, maxLength);
+                    }
+                }
+            });
+        }
+    };
+
+    // ========== 配置项 ==========
+    const CONFIG = {
+    "version": "1.8.20",
+    "debounceDelay": 500,
+    "routeChangeDelay": 500,
+    "debugMode": false,
+    "updateCheck": {
+        "enabled": false,
+        "intervalHours": 24,
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "autoUpdateVersion": true
+    },
+    "externalTranslation": {
+        "enabled": false,
+        "minLength": 20,
+        "maxLength": 500,
+        "timeout": 3000,
+        "requestInterval": 500,
+        "cacheSize": 500
+    },
+    "performance": {
+        "enableDeepObserver": true,
+        "enablePartialMatch": false,
+        "maxDictSize": 2000,
+        "enableTranslationCache": true
+    },
+    "selectors": {
+        "primary": [],
+        "popupMenus": []
+    },
+    "pagePatterns": {
+        "search": {},
+        "repository": {},
+        "issues": {},
+        "pullRequests": {},
+        "settings": {},
+        "dashboard": {}
+    }
+} 工具函数模块 ==========
+    /**
+     * 工具函数集合
+     */
+    const utils = {
+        /**
+         * 节流函数，用于限制高频操作的执行频率
+         * @param {Function} func - 要节流的函数
+         * @param {number} limit - 限制时间（毫秒）
+         * @returns {Function} 节流后的函数
+         */
+        throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        },
+
+        /**
+         * 转义正则表达式特殊字符
+         * @param {string} string - 要转义的字符串
+         * @returns {string} 转义后的字符串
+         */
+        escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        },
+
+        /**
+         * 获取当前页面路径
+         * @returns {string} 当前页面路径
+         */
+        getCurrentPath() {
+            return window.location.pathname;
+        },
+
+        /**
+         * 判断当前页面是否匹配某个路径模式
+         * @param {RegExp} pattern - 路径模式
+         * @returns {boolean} 是否匹配
+         */
+        isCurrentPathMatch(pattern) {
+            return pattern.test(this.getCurrentPath());
+        },
+
+        /**
+         * 收集页面中的文本节点，用于抓取新的翻译字符串
+         * @param {HTMLElement} element - 要收集文本的根元素
+         * @param {Set<string>} collectedTexts - 收集到的文本集合
+         * @param {number} minLength - 最小文本长度
+         * @param {number} maxLength - 最大文本长度
+         */
+        collectTextNodes(element, collectedTexts, minLength = 2, maxLength = 100) {
+            if (!element || !element.childNodes) return;
+
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue.trim();
+                    if (text && text.length >= minLength && text.length <= maxLength && !/^[\s\d]+$/.test(text)) {
+                        collectedTexts.add(text);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = node.tagName.toLowerCase();
+                    // 跳过不需要收集的元素类型
+                    if (!['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'].includes(tagName)) {
+                        this.collectTextNodes(node, collectedTexts, minLength, maxLength);
+                    }
+                }
+            });
+        }
+    };
+
+    // ========== 配置项 ==========
+    const CONFIG = {
+    "version": "1.8.20",
+    "debounceDelay": 500,
+    "routeChangeDelay": 500,
+    "debugMode": false,
+    "updateCheck": {
+        "enabled": false,
+        "intervalHours": 24,
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "autoUpdateVersion": true
+    },
+    "externalTranslation": {
+        "enabled": false,
+        "minLength": 20,
+        "maxLength": 500,
+        "timeout": 3000,
+        "requestInterval": 500,
+        "cacheSize": 500
+    },
+    "performance": {
+        "enableDeepObserver": true,
+        "enablePartialMatch": false,
+        "maxDictSize": 2000,
+        "enableTranslationCache": true
+    },
+    "selectors": {
+        "primary": [],
+        "popupMenus": []
+    },
+    "pagePatterns": {
+        "search": {},
+        "repository": {},
+        "issues": {},
+        "pullRequests": {},
+        "settings": {},
+        "dashboard": {}
+    }
+} 工具函数模块 ==========
+    /**
+     * 工具函数集合
+     */
+    const utils = {
+        /**
+         * 节流函数，用于限制高频操作的执行频率
+         * @param {Function} func - 要节流的函数
+         * @param {number} limit - 限制时间（毫秒）
+         * @returns {Function} 节流后的函数
+         */
+        throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        },
+
+        /**
+         * 转义正则表达式特殊字符
+         * @param {string} string - 要转义的字符串
+         * @returns {string} 转义后的字符串
+         */
+        escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        },
+
+        /**
+         * 获取当前页面路径
+         * @returns {string} 当前页面路径
+         */
+        getCurrentPath() {
+            return window.location.pathname;
+        },
+
+        /**
+         * 判断当前页面是否匹配某个路径模式
+         * @param {RegExp} pattern - 路径模式
+         * @returns {boolean} 是否匹配
+         */
+        isCurrentPathMatch(pattern) {
+            return pattern.test(this.getCurrentPath());
+        },
+
+        /**
+         * 收集页面中的文本节点，用于抓取新的翻译字符串
+         * @param {HTMLElement} element - 要收集文本的根元素
+         * @param {Set<string>} collectedTexts - 收集到的文本集合
+         * @param {number} minLength - 最小文本长度
+         * @param {number} maxLength - 最大文本长度
+         */
+        collectTextNodes(element, collectedTexts, minLength = 2, maxLength = 100) {
+            if (!element || !element.childNodes) return;
+
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue.trim();
+                    if (text && text.length >= minLength && text.length <= maxLength && !/^[\s\d]+$/.test(text)) {
+                        collectedTexts.add(text);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = node.tagName.toLowerCase();
+                    // 跳过不需要收集的元素类型
+                    if (!['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'].includes(tagName)) {
+                        this.collectTextNodes(node, collectedTexts, minLength, maxLength);
+                    }
+                }
+            });
+        }
+    };
+
+    // ========== 配置项 ==========
+    const CONFIG = {
+    "version": "1.8.20",
+    "debounceDelay": 500,
+    "routeChangeDelay": 500,
+    "debugMode": false,
+    "updateCheck": {
+        "enabled": true,
+        "intervalHours": 24,
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "autoUpdateVersion": true
+    },
+    "externalTranslation": {
+        "enabled": false,
+        "minLength": 20,
+        "maxLength": 500,
+        "timeout": 3000,
+        "requestInterval": 500,
+        "cacheSize": 500
+    },
+    "performance": {
+        "enableDeepObserver": true,
+        "enablePartialMatch": false,
+        "maxDictSize": 2000,
+        "enableTranslationCache": true
+    },
+    "selectors": {
+        "primary": [],
+        "popupMenus": []
+    },
+    "pagePatterns": {
+        "search": {},
+        "repository": {},
+        "issues": {},
+        "pullRequests": {},
+        "settings": {},
+        "dashboard": {}
+    }
+} 工具函数模块 ==========
+    /**
+     * 工具函数集合
+     */
+    const utils = {
+        /**
+         * 节流函数，用于限制高频操作的执行频率
+         * @param {Function} func - 要节流的函数
+         * @param {number} limit - 限制时间（毫秒）
+         * @returns {Function} 节流后的函数
+         */
+        throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        },
+
+        /**
+         * 转义正则表达式特殊字符
+         * @param {string} string - 要转义的字符串
+         * @returns {string} 转义后的字符串
+         */
+        escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        },
+
+        /**
+         * 获取当前页面路径
+         * @returns {string} 当前页面路径
+         */
+        getCurrentPath() {
+            return window.location.pathname;
+        },
+
+        /**
+         * 判断当前页面是否匹配某个路径模式
+         * @param {RegExp} pattern - 路径模式
+         * @returns {boolean} 是否匹配
+         */
+        isCurrentPathMatch(pattern) {
+            return pattern.test(this.getCurrentPath());
+        },
+
+        /**
+         * 收集页面中的文本节点，用于抓取新的翻译字符串
+         * @param {HTMLElement} element - 要收集文本的根元素
+         * @param {Set<string>} collectedTexts - 收集到的文本集合
+         * @param {number} minLength - 最小文本长度
+         * @param {number} maxLength - 最大文本长度
+         */
+        collectTextNodes(element, collectedTexts, minLength = 2, maxLength = 100) {
+            if (!element || !element.childNodes) return;
+
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue.trim();
+                    if (text && text.length >= minLength && text.length <= maxLength && !/^[\s\d]+$/.test(text)) {
+                        collectedTexts.add(text);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = node.tagName.toLowerCase();
+                    // 跳过不需要收集的元素类型
+                    if (!['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'].includes(tagName)) {
+                        this.collectTextNodes(node, collectedTexts, minLength, maxLength);
+                    }
+                }
+            });
+        }
+    };
+
+    // ========== 配置项 ==========
+    const CONFIG = {
+    "version": "1.8.20",
+    "debounceDelay": 500,
+    "routeChangeDelay": 500,
+    "debugMode": false,
+    "updateCheck": {
+        "enabled": true,
+        "intervalHours": 24,
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "autoUpdateVersion": true
+    },
+    "externalTranslation": {
+        "enabled": false,
+        "minLength": 20,
+        "maxLength": 500,
+        "timeout": 3000,
+        "requestInterval": 500,
+        "cacheSize": 500
+    },
+    "performance": {
+        "enableDeepObserver": true,
+        "enablePartialMatch": false,
+        "maxDictSize": 2000,
+        "enableTranslationCache": true
+    },
+    "selectors": {
+        "primary": [],
+        "popupMenus": []
+    },
+    "pagePatterns": {
+        "search": {},
+        "repository": {},
+        "issues": {},
+        "pullRequests": {},
+        "settings": {},
+        "dashboard": {}
+    }
+} 工具函数模块 ==========
+    /**
+     * 工具函数集合
+     */
+    const utils = {
+        /**
+         * 节流函数，用于限制高频操作的执行频率
+         * @param {Function} func - 要节流的函数
+         * @param {number} limit - 限制时间（毫秒）
+         * @returns {Function} 节流后的函数
+         */
+        throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        },
+
+        /**
+         * 转义正则表达式特殊字符
+         * @param {string} string - 要转义的字符串
+         * @returns {string} 转义后的字符串
+         */
+        escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        },
+
+        /**
+         * 获取当前页面路径
+         * @returns {string} 当前页面路径
+         */
+        getCurrentPath() {
+            return window.location.pathname;
+        },
+
+        /**
+         * 判断当前页面是否匹配某个路径模式
+         * @param {RegExp} pattern - 路径模式
+         * @returns {boolean} 是否匹配
+         */
+        isCurrentPathMatch(pattern) {
+            return pattern.test(this.getCurrentPath());
+        },
+
+        /**
+         * 收集页面中的文本节点，用于抓取新的翻译字符串
+         * @param {HTMLElement} element - 要收集文本的根元素
+         * @param {Set<string>} collectedTexts - 收集到的文本集合
+         * @param {number} minLength - 最小文本长度
+         * @param {number} maxLength - 最大文本长度
+         */
+        collectTextNodes(element, collectedTexts, minLength = 2, maxLength = 100) {
+            if (!element || !element.childNodes) return;
+
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue.trim();
+                    if (text && text.length >= minLength && text.length <= maxLength && !/^[\s\d]+$/.test(text)) {
+                        collectedTexts.add(text);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = node.tagName.toLowerCase();
+                    // 跳过不需要收集的元素类型
+                    if (!['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'].includes(tagName)) {
+                        this.collectTextNodes(node, collectedTexts, minLength, maxLength);
+                    }
+                }
+            });
+        }
+    };
+
+    // ========== 配置项 ==========
+    const CONFIG = {
+    "version": "1.8.20",
+    "debounceDelay": 300,
+    "routeChangeDelay": 400,
+    "debugMode": false,
+    "updateCheck": {
+        "enabled": true,
+        "intervalHours": 24,
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "autoUpdateVersion": true
+    },
+    "externalTranslation": {
+        "enabled": false,
+        "minLength": 20,
+        "maxLength": 500,
+        "timeout": 3000,
+        "requestInterval": 500,
+        "cacheSize": 500
+    },
+    "performance": {
+        "enableDeepObserver": false,
+        "enablePartialMatch": false,
+        "maxDictSize": 2000,
+        "enableTranslationCache": true
+    },
+    "selectors": {
+        "primary": [],
+        "popupMenus": []
+    },
+    "pagePatterns": {
+        "search": {},
+        "repository": {},
+        "issues": {},
+        "pullRequests": {},
+        "settings": {},
+        "dashboard": {}
+    }
+} 工具函数模块 ==========
+    /**
+     * 工具函数集合
+     */
+    const utils = {
+        /**
+         * 节流函数，用于限制高频操作的执行频率
+         * @param {Function} func - 要节流的函数
+         * @param {number} limit - 限制时间（毫秒）
+         * @returns {Function} 节流后的函数
+         */
+        throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        },
+
+        /**
+         * 转义正则表达式特殊字符
+         * @param {string} string - 要转义的字符串
+         * @returns {string} 转义后的字符串
+         */
+        escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        },
+
+        /**
+         * 获取当前页面路径
+         * @returns {string} 当前页面路径
+         */
+        getCurrentPath() {
+            return window.location.pathname;
+        },
+
+        /**
+         * 判断当前页面是否匹配某个路径模式
+         * @param {RegExp} pattern - 路径模式
+         * @returns {boolean} 是否匹配
+         */
+        isCurrentPathMatch(pattern) {
+            return pattern.test(this.getCurrentPath());
+        },
+
+        /**
+         * 收集页面中的文本节点，用于抓取新的翻译字符串
+         * @param {HTMLElement} element - 要收集文本的根元素
+         * @param {Set<string>} collectedTexts - 收集到的文本集合
+         * @param {number} minLength - 最小文本长度
+         * @param {number} maxLength - 最大文本长度
+         */
+        collectTextNodes(element, collectedTexts, minLength = 2, maxLength = 100) {
+            if (!element || !element.childNodes) return;
+
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue.trim();
+                    if (text && text.length >= minLength && text.length <= maxLength && !/^[\s\d]+$/.test(text)) {
+                        collectedTexts.add(text);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = node.tagName.toLowerCase();
+                    // 跳过不需要收集的元素类型
+                    if (!['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'].includes(tagName)) {
+                        this.collectTextNodes(node, collectedTexts, minLength, maxLength);
+                    }
+                }
+            });
+        }
+    };
+
+    // ========== 配置项 ==========
+    const CONFIG = {
+    "version": "1.8.18",
+    "debounceDelay": 500,
+    "routeChangeDelay": 500,
+    "debugMode": false,
+    "updateCheck": {
+        "enabled": false,
+        "intervalHours": 24,
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "autoUpdateVersion": true
+    },
+    "externalTranslation": {
+        "enabled": false,
+        "minLength": 20,
+        "maxLength": 500,
+        "timeout": 3000,
+        "requestInterval": 500,
+        "cacheSize": 500
+    },
+    "performance": {
+        "enableDeepObserver": false,
+        "enablePartialMatch": false,
+        "maxDictSize": 2000,
+        "enableTranslationCache": true,
+        "enableDictOptimization": true,
+        "enableRegexOptimization": true,
+        "maxCacheSize": 1000,
+        "regexCacheSize": 500,
+        "throttleInterval": 200
+    },
+    "selectors": {
+        "keyAreas": [
+            "#header",
+            ".application-main",
+            ".js-repo-nav",
+            "#repository-details-container"
+        ],
+        "translationTargets": [
+            "#header",
+            ".Header-item--full",
+            ".HeaderMenu",
+            ".UnderlineNav",
+            ".dropdown-menu",
+            ".SelectMenu",
+            ".Popover-menu",
+            ".menu",
+            ".ActionList",
+            ".BorderGrid",
+            ".Box",
+            ".menu-item",
+            ".js-selected-navigation-item",
+            ".Layout",
+            ".application-main",
+            ".js-menu-container",
+            ".js-repo-nav",
+            ".repository-details-container",
+            ".Overlay-body",
+            ".AppHeader-globalBar-end",
+            ".p-2",
+            ".footer"
+        ],
+        "popupMenus": [
+            "[aria-label=\"Menu\"]",
+            "[role=\"menu\"]",
+            ".ReactModal__Content",
+            ".Overlay-backdrop",
+            "[data-component-type=\"dropdown\"]"
+        ]
+    },
+    "pagePatterns": {
+        "search": {},
+        "repository": {},
+        "issues": {},
+        "pullRequests": {},
+        "settings": {},
+        "dashboard": {}
+    }
+}
 
     // ========== 翻译词典模块 ==========
     /**
