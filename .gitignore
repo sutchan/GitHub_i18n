@@ -1,12 +1,8 @@
-/auto_string_updater
-/docs
 /.trae
+/.vscode
+/docs
+/auto_string_updater
+/utils
 *.code-workspace
-github_string_fetcher.js
 *.bak
-/utils/node_modules
-/.vscode
-/.vscode
-/.vscode
-/utils
-/utils
+github_string_fetcher.js
