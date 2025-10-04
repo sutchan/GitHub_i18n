@@ -229,7 +229,7 @@
 
     // ========== 配置项 ==========
     const CONFIG = {
-    "version": "1.8.20",
+    "version": "1.8.16",
     "debounceDelay": 500,
     "routeChangeDelay": 500,
     "debugMode": false,
@@ -1034,7 +1034,7 @@
 
     // ========== 配置项 ==========
     const CONFIG = {
-    "version": "1.8.18",
+    "version": "1.8.16",
     "debounceDelay": 500,
     "routeChangeDelay": 500,
     "debugMode": false,
