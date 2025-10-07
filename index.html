@@ -40,7 +40,7 @@
   <!-- 主要内容区 -->
   <main class="flex-grow container mx-auto py-8 px-4">
     <!-- 状态卡片 -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       <div class="bg-white rounded-xl p-6 card-shadow border border-gray-100">
         <div class="flex items-center space-x-4">
           <div class="bg-primary/10 p-4 rounded-full">
@@ -60,6 +60,17 @@
           <div>
             <h3 class="text-gray-500 text-sm font-medium">新添加字符串</h3>
             <p id="addedCount" class="text-2xl font-bold text-dark">0</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-6 card-shadow border border-gray-100">
+        <div class="flex items-center space-x-4">
+          <div class="bg-success/10 p-4 rounded-full">
+            <i class="fa fa-database text-success text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-gray-500 text-sm font-medium">已存在字符串</h3>
+            <p id="existingCount" class="text-2xl font-bold text-dark">0</p>
           </div>
         </div>
       </div>
@@ -412,6 +423,10 @@
               class="w-full bg-primary hover:bg-primary/90 text-white px-4 py-3 rounded-md font-medium flex items-center justify-center btn-hover shadow-button">
               <i class="fa fa-play mr-2"></i>开始抓取字符串
             </button>
+            <button id="addStringBtn" type="button"
+              class="w-full bg-secondary hover:bg-secondary/90 text-white px-4 py-3 rounded-md font-medium flex items-center justify-center btn-hover shadow-button">
+              <i class="fa fa-plus mr-2"></i>添加字符串到词典
+            </button>
             <button id="viewBackupBtn" type="button"
               class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-md font-medium flex items-center justify-center btn-hover shadow-button">
               <i class="fa fa-folder-open mr-2"></i>查看备份
@@ -550,6 +565,63 @@
             <li>运行前请确保有足够的文件系统权限</li>
           </ul>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加字符串模态框 -->
+  <div id="addStringModal"
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden fade-in">
+    <div
+      class="bg-white rounded-xl p-6 w-full max-w-md mx-4 card-shadow scale-95 transition-all duration-200 transform">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-dark">添加字符串到翻译词典</h3>
+        <button id="closeAddStringModalBtn" type="button" class="text-gray-400 hover:text-gray-500 transition-colors" aria-label="关闭">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">原始字符串</label>
+          <input type="text" id="originalString"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" placeholder="请输入要翻译的原始英文字符串">
+          <p id="originalStringError" class="mt-1 text-xs text-danger hidden">请输入原始字符串</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">翻译模块</label>
+          <select id="stringModule" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus">
+            <option value="global">global (全局模块)</option>
+            <option value="header">header (顶部导航)</option>
+            <option value="footer">footer (页脚)</option>
+            <option value="buttons">buttons (按钮文本)</option>
+            <option value="labels">labels (标签文本)</option>
+            <option value="messages">messages (提示消息)</option>
+            <option value="settings">settings (设置页面)</option>
+            <option value="search">search (搜索功能)</option>
+            <option value="repository">repository (仓库页面)</option>
+            <option value="issues">issues (问题页面)</option>
+            <option value="pulls">pulls (拉取请求)</option>
+            <option value="actions">actions (Actions)</option>
+            <option value="marketplace">marketplace (Marketplace)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">中文翻译</label>
+          <textarea id="translatedString"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus min-h-[100px]"
+            placeholder="请输入中文翻译（可选，留空将标记为待翻译）"></textarea>
+        </div>
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="forceUpdate" class="w-4 h-4 text-primary focus:ring-primary rounded">
+          <label for="forceUpdate" class="text-sm font-medium text-gray-700">强制更新（覆盖现有翻译）</label>
+        </div>
+      </div>
+      <div class="mt-6 flex space-x-3">
+        <button id="cancelAddStringModalBtn" type="button"
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
+        <button id="saveStringBtn" type="button"
+          class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">保存</button>
       </div>
     </div>
   </div>

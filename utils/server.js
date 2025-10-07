@@ -778,6 +778,70 @@ app.get('/api/test-endpoint', (req, res) => {
 });
 
 /**
+ * API端点：向词典添加新字符串
+ */
+app.post('/api/add-string-to-dictionary', async (req, res) => {
+    try {
+        log('info', '接收到添加字符串到词典的请求');
+        
+        // 验证请求参数
+        const { originalText, moduleName, translation, forceUpdate = false } = req.body;
+        
+        if (!originalText || !moduleName) {
+            throw new Error('原始文本和模块名称是必需的');
+        }
+        
+        // 导入dictionary_processor工具
+        const dictionaryProcessor = require('./dictionary_processor');
+        
+        // 尝试读取用户脚本中的词典
+        let dictionary;
+        try {
+            dictionary = await dictionaryProcessor.extractDictionaryFromUserScript();
+        } catch (error) {
+            log('warn', '从用户脚本提取词典失败，创建新词典:', error.message);
+            dictionary = {};
+        }
+        
+        // 确保模块存在
+        if (!dictionary[moduleName]) {
+            dictionary[moduleName] = {};
+        }
+        
+        // 检查字符串是否已存在
+        const isExisting = !!dictionary[moduleName][originalText];
+        
+        if (isExisting && !forceUpdate) {
+            log('info', `字符串已存在于模块 ${moduleName} 中，且未设置强制更新`);
+            return res.json({
+                success: false,
+                message: '字符串已存在，若要更新请启用强制更新选项',
+                isExisting: true
+            });
+        }
+        
+        // 添加或更新字符串
+        dictionary[moduleName][originalText] = translation || `待翻译: ${originalText}`;
+        
+        // 写入回用户脚本
+        await dictionaryProcessor.writeDictionaryToUserScript(dictionary);
+        
+        log('success', `已${isExisting ? '更新' : '添加'}字符串到模块 ${moduleName}`);
+        res.json({
+            success: true,
+            message: `已${isExisting ? '更新' : '添加'}字符串到词典`,
+            moduleName: moduleName,
+            originalText: originalText,
+            translation: translation || `待翻译: ${originalText}`,
+            isExisting: isExisting
+        });
+    } catch (error) {
+        log('error', '添加字符串到词典失败:', error);
+        res.status(500).json({ success: false, message: '添加字符串到词典失败', error: error.message });
+    }
+});
+
+/**
  * API端点：直接修改GitHub用户脚本配置
  */
 app.post('/api/update-user-script-config', async (req, res) => {

@@ -1,15 +1,7 @@
 {
   "extractedCount": 0,
   "addedCount": 0,
-  "lastUpdate": "2025/10/4 20:25:05",
-  "lastRunStatus": "failed",
-  "runCount": 1,
-  "runHistory": [
-    {
-      "timestamp": "2025-10-04T12:25:05.143Z",
-      "status": "failed",
-      "extractedCount": 0,
-      "addedCount": 0
-    }
-  ]
+  "lastUpdate": null,
+  "lastRunStatus": "idle",
+  "runCount": 0
 }

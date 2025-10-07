@@ -5,13 +5,23 @@
  * 当前工具版本号
  * @type {string}
  */
-export const VERSION = '1.8.16';
+export const VERSION = '1.8.21';
 
 /**
  * 版本历史记录
  * @type {Array<{version: string, date: string, changes: string[]}>}
  */
 export const VERSION_HISTORY = [
+  {
+    version: '1.8.21',
+    date: new Date().toLocaleDateString('zh-CN'),
+    changes: [
+      '实现版本自动更新检查功能',
+      '修复代码语法错误',
+      '完善翻译选择器配置',
+      '清理重复代码'
+    ]
+  },
   {
     version: '1.8.16',
     date: '2023-12-17',

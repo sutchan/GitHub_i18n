@@ -150,6 +150,27 @@ function bindEvents() {
         searchInput.addEventListener('input', handleSearchInput);
     }
     
+    // 添加字符串相关事件
+    const addStringBtn = document.getElementById('addStringBtn');
+    if (addStringBtn) {
+        addStringBtn.addEventListener('click', showAddStringModal);
+    }
+    
+    const closeAddStringModalBtn = document.getElementById('closeAddStringModalBtn');
+    if (closeAddStringModalBtn) {
+        closeAddStringModalBtn.addEventListener('click', hideAddStringModal);
+    }
+    
+    const cancelAddStringModalBtn = document.getElementById('cancelAddStringModalBtn');
+    if (cancelAddStringModalBtn) {
+        cancelAddStringModalBtn.addEventListener('click', hideAddStringModal);
+    }
+    
+    const saveStringBtn = document.getElementById('saveStringBtn');
+    if (saveStringBtn) {
+        saveStringBtn.addEventListener('click', saveStringToDictionary);
+    }
+    
     // 批量操作下拉菜单
     const batchOperationsBtn = document.getElementById('batchOperationsBtn');
     const batchOperationsMenu = document.getElementById('batchOperationsMenu');
@@ -1343,6 +1364,46 @@ async function loadStats() {
 
     document.getElementById('extractedCount').textContent = stats.extractedCount || 0;
     document.getElementById('addedCount').textContent = stats.addedCount || 0;
+    
+    // 获取用户脚本中已存在的字符串数量
+    try {
+      const userScriptPath = document.getElementById('userScriptPath').value;
+      const scriptResponse = await fetch(userScriptPath);
+      const scriptContent = await scriptResponse.text();
+      
+      // 尝试从脚本内容中提取translationModule对象
+      const translationModuleMatch = scriptContent.match(/const translationModule = (\{[\s\S]*?\});/);
+      
+      if (translationModuleMatch && translationModuleMatch[1]) {
+        try {
+          // 解析translationModule对象
+          const translationModule = JSON.parse(translationModuleMatch[1].replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''));
+          
+          // 计算所有模块中的字符串数量
+          let existingCount = 0;
+          for (const moduleName in translationModule) {
+            if (translationModule.hasOwnProperty(moduleName)) {
+              const module = translationModule[moduleName];
+              for (const key in module) {
+                if (module.hasOwnProperty(key)) {
+                  existingCount++;
+                }
+              }
+            }
+          }
+          
+          document.getElementById('existingCount').textContent = existingCount;
+        } catch (parseError) {
+          console.warn('解析translationModule失败:', parseError);
+          document.getElementById('existingCount').textContent = '无法解析';
+        }
+      } else {
+        document.getElementById('existingCount').textContent = '未找到';
+      }
+    } catch (scriptError) {
+      console.warn('读取用户脚本失败:', scriptError);
+      document.getElementById('existingCount').textContent = '无法读取';
+    }
   } catch (error) {
     console.error('加载统计数据失败:', error);
     addLog(`加载统计数据失败: ${error}`, 'error');
@@ -2446,4 +2507,115 @@ function toggleAdvancedMode(isAdvanced) {
       section.classList.toggle('opacity-100', isAdvanced);
     });
   }, 10);
+}
+
+// 显示添加字符串模态框
+function showAddStringModal() {
+  const modal = document.getElementById('addStringModal');
+  modal.classList.remove('hidden');
+  
+  // 清空表单
+  document.getElementById('originalString').value = '';
+  document.getElementById('translatedString').value = '';
+  document.getElementById('stringModule').value = 'global';
+  document.getElementById('forceUpdate').checked = false;
+  
+  // 隐藏错误提示
+  document.getElementById('originalStringError').classList.add('hidden');
+  
+  setTimeout(() => {
+    modal.querySelector('.scale-95').classList.replace('scale-95', 'scale-100');
+  }, 10);
+}
+
+// 隐藏添加字符串模态框
+function hideAddStringModal() {
+  const modal = document.getElementById('addStringModal');
+  modal.querySelector('.scale-100').classList.replace('scale-100', 'scale-95');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 200);
+}
+
+// 保存字符串到词典
+async function saveStringToDictionary() {
+  // 获取表单数据
+  const originalText = document.getElementById('originalString').value.trim();
+  const moduleName = document.getElementById('stringModule').value;
+  const translation = document.getElementById('translatedString').value.trim();
+  const forceUpdate = document.getElementById('forceUpdate').checked;
+  
+  // 表单验证
+  const originalStringError = document.getElementById('originalStringError');
+  if (!originalText) {
+    originalStringError.classList.remove('hidden');
+    return;
+  } else {
+    originalStringError.classList.add('hidden');
+  }
+  
+  try {
+    // 添加日志
+    addLog(`正在添加字符串到词典: "${originalText}"`, 'info');
+    
+    // 检查服务器状态
+    const serverStatus = await checkServerStatus();
+    if (!serverStatus) {
+      addLog('服务器连接失败，请检查服务器是否正常运行', 'error');
+      return;
+    }
+    
+    // 显示加载状态
+    const saveBtn = document.getElementById('saveStringBtn');
+    const originalBtnText = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = '处理中...';
+    
+    // 准备数据
+    const data = {
+      originalText: originalText,
+      moduleName: moduleName,
+      translation: translation,
+      forceUpdate: forceUpdate
+    };
+    
+    // 发送请求到后端
+    const response = await fetchWithTimeout('/api/add-string-to-dictionary', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }, 30000);
+    
+    const result = await response.json();
+    
+    // 恢复按钮状态
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalBtnText;
+    
+    if (response.ok) {
+      if (result.success) {
+        addLog(result.message || '字符串添加成功', 'success');
+        
+        // 更新统计信息
+        await loadStats();
+        
+        // 关闭模态框
+        hideAddStringModal();
+      } else {
+        addLog(result.message || '添加失败，请重试', 'error');
+      }
+    } else {
+      addLog(result.error || '添加失败，请重试', 'error');
+    }
+  } catch (error) {
+    // 恢复按钮状态
+    const saveBtn = document.getElementById('saveStringBtn');
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = '保存';
+    }
+    addLog(`添加字符串时出错: ${error.message}`, 'error');
+  }
 }
