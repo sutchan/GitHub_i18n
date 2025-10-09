@@ -1,7 +1,7 @@
 const fs = require('fs');
 // Web服务器模块，提供字符串抓取工具的操作界面和API
 // 作者: SutChan
-// 版本: 1.8.16
+// 版本: 1.8.17
 
 const fsPromises = require('fs').promises;
 const path = require('path');
@@ -997,30 +997,27 @@ app.post('/api/update-user-script-config', async (req, res) => {
             };
         }
         
-        // 更新配置
-        const updatedConfig = { ...currentConfig, ...newConfigValues };
-        
-        // 特殊处理嵌套对象
-        if (newConfigValues.externalTranslation && typeof newConfigValues.externalTranslation === 'object') {
-            updatedConfig.externalTranslation = {
-                ...currentConfig.externalTranslation,
-                ...newConfigValues.externalTranslation
-            };
+        // 深度合并函数，用于正确处理嵌套对象
+        function deepMerge(target, source) {
+            const result = { ...target };
+            
+            for (const key in source) {
+                if (source.hasOwnProperty(key)) {
+                    if (source[key] instanceof Object && key in target && target[key] instanceof Object) {
+                        // 递归合并嵌套对象
+                        result[key] = deepMerge(target[key], source[key]);
+                    } else {
+                        // 简单属性直接替换
+                        result[key] = source[key];
+                    }
+                }
+            }
+            
+            return result;
         }
         
-        if (newConfigValues.updateCheck && typeof newConfigValues.updateCheck === 'object') {
-            updatedConfig.updateCheck = {
-                ...currentConfig.updateCheck,
-                ...newConfigValues.updateCheck
-            };
-        }
-        
-        if (newConfigValues.performance && typeof newConfigValues.performance === 'object') {
-            updatedConfig.performance = {
-                ...currentConfig.performance,
-                ...newConfigValues.performance
-            };
-        }
+        // 使用深度合并更新配置
+        const updatedConfig = deepMerge(currentConfig, newConfigValues);
         
         // 确保version属性保持不变或使用新提供的值
         if (!newConfigValues.version) {

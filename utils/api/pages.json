@@ -45,17 +45,17 @@
     "module": "gist"
   },
   {
-    "url": "https://github.com/github/github",
+    "url": "https://github.com/github/opensource.guide",
     "selector": "body",
     "module": "repository"
   },
   {
-    "url": "https://github.com/github/github/issues",
+    "url": "https://github.com/github/opensource.guide/issues",
     "selector": "body",
     "module": "repository"
   },
   {
-    "url": "https://github.com/github/github/pulls",
+    "url": "https://github.com/github/opensource.guide/pulls",
     "selector": "body",
     "module": "repository"
   },

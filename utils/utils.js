@@ -315,7 +315,7 @@ function sleep(ms) {
  * @returns {string} 格式化后的数字字符串
  */
 function formatNumber(num, decimals = 2) {
-  return Number(num.toFixed(decimals));
+  return num.toFixed(decimals);
 }
 
 module.exports = {

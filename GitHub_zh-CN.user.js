@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 网站国际化之中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.8.16
+// @version      1.8.17
 // @description  使用预定义词典实现 GitHub 全站高频 UI 中文翻译，零延迟、不破坏布局
 // @author       Sut
 // @match        https://github.com/*
@@ -32,13 +32,13 @@
         }
 
         // 如果无法从注释中读取，返回默认版本号
-        return '1.8.16';
+        return '1.8.17';
     }
 
 
     // ========== 配置项 ==========
     const CONFIG = {
-        "version": "1.8.20",
+        "version": "1.8.17",
         "debounceDelay": 500,
         "routeChangeDelay": 500,
         "debugMode": false,
@@ -195,7 +195,7 @@
                 const scriptContent = await response.text();
                 
                 // 提取远程版本号
-                const remoteVersionMatch = scriptContent.match(/\/\*\s*@version\s+(\d+\.\d+\.\d+)\s*\*\//i);
+                const remoteVersionMatch = scriptContent.match(/\/\/\s*@version\s+(\d+\.\d+\.\d+)/i);
                 if (!remoteVersionMatch) {
                     throw new Error('无法从远程脚本提取版本号');
                 }

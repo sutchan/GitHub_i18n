@@ -374,6 +374,8 @@ function filterString(text) {
     ];
 
     for (const pattern of sensitivePatterns) {
+      // 重置正则表达式的lastIndex以避免多次调用时的状态问题
+      pattern.lastIndex = 0;
       if (pattern.test(text)) {
         return false;
       }
@@ -408,7 +410,9 @@ function filterString(text) {
  */
 function hasExcessiveRepeats(text) {
   // 检查连续重复的字符
-  if (/([a-zA-Z0-9])\1{4,}/.test(text)) {
+  const repeatPattern = /([a-zA-Z0-9])\1{4,}/;
+  repeatPattern.lastIndex = 0;
+  if (repeatPattern.test(text)) {
     return true;
   }
   
@@ -449,7 +453,10 @@ function isLikelyNumericData(text) {
     /^\$?\d+(,\d{3})*(\.\d{2})?$/
   ];
   
-  return numericPatterns.some(pattern => pattern.test(text));
+  return numericPatterns.some(pattern => {
+    pattern.lastIndex = 0;
+    return pattern.test(text);
+  });
 }
 
 /**
@@ -473,6 +480,8 @@ function isLikelyCodeSnippet(text) {
   // 如果字符串包含多个代码特征，认为是代码片段
   let codeFeaturesCount = 0;
   for (const pattern of codePatterns) {
+    // 重置正则表达式的lastIndex以避免多次调用时的状态问题
+    pattern.lastIndex = 0;
     if (pattern.test(text)) {
       codeFeaturesCount++;
       if (codeFeaturesCount >= 2) {
@@ -493,15 +502,15 @@ function isLikelyCodeSnippet(text) {
 function extractStrings(html, module) {
   try {
     // 检查输入
-  if (!html || typeof html !== 'string') {
-    log('warn', 'HTML内容为空或不是字符串');
-    return [];
-  }
+    if (!html || typeof html !== 'string') {
+      log('warn', 'HTML内容为空或不是字符串');
+      return [];
+    }
 
-  if (!module || typeof module !== 'string') {
-    log('warn', '模块名称为空或不是字符串');
-    module = 'global';
-  }
+    if (!module || typeof module !== 'string') {
+      log('warn', '模块名称为空或不是字符串');
+      module = 'global';
+    }
 
     const { window } = new JSDOM(html);
     const document = window.document;
@@ -741,7 +750,6 @@ async function updateTranslationDictionary(scriptContent, newStrings) {
         
         // 收集需要添加的条目，一次性添加
         const entriesToAdd = [];
-        const moduleAddedCount = 0;
         
         // 检查每个字符串是否已存在
         strings.forEach(text => {
