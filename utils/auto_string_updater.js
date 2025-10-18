@@ -321,64 +321,17 @@ class AutoStringUpdater {
   }
 }
 
-/**
- * 日志记录器
- */
-class Logger {
-  constructor() {
-    this.logs = [];
-  }
-  
-  _log(level, message, data = null) {
-    const timestamp = new Date().toISOString();
-    const logEntry = { timestamp, level, message };
-    
-    if (data !== null) {
-      logEntry.data = data;
-    }
-    
-    this.logs.push(logEntry);
-    
-    const logMessage = `[${timestamp}] [${level}] ${message}`;
-    if (data) {
-      console[level === 'error' ? 'error' : 'log'](logMessage, data);
-    } else {
-      console[level === 'error' ? 'error' : 'log'](logMessage);
-    }
-  }
-  
-  info(message, data = null) {
-    this._log('INFO', message, data);
-  }
-  
-  warn(message, data = null) {
-    this._log('WARN', message, data);
-  }
-  
-  error(message, data = null) {
-    this._log('ERROR', message, data);
-  }
-  
-  getLogs() {
-    return this.logs;
-  }
-  
-  clearLogs() {
-    this.logs = [];
-  }
-}
+// 使用来自dictionary_processor.js的Logger类
 
 // 浏览器环境中注册全局变量
 if (typeof window !== 'undefined') {
   window.AutoStringUpdater = AutoStringUpdater;
-  window.Logger = Logger;
 } else if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   // Node.js环境中导出模块
-  module.exports = { AutoStringUpdater, Logger };
+  module.exports = { AutoStringUpdater };
 } else if (typeof global !== 'undefined') {
   // 其他环境
   global.AutoStringUpdater = AutoStringUpdater;
-  global.Logger = Logger;
 }
 
 // 如果直接运行此脚本
