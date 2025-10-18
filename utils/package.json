@@ -1,0 +1,27 @@
+{
+  "name": "github-i18n-utils",
+  "version": "1.8.23",
+  "description": "GitHub 中文翻译工具集",
+  "main": "auto_string_updater.js",
+  "scripts": {
+    "start": "node auto_string_updater.js",
+    "server": "http-server -p 3000",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "github",
+    "i18n",
+    "translation",
+    "chinese"
+  ],
+  "author": "Sut",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "http-server": "^14.1.1",
+    "jsdom": "^22.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
+}
