@@ -532,7 +532,7 @@
             class="fa fa-envelope text-xl"></i></a>
         <a href="#" id="userScriptSettingsBtn" class="hover:text-white transition-colors" aria-label="用户脚本设置"><i
             class="fa fa-code text-xl"></i></a>
-        <a href="#" class="hover:text-white transition-colors" aria-label="帮助"><i
+        <a href="#" id="helpBtn" class="hover:text-white transition-colors" aria-label="帮助"><i
             class="fa fa-question-circle text-xl"></i></a>
       </div>
     </div>
@@ -577,11 +577,11 @@
   </div>
 
   <!-- 帮助对话框 -->
-  <div id="helpModal" class="modal-backdrop">
-    <div class="modal-content" style="max-width: 800px;">
-      <div class="modal-header">
-        <h3 class="modal-title">使用帮助</h3>
-        <button type="button" class="modal-close" id="closeHelpBtn">
+  <div id="helpModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden modal-backdrop">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 card-shadow modal-content" style="max-width: 800px;">
+      <div class="modal-header flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-dark modal-title">使用帮助</h3>
+        <button type="button" class="text-gray-400 hover:text-gray-500 transition-colors modal-close" id="closeHelpBtn" aria-label="关闭">
           <i class="fa fa-times text-xl"></i>
         </button>
       </div>
@@ -610,21 +610,21 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" id="closeHelpBtn">关闭</button>
+      <div class="modal-footer mt-6 flex justify-end space-x-3">
+        <button type="button" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors" id="closeHelpBtn">关闭</button>
       </div>
     </div>
   </div>
 
   <!-- 添加字符串模态框 -->
-    <div id="addStringModal" class="hidden fixed inset-0 z-50 overflow-y-auto modal-backdrop">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">添加字符串到翻译词典</h3>
-                <button id="closeAddStringModalBtn" type="button" class="modal-close" aria-label="关闭">
-                    <i class="fa fa-times text-xl"></i>
-                </button>
-            </div>
+  <div id="addStringModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 modal-backdrop">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 card-shadow modal-content">
+      <div class="modal-header flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-dark modal-title">添加字符串到翻译词典</h3>
+        <button id="closeAddStringModalBtn" type="button" class="text-gray-400 hover:text-gray-500 transition-colors modal-close" aria-label="关闭">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      </div>
             <div class="modal-body">
                 <div class="space-y-4">
                     <div>
@@ -664,9 +664,9 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer justify-end">
-                <button id="cancelAddStringBtn" type="button"
-                    class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
+            <div class="modal-footer mt-6 flex justify-end space-x-3">
+        <button id="cancelAddStringBtn" type="button"
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
         <button id="saveStringBtn" type="button"
           class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">保存</button>
       </div>
@@ -674,11 +674,11 @@
   </div>
 
   <!-- 用户脚本设置模态框 -->
-  <div id="userScriptSettingsModal" class="hidden fixed inset-0 z-50 overflow-y-auto modal-backdrop">
-    <div class="modal-content max-w-2xl max-h-[90vh] overflow-y-auto">
-      <div class="modal-header">
-        <h3 class="modal-title">用户脚本设置</h3>
-        <button id="closeUserScriptModalBtn" type="button" class="modal-close" aria-label="关闭">
+  <div id="userScriptSettingsModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 modal-backdrop">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 card-shadow modal-content max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="modal-header flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-dark modal-title">用户脚本设置</h3>
+        <button id="closeUserScriptModalBtn" type="button" class="text-gray-400 hover:text-gray-500 transition-colors modal-close" aria-label="关闭">
           <i class="fa fa-times text-xl"></i>
         </button>
       </div>
@@ -743,7 +743,7 @@
         </div>
       </div>
   </div>
-  <div class="modal-footer justify-end">
+  <div class="modal-footer mt-6 flex justify-end space-x-3">
     <button id="cancelUserScriptSettingsBtn" type="button"
       class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
     <button id="resetUserScriptConfigBtn" type="button"
