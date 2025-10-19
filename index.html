@@ -23,28 +23,37 @@
 
 <body class="font-inter bg-gray-50 min-h-screen flex flex-col">
   <!-- 顶部导航栏 -->
-  <header class="bg-white shadow-md py-4 px-6 sticky top-0 z-50 transition-all duration-300">
-    <div class="container mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-3">
-        <div class="bg-primary-container p-2 rounded-lg">
-          <i class="fa fa-code-fork text-primary text-2xl"></i>
+  <header class="navbar bg-white shadow-md py-4 px-6 sticky top-0 z-50 transition-all duration-300">
+    <div class="container mx-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <a href="#" class="navbar-brand">
+            <div class="bg-primary-container p-2 rounded-lg">
+              <i class="fa fa-code-fork text-primary text-2xl"></i>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-1">
+              <h1 class="text-xl md:text-2xl font-bold text-dark">GitHub自动化字符串更新工具</h1>
+              <span class="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">v1.8.23</span>
+            </div>
+          </a>
         </div>
-        <div class="flex flex-col sm:flex-row sm:items-center gap-1">
-          <h1 class="text-xl md:text-2xl font-bold text-dark">GitHub自动化字符串更新工具</h1>
-          <span class="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">v1.8.23</span>
-        </div>
+        <nav>
+          <ul class="navbar-nav flex items-center space-x-4">
+            <li class="nav-item">
+              <button id="saveConfigBtn" type="button"
+                class="nav-link btn-hover bg-secondary text-white px-4 py-2 rounded-md flex items-center shadow-button">
+                <i class="fa fa-code mr-2"></i>用户脚本设置
+              </button>
+            </li>
+            <li class="nav-item">
+              <button id="helpBtn" type="button"
+                class="nav-link btn-hover bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center shadow-button hover:bg-gray-300">
+                <i class="fa fa-question-circle mr-2"></i>帮助
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
-      <div class="flex items-center space-x-4">
-        <button id="saveConfigBtn" type="button"
-          class="btn-hover bg-secondary text-white px-4 py-2 rounded-md flex items-center shadow-button">
-          <i class="fa fa-code mr-2"></i>用户脚本设置
-        </button>
-        <button id="helpBtn" type="button"
-          class="btn-hover bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center shadow-button hover:bg-gray-300">
-          <i class="fa fa-question-circle mr-2"></i>帮助
-        </button>
-      </div>
-
     </div>
   </header>
 
@@ -52,47 +61,47 @@
   <main class="flex-grow container mx-auto py-8 px-4">
     <!-- 状态卡片 -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <div class="bg-white rounded-xl p-6 card-shadow border border-gray-100 transition-all duration-300 hover-lift">
-        <div class="flex items-center space-x-4">
-          <div class="bg-primary/10 p-4 rounded-full">
-            <i class="fa fa-file-text-o text-primary text-xl"></i>
-          </div>
+      <div class="stats-card">
+        <div class="stats-card-header">
           <div>
-            <h3 class="text-gray-500 text-sm font-medium">已提取字符串</h3>
-            <p id="extractedCount" class="text-2xl font-bold text-dark">0</p>
+            <p class="stats-card-title">已提取字符串</p>
+            <p id="extractedCount" class="stats-card-value">0</p>
+          </div>
+          <div class="stats-card-icon" style="background-color: var(--color-primary);">
+            <i class="fa fa-file-text-o text-xl"></i>
           </div>
         </div>
       </div>
-      <div class="bg-white rounded-xl p-6 card-shadow border border-gray-100 transition-all duration-300 hover-lift">
-        <div class="flex items-center space-x-4">
-          <div class="bg-secondary/10 p-4 rounded-full">
-            <i class="fa fa-plus-circle text-secondary text-xl"></i>
-          </div>
+      <div class="stats-card">
+        <div class="stats-card-header">
           <div>
-            <h3 class="text-gray-500 text-sm font-medium">新添加字符串</h3>
-            <p id="addedCount" class="text-2xl font-bold text-dark">0</p>
+            <p class="stats-card-title">新添加字符串</p>
+            <p id="addedCount" class="stats-card-value">0</p>
+          </div>
+          <div class="stats-card-icon" style="background-color: var(--color-secondary);">
+            <i class="fa fa-plus-circle text-xl"></i>
           </div>
         </div>
       </div>
-      <div class="bg-white rounded-xl p-6 card-shadow border border-gray-100 transition-all duration-300 hover-lift">
-        <div class="flex items-center space-x-4">
-          <div class="bg-success/10 p-4 rounded-full">
-            <i class="fa fa-database text-success text-xl"></i>
-          </div>
+      <div class="stats-card">
+        <div class="stats-card-header">
           <div>
-            <h3 class="text-gray-500 text-sm font-medium">已存在字符串</h3>
-            <p id="existingCount" class="text-2xl font-bold text-dark">0</p>
+            <p class="stats-card-title">已存在字符串</p>
+            <p id="existingCount" class="stats-card-value">0</p>
+          </div>
+          <div class="stats-card-icon" style="background-color: var(--color-success);">
+            <i class="fa fa-database text-xl"></i>
           </div>
         </div>
       </div>
-      <div class="bg-white rounded-xl p-6 card-shadow border border-gray-100 transition-all duration-300 hover-lift">
-        <div class="flex items-center space-x-4">
-          <div class="bg-accent/10 p-4 rounded-full">
-            <i class="fa fa-clock-o text-accent text-xl"></i>
-          </div>
+      <div class="stats-card">
+        <div class="stats-card-header">
           <div>
-            <h3 class="text-gray-500 text-sm font-medium">上次更新</h3>
-            <p id="lastUpdate" class="text-2xl font-bold text-dark">从未</p>
+            <p class="stats-card-title">上次更新</p>
+            <p id="lastUpdate" class="stats-card-value">从未</p>
+          </div>
+          <div class="stats-card-icon" style="background-color: var(--color-accent);">
+            <i class="fa fa-clock-o text-xl"></i>
           </div>
         </div>
       </div>
@@ -105,19 +114,13 @@
         <!-- 配置与页面设置选项卡容器 -->
         <div class="bg-white rounded-xl overflow-hidden card-shadow border border-gray-100">
           <!-- 选项卡导航 -->
-          <div class="border-b border-gray-200">
-            <div class="flex flex-wrap">
-              <button id="tabConfig"
-                class="px-6 py-4 text-secondary bg-secondary/5 border-b-2 border-secondary font-semibold transition-all duration-300 shadow-sm"
-                role="tab">
-                <i class="fa fa-cog mr-2"></i>配置设置
-              </button>
-              <button id="tabPages"
-                class="px-6 py-4 text-gray-500 hover:text-secondary hover:bg-secondary/5 border-b-2 border-transparent font-medium hover:border-secondary transition-all duration-300"
-                role="tab">
-                <i class="fa fa-globe mr-2"></i>GitHub页面配置
-              </button>
-            </div>
+          <div class="tabs">
+            <button id="tabConfig" class="tab active" role="tab">
+              <i class="fa fa-cog mr-2"></i>配置设置
+            </button>
+            <button id="tabPages" class="tab" role="tab">
+              <i class="fa fa-globe mr-2"></i>GitHub页面配置
+            </button>
           </div>
 
           <!-- 选项卡内容区域 -->
@@ -474,15 +477,41 @@
         <!-- 日志区域 -->
         <div class="bg-white rounded-xl overflow-hidden card-shadow border border-gray-100">
           <div class="bg-dark text-white px-6 py-4 flex justify-between items-center">
-            <h2 class="text-lg font-semibold">运行日志</h2>
+            <h2 class="text-lg font-semibold flex items-center gap-2">
+              <i class="fa fa-terminal" aria-hidden="true"></i>
+              <span>运行日志</span>
+            </h2>
             <button id="clearLogBtn" type="button" class="text-white/70 hover:text-white text-sm transition-colors">
               <i class="fa fa-trash mr-1"></i>清空
             </button>
           </div>
           <div class="p-4">
-            <div id="logContainer"
-              class="h-80 overflow-y-auto bg-gray-50 p-3 rounded-md log-text font-mono space-y-1 shadow-inner">
-              <div class="text-gray-500">日志将显示在这里...</div>
+            <div class="relative log-container-wrapper">
+              <div id="logContainer"
+                class="h-80 overflow-y-auto bg-gray-50 p-3 rounded-md log-text font-mono space-y-1 shadow-inner">
+                <!-- 初始欢迎日志 -->
+                <div class="log-entry log-info">
+                  <span class="log-time">[00:00:00]</span>
+                  <span class="log-message">
+                    <i class="fa fa-info-circle mr-2" aria-hidden="true"></i>
+                    工具已启动，准备就绪
+                  </span>
+                </div>
+              </div>
+              <div class="absolute top-3 right-3 flex gap-2">
+                <button id="filterLogInfo" class="p-1.5 rounded-md bg-gray-200 bg-opacity-70 hover:bg-opacity-100 text-gray-600 transition-all" title="显示信息日志">
+                  <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </button>
+                <button id="filterLogSuccess" class="p-1.5 rounded-md bg-green-100 bg-opacity-70 hover:bg-opacity-100 text-green-600 transition-all" title="显示成功日志">
+                  <i class="fa fa-check-circle" aria-hidden="true"></i>
+                </button>
+                <button id="filterLogWarning" class="p-1.5 rounded-md bg-yellow-100 bg-opacity-70 hover:bg-opacity-100 text-yellow-600 transition-all" title="显示警告日志">
+                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                </button>
+                <button id="filterLogError" class="p-1.5 rounded-md bg-red-100 bg-opacity-70 hover:bg-opacity-100 text-red-600 transition-all" title="显示错误日志">
+                  <i class="fa fa-times-circle" aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -511,10 +540,14 @@
 
   <!-- 添加/编辑页面对话框 -->
   <div id="pageModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden modal-backdrop">
-    <div
-      class="bg-white rounded-xl p-6 w-full max-w-md mx-4 card-shadow modal-content">
-      <h3 class="text-lg font-semibold text-dark mb-4" id="modalTitle">添加GitHub页面</h3>
-      <div class="space-y-4">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 card-shadow modal-content">
+      <div class="modal-header flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-dark" id="modalTitle">添加GitHub页面</h3>
+        <button id="closeModalBtn" type="button" class="text-gray-400 hover:text-gray-500 transition-colors" aria-label="关闭">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="modal-body space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">URL</label>
           <input type="text" id="pageUrl"
@@ -534,7 +567,7 @@
             placeholder="global">
         </div>
       </div>
-      <div class="mt-6 flex space-x-3">
+      <div class="modal-footer mt-6 flex justify-end space-x-3">
         <button id="cancelModalBtn" type="button"
           class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
         <button id="saveModalBtn" type="button"
@@ -544,93 +577,96 @@
   </div>
 
   <!-- 帮助对话框 -->
-  <div id="helpModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden modal-backdrop">
-    <div
-      class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto card-shadow modal-content">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-dark">使用帮助</h3>
-        <button id="closeHelpBtn" type="button" class="text-gray-400 hover:text-gray-500 transition-colors"
-          aria-label="关闭">
+  <div id="helpModal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3 class="modal-title">使用帮助</h3>
+        <button type="button" class="modal-close" id="closeHelpBtn">
           <i class="fa fa-times text-xl"></i>
         </button>
       </div>
-      <div class="space-y-4">
-        <div class="fade-in">
-          <h4 class="text-md font-medium text-gray-800 mb-2">工具介绍</h4>
-          <p class="text-sm text-gray-600">此工具用于自动化从GitHub网站抓取字符串并更新翻译词典，帮助维护者持续更新GitHub中文翻译词典。</p>
+      <div class="modal-body">
+        <div class="space-y-4">
+          <div class="fade-in">
+            <h4 class="text-md font-medium text-gray-800 mb-2">工具介绍</h4>
+            <p class="text-sm text-gray-600">此工具用于自动化从GitHub网站抓取字符串并更新翻译词典，帮助维护者持续更新GitHub中文翻译词典。</p>
+          </div>
+          <div class="fade-in">
+            <h4 class="text-md font-medium text-gray-800 mb-2">基本使用</h4>
+            <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1">
+              <li>配置用户脚本路径和其他参数</li>
+              <li>添加或编辑需要抓取的GitHub页面</li>
+              <li>点击"开始抓取字符串"按钮运行工具</li>
+              <li>查看运行日志和结果统计</li>
+            </ol>
+          </div>
+          <div class="fade-in">
+            <h4 class="text-md font-medium text-gray-800 mb-2">注意事项</h4>
+            <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+              <li>新添加的字符串会标记为"待翻译:"，需要手动进行翻译</li>
+              <li>过度频繁的请求可能会触发GitHub的访问限制</li>
+              <li>运行前请确保有足够的文件系统权限</li>
+            </ul>
+          </div>
         </div>
-        <div class="fade-in">
-          <h4 class="text-md font-medium text-gray-800 mb-2">基本使用</h4>
-          <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1">
-            <li>配置用户脚本路径和其他参数</li>
-            <li>添加或编辑需要抓取的GitHub页面</li>
-            <li>点击"开始抓取字符串"按钮运行工具</li>
-            <li>查看运行日志和结果统计</li>
-          </ol>
-        </div>
-        <div class="fade-in">
-          <h4 class="text-md font-medium text-gray-800 mb-2">注意事项</h4>
-          <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-            <li>新添加的字符串会标记为"待翻译:"，需要手动进行翻译</li>
-            <li>过度频繁的请求可能会触发GitHub的访问限制</li>
-            <li>运行前请确保有足够的文件系统权限</li>
-          </ul>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" id="closeHelpBtn">关闭</button>
       </div>
     </div>
   </div>
 
   <!-- 添加字符串模态框 -->
-  <div id="addStringModal"
-    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden modal-backdrop">
-    <div
-      class="bg-white rounded-xl p-6 w-full max-w-md mx-4 card-shadow modal-content">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-dark">添加字符串到翻译词典</h3>
-        <button id="closeAddStringModalBtn" type="button" class="text-gray-400 hover:text-gray-500 transition-colors" aria-label="关闭">
-          <i class="fa fa-times text-xl"></i>
-        </button>
-      </div>
-      <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">原始字符串</label>
-          <input type="text" id="originalString"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" placeholder="请输入要翻译的原始英文字符串">
-          <p id="originalStringError" class="mt-1 text-xs text-danger hidden">请输入原始字符串</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">翻译模块</label>
-          <select id="stringModule" 
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus">
-            <option value="global">global (全局模块)</option>
-            <option value="header">header (顶部导航)</option>
-            <option value="footer">footer (页脚)</option>
-            <option value="buttons">buttons (按钮文本)</option>
-            <option value="labels">labels (标签文本)</option>
-            <option value="messages">messages (提示消息)</option>
-            <option value="settings">settings (设置页面)</option>
-            <option value="search">search (搜索功能)</option>
-            <option value="repository">repository (仓库页面)</option>
-            <option value="issues">issues (问题页面)</option>
-            <option value="pulls">pulls (拉取请求)</option>
-            <option value="actions">actions (Actions)</option>
-            <option value="marketplace">marketplace (Marketplace)</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">中文翻译</label>
-          <textarea id="translatedString"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus min-h-[100px]"
-            placeholder="请输入中文翻译（可选，留空将标记为待翻译）"></textarea>
-        </div>
-        <div class="flex items-center space-x-2">
-          <input type="checkbox" id="forceUpdate" class="w-4 h-4 text-primary focus:ring-primary rounded">
-          <label for="forceUpdate" class="text-sm font-medium text-gray-700">强制更新（覆盖现有翻译）</label>
-        </div>
-      </div>
-      <div class="mt-6 flex space-x-3">
-        <button id="cancelAddStringModalBtn" type="button"
-          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
+    <div id="addStringModal" class="hidden fixed inset-0 z-50 overflow-y-auto modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">添加字符串到翻译词典</h3>
+                <button id="closeAddStringModalBtn" type="button" class="modal-close" aria-label="关闭">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">原始字符串</label>
+                        <input type="text" id="originalString"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" placeholder="请输入要翻译的原始英文字符串">
+                        <p id="originalStringError" class="mt-1 text-xs text-danger hidden">请输入原始字符串</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">翻译模块</label>
+                        <select id="stringModule" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus">
+                            <option value="global">global (全局模块)</option>
+                            <option value="header">header (顶部导航)</option>
+                            <option value="footer">footer (页脚)</option>
+                            <option value="buttons">buttons (按钮文本)</option>
+                            <option value="labels">labels (标签文本)</option>
+                            <option value="messages">messages (提示消息)</option>
+                            <option value="settings">settings (设置页面)</option>
+                            <option value="search">search (搜索功能)</option>
+                            <option value="repository">repository (仓库页面)</option>
+                            <option value="issues">issues (问题页面)</option>
+                            <option value="pulls">pulls (拉取请求)</option>
+                            <option value="actions">actions (Actions)</option>
+                            <option value="marketplace">marketplace (Marketplace)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">中文翻译</label>
+                        <textarea id="translatedString"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus min-h-[100px]"
+                            placeholder="请输入中文翻译（可选，留空将标记为待翻译）"></textarea>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="forceUpdate" class="w-4 h-4 text-primary focus:ring-primary rounded">
+                        <label for="forceUpdate" class="text-sm font-medium text-gray-700">强制更新（覆盖现有翻译）</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-end">
+                <button id="cancelAddStringBtn" type="button"
+                    class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
         <button id="saveStringBtn" type="button"
           class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">保存</button>
       </div>
@@ -638,17 +674,15 @@
   </div>
 
   <!-- 用户脚本设置模态框 -->
-  <div id="userScriptSettingsModal"
-    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden modal-backdrop">
-    <div
-      class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto card-shadow modal-content">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-dark">用户脚本设置</h3>
-        <button id="closeUserScriptModalBtn" type="button" class="text-gray-400 hover:text-gray-500 transition-colors"
-          aria-label="关闭">
+  <div id="userScriptSettingsModal" class="hidden fixed inset-0 z-50 overflow-y-auto modal-backdrop">
+    <div class="modal-content max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="modal-header">
+        <h3 class="modal-title">用户脚本设置</h3>
+        <button id="closeUserScriptModalBtn" type="button" class="modal-close" aria-label="关闭">
           <i class="fa fa-times text-xl"></i>
         </button>
       </div>
+      <div class="modal-body">
       <div id="userScriptSettings" class="space-y-4">
         <!-- 外部翻译设置 -->
         <div class="bg-gray-50 p-4 rounded-lg">
@@ -708,18 +742,21 @@
           </div>
         </div>
       </div>
-      <div class="mt-6 flex justify-end space-x-3">
-        <button id="resetUserScriptConfigBtn" type="button"
-          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
-          <i class="fa fa-refresh mr-1"></i>重置
-        </button>
-        <button id="saveUserScriptSettingsBtn" type="button"
-          class="px-4 py-2 bg-secondary text-white rounded-md hover:bg-secondary/90 transition-colors">
-          <i class="fa fa-save mr-1"></i>保存
-        </button>
-      </div>
-    </div>
   </div>
+  <div class="modal-footer justify-end">
+    <button id="cancelUserScriptSettingsBtn" type="button"
+      class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
+    <button id="resetUserScriptConfigBtn" type="button"
+      class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+      <i class="fa fa-refresh mr-1"></i>重置
+    </button>
+    <button id="saveUserScriptSettingsBtn" type="button"
+      class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">
+      <i class="fa fa-save mr-1"></i>保存
+    </button>
+  </div>
+</div>
+</div>
 
   <!-- 引入JavaScript文件 - 添加defer属性以异步加载，不阻塞页面渲染 -->
   <script src="utils/auto_string_updater.js" defer></script>
