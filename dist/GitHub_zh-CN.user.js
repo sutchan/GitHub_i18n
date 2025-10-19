@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.25
+// @version 1.8.26
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -26,8 +26,8 @@
 // @connect      cdn.jsdelivr.net
 // @run-at       document-start
 // @license      MIT
-// @updateURL    https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js
-// @downloadURL  https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js
+// @updateURL    https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js
+// @downloadURL  https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js
 // ==/UserScript==
 
 // 导入配置
@@ -40,22 +40,23 @@
 // 导入主初始化函数
 // 导出所有公开模块
 export {
-    CONFIG,
-    utils,
-    versionChecker,
-    translationCore,
-    translationModule,
-    pageMonitor,
-    stringExtractor,
-    AutoStringUpdater,
-    DictionaryProcessor,
-    loadTools,
-    init,
-    startScript
+  CONFIG,
+  utils,
+  versionChecker,
+  translationCore,
+  translationModule,
+  pageMonitor,
+  stringExtractor,
+  AutoStringUpdater,
+  DictionaryProcessor,
+  loadTools,
+  init,
+  startScript
 };
 
 // 启动脚本
 startScript();
+
 
 /**
  * GitHub 中文翻译配置文件
@@ -86,14 +87,14 @@ function getVersionFromComment() {
  * 配置对象，包含所有可配置项
  */
 export const CONFIG = {
-    "version": "1.8.23",
+    "version": "1.8.26",
     "debounceDelay": 500,
     "routeChangeDelay": 500,
     "debugMode": false,
     "updateCheck": {
         "enabled": true,
         "intervalHours": 24,
-        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js",
         "autoUpdateVersion": true
     },
     "externalTranslation": {

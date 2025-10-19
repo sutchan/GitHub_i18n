@@ -27,14 +27,14 @@ function getVersionFromComment() {
  * 配置对象，包含所有可配置项
  */
 export const CONFIG = {
-    "version": "1.8.23",
+    "version": "1.8.26",
     "debounceDelay": 500,
     "routeChangeDelay": 500,
     "debugMode": false,
     "updateCheck": {
         "enabled": true,
         "intervalHours": 24,
-        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js",
+        "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js",
         "autoUpdateVersion": true
     },
     "externalTranslation": {
