@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.8.24
+// @version 1.8.25
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -26,6 +26,8 @@
 // @connect      cdn.jsdelivr.net
 // @run-at       document-start
 // @license      MIT
+// @updateURL    https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js
+// @downloadURL  https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js
 // ==/UserScript==
 
 // 导入配置
@@ -54,18 +56,18 @@ import { init, startScript } from './main.js';
 
 // 导出所有公开模块
 export {
-    CONFIG,
-    utils,
-    versionChecker,
-    translationCore,
-    translationModule,
-    pageMonitor,
-    stringExtractor,
-    AutoStringUpdater,
-    DictionaryProcessor,
-    loadTools,
-    init,
-    startScript
+  CONFIG,
+  utils,
+  versionChecker,
+  translationCore,
+  translationModule,
+  pageMonitor,
+  stringExtractor,
+  AutoStringUpdater,
+  DictionaryProcessor,
+  loadTools,
+  init,
+  startScript
 };
 
 // 启动脚本

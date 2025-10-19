@@ -5,8 +5,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GitHub自动化字符串更新工具</title>
-  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="utils/styles.css" rel="stylesheet">
+  <!-- 预连接关键外部域名 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  
+  <!-- 预加载关键CSS资源 -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"></noscript>
+  <!-- 使用压缩后的CSS文件，提升加载性能 -->
+  <link rel="preload" href="utils/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="utils/styles.min.css" rel="stylesheet"></noscript>
+  <!-- 回退到原始CSS文件，确保兼容性 -->
+  <link href="utils/styles.css" rel="stylesheet" media="print" onload="this.media='all'">
+<meta name="version" content="null">
 </head>
 
 <body class="font-inter bg-gray-50 min-h-screen flex flex-col">
@@ -709,10 +721,10 @@
     </div>
   </div>
 
-  <!-- 引入JavaScript文件 -->
-  <script src="utils/auto_string_updater.js"></script>
-  <script src="utils/dictionary_processor.js"></script>
-  <script src="utils/app.js"></script>
+  <!-- 引入JavaScript文件 - 添加defer属性以异步加载，不阻塞页面渲染 -->
+  <script src="utils/auto_string_updater.js" defer></script>
+  <script src="utils/dictionary_processor.js" defer></script>
+  <script src="utils/app.js" defer></script>
 
 </body>
 
