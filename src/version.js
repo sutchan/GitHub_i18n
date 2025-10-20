@@ -5,7 +5,7 @@
  * 当前工具版本号
  * @type {string}
  */
-export const VERSION = '1.8.33';
+export const VERSION = '1.8.37';
 
 /**
  * 版本历史记录
@@ -13,11 +13,9 @@ export const VERSION = '1.8.33';
  */
 export const VERSION_HISTORY = [
   {
-    version: '1.8.33',
+    version: '1.8.37',
     date: new Date().toISOString().split('T')[0],
-    changes: [
-      '检查语法和引用文件是否正确'
-    ]
+    changes: ['修复utils/app.js文件中的语法错误']
   },
   {
     version: '1.8.29',

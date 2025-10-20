@@ -1,4 +1,3 @@
-@ -1, 2621 + 0, 0 @@
 // 当前的SSE连接
 // Web界面交互逻辑模块
 // 作者: SutChan
@@ -69,6 +68,24 @@ function hideUserScriptModal() {
   }, 200);
 }
 
+// 显示帮助模态框
+function showHelpModal() {
+  const modal = document.getElementById('helpModal');
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    modal.querySelector('.scale-95').classList.replace('scale-95', 'scale-100');
+  }, 10);
+}
+
+// 隐藏帮助模态框
+function hideHelpModal() {
+  const modal = document.getElementById('helpModal');
+  modal.querySelector('.scale-100').classList.replace('scale-100', 'scale-95');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 200);
+}
+
 // 选项卡切换功能
 function initTabs() {
   const tabConfig = document.getElementById('tabConfig');
@@ -131,6 +148,24 @@ function bindEvents() {
   // 帮助事件
   document.getElementById('helpBtn').addEventListener('click', showHelpModal);
   document.getElementById('closeHelpBtn').addEventListener('click', hideHelpModal);
+  
+  // 页脚中的帮助链接事件
+  const footerHelpLinks = document.querySelectorAll('a[aria-label="帮助"]');
+  footerHelpLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      showHelpModal();
+    });
+  });
+
+  // 页脚中的用户脚本设置链接事件
+  const userScriptSettingsLink = document.getElementById('userScriptSettingsBtn');
+  if (userScriptSettingsLink) {
+    userScriptSettingsLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      showUserScriptModal();
+    });
+  }
 
   // 已经在上面绑定了saveConfigBtn点击事件来显示用户脚本设置模态框
 
