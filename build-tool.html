@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub 中文翻译 - 构建工具</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f6f8fa;
+        }
+        h1 {
+            color: #24292e;
+            border-bottom: 1px solid #e1e4e8;
+            padding-bottom: 10px;
+        }
+        .container {
+            background: white;
+            border-radius: 6px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #2ea44f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #22863a;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre-wrap;
+        }
+        .download-link {
+            display: block;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #0366d6;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .download-link:hover {
+            background-color: #0256cc;
+        }
+        .hidden {
+            display: none;
+        }
+        .note {
+            background-color: #f1f8ff;
+            border: 1px solid #c6e1ec;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub 中文翻译 - 构建工具</h1>
+        
+        <div class="note">
+            <strong>说明：</strong>这是一个纯浏览器端的构建工具，完全不依赖 Node.js。
+            它会合并所有源文件，生成最终的用户脚本。
+        </div>
+        
+        <button id="buildBtn">开始构建</button>
+        
+        <div class="output" id="output"></div>
+        
+        <a id="downloadLink" class="download-link hidden" href="#">
+            下载合并后的用户脚本
+        </a>
+    </div>
+
+    <script>
+        // 简单的日志输出函数
+        function log(message) {
+            const output = document.getElementById('output');
+            output.textContent += message + '\n';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // 文件加载函数
+        async function loadFile(url) {
+            try {
+                log(`正在加载: ${url}`);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`加载失败: ${response.status}`);
+                }
+                return await response.text();
+            } catch (error) {
+                log(`❌ ${error.message}`);
+                return null;
+            }
+        }
+
+        // 合并所有文件
+        async function mergeAllFiles() {
+            const startTime = Date.now();
+            log('🔄 开始合并源代码文件...');
+            
+            // 文件列表
+            const files = [
+                'src/index.js',
+                'src/config.js',
+                'src/utils.js',
+                'src/versionChecker.js',
+                'src/dictionaries/index.js',
+                'src/dictionaries/codespaces.js',
+                'src/dictionaries/explore.js',
+                'src/translationCore.js',
+                'src/pageMonitor.js',
+                'src/tools.js',
+                'src/main.js'
+            ];
+            
+            let mergedCode = '';
+            let hasHeader = false;
+            
+            // 加载并合并文件
+            for (const file of files) {
+                const content = await loadFile(file);
+                if (content) {
+                    // 处理文件内容
+                    let processedContent = content;
+                    
+                    // 保留index.js的头部（UserScript元数据）
+                    if (file === 'src/index.js') {
+                        hasHeader = true;
+                        // 移除import和export语句
+                        processedContent = content.replace(/import\s+[^;]+;\s*/g, '')
+                            .replace(/export\s+default\s+/g, '')
+                            .replace(/export\s+\{[^}]+\}\s*;?\s*/g, '');
+                    } else {
+                        // 对于其他文件，移除import和export语句
+                        processedContent = content.replace(/import\s+[^;]+;\s*/g, '')
+                            .replace(/export\s+default\s+/g, '')
+                            .replace(/export\s+\{[^}]+\}\s*;?\s*/g, '');
+                    }
+                    
+                    mergedCode += `\n\n/* --- ${file} --- */\n`;
+                    mergedCode += processedContent;
+                    log(`✅ 已合并: ${file}`);
+                }
+            }
+            
+            // 如果没有找到UserScript头部，添加一个基本的头部
+            if (!hasHeader) {
+                const basicHeader = `// ==UserScript==
+// @name         GitHub 中文翻译
+// @namespace    https://github.com/sutchan/GitHub_i18n
+// @version      1.0.0
+// @description  将 GitHub 界面翻译成中文
+// @author       Sut
+// @match        https://github.com/*
+// @match        https://gist.github.com/*
+// @match        https://*.githubusercontent.com/*
+// @exclude      https://github.com/login*
+// @exclude      https://github.com/signup*
+// @icon         https://github.com/favicon.ico
+// @grant        GM_xmlhttpRequest
+// @grant        GM_getResourceText
+// @grant        GM_addStyle
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @run-at       document-start
+// @license      MIT
+// ==/UserScript==\n`;
+                mergedCode = basicHeader + mergedCode;
+            }
+            
+            // 添加启动代码（如果main.js中没有）
+            if (!mergedCode.includes('startScript();')) {
+                mergedCode += '\n\n// 启动脚本\nstartScript();';
+            }
+            
+            const endTime = Date.now();
+            log(`🎉 合并完成!`);
+            log(`⏱️  用时: ${(endTime - startTime) / 1000} 秒`);
+            log(`📝 合并后的代码长度: ${mergedCode.length} 字符`);
+            
+            // 创建下载链接
+            const blob = new Blob([mergedCode], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = url;
+            downloadLink.download = 'GitHub_zh-CN.user.js';
+            downloadLink.classList.remove('hidden');
+            
+            log('👇 点击上方按钮下载合并后的用户脚本');
+            
+            return mergedCode;
+        }
+
+        // 绑定按钮事件
+        document.getElementById('buildBtn').addEventListener('click', async function() {
+            this.disabled = true;
+            this.textContent = '构建中...';
+            document.getElementById('output').textContent = '';
+            document.getElementById('downloadLink').classList.add('hidden');
+            
+            try {
+                await mergeAllFiles();
+            } catch (error) {
+                log(`❌ 构建失败: ${error.message}`);
+            } finally {
+                this.disabled = false;
+                this.textContent = '开始构建';
+            }
+        });
+    </script>
+</body>
+</html>

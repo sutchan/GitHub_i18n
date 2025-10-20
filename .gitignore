@@ -6,3 +6,14 @@
 *.code-workspace
 *.bak
 github_string_fetcher.js
+
+# Node.js 相关文件（可选忽略）
+/node_modules
+/package-lock.json
+/build
+
+# 保留的构建工具文件不忽略
+# build-tool.html
+# merge-script.js
+/node_modules
+/node_modules
