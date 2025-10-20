@@ -5,69 +5,72 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GitHub自动化字符串更新工具</title>
-  <!-- 预连接关键外部域名 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-
-  <!-- 预加载关键CSS资源 -->
-  <link rel="preload" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" as="style"
-    onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  </noscript>
-  <!-- 使用压缩后的CSS文件，提升加载性能 -->
-  <link rel="preload" href="utils/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link href="utils/styles.min.css" rel="stylesheet">
-  </noscript>
-  <!-- 回退到原始CSS文件，确保兼容性 -->
-  <link href="utils/styles.css" rel="stylesheet" media="print" onload="this.media='all'">
-  <meta name="version" content="null">
+  <link href="utils/dist/tailwind.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="utils/dist/custom.css" rel="stylesheet">
 </head>
 
 <body class="font-inter bg-gray-50 min-h-screen flex flex-col">
-  <!-- 顶部导航栏 - 简化版 -->
-  <header class="bg-dark text-white py-3 px-4">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white shadow-md py-4 px-6 sticky top-0 z-50 transition-all duration-300">
     <div class="container mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-2">
-        <div class="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-          <i class="fa fa-language text-lg"></i>
+      <div class="flex items-center space-x-3">
+        <div class="bg-primary-container p-2 rounded-lg">
+          <i class="fa fa-code-fork text-primary text-2xl"></i>
         </div>
-        <h1 class="text-xl font-bold">GitHub翻译助手</h1>
+        <div class="flex flex-col sm:flex-row sm:items-center gap-1">
+          <h1 class="text-xl md:text-2xl font-bold text-dark">GitHub自动化字符串更新工具</h1>
+          <span class="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">v1.8.31</span>
+        </div>
       </div>
-      <div class="flex space-x-2">
+      <div class="flex items-center space-x-4">
+        <button id="saveConfigBtn" type="button"
+          class="btn-hover bg-secondary text-white px-4 py-2 rounded-md flex items-center shadow-button">
+          <i class="fa fa-code mr-2"></i>用户脚本设置
+        </button>
         <button id="helpBtn" type="button"
-          class="px-3 py-1.5 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors text-sm flex items-center">
-          <i class="fa fa-question-circle mr-1.5"></i>帮助
+          class="btn-hover bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center shadow-button hover:bg-gray-300">
+          <i class="fa fa-question-circle mr-2"></i>帮助
         </button>
       </div>
+
     </div>
   </header>
 
   <!-- 主要内容区 -->
   <main class="flex-grow container mx-auto py-8 px-4">
     <!-- 状态卡片 -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-      <div class="stats-card">
-        <div class="stats-card-header">
-          <div>
-            <p class="stats-card-title">已提取字符串</p>
-            <p id="extractedCount" class="stats-card-value">0</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-xl p-6 card-shadow border border-gray-100">
+        <div class="flex items-center space-x-4">
+          <div class="bg-primary/10 p-4 rounded-full">
+            <i class="fa fa-file-text-o text-primary text-xl"></i>
           </div>
-          <div class="stats-card-icon" style="background-color: var(--color-primary);">
-            <i class="fa fa-file-text-o text-xl"></i>
+          <div>
+            <h3 class="text-gray-500 text-sm font-medium">已提取字符串</h3>
+            <p id="extractedCount" class="text-2xl font-bold text-dark">0</p>
           </div>
         </div>
       </div>
-      <div class="stats-card">
-        <div class="stats-card-header">
-          <div>
-            <p class="stats-card-title">上次更新</p>
-            <p id="lastUpdate" class="stats-card-value">从未</p>
+      <div class="bg-white rounded-xl p-6 card-shadow border border-gray-100">
+        <div class="flex items-center space-x-4">
+          <div class="bg-secondary/10 p-4 rounded-full">
+            <i class="fa fa-plus-circle text-secondary text-xl"></i>
           </div>
-          <div class="stats-card-icon" style="background-color: var(--color-accent);">
-            <i class="fa fa-clock-o text-xl"></i>
+          <div>
+            <h3 class="text-gray-500 text-sm font-medium">新添加字符串</h3>
+            <p id="addedCount" class="text-2xl font-bold text-dark">0</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-6 card-shadow border border-gray-100">
+        <div class="flex items-center space-x-4">
+          <div class="bg-accent/10 p-4 rounded-full">
+            <i class="fa fa-clock-o text-accent text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-gray-500 text-sm font-medium">上次更新</h3>
+            <p id="lastUpdate" class="text-2xl font-bold text-dark">从未</p>
           </div>
         </div>
       </div>
@@ -80,27 +83,39 @@
         <!-- 配置与页面设置选项卡容器 -->
         <div class="bg-white rounded-xl overflow-hidden card-shadow border border-gray-100">
           <!-- 选项卡导航 -->
-          <div class="tabs">
-            <button id="tabConfig" class="tab active" role="tab">
-              <i class="fa fa-cog mr-2"></i>配置设置
-            </button>
-            <button id="tabPages" class="tab" role="tab">
-              <i class="fa fa-globe mr-2"></i>GitHub页面配置
-            </button>
+          <div class="border-b border-gray-200">
+            <div class="flex flex-wrap">
+              <button id="tabConfig"
+                class="px-6 py-4 text-secondary bg-secondary/5 border-b-2 border-secondary font-semibold transition-all duration-300 shadow-sm"
+                role="tab">
+                <i class="fa fa-cog mr-2"></i>配置设置
+              </button>
+              <button id="tabPages"
+                class="px-6 py-4 text-gray-500 hover:text-secondary hover:bg-secondary/5 border-b-2 border-transparent font-medium hover:border-secondary transition-all duration-300"
+                role="tab">
+                <i class="fa fa-globe mr-2"></i>GitHub页面配置
+              </button>
+            </div>
           </div>
 
           <!-- 选项卡内容区域 -->
           <div class="tab-content">
             <!-- 配置设置选项卡内容 -->
             <div id="tabConfigContent" class="tab-pane p-6" role="tabpanel">
-              <div class="mb-6 flex justify-end">
+              <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-2">
+                  <button id="resetConfigBtn" type="button"
+                    class="text-gray-500 hover:text-gray-700 text-sm transition-colors">
+                    <i class="fa fa-refresh mr-1"></i>重置
+                  </button>
+                </div>
                 <button id="saveSettingsBtn" type="button"
                   class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
                   <i class="fa fa-save mr-1"></i>保存
                 </button>
               </div>
 
-              <!-- 基本设置 - 简单模式和高级模式都显示 -->
+              <!-- 基本设置 -->
               <div class="mb-6 fade-in">
                 <h3 class="text-md font-medium text-gray-700 mb-4 flex items-center">
                   <i class="fa fa-sliders mr-2 text-primary"></i>基本设置
@@ -133,7 +148,44 @@
                 </div>
               </div>
 
-
+              <!-- HTTP设置 -->
+              <div class="mb-6 fade-in">
+                <h3 class="text-md font-medium text-gray-700 mb-4 flex items-center">
+                  <i class="fa fa-globe mr-2 text-primary"></i>HTTP设置
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">请求超时(ms)</label>
+                    <input type="number" id="httpTimeout"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
+                      value="30000">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">最大重试次数</label>
+                    <input type="number" id="maxRetries"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
+                      value="3">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">重试延迟(ms)</label>
+                    <input type="number" id="retryDelay"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
+                      value="2000">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">请求间隔(ms)</label>
+                    <input type="number" id="requestDelay"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
+                      value="1000">
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">User-Agent</label>
+                  <input type="text" id="userAgent"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
+                    value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36">
+                </div>
+              </div>
 
               <!-- 字符串匹配设置 -->
               <div class="mb-6 fade-in">
@@ -151,9 +203,36 @@
                     value="GitHub,API,URL,HTTP,HTTPS">
                   <p class="text-xs text-gray-500 mt-1">这些单词出现在任何字符串中时，该字符串将被忽略</p>
                 </div>
+                <div class="mt-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">忽略的正则表达式模式（一行一个）</label>
+                  <textarea id="ignorePatterns"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus h-20"></textarea>
+                  <p class="text-xs text-gray-500 mt-1">匹配这些正则表达式的字符串将被忽略</p>
+                </div>
+                <div class="mt-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">必须包含的正则表达式模式（一行一个）</label>
+                  <textarea id="includePatterns"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus h-20"></textarea>
+                  <p class="text-xs text-gray-500 mt-1">字符串必须匹配至少一个这些正则表达式才会被提取</p>
+                </div>
               </div>
 
-
+              <!-- 调试设置 -->
+              <div class="fade-in">
+                <h3 class="text-md font-medium text-gray-700 mb-4 flex items-center">
+                  <i class="fa fa-bug mr-2 text-primary"></i>调试设置
+                </h3>
+                <div class="flex items-center space-x-2 mb-4">
+                  <input type="checkbox" id="debugMode" class="w-4 h-4 text-primary focus:ring-primary rounded">
+                  <label for="debugMode" class="text-sm font-medium text-gray-700">启用调试模式</label>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">调试输出文件</label>
+                  <input type="text" id="debugOutputFile"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
+                    value="../debug/fetched_strings.json">
+                </div>
+              </div>
             </div>
 
             <!-- GitHub页面配置选项卡内容 -->
@@ -161,67 +240,33 @@
               <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-semibold text-gray-800">GitHub页面配置</h2>
                 <div class="flex space-x-2">
-                  <button id="addPageBtn" type="button"
-                    class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
-                    <i class="fa fa-plus mr-1"></i>添加页面
-                  </button>
                   <button id="savePagesBtn" type="button"
                     class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
                     <i class="fa fa-save mr-1"></i>保存
                   </button>
+                  <button id="addPageBtn" type="button"
+                    class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
+                    <i class="fa fa-plus mr-1"></i>添加页面
+                  </button>
                 </div>
               </div>
-
-              <!-- 搜索框 -->
-              <div class="mb-4">
-                <div class="relative flex items-center">
-                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <i class="fa fa-search text-gray-400"></i>
-                  </div>
-                  <input type="text" id="pagesSearch" placeholder="搜索URL..."
-                    class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary">
-                </div>
-              </div>
-
-              <div class="overflow-x-auto shadow-sm rounded-lg">
+              <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                   <thead class="bg-gray-50">
                     <tr>
                       <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        URL
-                      </th>
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
                       <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable-column"
-                        data-sort="url" style="width: 45%;">
-                        URL
-                        <i class="fa fa-sort ml-1 text-gray-400"></i>
-                      </th>
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">选择器</th>
                       <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable-column"
-                        data-sort="selector" style="width: 25%;">
-                        选择器
-                        <i class="fa fa-sort ml-1 text-gray-400"></i>
-                      </th>
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">模块</th>
                       <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable-column"
-                        data-sort="module" style="width: 20%;">
-                        模块
-                        <i class="fa fa-sort ml-1 text-gray-400"></i>
-                      </th>
-                      <th scope="col"
-                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                        style="width: 10%;">操作</th>
+                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                     </tr>
                   </thead>
                   <tbody id="pagesTableBody" class="bg-white divide-y divide-gray-200">
                     <tr data-index="0" class="hover:bg-gray-50 transition-colors">
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="max-w-md overflow-hidden text-ellipsis whitespace-nowrap relative"
-                          title="https://github.com">
-                          https://github.com
-                        </div>
-                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">https://github.com</td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">body</td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">global</td>
                       <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -233,19 +278,10 @@
                           aria-label="删除">
                           <i class="fa fa-trash"></i>
                         </button>
-                        <button type="button"
-                          class="text-secondary hover:text-secondary/80 ml-3 test-page transition-colors"
-                          aria-label="测试" data-url="https://github.com">
-                          <i class="fa fa-external-link"></i>
-                        </button>
                       </td>
                     </tr>
                     <tr data-index="1" class="hover:bg-gray-50 transition-colors">
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="max-w-md overflow-hidden text-ellipsis whitespace-nowrap relative"
-                          title="https://github.com/settings/profile">
-                          https://github.com/settings/profile
-                        </div>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">https://github.com/settings/profile
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">body</td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">settings</td>
@@ -272,7 +308,7 @@
       </div>
 
       <!-- 右侧操作和日志区域 -->
-      <div id="rightSidebar" class="space-y-6">
+      <div id="rightSidebar" class="space-y-6 lg:col-span-1">
         <!-- 操作按钮 -->
         <div class="bg-white rounded-xl p-6 card-shadow border border-gray-100">
           <h2 class="text-lg font-semibold text-dark mb-4 flex items-center">
@@ -283,11 +319,10 @@
               class="w-full bg-primary hover:bg-primary/90 text-white px-4 py-3 rounded-md font-medium flex items-center justify-center btn-hover shadow-button">
               <i class="fa fa-play mr-2"></i>开始抓取字符串
             </button>
-            <button id="addStringBtn" type="button"
-              class="w-full bg-secondary hover:bg-secondary/90 text-white px-4 py-3 rounded-md font-medium flex items-center justify-center btn-hover shadow-button">
-              <i class="fa fa-plus mr-2"></i>添加字符串到词典
+            <button id="viewBackupBtn" type="button"
+              class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-md font-medium flex items-center justify-center btn-hover shadow-button">
+              <i class="fa fa-folder-open mr-2"></i>查看备份
             </button>
-
             <button id="resetStatusBtn" type="button"
               class="w-full bg-warning hover:bg-warning/90 active:bg-warning/80 text-white px-4 py-3 rounded-md font-medium flex items-center justify-center btn-hover shadow-button transition-all duration-300 group relative overflow-hidden">
               <span
@@ -320,27 +355,15 @@
         <!-- 日志区域 -->
         <div class="bg-white rounded-xl overflow-hidden card-shadow border border-gray-100">
           <div class="bg-dark text-white px-6 py-4 flex justify-between items-center">
-            <h2 class="text-lg font-semibold flex items-center gap-2">
-              <i class="fa fa-terminal" aria-hidden="true"></i>
-              <span>运行日志</span>
-            </h2>
+            <h2 class="text-lg font-semibold">运行日志</h2>
             <button id="clearLogBtn" type="button" class="text-white/70 hover:text-white text-sm transition-colors">
               <i class="fa fa-trash mr-1"></i>清空
             </button>
           </div>
           <div class="p-4">
-            <div class="log-container-wrapper">
-              <div id="logContainer"
-                class="h-80 overflow-y-auto bg-gray-50 p-3 rounded-md log-text font-mono space-y-1 shadow-inner">
-                <!-- 初始欢迎日志 -->
-                <div class="log-entry log-info">
-                  <span class="log-time">[00:00:00]</span>
-                  <span class="log-message">
-                    <i class="fa fa-info-circle mr-2" aria-hidden="true"></i>
-                    工具已启动，准备就绪
-                  </span>
-                </div>
-              </div>
+            <div id="logContainer"
+              class="h-80 overflow-y-auto bg-gray-50 p-3 rounded-md log-text font-mono space-y-1 shadow-inner">
+              <div class="text-gray-500">日志将显示在这里...</div>
             </div>
           </div>
         </div>
@@ -349,23 +372,30 @@
   </main>
 
   <!-- 页脚 -->
-  <footer class="bg-dark text-white/70 py-4 px-4">
-    <div class="container mx-auto text-center">
-      <p>GitHub翻译助手 - 作者: SutChan</p>
+  <footer class="bg-dark text-white/70 py-6 px-4">
+    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+      <div class="mb-4 md:mb-0">
+        <p>GitHub自动化字符串更新工具 - 作者: SutChan</p>
+      </div>
+      <div class="flex space-x-4">
+        <a href="#" class="hover:text-white transition-colors" aria-label="GitHub"><i
+            class="fa fa-github text-xl"></i></a>
+        <a href="#" class="hover:text-white transition-colors" aria-label="邮箱"><i
+            class="fa fa-envelope text-xl"></i></a>
+        <a href="#" id="userScriptSettingsBtn" class="hover:text-white transition-colors" aria-label="用户脚本设置"><i
+            class="fa fa-code text-xl"></i></a>
+        <a href="#" class="hover:text-white transition-colors" aria-label="帮助"><i
+            class="fa fa-question-circle text-xl"></i></a>
+      </div>
     </div>
   </footer>
 
-  <!-- 编辑页面对话框 -->
-  <div id="pageModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden modal-backdrop">
-    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 card-shadow modal-content">
-      <div class="modal-header flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-dark" id="modalTitle">添加GitHub页面</h3>
-        <button id="closeModalBtn" type="button" class="text-gray-400 hover:text-gray-500 transition-colors"
-          aria-label="关闭">
-          <i class="fa fa-times text-xl"></i>
-        </button>
-      </div>
-      <div class="modal-body space-y-4">
+  <!-- 添加/编辑页面对话框 -->
+  <div id="pageModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden fade-in">
+    <div
+      class="bg-white rounded-xl p-6 w-full max-w-md mx-4 card-shadow scale-95 transition-all duration-200 transform">
+      <h3 class="text-lg font-semibold text-dark mb-4" id="modalTitle">添加GitHub页面</h3>
+      <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">URL</label>
           <input type="text" id="pageUrl"
@@ -385,7 +415,7 @@
             placeholder="global">
         </div>
       </div>
-      <div class="modal-footer mt-6 flex justify-end space-x-3">
+      <div class="mt-6 flex space-x-3">
         <button id="cancelModalBtn" type="button"
           class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
         <button id="saveModalBtn" type="button"
@@ -395,148 +425,120 @@
   </div>
 
   <!-- 帮助对话框 -->
-  <div id="helpModal" class="modal-backdrop">
-    <div class="modal-content" style="max-width: 800px;">
-      <div class="modal-header">
-        <h3 class="modal-title">使用帮助</h3>
-        <button type="button" class="modal-close" id="closeHelpBtn">
+  <div id="helpModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden fade-in">
+    <div
+      class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto card-shadow scale-95 transition-all duration-200 transform">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-dark">使用帮助</h3>
+        <button id="closeHelpBtn" type="button" class="text-gray-400 hover:text-gray-500 transition-colors"
+          aria-label="关闭">
           <i class="fa fa-times text-xl"></i>
         </button>
       </div>
-      <div class="modal-body">
-        <div class="space-y-4">
-          <div class="fade-in">
-            <h4 class="text-md font-medium text-gray-800 mb-2">工具介绍</h4>
-            <p class="text-sm text-gray-600">此工具用于自动化从GitHub网站抓取字符串并更新翻译词典，帮助维护者持续更新GitHub中文翻译词典。</p>
-          </div>
-          <div class="fade-in">
-            <h4 class="text-md font-medium text-gray-800 mb-2">基本使用</h4>
-            <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1">
-              <li>配置用户脚本路径和其他参数</li>
-              <li>添加或编辑需要抓取的GitHub页面</li>
-              <li>点击"开始抓取字符串"按钮运行工具</li>
-              <li>查看运行日志和结果统计</li>
-            </ol>
-          </div>
-          <div class="fade-in">
-            <h4 class="text-md font-medium text-gray-800 mb-2">注意事项</h4>
-            <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-              <li>新添加的字符串会标记为"待翻译:"，需要手动进行翻译</li>
-              <li>过度频繁的请求可能会触发GitHub的访问限制</li>
-              <li>运行前请确保有足够的文件系统权限</li>
-            </ul>
-          </div>
+      <div class="space-y-4">
+        <div class="fade-in">
+          <h4 class="text-md font-medium text-gray-800 mb-2">工具介绍</h4>
+          <p class="text-sm text-gray-600">此工具用于自动化从GitHub网站抓取字符串并更新翻译词典，帮助维护者持续更新GitHub中文翻译词典。</p>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button"
-          class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          id="closeHelpBtn">关闭</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 添加字符串模态框 -->
-  <div id="addStringModal" class="hidden fixed inset-0 z-50 overflow-y-auto modal-backdrop">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">添加字符串到翻译词典</h3>
-        <button id="closeAddStringModalBtn" type="button" class="modal-close" aria-label="关闭">
-          <i class="fa fa-times text-xl"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">原始字符串</label>
-            <input type="text" id="originalString"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
-              placeholder="请输入要翻译的原始英文字符串">
-            <p id="originalStringError" class="mt-1 text-xs text-danger hidden">请输入原始字符串</p>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">翻译模块</label>
-            <select id="stringModule"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus">
-              <option value="global">global (全局模块)</option>
-              <option value="header">header (顶部导航)</option>
-              <option value="footer">footer (页脚)</option>
-              <option value="buttons">buttons (按钮文本)</option>
-              <option value="labels">labels (标签文本)</option>
-              <option value="messages">messages (提示消息)</option>
-              <option value="settings">settings (设置页面)</option>
-              <option value="search">search (搜索功能)</option>
-              <option value="repository">repository (仓库页面)</option>
-              <option value="issues">issues (问题页面)</option>
-              <option value="pulls">pulls (拉取请求)</option>
-              <option value="actions">actions (Actions)</option>
-              <option value="marketplace">marketplace (Marketplace)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">中文翻译</label>
-            <textarea id="translatedString"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus min-h-[100px]"
-              placeholder="请输入中文翻译（可选，留空将标记为待翻译）"></textarea>
-          </div>
-          <div class="flex items-center space-x-2">
-            <input type="checkbox" id="forceUpdate" class="w-4 h-4 text-primary focus:ring-primary rounded">
-            <label for="forceUpdate" class="text-sm font-medium text-gray-700">强制更新（覆盖现有翻译）</label>
-          </div>
+        <div class="fade-in">
+          <h4 class="text-md font-medium text-gray-800 mb-2">基本使用</h4>
+          <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1">
+            <li>配置用户脚本路径和其他参数</li>
+            <li>添加或编辑需要抓取的GitHub页面</li>
+            <li>点击"开始抓取字符串"按钮运行工具</li>
+            <li>查看运行日志和结果统计</li>
+          </ol>
         </div>
-      </div>
-      <div class="modal-footer justify-end">
-        <button id="cancelAddStringBtn" type="button"
-          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
-        <button id="saveStringBtn" type="button"
-          class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">保存</button>
+        <div class="fade-in">
+          <h4 class="text-md font-medium text-gray-800 mb-2">注意事项</h4>
+          <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+            <li>新添加的字符串会标记为"待翻译:"，需要手动进行翻译</li>
+            <li>过度频繁的请求可能会触发GitHub的访问限制</li>
+            <li>运行前请确保有足够的文件系统权限</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- 用户脚本设置模态框 -->
-  <div id="userScriptSettingsModal" class="hidden fixed inset-0 z-50 overflow-y-auto modal-backdrop">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">用户脚本设置</h3>
-        <button id="closeUserScriptModalBtn" type="button" class="modal-close" aria-label="关闭">
+  <div id="userScriptSettingsModal"
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden fade-in">
+    <div
+      class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto card-shadow scale-95 transition-all duration-200 transform">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-dark">用户脚本设置</h3>
+        <button id="closeUserScriptModalBtn" type="button" class="text-gray-400 hover:text-gray-500 transition-colors"
+          aria-label="关闭">
           <i class="fa fa-times text-xl"></i>
         </button>
       </div>
-      <div class="modal-body">
-        <div id="userScriptSettings" class="space-y-4">
-          <!-- 脚本行为设置 -->
-          <div>
-            <h4 class="text-sm font-medium text-gray-700 mb-3">脚本行为配置</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">路由变化延迟(ms)</label>
-                <input type="number" id="scriptRouteChangeDelay"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="500">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">节流间隔(ms)</label>
-                <input type="number" id="scriptThrottleInterval"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="100">
-              </div>
+      <div id="userScriptSettings" class="space-y-4">
+        <!-- 外部翻译设置 -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h4 class="text-sm font-medium text-gray-700 mb-3">外部翻译配置</h4>
+          <div class="flex items-center space-x-2 mb-4">
+            <input type="checkbox" id="scriptExternalTranslation"
+              class="w-4 h-4 text-primary focus:ring-primary rounded">
+            <label for="scriptExternalTranslation" class="text-sm font-medium text-gray-700">启用外部翻译</label>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">最小翻译长度</label>
+              <input type="number" id="scriptMinTranslationLength"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="20">
             </div>
-            <div class="mt-4 flex items-center space-x-2">
-              <input type="checkbox" id="scriptCheckUpdate" class="w-4 h-4 text-primary focus:ring-primary rounded">
-              <label for="scriptCheckUpdate" class="text-sm font-medium text-gray-700">启用更新检测</label>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">最大翻译长度</label>
+              <input type="number" id="scriptMaxTranslationLength"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="500">
             </div>
-            <div class="mt-4 flex items-center space-x-2">
-              <input type="checkbox" id="scriptEnableDeepObserver"
-                class="w-4 h-4 text-primary focus:ring-primary rounded">
-              <label for="scriptEnableDeepObserver" class="text-sm font-medium text-gray-700">启用深度DOM观察</label>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">翻译超时(ms)</label>
+              <input type="number" id="scriptTranslationTimeout"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="3000">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">请求间隔(ms)</label>
+              <input type="number" id="scriptRequestDelay"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="500">
             </div>
           </div>
         </div>
+
+        <!-- 脚本行为设置 -->
+        <div>
+          <h4 class="text-sm font-medium text-gray-700 mb-3">脚本行为配置</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">路由变化延迟(ms)</label>
+              <input type="number" id="scriptRouteChangeDelay"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">节流间隔(ms)</label>
+              <input type="number" id="scriptThrottleInterval"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="100">
+            </div>
+          </div>
+          <div class="mt-4 flex items-center space-x-2">
+            <input type="checkbox" id="scriptCheckUpdate" class="w-4 h-4 text-primary focus:ring-primary rounded">
+            <label for="scriptCheckUpdate" class="text-sm font-medium text-gray-700">启用更新检测</label>
+          </div>
+          <div class="mt-4 flex items-center space-x-2">
+            <input type="checkbox" id="scriptEnableDeepObserver"
+              class="w-4 h-4 text-primary focus:ring-primary rounded">
+            <label for="scriptEnableDeepObserver" class="text-sm font-medium text-gray-700">启用深度DOM观察</label>
+          </div>
+        </div>
       </div>
-      <div class="modal-footer justify-end">
-        <button id="cancelUserScriptSettingsBtn" type="button"
-          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
+      <div class="mt-6 flex justify-end space-x-3">
+        <button id="resetUserScriptConfigBtn" type="button"
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+          <i class="fa fa-refresh mr-1"></i>重置
+        </button>
         <button id="saveUserScriptSettingsBtn" type="button"
-          class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">
+          class="px-4 py-2 bg-secondary text-white rounded-md hover:bg-secondary/90 transition-colors">
           <i class="fa fa-save mr-1"></i>保存
         </button>
       </div>
@@ -544,88 +546,8 @@
   </div>
 
   <!-- 引入JavaScript文件 -->
-  <script src="utils/auto_string_updater.js" defer></script>
-  <script src="utils/dictionary_processor.js" defer></script>
-  <script src="utils/app.js" defer></script>
+  <script src="utils/app.js"></script>
 
 </body>
 
 </html>
-
-<!-- 简化统计卡片 -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-  <div class="bg-white p-4 rounded-xl card-shadow border border-gray-100">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm text-gray-500">已提取字符串</p>
-        <h3 class="text-2xl font-bold text-dark mt-1" id="extractedCount">0</h3>
-      </div>
-      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-primary">
-        <i class="fa fa-file-text-o text-xl"></i>
-      </div>
-    </div>
-  </div>
-  <div class="bg-white p-4 rounded-xl card-shadow border border-gray-100">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm text-gray-500">新添加字符串</p>
-        <h3 class="text-2xl font-bold text-dark mt-1" id="addedCount">0</h3>
-      </div>
-      <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-        <i class="fa fa-plus-circle text-xl"></i>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 简化用户脚本设置模态框内容 -->
-<div id="userScriptSettings" class="space-y-4">
-  <!-- 基本脚本设置 -->
-  <div class="space-y-4">
-    <div class="flex items-center space-x-2">
-      <input type="checkbox" id="scriptCheckUpdate" class="w-4 h-4 text-primary focus:ring-primary rounded">
-      <label for="scriptCheckUpdate" class="text-sm font-medium text-gray-700">启用更新检测</label>
-    </div>
-    <div class="flex items-center space-x-2">
-      <input type="checkbox" id="scriptEnableDeepObserver" class="w-4 h-4 text-primary focus:ring-primary rounded">
-      <label for="scriptEnableDeepObserver" class="text-sm font-medium text-gray-700">启用深度DOM观察</label>
-    </div>
-  </div>
-</div>
-
-<!-- 简化保存按钮 -->
-<div class="mt-6">
-  <button id="saveConfigBtn" type="button"
-    class="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">
-    <i class="fa fa-save mr-1.5"></i>保存配置
-  </button>
-</div>
-
-<!-- 简化搜索框，移除搜索建议 -->
-<div class="relative">
-  <input type="text" id="pageSearch"
-    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
-    placeholder="搜索页面...">
-  <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-</div>
-
-<!-- 简化添加页面按钮 -->
-<div class="mb-4">
-  <button id="addPageBtn" type="button"
-    class="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center">
-    <i class="fa fa-plus mr-1.5"></i>添加页面
-  </button>
-</div>
-
-<!-- 简化查看备份按钮 -->
-
-<!-- 简化日志过滤按钮组 -->
-
-<!-- 简化页脚 -->
-<footer class="bg-dark text-white/70 py-4 px-4">
-  <div class="container mx-auto text-center">
-    <p>GitHub翻译助手 - 作者: SutChan</p>
-  </div>
-</footer>
-
-<!-- 简化用户脚本设置模态框中的重置按钮 -->

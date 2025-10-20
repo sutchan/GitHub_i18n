@@ -5,16 +5,23 @@
  * 当前工具版本号
  * @type {string}
  */
-const VERSION = '1.8.29';
+export const VERSION = '1.8.33';
 
 /**
  * 版本历史记录
  * @type {Array<{version: string, date: string, changes: string[]}>}
  */
-const VERSION_HISTORY = [
+export const VERSION_HISTORY = [
+  {
+    version: '1.8.33',
+    date: new Date().toISOString().split('T')[0],
+    changes: [
+      '检查语法和引用文件是否正确'
+    ]
+  },
   {
     version: '1.8.29',
-    date: new Date().toLocaleDateString('zh-CN'),
+    date: new Date().toISOString().split('T')[0],
     changes: [
       '完成所有文件版本号同步',
       '更新构建系统补丁版本',
@@ -92,8 +99,8 @@ function getFormattedVersion() {
   return `GitHub自动化字符串更新工具 v${VERSION}`;
 }
 
-// CommonJS 导出
-module.exports = {
+// ES模块导出
+export {
   VERSION,
   VERSION_HISTORY,
   getFormattedVersion
