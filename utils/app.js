@@ -132,8 +132,7 @@ function bindEvents() {
   document.getElementById('helpBtn').addEventListener('click', showHelpModal);
   document.getElementById('closeHelpBtn').addEventListener('click', hideHelpModal);
 
-  // 用户脚本设置入口事件
-  document.getElementById('userScriptSettingsBtn').addEventListener('click', showUserScriptModal);
+  // 已经在上面绑定了saveConfigBtn点击事件来显示用户脚本设置模态框
 
   // 用户脚本设置模态框事件
   document.getElementById('closeUserScriptModalBtn').addEventListener('click', hideUserScriptModal);
@@ -381,7 +380,8 @@ async function runTool() {
 }
 
 // 服务器基础URL - 使用正确的端口3004
-const API_BASE_URL = 'http://localhost:3004';
+// 使用相对路径以便在不同环境中正常工作
+const API_BASE_URL = '';
 
 // 检查服务器状态
 async function checkServerStatus() {
