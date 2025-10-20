@@ -1,12 +1,16 @@
-// 当前的SSE连接
 // Web界面交互逻辑模块
 // 作者: SutChan
 // 版本: 1.8.16
 
+// 全局配置和常量定义
+const API_BASE_URL = '/utils';
+const DEFAULT_TIMEOUT = 5000;
+
+// 当前的SSE连接
 let eventSource = null;
 
 // 全局的带超时的fetch函数
-function fetchWithTimeout(url, options = {}, timeout = 5000) {
+function fetchWithTimeout(url, options = {}, timeout = DEFAULT_TIMEOUT) {
   return new Promise((resolve, reject) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -73,17 +77,23 @@ function showHelpModal() {
   const modal = document.getElementById('helpModal');
   modal.classList.remove('hidden');
   setTimeout(() => {
-    modal.querySelector('.scale-95').classList.replace('scale-95', 'scale-100');
+    const scaleElement = modal.querySelector('.scale-95');
+    if (scaleElement) {
+      scaleElement.classList.replace('scale-95', 'scale-100');
+    }
   }, 10);
 }
 
 // 隐藏帮助模态框
 function hideHelpModal() {
   const modal = document.getElementById('helpModal');
-  modal.querySelector('.scale-100').classList.replace('scale-100', 'scale-95');
-  setTimeout(() => {
-    modal.classList.add('hidden');
-  }, 200);
+  const scaleElement = modal.querySelector('.scale-100');
+  if (scaleElement) {
+    scaleElement.classList.replace('scale-100', 'scale-95');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+    }, 200);
+  }
 }
 
 // 选项卡切换功能
@@ -414,17 +424,15 @@ async function runTool() {
   }
 }
 
-// 服务器基础URL - 使用正确的端口3004
-// 使用相对路径以便在不同环境中正常工作
-const API_BASE_URL = '';
+// 服务器基础URL已在文件顶部全局配置中定义
 
 // 检查服务器状态
 async function checkServerStatus() {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/stats`, {
-      method: 'GET',
-      timeout: 5000
-    });
+    // 使用fetchWithTimeout以支持超时功能
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/stats`, {
+      method: 'GET'
+    }, DEFAULT_TIMEOUT);
     return response.ok;
   } catch (error) {
     return false;
@@ -563,13 +571,12 @@ async function stopTool() {
     addLog('正在停止工具...', 'info');
 
     // 发送停止请求到服务器
-    const response = await fetch(`${API_BASE_URL}/api/stop`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/stop`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
-      },
-      timeout: 5000 // 增加超时时间到5秒
-    });
+      }
+    }, DEFAULT_TIMEOUT);
 
     if (!response.ok) {
       throw new Error(`服务器响应错误: ${response.status} ${response.statusText}`);
@@ -1258,8 +1265,8 @@ async function loadPagesConfig() {
         // 检查响应内容类型
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
-          // 如果不是JSON，尝试获取HTML内容并解析错误
-          const text = await response.text();
+          // 如果不是JSON，获取响应内容但不存储到变量
+          await response.text();
           throw new Error(`无效的响应格式: 期望JSON但收到HTML. 状态码: ${response.status}`);
         }
 
@@ -1390,7 +1397,7 @@ function escapeHTML(text) {
 // 加载统计数据
 async function loadStats() {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/stats`);
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/stats`, {}, DEFAULT_TIMEOUT);
     const stats = await response.json();
 
     if (stats.lastUpdate) {
@@ -1404,7 +1411,7 @@ async function loadStats() {
     // 获取用户脚本中已存在的字符串数量
     try {
       const userScriptPath = document.getElementById('userScriptPath').value;
-      const scriptResponse = await fetch(userScriptPath);
+      const scriptResponse = await fetchWithTimeout(userScriptPath, {}, DEFAULT_TIMEOUT);
       const scriptContent = await scriptResponse.text();
 
       // 尝试从脚本内容中提取translationModule对象
@@ -1418,10 +1425,10 @@ async function loadStats() {
           // 计算所有模块中的字符串数量
           let existingCount = 0;
           for (const moduleName in translationModule) {
-            if (translationModule.hasOwnProperty(moduleName)) {
+            if (Object.prototype.hasOwnProperty.call(translationModule, moduleName)) {
               const module = translationModule[moduleName];
               for (const key in module) {
-                if (module.hasOwnProperty(key)) {
+                if (Object.prototype.hasOwnProperty.call(module, key)) {
                   existingCount++;
                 }
               }
@@ -1500,11 +1507,15 @@ function showEditPageModal(index) {
   // 获取当前页面数据
   const row = document.querySelector(`tr[data-index="${index}"]`);
   if (row) {
-    const cells = row.querySelectorAll('td');
+    // 从data属性获取数据，而不是通过单元格索引，这样更可靠
+    const url = row.getAttribute('data-url');
+    const selector = row.getAttribute('data-selector');
+    const moduleName = row.getAttribute('data-module');
+    
     document.getElementById('modalTitle').textContent = '编辑GitHub页面';
-    document.getElementById('pageUrl').value = cells[0].textContent;
-    document.getElementById('pageSelector').value = cells[1].textContent;
-    document.getElementById('pageModule').value = cells[2].textContent;
+    document.getElementById('pageUrl').value = url || '';
+    document.getElementById('pageSelector').value = selector || '';
+    document.getElementById('pageModule').value = moduleName || '';
     document.getElementById('pageModal').classList.remove('hidden');
 
     // 存储当前编辑的索引
@@ -1523,32 +1534,27 @@ function hidePageModal() {
 
 // 检查URL是否存在重复
 async function hasDuplicateUrl(url, editIndex) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/pages`, {
-      method: 'GET',
-      timeout: 3000
-    });
+  const response = await fetch(`${API_BASE_URL}/api/pages`, {
+    method: 'GET',
+    timeout: 3000
+  });
 
-    if (!response.ok) {
-      throw new Error(`获取页面配置失败: ${response.status}`);
-    }
-
-    let pages = await response.json();
-    // 确保pages是数组
-    if (!Array.isArray(pages)) {
-      pages = [];
-    }
-
-    // 检查URL是否已存在（除了编辑的当前项）
-    const duplicateIndex = pages.findIndex((page, index) =>
-      page.url === url && (editIndex === null || index != editIndex)
-    );
-
-    return duplicateIndex !== -1;
-  } catch (error) {
-    // 如果获取失败，抛出错误
-    throw error;
+  if (!response.ok) {
+    throw new Error(`获取页面配置失败: ${response.status}`);
   }
+
+  let pages = await response.json();
+  // 确保pages是数组
+  if (!Array.isArray(pages)) {
+    pages = [];
+  }
+
+  // 检查URL是否已存在（除了编辑的当前项）
+  const duplicateIndex = pages.findIndex((page, index) =>
+    page.url === url && (editIndex === null || index != editIndex)
+  );
+
+  return duplicateIndex !== -1;
 }
 
 // 显示字段错误
@@ -1722,14 +1728,13 @@ async function savePage() {
     }
 
     // 保存到服务器
-    const saveResponse = await fetch(`${API_BASE_URL}/api/pages`, {
+    const saveResponse = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(pages),
-      timeout: 5000
-    });
+      body: JSON.stringify(pages)
+    }, DEFAULT_TIMEOUT);
 
     if (!saveResponse.ok) {
       throw new Error(`服务器响应错误: ${saveResponse.status} ${saveResponse.statusText}`);
@@ -1760,20 +1765,20 @@ async function deletePage(index) {
   if (confirm('确定要删除这个页面配置吗？')) {
     try {
       // 获取当前页面配置
-      const response = await fetch(`${API_BASE_URL}/api/pages`);
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {}, DEFAULT_TIMEOUT);
       let pages = await response.json();
 
       // 删除指定页面
       pages.splice(index, 1);
 
       // 保存到服务器
-      const saveResponse = await fetch(`${API_BASE_URL}/api/pages`, {
+      const saveResponse = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(pages)
-      });
+      }, DEFAULT_TIMEOUT);
 
       const saveResult = await saveResponse.json();
 
@@ -1798,15 +1803,7 @@ function updatePagesCount() {
   document.getElementById('pagesCount').textContent = count;
 }
 
-// 显示帮助对话框
-function showHelpModal() {
-  document.getElementById('helpModal').classList.remove('hidden');
-}
-
-// 隐藏帮助对话框
-function hideHelpModal() {
-  document.getElementById('helpModal').classList.add('hidden');
-}
+// 帮助对话框函数已在文件上方定义
 
 // 查看备份
 function viewBackup() {
@@ -1905,12 +1902,12 @@ async function savePagesConfig() {
   try {
     // 获取当前表格中的所有页面配置
     const tableRows = document.querySelectorAll('#pagesTableBody tr[data-index]');
-    const pages = Array.from(tableRows).map((row, index) => {
-      const cells = row.querySelectorAll('td');
+    const pages = Array.from(tableRows).map((row) => {
+      // 从data属性获取数据，更可靠且不受表格结构变化影响
       return {
-        url: cells[0].textContent,
-        selector: cells[1].textContent,
-        module: cells[2].textContent
+        url: row.getAttribute('data-url') || '',
+        selector: row.getAttribute('data-selector') || '',
+        module: row.getAttribute('data-module') || ''
       };
     });
 
@@ -2217,21 +2214,25 @@ function setupSearchSuggestionsKeyboardNavigation(suggestionsContainer) {
   });
 }
 
-// 全选/取消全选页面
+// 暂时注释掉未使用的函数
+/*
 function selectAllPages() {
-  const isChecked = this.checked;
-  const checkboxes = document.querySelectorAll('.page-checkbox');
+  if (this && typeof this.checked !== 'undefined') {
+    const isChecked = this.checked;
+    const checkboxes = document.querySelectorAll('.page-checkbox');
 
-  checkboxes.forEach(checkbox => {
-    // 只处理可见行的复选框
-    const row = checkbox.closest('tr');
-    if (row && row.style.display !== 'none') {
-      checkbox.checked = isChecked;
-    }
-  });
+    checkboxes.forEach(checkbox => {
+      // 只处理可见行的复选框
+      const row = checkbox.closest('tr');
+      if (row && row.style.display !== 'none') {
+        checkbox.checked = isChecked;
+      }
+    });
 
-  updateSelectedPagesStatus();
+    updateSelectedPagesStatus();
+  }
 }
+*/
 
 // 更新已选择页面状态
 function updateSelectedPagesStatus() {
@@ -2297,7 +2298,7 @@ async function deleteSelectedPages() {
 
   try {
     // 获取当前页面配置
-    const response = await fetch(`${API_BASE_URL}/api/pages`);
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {}, DEFAULT_TIMEOUT);
     let pages = await response.json();
 
     // 收集要删除的索引
@@ -2365,8 +2366,8 @@ async function importPages(event) {
     // 读取文件内容
     const content = await new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = e => resolve(e.target.result);
-      reader.onerror = e => reject(new Error('文件读取失败'));
+      reader.onload = event => resolve(event.target.result);
+      reader.onerror = () => reject(new Error('文件读取失败'));
       reader.readAsText(file);
     });
 
@@ -2386,7 +2387,7 @@ async function importPages(event) {
     });
 
     // 获取现有页面配置
-    const response = await fetch(`${API_BASE_URL}/api/pages`);
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {}, DEFAULT_TIMEOUT);
     let currentPages = await response.json();
 
     // 合并配置（去重）
@@ -2395,14 +2396,13 @@ async function importPages(event) {
     const mergedPages = [...currentPages, ...newPages];
 
     // 保存合并后的配置
-    const saveResponse = await fetch(`${API_BASE_URL}/api/pages`, {
+    const saveResponse = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(mergedPages),
-      timeout: 5000
-    });
+      body: JSON.stringify(mergedPages)
+    }, DEFAULT_TIMEOUT);
 
     if (!saveResponse.ok) {
       throw new Error(`服务器响应错误: ${saveResponse.status} ${saveResponse.statusText}`);
@@ -2435,7 +2435,7 @@ async function importPages(event) {
 async function exportPages() {
   try {
     // 获取当前页面配置
-    const response = await fetch(`${API_BASE_URL}/api/pages`);
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {}, DEFAULT_TIMEOUT);
     const pages = await response.json();
 
     // 验证数据

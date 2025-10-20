@@ -1,13 +1,13 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.37
+ * @version 1.8.38
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+// const { execSync } = require('child_process'); // 暂时注释掉未使用的模块
 
 class BuildManager {
   constructor() {
