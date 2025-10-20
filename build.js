@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.38
+ * @version 1.8.41
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -214,7 +214,6 @@ class BuildManager {
    * 构建用户脚本
    */
   buildUserScript() {
-    console.log('🏗️  开始构建用户脚本...');
     
     try {
       // 合并所有源文件
@@ -372,14 +371,8 @@ function main() {
   // 运行构建
   const result = buildManager.build(options);
 
-  if (result.success) {
-    // 验证构建
-    const validation = buildManager.validateBuild();
-    if (validation.valid) {
-      console.log(`✅ 构建验证通过，版本: ${validation.version}`);
-    } else {
-      console.error(`❌ 构建验证失败: ${validation.error}`);
-    }
+  if (!result.success) {
+    console.error(`❌ 构建失败: ${result.error}`);
   }
 
   process.exit(result.success ? 0 : 1);

@@ -1134,7 +1134,7 @@ async function loadConfig() {
           });
         };
 
-        const response = await fetchWithTimeout(`${API_BASE_URL}/api/config`, {
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/config.json`, {
           method: 'GET'
         }, 3000);
 
@@ -1397,30 +1397,63 @@ function escapeHTML(text) {
 // 加载统计数据
 async function loadStats() {
   try {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/stats`, {}, DEFAULT_TIMEOUT);
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/stats.json`, {}, DEFAULT_TIMEOUT);
     const stats = await response.json();
 
+    // 安全地更新统计数据DOM元素
     if (stats.lastUpdate) {
       const date = new Date(stats.lastUpdate);
-      document.getElementById('lastUpdate').textContent = date.toLocaleString();
+      const lastUpdateElem = document.getElementById('lastUpdate');
+      if (lastUpdateElem) {
+        lastUpdateElem.textContent = date.toLocaleString();
+      }
     }
 
-    document.getElementById('extractedCount').textContent = stats.extractedCount || 0;
-    document.getElementById('addedCount').textContent = stats.addedCount || 0;
+    const extractedCountElem = document.getElementById('extractedCount');
+    if (extractedCountElem) {
+      extractedCountElem.textContent = stats.extractedCount || 0;
+    }
+    
+    const addedCountElem = document.getElementById('addedCount');
+    if (addedCountElem) {
+      addedCountElem.textContent = stats.addedCount || 0;
+    }
 
     // 获取用户脚本中已存在的字符串数量
     try {
-      const userScriptPath = document.getElementById('userScriptPath').value;
+      const userScriptPath = document.getElementById('userScriptPath')?.value || '';
+      if (!userScriptPath) {
+        console.warn('未设置用户脚本路径');
+        if (document.getElementById('existingCount')) {
+          document.getElementById('existingCount').textContent = '未设置';
+        }
+        return;
+      }
+      
       const scriptResponse = await fetchWithTimeout(userScriptPath, {}, DEFAULT_TIMEOUT);
       const scriptContent = await scriptResponse.text();
 
-      // 尝试从脚本内容中提取translationModule对象
-      const translationModuleMatch = scriptContent.match(/const translationModule = (\{[\s\S]*?\});/);
+      // 尝试从脚本内容中提取translationModule对象，改进正则表达式匹配
+      const translationModuleMatch = scriptContent.match(/const\s+translationModule\s*=\s*(\{[\s\S]*?\});/);
 
       if (translationModuleMatch && translationModuleMatch[1]) {
         try {
+          // 更安全的解析方法，先清理内容
+          let cleanedContent = translationModuleMatch[1]
+            .replace(/\/\*[\s\S]*?\*\//g, '')  // 移除多行注释
+            .replace(/\/\/.*$/gm, '');            // 移除单行注释
+          
+          // 检查是否包含非JSON内容
+          if (cleanedContent.includes('codespaces') || cleanedContent.includes('require(')) {
+            console.warn('translationModule包含非JSON内容');
+            if (document.getElementById('existingCount')) {
+              document.getElementById('existingCount').textContent = '非JSON格式';
+            }
+            return;
+          }
+
           // 解析translationModule对象
-          const translationModule = JSON.parse(translationModuleMatch[1].replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''));
+          const translationModule = JSON.parse(cleanedContent);
 
           // 计算所有模块中的字符串数量
           let existingCount = 0;
@@ -1435,17 +1468,25 @@ async function loadStats() {
             }
           }
 
-          document.getElementById('existingCount').textContent = existingCount;
+          if (document.getElementById('existingCount')) {
+            document.getElementById('existingCount').textContent = existingCount;
+          }
         } catch (parseError) {
           console.warn('解析translationModule失败:', parseError);
-          document.getElementById('existingCount').textContent = '无法解析';
+          if (document.getElementById('existingCount')) {
+            document.getElementById('existingCount').textContent = '无法解析';
+          }
         }
       } else {
-        document.getElementById('existingCount').textContent = '未找到';
+        if (document.getElementById('existingCount')) {
+          document.getElementById('existingCount').textContent = '未找到';
+        }
       }
     } catch (scriptError) {
       console.warn('读取用户脚本失败:', scriptError);
-      document.getElementById('existingCount').textContent = '无法读取';
+      if (document.getElementById('existingCount')) {
+        document.getElementById('existingCount').textContent = '无法读取';
+      }
     }
   } catch (error) {
     console.error('加载统计数据失败:', error);
