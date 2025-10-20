@@ -5,7 +5,7 @@
  * 当前工具版本号
  * @type {string}
  */
-const VERSION = '1.8.24';
+const VERSION = '1.8.29';
 
 /**
  * 版本历史记录
@@ -13,8 +13,31 @@ const VERSION = '1.8.24';
  */
 const VERSION_HISTORY = [
   {
-    version: '1.8.21',
+    version: '1.8.29',
     date: new Date().toLocaleDateString('zh-CN'),
+    changes: [
+      '完成所有文件版本号同步',
+      '更新构建系统补丁版本',
+      '优化项目版本管理'
+    ]
+  },
+  {
+    version: '1.8.25',
+    date: '2023-12-18',
+    changes: [
+      '更新构建系统'
+    ]
+  },
+  {
+    version: '1.8.24',
+    date: '2023-12-17',
+    changes: [
+      '同步版本号'
+    ]
+  },
+  {
+    version: '1.8.21',
+    date: '2023-12-17',
     changes: [
       '实现版本自动更新检查功能',
       '修复代码语法错误',

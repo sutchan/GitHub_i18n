@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.26
+ * @version 1.8.29
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -21,7 +21,7 @@ class BuildManager {
       mainScript: this.outputFile,
       apiDir: path.join(this.projectRoot, 'api')
     };
-    this.currentVersion = '1.8.24'; // 初始版本号
+    this.currentVersion = '1.8.26'; // 初始版本号
   }
 
   /**
