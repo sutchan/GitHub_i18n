@@ -1313,8 +1313,8 @@ async function loadConfig() {
       
       // 使用默认配置
       const defaultConfig = {
-        userScriptPath: '',
-        backupDir: '',
+        userScriptPath: '../GitHub_zh-CN.user.js',
+        backupDir: '../backups',
         minStringLength: 3,
         maxStringLength: 1000,
         httpTimeout: 10000,
@@ -1664,8 +1664,8 @@ async function loadPagesConfig() {
         } else {
           pages.forEach((page, index) => {
             // 验证每个页面配置的必需字段
-            if (!page.url || !page.selector || !page.module) {
-              console.warn(`页面配置 ${index} 缺少必需字段:`, page);
+            if (!page.url || (!page.selectors && !page.selector)) {
+              console.warn(`页面配置 ${index} 缺少必需字段（url或selectors/selector）:`, page);
               return;
             }
 
@@ -1856,79 +1856,50 @@ async function loadStats() {
       const scriptContent = await scriptResponse.text();
 
       // 尝试从脚本内容中提取translationModule对象，改进正则表达式匹配
-      const translationModuleMatch = scriptContent.match(/const\s+translationModule\s*=\s*(\{[\s\S]*?\});/);
+      // 修改为更安全的模式，避免匹配过大的内容
+      const translationModuleMatch = scriptContent.match(/const\s+translationModule\s*=\s*\{[\s\S]*?\};/);
 
-      if (translationModuleMatch && translationModuleMatch[1]) {
+      if (translationModuleMatch && translationModuleMatch[0]) {
         try {
-          // 更安全的解析方法，先清理内容
-          let cleanedContent = translationModuleMatch[1]
-            .replace(/\/\*[\s\S]*?\*\//g, '')  // 移除多行注释
-            .replace(/\/\/.*$/gm, '')             // 移除单行注释
-            .replace(/\s+/g, ' ')                  // 合并空白字符
-            .replace(/([,\{\}])\s*/g, '$1')        // 清理花括号和逗号周围的空格
-            .replace(/\s*([,\{\}])/g, '$1');        // 清理花括号和逗号周围的空格
+          // 使用更安全的方式处理包含变量引用的translationModule
+          // 尝试提取模块数量而不是完整解析
+          const moduleCount = (translationModuleMatch[0].match(/['"](\w+)['"]\s*:/g) || []).length;
           
-          // 处理可能包含非JSON内容的情况
-          // 只保留可以JSON解析的部分
-          if (!cleanedContent.startsWith('{') || !cleanedContent.endsWith('}')) {
-            console.warn('translationModule格式不完整');
-          } else {
-            // 尝试安全地解析，使用try-catch而不是预先判断
-            try {
-              const translationModule = JSON.parse(cleanedContent);
-              if (translationModule && typeof translationModule === 'object') {
-                const existingCount = Object.keys(translationModule).length;
-                if (document.getElementById('existingCount')) {
-                  document.getElementById('existingCount').textContent = existingCount;
-                }
-              }
-            } catch (parseError) {
-              // 解析失败时提供默认值
-              console.warn('translationModule解析失败，使用默认值:', parseError.message);
-              if (document.getElementById('existingCount')) {
-                document.getElementById('existingCount').textContent = '解析失败';
-              }
-            }
-            return; // 跳过下面的旧解析逻辑
-          }
-          
-          // 检查是否包含非JSON内容 - 这是旧代码，保留作为备份
-          if (cleanedContent.includes('codespaces') || cleanedContent.includes('require(')) {
-            console.warn('translationModule包含特殊内容，尝试安全解析');
+          if (moduleCount > 0) {
+            // 如果找到了模块引用，显示模块数量作为估计值
             if (document.getElementById('existingCount')) {
-              document.getElementById('existingCount').textContent = '非JSON格式';
+              document.getElementById('existingCount').textContent = `${moduleCount}个模块`;
             }
-            return;
-          }
-
-          // 解析translationModule对象
-          const translationModule = JSON.parse(cleanedContent);
-
-          // 计算所有模块中的字符串数量
-          let existingCount = 0;
-          for (const moduleName in translationModule) {
-            if (Object.prototype.hasOwnProperty.call(translationModule, moduleName)) {
-              const module = translationModule[moduleName];
-              for (const key in module) {
-                if (Object.prototype.hasOwnProperty.call(module, key)) {
-                  existingCount++;
-                }
-              }
+          } else {
+            // 尝试使用正则表达式直接计算字符串数量的估计值
+            // 查找形如 'key': 'value' 或 "key": "value" 的模式
+            const stringPattern = /['"][^'"]+['"]\s*:\s*['"][^'"]*['"]/g;
+            const stringMatches = translationModuleMatch[0].match(stringPattern);
+            const estimatedCount = stringMatches ? stringMatches.length : 0;
+            
+            if (document.getElementById('existingCount')) {
+              document.getElementById('existingCount').textContent = estimatedCount || '无法计算';
             }
-          }
-
-          if (document.getElementById('existingCount')) {
-            document.getElementById('existingCount').textContent = existingCount;
           }
         } catch (parseError) {
-          console.warn('解析translationModule失败:', parseError);
+          // 解析失败时提供默认值
+          console.warn('translationModule解析失败，使用默认值:', parseError.message);
           if (document.getElementById('existingCount')) {
-            document.getElementById('existingCount').textContent = '无法解析';
+            document.getElementById('existingCount').textContent = '估计模式';
           }
         }
       } else {
-        if (document.getElementById('existingCount')) {
-          document.getElementById('existingCount').textContent = '未找到';
+        // 尝试查找其他可能的translationModule定义格式
+        const alternativeMatch = scriptContent.match(/translationModule\s*=\s*\{[\s\S]*?\};/);
+        if (alternativeMatch && alternativeMatch[0]) {
+          console.warn('找到alternative translationModule格式');
+          if (document.getElementById('existingCount')) {
+            document.getElementById('existingCount').textContent = '替代格式';
+          }
+        } else {
+          if (document.getElementById('existingCount')) {
+            document.getElementById('existingCount').textContent = '未找到';
+          }
         }
       }
     } catch (scriptError) {
@@ -2871,8 +2842,8 @@ async function importPages(event) {
 
     // 验证每个页面配置
     importedPages.forEach((page, index) => {
-      if (!page.url || !page.selector || !page.module) {
-        throw new Error(`第${index + 1}个页面配置缺少必需字段`);
+      if (!page.url || (!page.selectors && !page.selector)) {
+        throw new Error(`第${index + 1}个页面配置缺少必需字段（url或selectors/selector）`);
       }
     });
 

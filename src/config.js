@@ -27,7 +27,7 @@ function getVersionFromComment() {
  * 配置对象，包含所有可配置项
  */
 export const CONFIG = {
-    "version": "1.8.43",
+    "version": "1.8.51",
     "debounceDelay": 500,
     "routeChangeDelay": 500,
     "debugMode": true,

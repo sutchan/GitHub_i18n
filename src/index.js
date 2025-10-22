@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.50
+// @version 1.8.55
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
