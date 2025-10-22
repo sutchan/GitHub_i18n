@@ -16,7 +16,15 @@ async function init() {
     try {
         // 检查更新
         if (CONFIG.updateCheck.enabled) {
-            await versionChecker.checkForUpdates();
+            versionChecker.checkForUpdates().then(hasUpdate => {
+                if (CONFIG.debugMode) {
+                    console.log(`[GitHub 中文翻译] 更新检查完成，${hasUpdate ? '发现新版本' : '当前已是最新版本'}`);
+                }
+            }).catch(err => {
+                if (CONFIG.debugMode) {
+                    console.error('[GitHub 中文翻译] 更新检查失败:', err);
+                }
+            });
         }
         
         // 初始化翻译核心功能

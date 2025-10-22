@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.41
+// @version 1.8.43
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -87,7 +87,7 @@ function getVersionFromComment() {
  * 配置对象，包含所有可配置项
  */
 export const CONFIG = {
-    "version": "1.8.29",
+    "version": "1.8.42",
     "debounceDelay": 500,
     "routeChangeDelay": 500,
     "debugMode": true,
@@ -153,37 +153,90 @@ export const CONFIG = {
 export const utils = {
     /**
      * 节流函数，用于限制高频操作的执行频率
+     * 支持返回Promise
      * @param {Function} func - 要节流的函数
      * @param {number} limit - 限制时间（毫秒）
+     * @param {Object} options - 配置选项
+     * @param {boolean} options.leading - 是否在开始时执行（默认true）
+     * @param {boolean} options.trailing - 是否在结束后执行（默认true）
      * @returns {Function} 节流后的函数
      */
-    throttle(func, limit) {
-        let inThrottle;
+    throttle(func, limit, options = {}) {
+        const { leading = true, trailing = true } = options;
+        let inThrottle, lastArgs, lastThis, result, timerId;
+        
+        const later = (context, args) => {
+            inThrottle = false;
+            if (trailing && lastArgs) {
+                result = func.apply(context, args);
+                lastArgs = lastThis = null;
+            }
+        };
+        
         return function() {
             const args = arguments;
             const context = this;
+            
             if (!inThrottle) {
-                func.apply(context, args);
+                if (leading) {
+                    result = func.apply(context, args);
+                }
                 inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
+                timerId = setTimeout(() => later(context, args), limit);
+            } else if (trailing) {
+                lastArgs = args;
+                lastThis = context;
+                
+                // 确保只有一个定时器
+                clearTimeout(timerId);
+                timerId = setTimeout(() => later(lastThis, lastArgs), limit);
             }
+            
+            return result;
         };
     },
     
     /**
      * 防抖函数，延迟执行函数直到停止触发一段时间
+     * 支持返回Promise
      * @param {Function} func - 要防抖的函数
      * @param {number} delay - 延迟时间（毫秒）
+     * @param {Object} options - 配置选项
+     * @param {boolean} options.leading - 是否在开始时执行一次（默认false）
      * @returns {Function} 防抖后的函数
      */
-    debounce(func, delay) {
-        let timeout;
+    debounce(func, delay, options = {}) {
+        const { leading = false } = options;
+        let timeout, lastArgs, lastThis, result;
+        
+        const later = (context, args) => {
+            lastArgs = lastThis = null;
+            result = func.apply(context, args);
+        };
+        
         return function() {
             const args = arguments;
             const context = this;
+            const isLeadingCall = !timeout && leading;
+            
             clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(context, args), delay);
+            timeout = setTimeout(() => later(context, args), delay);
+            
+            if (isLeadingCall) {
+                result = func.apply(context, args);
+            }
+            
+            return result;
         };
+    },
+    
+    /**
+     * 延迟函数，返回Promise的setTimeout
+     * @param {number} ms - 延迟时间（毫秒）
+     * @returns {Promise<void>}
+     */
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     },
 
     /**
@@ -196,11 +249,49 @@ export const utils = {
     },
     
     /**
+     * 安全地解析JSON字符串
+     * @param {string} jsonString - JSON字符串
+     * @param {*} defaultValue - 解析失败时的默认值
+     * @returns {*} 解析结果或默认值
+     */
+    safeJSONParse(jsonString, defaultValue = null) {
+        try {
+            return JSON.parse(jsonString);
+        } catch (error) {
+            console.warn('[GitHub 中文翻译] JSON解析失败:', error);
+            return defaultValue;
+        }
+    },
+    
+    /**
+     * 安全地序列化对象为JSON字符串
+     * @param {*} obj - 要序列化的对象
+     * @param {string} defaultValue - 序列化失败时的默认值
+     * @returns {string} JSON字符串或默认值
+     */
+    safeJSONStringify(obj, defaultValue = '{}') {
+        try {
+            return JSON.stringify(obj);
+        } catch (error) {
+            console.warn('[GitHub 中文翻译] JSON序列化失败:', error);
+            return defaultValue;
+        }
+    },
+    
+    /**
      * 获取当前页面路径
      * @returns {string} 当前页面的路径
      */
     getCurrentPath() {
         return window.location.pathname;
+    },
+    
+    /**
+     * 获取完整的当前页面URL（包含查询参数）
+     * @returns {string} 完整的URL
+     */
+    getCurrentUrl() {
+        return window.location.href;
     },
     
     /**
@@ -213,35 +304,147 @@ export const utils = {
     },
     
     /**
+     * 从URL获取查询参数
+     * @param {string} name - 参数名
+     * @param {string} url - URL字符串，默认使用当前页面URL
+     * @returns {string|null} 参数值或null
+     */
+    getQueryParam(name, url = window.location.href) {
+        const match = RegExp(`[?&]${name}=([^&]*)`).exec(url);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    },
+    
+    /**
+     * 获取URL中的所有查询参数
+     * @param {string} url - URL字符串，默认使用当前页面URL
+     * @returns {Object} 查询参数对象
+     */
+    getAllQueryParams(url = window.location.href) {
+        const params = {};
+        const searchParams = new URL(url).searchParams;
+        for (const [key, value] of searchParams) {
+            params[key] = value;
+        }
+        return params;
+    },
+    
+    /**
      * 收集DOM树中的所有文本节点内容
      * @param {HTMLElement} element - 要收集文本的起始元素
      * @param {Set<string>} resultSet - 用于存储结果的Set集合
+     * @param {Object} options - 配置选项
+     * @param {number} options.maxLength - 最大文本长度（默认200）
+     * @param {string[]} options.skipTags - 跳过的标签名数组
      */
-    collectTextNodes(element, resultSet) {
-        if (!element || !resultSet) return;
+    collectTextNodes(element, resultSet, options = {}) {
+        if (!element || !resultSet || typeof resultSet.add !== 'function') return;
         
-        const skipElements = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'];
+        const {
+            maxLength = 200,
+            skipTags = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select', 'noscript', 'template']
+        } = options;
         
-        // 检查是否需要跳过此元素
-        if (element.tagName && skipElements.includes(element.tagName.toLowerCase())) {
-            return;
-        }
-        
-        // 遍历所有子节点
-        const childNodes = Array.from(element.childNodes);
-        for (const node of childNodes) {
-            if (node.nodeType === Node.TEXT_NODE) {
-                const text = node.nodeValue.trim();
-                // 只收集非空字符串，且过滤掉纯数字和过长的字符串
-                if (text && text.length > 0 && 
-                    text.length < 200 && 
-                    !/^\d+$/.test(text) &&
-                    !/^[\s\p{P}\p{S}]+$/u.test(text)) {
-                    resultSet.add(text);
-                }
-            } else if (node.nodeType === Node.ELEMENT_NODE) {
-                this.collectTextNodes(node, resultSet);
+        try {
+            // 检查是否需要跳过此元素
+            if (element.tagName && skipTags.includes(element.tagName.toLowerCase())) {
+                return;
             }
+            
+            // 检查元素是否有隐藏类或样式
+            if (element.classList && element.classList.contains('sr-only')) {
+                return;
+            }
+            
+            // 遍历所有子节点
+            const childNodes = Array.from(element.childNodes || []);
+            for (const node of childNodes) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue ? node.nodeValue.trim() : '';
+                    // 只收集符合条件的文本
+                    if (text && 
+                        text.length > 0 && 
+                        text.length < maxLength && 
+                        !/^\d+$/.test(text) &&
+                        !/^[\s\p{P}\p{S}]+$/u.test(text)) {
+                        resultSet.add(text);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    // 递归收集子元素的文本
+                    this.collectTextNodes(node, resultSet, options);
+                }
+            }
+        } catch (error) {
+            console.error('[GitHub 中文翻译] 收集文本节点时出错:', error);
+        }
+    },
+    
+    /**
+     * 安全地访问对象属性，避免嵌套属性访问出错
+     * @param {Object} obj - 目标对象
+     * @param {string|string[]} path - 属性路径，如'a.b.c'或['a','b','c']
+     * @param {*} defaultValue - 获取失败时的默认值
+     * @returns {*} 属性值或默认值
+     */
+    getNestedProperty(obj, path, defaultValue = null) {
+        try {
+            const pathArray = Array.isArray(path) ? path : path.split('.');
+            let result = obj;
+            
+            for (const key of pathArray) {
+                if (result === null || result === undefined) {
+                    return defaultValue;
+                }
+                result = result[key];
+            }
+            
+            return result === undefined ? defaultValue : result;
+        } catch (error) {
+            return defaultValue;
+        }
+    },
+    
+    /**
+     * 深拷贝对象
+     * @param {*} obj - 要拷贝的对象
+     * @returns {*} 拷贝后的对象
+     */
+    deepClone(obj) {
+        try {
+            if (obj === null || typeof obj !== 'object') return obj;
+            if (obj instanceof Date) return new Date(obj.getTime());
+            if (obj instanceof Array) return obj.map(item => this.deepClone(item));
+            if (obj instanceof Object) {
+                const clonedObj = {};
+                for (const key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        clonedObj[key] = this.deepClone(obj[key]);
+                    }
+                }
+                return clonedObj;
+            }
+        } catch (error) {
+            console.warn('[GitHub 中文翻译] 深拷贝失败:', error);
+            return obj;
+        }
+    },
+    
+    /**
+     * 安全地执行函数，捕获可能的异常
+     * @param {Function} fn - 要执行的函数
+     * @param {*} defaultValue - 执行失败时的默认返回值
+     * @param {Object} context - 函数执行上下文
+     * @param {...*} args - 函数参数
+     * @returns {*} 函数返回值或默认值
+     */
+    safeExecute(fn, defaultValue = null, context = null, ...args) {
+        try {
+            if (typeof fn === 'function') {
+                return fn.apply(context, args);
+            }
+            return defaultValue;
+        } catch (error) {
+            console.error('[GitHub 中文翻译] 安全执行函数失败:', error);
+            return defaultValue;
         }
     }
 };
@@ -256,50 +459,43 @@ export const utils = {
 export const versionChecker = {
     /**
      * 检查版本更新
-     * @returns {Promise<void>} 检查完成的Promise
+     * 支持重试机制和更详细的错误处理
+     * @returns {Promise<boolean>} 检查完成的Promise，resolve为是否发现更新
      */
     async checkForUpdates() {
         // 检查是否启用了更新检查
-        if (!CONFIG.updateCheck.enabled) return;
+        if (!CONFIG.updateCheck.enabled) {
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 已禁用更新检查');
+            }
+            return false;
+        }
         
         // 检查是否达到检查间隔
         const lastCheck = localStorage.getItem('githubZhLastUpdateCheck');
         const now = Date.now();
-        const intervalMs = CONFIG.updateCheck.intervalHours * 60 * 60 * 1000;
+        const intervalMs = (CONFIG.updateCheck.intervalHours || 24) * 60 * 60 * 1000;
         
         if (lastCheck && now - parseInt(lastCheck) < intervalMs) {
             if (CONFIG.debugMode) {
-                console.log('[GitHub 中文翻译] 未达到更新检查间隔，跳过检查');
+                console.log(`[GitHub 中文翻译] 未达到更新检查间隔，跳过检查 (上次检查: ${new Date(parseInt(lastCheck)).toLocaleString()})`);
             }
-            return;
+            return false;
         }
         
         try {
             // 记录本次检查时间
             localStorage.setItem('githubZhLastUpdateCheck', now.toString());
             
-            // 获取远程脚本内容
-            const response = await fetch(CONFIG.updateCheck.scriptUrl, {
-                method: 'GET',
-                headers: {
-                    'Cache-Control': 'no-cache'
-                },
-                timeout: 5000
-            });
+            // 使用带重试的获取方法
+            const scriptContent = await this.fetchWithRetry(CONFIG.updateCheck.scriptUrl);
             
-            if (!response.ok) {
-                throw new Error(`服务器响应错误: ${response.status}`);
+            // 提取远程版本号 - 支持多种格式
+            const remoteVersion = this.extractVersion(scriptContent);
+            
+            if (!remoteVersion) {
+                throw new Error('无法从远程脚本提取有效的版本号');
             }
-            
-            const scriptContent = await response.text();
-            
-            // 提取远程版本号
-            const remoteVersionMatch = scriptContent.match(/\/\*\s*@version\s+(\d+\.\d+\.\d+)\s*\*\//i);
-            if (!remoteVersionMatch) {
-                throw new Error('无法从远程脚本提取版本号');
-            }
-            
-            const remoteVersion = remoteVersionMatch[1];
             
             if (CONFIG.debugMode) {
                 console.log(`[GitHub 中文翻译] 当前版本: ${CONFIG.version}, 远程版本: ${remoteVersion}`);
@@ -314,12 +510,114 @@ export const versionChecker = {
                 if (CONFIG.updateCheck.autoUpdateVersion) {
                     this.updateVersionInStorage(remoteVersion);
                 }
+                
+                // 记录版本历史
+                this.recordVersionHistory(remoteVersion);
+                
+                return true;
             }
+            
+            return false;
         } catch (error) {
+            const errorMsg = `[GitHub 中文翻译] 检查更新时发生错误: ${error.message || error}`;
             if (CONFIG.debugMode) {
-                console.error('[GitHub 中文翻译] 检查更新时发生错误:', error);
+                console.error(errorMsg, error);
+            }
+            
+            // 记录错误日志
+            try {
+                localStorage.setItem('githubZhUpdateError', JSON.stringify({
+                    message: error.message,
+                    timestamp: now
+                }));
+            } catch (e) {
+                // 忽略存储错误
+            }
+            
+            return false;
+        }
+    },
+    
+    /**
+     * 带重试机制的网络请求
+     * @param {string} url - 请求URL
+     * @param {number} maxRetries - 最大重试次数
+     * @param {number} retryDelay - 重试间隔（毫秒）
+     * @returns {Promise<string>} 响应文本
+     */
+    async fetchWithRetry(url, maxRetries = 2, retryDelay = 1000) {
+        let lastError;
+        
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                if (CONFIG.debugMode && attempt > 0) {
+                    console.log(`[GitHub 中文翻译] 重试更新检查 (${attempt}/${maxRetries})...`);
+                }
+                
+                // 自定义超时控制
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Accept': 'text/javascript, text/plain, */*'
+                    },
+                    signal: controller.signal,
+                    credentials: 'omit' // 不发送凭证信息
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP错误! 状态码: ${response.status}`);
+                }
+                
+                return await response.text();
+            } catch (error) {
+                lastError = error;
+                
+                // 如果是最后一次尝试，则抛出错误
+                if (attempt === maxRetries) {
+                    throw error;
+                }
+                
+                // 等待后重试
+                await utils.delay(retryDelay * Math.pow(2, attempt)); // 指数退避策略
             }
         }
+        
+        throw lastError;
+    },
+    
+    /**
+     * 从脚本内容中提取版本号
+     * 支持多种版本号格式
+     * @param {string} content - 脚本内容
+     * @returns {string|null} 提取的版本号或null
+     */
+    extractVersion(content) {
+        // 尝试多种版本号格式
+        const patterns = [
+            // UserScript格式
+            /\/\*\s*@version\s+(\d+\.\d+\.\d+)\s*\*\//i,
+            // JavaScript注释格式
+            /\/\/\s*version\s*:\s*(\d+\.\d+\.\d+)/i,
+            // 变量赋值格式
+            /version\s*=\s*['"](\d+\.\d+\.\d+)['"]/i,
+            // 对象属性格式
+            /version:\s*['"](\d+\.\d+\.\d+)['"]/i
+        ];
+        
+        for (const pattern of patterns) {
+            const match = content.match(pattern);
+            if (match && match[1]) {
+                return match[1];
+            }
+        }
+        
+        return null;
     },
 
     /**
@@ -351,44 +649,152 @@ export const versionChecker = {
 
     /**
      * 显示更新通知
+     * 使用更安全的事件处理方式
      * @param {string} newVersion - 新版本号
      */
     showUpdateNotification(newVersion) {
         const notificationKey = 'githubZhUpdateNotificationDismissed';
+        const notificationVersionKey = 'githubZhLastNotifiedVersion';
         
-        // 检查用户是否已经关闭过通知
-        if (localStorage.getItem(notificationKey) === 'dismissed') {
+        // 获取最后通知的版本
+        const lastNotifiedVersion = localStorage.getItem(notificationVersionKey);
+        
+        // 如果用户已经关闭过通知，或者已经通知过相同版本，则不显示
+        if (localStorage.getItem(notificationKey) === 'dismissed' || 
+            lastNotifiedVersion === newVersion) {
+            if (CONFIG.debugMode && lastNotifiedVersion === newVersion) {
+                console.log(`[GitHub 中文翻译] 已经通知过版本 ${newVersion} 的更新`);
+            }
             return;
         }
         
-        // 创建通知元素
-        const notification = document.createElement('div');
-        notification.className = 'fixed bottom-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-50 max-w-md';
-        notification.innerHTML = `
-            <div class="flex items-start">
-                <div class="flex-shrink-0 bg-blue-100 rounded-full p-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-blue-800">GitHub 中文翻译脚本更新</p>
-                    <p class="text-sm text-blue-700 mt-1">发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。</p>
-                    <div class="mt-3 flex space-x-2">
-                        <a href="${CONFIG.updateCheck.scriptUrl}" target="_blank" rel="noopener noreferrer"
-                            class="inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 transition-colors">
-                            立即更新
-                        </a>
-                        <button onclick="this.closest('.fixed').remove(); localStorage.setItem('${notificationKey}', 'dismissed');"
-                            class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors">
-                            稍后
-                        </button>
+        try {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = 'fixed bottom-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-50 max-w-md transform transition-all duration-300 translate-y-0 opacity-100';
+            
+            // 生成唯一的ID
+            const notificationId = `github-zh-update-${Date.now()}`;
+            notification.id = notificationId;
+            
+            notification.innerHTML = `
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 bg-blue-100 rounded-full p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-blue-800">GitHub 中文翻译脚本更新</p>
+                        <p class="text-sm text-blue-700 mt-1">发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。</p>
+                        <div class="mt-3 flex space-x-2">
+                            <a id="${notificationId}-update-btn" href="${CONFIG.updateCheck.scriptUrl || '#'}" target="_blank" rel="noopener noreferrer"
+                                class="inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 transition-colors">
+                                立即更新
+                            </a>
+                            <button id="${notificationId}-later-btn"
+                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors">
+                                稍后
+                            </button>
+                            <button id="${notificationId}-dismiss-btn"
+                                class="inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                                不再提醒
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-        
-        document.body.appendChild(notification);
+            `;
+            
+            // 添加到DOM
+            if (document.body) {
+                document.body.appendChild(notification);
+                
+                // 记录本次通知的版本
+                localStorage.setItem(notificationVersionKey, newVersion);
+                
+                // 添加事件监听器
+                document.getElementById(`${notificationId}-later-btn`).addEventListener('click', () => {
+                    this.hideNotification(notification, false);
+                });
+                
+                document.getElementById(`${notificationId}-dismiss-btn`).addEventListener('click', () => {
+                    this.hideNotification(notification, true);
+                });
+                
+                // 自动隐藏（可选）
+                if (CONFIG.updateCheck.autoHideNotification !== false) {
+                    setTimeout(() => {
+                        this.hideNotification(notification, false);
+                    }, 20000); // 20秒后自动隐藏
+                }
+                
+                if (CONFIG.debugMode) {
+                    console.log(`[GitHub 中文翻译] 显示更新通知: 版本 ${newVersion}`);
+                }
+            }
+        } catch (error) {
+            console.error('[GitHub 中文翻译] 创建更新通知失败:', error);
+        }
+    },
+    
+    /**
+     * 隐藏通知元素（带动画效果）
+     * @param {HTMLElement} notification - 通知元素
+     * @param {boolean} permanently - 是否永久隐藏
+     */
+    hideNotification(notification, permanently = false) {
+        try {
+            // 添加动画效果
+            notification.style.transform = 'translateY(20px)';
+            notification.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+            
+            // 如果是永久隐藏，记录到localStorage
+            if (permanently) {
+                localStorage.setItem('githubZhUpdateNotificationDismissed', 'dismissed');
+                if (CONFIG.debugMode) {
+                    console.log('[GitHub 中文翻译] 更新通知已永久隐藏');
+                }
+            }
+        } catch (error) {
+            console.error('[GitHub 中文翻译] 隐藏通知失败:', error);
+        }
+    },
+    
+    /**
+     * 记录版本历史
+     * @param {string} version - 版本号
+     */
+    recordVersionHistory(version) {
+        try {
+            const historyKey = 'githubZhVersionHistory';
+            let history = utils.safeJSONParse(localStorage.getItem(historyKey), []);
+            
+            // 确保是数组
+            if (!Array.isArray(history)) {
+                history = [];
+            }
+            
+            // 添加新版本记录
+            history.push({
+                version,
+                detectedAt: Date.now()
+            });
+            
+            // 限制历史记录数量
+            if (history.length > 10) {
+                history = history.slice(-10);
+            }
+            
+            localStorage.setItem(historyKey, JSON.stringify(history));
+        } catch (error) {
+            // 忽略存储错误
+        }
     },
     
     /**
@@ -397,14 +803,59 @@ export const versionChecker = {
      */
     updateVersionInStorage(newVersion) {
         try {
-            localStorage.setItem('githubZhCachedVersion', newVersion);
+            const cacheData = {
+                version: newVersion,
+                cachedAt: Date.now(),
+                currentVersion: CONFIG.version
+            };
+            
+            localStorage.setItem('githubZhCachedVersion', utils.safeJSONStringify(cacheData));
+            
             if (CONFIG.debugMode) {
-                console.log(`[GitHub 中文翻译] 已缓存新版本号: ${newVersion}`);
+                console.log(`[GitHub 中文翻译] 已缓存新版本号: ${newVersion} (缓存时间: ${new Date().toLocaleString()})`);
             }
+            
+            return true;
         } catch (error) {
             if (CONFIG.debugMode) {
                 console.error('[GitHub 中文翻译] 更新缓存版本号时出错:', error);
             }
+            return false;
+        }
+    },
+    
+    /**
+     * 获取缓存的版本信息
+     * @returns {Object|null} 缓存的版本数据
+     */
+    getCachedVersion() {
+        try {
+            const cachedData = utils.safeJSONParse(localStorage.getItem('githubZhCachedVersion'));
+            return cachedData;
+        } catch (error) {
+            return null;
+        }
+    },
+    
+    /**
+     * 清除更新通知的忽略状态
+     * 允许再次显示更新通知
+     */
+    clearNotificationDismissal() {
+        try {
+            localStorage.removeItem('githubZhUpdateNotificationDismissed');
+            localStorage.removeItem('githubZhLastNotifiedVersion');
+            
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 已清除更新通知忽略状态');
+            }
+            
+            return true;
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 清除通知忽略状态失败:', error);
+            }
+            return false;
         }
     }
 };
@@ -604,6 +1055,12 @@ export const translationCore = {
     dictionary: {},
     
     /**
+     * 翻译缓存，用于存储已翻译过的文本
+     * @type {Map<string, string>}
+     */
+    translationCache: new Map(),
+    
+    /**
      * 初始化词典
      */
     initDictionary() {
@@ -630,7 +1087,7 @@ export const translationCore = {
             });
             
             if (CONFIG.debugMode) {
-                console.log('[GitHub 中文翻译] 翻译完成');
+                console.log('[GitHub 中文翻译] 翻译完成，已翻译元素数量:', elements.length);
             }
         } catch (error) {
             console.error('[GitHub 中文翻译] 翻译过程中出错:', error);
@@ -642,30 +1099,72 @@ export const translationCore = {
      * @returns {HTMLElement[]} 需要翻译的元素数组
      */
     getElementsToTranslate() {
-        const elements = [];
+        // 使用Set避免重复添加元素，提高性能
+        const uniqueElements = new Set();
         
         // 获取主选择器匹配的元素
         CONFIG.selectors.primary.forEach(selector => {
-            const matchedElements = document.querySelectorAll(selector);
-            matchedElements.forEach(element => {
-                // 避免重复添加
-                if (!elements.includes(element)) {
-                    elements.push(element);
+            try {
+                const matchedElements = document.querySelectorAll(selector);
+                matchedElements.forEach(element => {
+                    // 过滤不应该翻译的元素
+                    if (this.shouldTranslateElement(element)) {
+                        uniqueElements.add(element);
+                    }
+                });
+            } catch (error) {
+                if (CONFIG.debugMode) {
+                    console.warn(`[GitHub 中文翻译] 选择器 "${selector}" 解析失败:`, error);
                 }
-            });
+            }
         });
         
         // 获取弹出菜单元素
         CONFIG.selectors.popupMenus.forEach(selector => {
-            const matchedElements = document.querySelectorAll(selector);
-            matchedElements.forEach(element => {
-                if (!elements.includes(element)) {
-                    elements.push(element);
+            try {
+                const matchedElements = document.querySelectorAll(selector);
+                matchedElements.forEach(element => {
+                    // 过滤不应该翻译的元素
+                    if (this.shouldTranslateElement(element)) {
+                        uniqueElements.add(element);
+                    }
+                });
+            } catch (error) {
+                if (CONFIG.debugMode) {
+                    console.warn(`[GitHub 中文翻译] 选择器 "${selector}" 解析失败:`, error);
                 }
-            });
+            }
         });
         
-        return elements;
+        return Array.from(uniqueElements);
+    },
+    
+    /**
+     * 判断元素是否应该被翻译
+     * @param {HTMLElement} element - 要检查的元素
+     * @returns {boolean} 是否应该翻译
+     */
+    shouldTranslateElement(element) {
+        // 避免翻译特定类型的元素
+        const skipTags = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'];
+        if (skipTags.includes(element.tagName.toLowerCase())) {
+            return false;
+        }
+        
+        // 避免翻译具有特定属性的元素
+        if (element.hasAttribute('data-no-translate') || 
+            element.hasAttribute('translate') && element.getAttribute('translate') === 'no') {
+            return false;
+        }
+        
+        // 避免翻译具有特定类名的元素
+        const skipClasses = ['language-', 'highlight', 'token', 'no-translate'];
+        const classList = element.className;
+        if (classList && skipClasses.some(cls => classList.includes(cls))) {
+            return false;
+        }
+        
+        return true;
     },
     
     /**
@@ -673,12 +1172,6 @@ export const translationCore = {
      * @param {HTMLElement} element - 要翻译的元素
      */
     translateElement(element) {
-        // 避免翻译特定类型的元素
-        const skipElements = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'];
-        if (skipElements.includes(element.tagName.toLowerCase())) {
-            return;
-        }
-        
         // 遍历元素的所有文本节点
         const childNodes = Array.from(element.childNodes);
         childNodes.forEach(node => {
@@ -703,25 +1196,55 @@ export const translationCore = {
         // 去除文本中的多余空白字符
         const normalizedText = text.trim();
         
+        // 检查缓存
+        if (CONFIG.performance.enableTranslationCache && this.translationCache.has(normalizedText)) {
+            return this.translationCache.get(normalizedText);
+        }
+        
         // 直接查找精确匹配
+        let result = null;
         if (this.dictionary[normalizedText]) {
             const translation = this.dictionary[normalizedText];
             // 避免返回标记为待翻译的文本
             if (!translation.startsWith('待翻译: ')) {
-                return translation;
+                result = translation;
             }
         }
         
-        // 如果启用了部分匹配
-        if (CONFIG.performance.enablePartialMatch) {
+        // 如果启用了部分匹配且尚未找到结果
+        if (result === null && CONFIG.performance.enablePartialMatch) {
             for (const [key, value] of Object.entries(this.dictionary)) {
-                if (normalizedText.includes(key) && !value.startsWith('待翻译: ')) {
-                    return normalizedText.replace(new RegExp(key, 'g'), value);
+                // 只对较长的键进行部分匹配，避免意外替换
+                if (key.length > 3 && normalizedText.includes(key) && !value.startsWith('待翻译: ')) {
+                    result = normalizedText.replace(new RegExp(key, 'g'), value);
+                    // 只返回第一个匹配的结果，避免多次替换导致的问题
+                    break;
                 }
             }
         }
         
-        return null;
+        // 更新缓存
+        if (CONFIG.performance.enableTranslationCache) {
+            // 限制缓存大小
+            if (this.translationCache.size >= CONFIG.performance.maxDictSize) {
+                // 删除最旧的缓存项（Map保持插入顺序）
+                const firstKey = this.translationCache.keys().next().value;
+                this.translationCache.delete(firstKey);
+            }
+            this.translationCache.set(normalizedText, result);
+        }
+        
+        return result;
+    },
+    
+    /**
+     * 清除翻译缓存
+     */
+    clearCache() {
+        this.translationCache.clear();
+        if (CONFIG.debugMode) {
+            console.log('[GitHub 中文翻译] 翻译缓存已清除');
+        }
     }
 };
 
@@ -746,17 +1269,27 @@ export const pageMonitor = {
     lastPath: '',
     
     /**
+     * 最后翻译的时间戳
+     * @type {number}
+     */
+    lastTranslateTimestamp: 0,
+    
+    /**
      * 初始化监控
      */
     init() {
-        // 设置路径变化监听
-        this.setupPathListener();
-        
-        // 设置DOM变化监听
-        this.setupDomObserver();
-        
-        if (CONFIG.debugMode) {
-            console.log('[GitHub 中文翻译] 页面监控已初始化');
+        try {
+            // 设置路径变化监听
+            this.setupPathListener();
+            
+            // 设置DOM变化监听
+            this.setupDomObserver();
+            
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 页面监控已初始化');
+            }
+        } catch (error) {
+            console.error('[GitHub 中文翻译] 页面监控初始化失败:', error);
         }
     },
     
@@ -795,63 +1328,154 @@ export const pageMonitor = {
      * 处理路径变化
      */
     handlePathChange() {
-        const currentPath = window.location.pathname + window.location.search;
-        this.lastPath = currentPath;
-        
-        if (CONFIG.debugMode) {
-            console.log(`[GitHub 中文翻译] 页面路径变化: ${currentPath}`);
+        try {
+            const currentPath = window.location.pathname + window.location.search;
+            this.lastPath = currentPath;
+            
+            if (CONFIG.debugMode) {
+                console.log(`[GitHub 中文翻译] 页面路径变化: ${currentPath}`);
+            }
+            
+            // 延迟执行翻译，等待页面内容加载完成
+            setTimeout(() => {
+                this.translateWithThrottle();
+            }, CONFIG.routeChangeDelay);
+        } catch (error) {
+            console.error('[GitHub 中文翻译] 路径变化处理失败:', error);
         }
+    },
+    
+    /**
+     * 带节流的翻译方法
+     * 防止短时间内频繁触发翻译
+     */
+    translateWithThrottle() {
+        const now = Date.now();
+        const minInterval = CONFIG.performance.minTranslateInterval || 500; // 最小翻译间隔，默认500ms
         
-        // 延迟执行翻译，等待页面内容加载完成
-        setTimeout(() => {
-            translationCore.translate();
-        }, CONFIG.routeChangeDelay);
+        if (now - this.lastTranslateTimestamp >= minInterval) {
+            this.lastTranslateTimestamp = now;
+            
+            if (CONFIG.debugMode && CONFIG.performance.logTiming) {
+                console.time('[GitHub 中文翻译] 翻译耗时');
+                translationCore.translate().finally(() => {
+                    console.timeEnd('[GitHub 中文翻译] 翻译耗时');
+                });
+            } else {
+                translationCore.translate();
+            }
+        } else if (CONFIG.debugMode) {
+            console.log(`[GitHub 中文翻译] 翻译请求被节流，距离上次翻译${now - this.lastTranslateTimestamp}ms`);
+        }
     },
     
     /**
      * 设置DOM变化监听
      */
     setupDomObserver() {
-        const observerConfig = {
-            childList: true,
-            subtree: CONFIG.performance.enableDeepObserver,
-            characterData: true
-        };
-        
-        this.observer = new MutationObserver(utils.debounce((mutations) => {
-            // 检查是否有实际内容变化
-            const hasContentChange = mutations.some(mutation => {
-                // 检查子节点变化
-                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                    return true;
-                }
-                // 检查字符数据变化
-                if (mutation.type === 'characterData' && mutation.target.nodeValue) {
-                    return true;
-                }
-                return false;
-            });
+        try {
+            const observerConfig = {
+                childList: true,
+                subtree: CONFIG.performance.enableDeepObserver,
+                characterData: true,
+                attributes: CONFIG.performance.observeAttributes // 是否观察属性变化
+            };
             
-            if (hasContentChange) {
-                translationCore.translate();
+            this.observer = new MutationObserver(utils.debounce((mutations) => {
+                try {
+                    // 更精细的变化检测
+                    const hasImportantChange = this.detectImportantChanges(mutations);
+                    
+                    if (hasImportantChange) {
+                        this.translateWithThrottle();
+                    } else if (CONFIG.debugMode && CONFIG.performance.logAllMutations) {
+                        console.log(`[GitHub 中文翻译] 检测到非重要变化，跳过翻译，变化数量: ${mutations.length}`);
+                    }
+                } catch (error) {
+                    console.error('[GitHub 中文翻译] 处理DOM变化时出错:', error);
+                }
+            }, CONFIG.debounceDelay));
+            
+            // 开始观察文档
+            if (document.body) {
+                this.observer.observe(document.body, observerConfig);
+                if (CONFIG.debugMode) {
+                    console.log('[GitHub 中文翻译] DOM观察器已启动');
+                }
+            } else {
+                console.error('[GitHub 中文翻译] document.body不存在，无法启动观察器');
+                // 尝试延迟启动
+                setTimeout(() => this.setupDomObserver(), 500);
             }
-        }, CONFIG.debounceDelay));
-        
-        // 开始观察文档
-        this.observer.observe(document.body, observerConfig);
+        } catch (error) {
+            console.error('[GitHub 中文翻译] 设置DOM观察器失败:', error);
+        }
+    },
+    
+    /**
+     * 检测重要的DOM变化
+     * 只在有实际内容变化时触发翻译
+     * @param {MutationRecord[]} mutations - 变更记录数组
+     * @returns {boolean} 是否有需要触发翻译的重要变化
+     */
+    detectImportantChanges(mutations) {
+        // 检查是否有实际内容变化
+        return mutations.some(mutation => {
+            // 检查子节点变化
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                // 过滤出可见的元素节点
+                const hasVisibleElements = Array.from(mutation.addedNodes).some(node => {
+                    // 忽略脚本、样式、注释等不可见元素
+                    if (node.nodeType !== 1) return false; // 不是元素节点
+                    if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE') return false;
+                    
+                    // 检查是否有文本内容或子元素
+                    return node.textContent.trim().length > 0 || node.children.length > 0;
+                });
+                return hasVisibleElements;
+            }
+            
+            // 检查字符数据变化
+            if (mutation.type === 'characterData' && 
+                mutation.target.nodeValue && 
+                mutation.target.nodeValue.trim().length > 0) {
+                return true;
+            }
+            
+            // 检查重要属性变化
+            if (mutation.type === 'attributes' && 
+                CONFIG.performance.importantAttributes && 
+                CONFIG.performance.importantAttributes.includes(mutation.attributeName)) {
+                return true;
+            }
+            
+            return false;
+        });
     },
     
     /**
      * 停止监控
      */
     stop() {
-        if (this.observer) {
-            this.observer.disconnect();
-            this.observer = null;
-        }
-        
-        if (CONFIG.debugMode) {
-            console.log('[GitHub 中文翻译] 页面监控已停止');
+        try {
+            if (this.observer) {
+                this.observer.disconnect();
+                this.observer = null;
+                
+                if (CONFIG.debugMode) {
+                    console.log('[GitHub 中文翻译] DOM观察器已断开连接');
+                }
+            }
+            
+            // 重置状态
+            this.lastPath = '';
+            this.lastTranslateTimestamp = 0;
+            
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 页面监控已停止');
+            }
+        } catch (error) {
+            console.error('[GitHub 中文翻译] 停止监控时出错:', error);
         }
     },
     
@@ -859,8 +1483,20 @@ export const pageMonitor = {
      * 重新开始监控
      */
     restart() {
-        this.stop();
-        this.init();
+        try {
+            this.stop();
+            this.init();
+        } catch (error) {
+            console.error('[GitHub 中文翻译] 重新开始监控失败:', error);
+        }
+    },
+    
+    /**
+     * 手动触发翻译
+     * 提供外部调用接口
+     */
+    triggerTranslation() {
+        this.translateWithThrottle();
     }
 };
 
@@ -1033,7 +1669,15 @@ async function init() {
     try {
         // 检查更新
         if (CONFIG.updateCheck.enabled) {
-            await versionChecker.checkForUpdates();
+            versionChecker.checkForUpdates().then(hasUpdate => {
+                if (CONFIG.debugMode) {
+                    console.log(`[GitHub 中文翻译] 更新检查完成，${hasUpdate ? '发现新版本' : '当前已是最新版本'}`);
+                }
+            }).catch(err => {
+                if (CONFIG.debugMode) {
+                    console.error('[GitHub 中文翻译] 更新检查失败:', err);
+                }
+            });
         }
         
         // 初始化翻译核心功能
