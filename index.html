@@ -59,17 +59,30 @@
       transform: translateX(20px);
     }
 
-    /* 简易模式下隐藏高级配置项 */
-    .config-section-advanced {
-      display: none;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-    }
-
-    /* 高级模式下显示高级配置项 */
+    /* 高级模式切换开关样式 */
     .advanced-mode-active .config-section-advanced {
       display: block;
       opacity: 1;
+      max-height: 1000px;
+      overflow: visible;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .config-section-advanced {
+      display: none;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* 高级模式切换文本状态动画 */
+    #advancedModeToggle:checked ~ span:last-child {
+      opacity: 1 !important;
+    }
+
+    #advancedModeToggle:checked ~ span:nth-last-child(2) {
+      opacity: 0 !important;
     }
   </style>
 </head>
@@ -176,13 +189,13 @@
               <div class="flex items-center space-x-4">
                 <!-- 简易/高级设置切换开关 -->
                 <div class="flex items-center">
-                  <label for="advancedModeToggle" class="text-sm text-gray-600 mr-2">高级设置</label>
-                  <div class="relative inline-block w-10 h-5">
-                    <input type="checkbox" id="advancedModeToggle" class="opacity-0 w-0 h-0">
-                    <span class="slider round bg-gray-300 transition-colors duration-300 ease-in-out absolute cursor-pointer top-0 left-0 right-0 bottom-0" 
-                          data-checked-text="高级" data-unchecked-text="简易">
-                      <span class="toggle-dot absolute h-4 w-4 left-0.5 bottom-0.5 bg-white rounded-full transition-transform duration-300 ease-in-out"></span>
-                    </span>
+                  <label for="advancedModeToggle" class="text-sm text-gray-600 mr-2 font-medium">高级设置</label>
+                  <div class="relative inline-block w-14 h-6">
+                    <input type="checkbox" id="advancedModeToggle" class="opacity-0 w-0 h-0 peer">
+                    <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full bg-gray-300 peer-checked:bg-blue-500 transition-all duration-300 ease-in-out shadow-inner before:absolute before:content-[''] before:h-5 before:w-5 before:left-0.5 before:bottom-0.5 before:bg-white before:rounded-full before:transition-transform before:duration-300 before:ease-in-out before:shadow-md peer-checked:before:translate-x-8 peer-checked:before:bg-white"></span>
+                    <!-- 状态文本指示器 -->
+                    <span class="absolute left-6 bottom-1.5 text-[10px] font-medium text-gray-700 transition-opacity duration-200 pointer-events-none">简易</span>
+                    <span class="absolute right-6 bottom-1.5 text-[10px] font-medium text-white opacity-0 transition-opacity duration-200 pointer-events-none">高级</span>
                   </div>
                 </div>
                 <button id="saveSettingsBtn" type="button"

@@ -1,6 +1,6 @@
 // Web界面交互逻辑模块
 // 作者: SutChan
-// 版本: 1.8.44
+// 版本: 1.8.45
 
 // 全局配置和常量定义
 const API_BASE_URL = '/utils';
@@ -93,6 +93,20 @@ function initializeAdvancedMode() {
     
     // 绑定切换事件
     toggle.addEventListener('change', toggleAdvancedMode);
+    
+    // 确保初始状态文本正确显示
+    const basicText = toggle.nextElementSibling.nextElementSibling;
+    const advancedText = toggle.nextElementSibling.nextElementSibling.nextElementSibling;
+    
+    if (basicText && advancedText) {
+      if (savedMode) {
+        basicText.style.opacity = '0';
+        advancedText.style.opacity = '1';
+      } else {
+        basicText.style.opacity = '1';
+        advancedText.style.opacity = '0';
+      }
+    }
   }
 }
 
