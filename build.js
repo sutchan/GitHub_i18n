@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.43
+ * @version 1.8.49
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -17,6 +17,7 @@ class BuildManager {
     this.srcFiles = {
       indexJs: path.join(this.srcDir, 'index.js'),
       configJs: path.join(this.srcDir, 'config.js'),
+      versionJs: path.join(this.srcDir, 'version.js'),
       mainScript: this.outputFile,
       apiDir: path.join(this.projectRoot, 'api')
     };
@@ -86,32 +87,69 @@ class BuildManager {
    */
   updateVersionInFiles() {
     try {
-      // 更新config.js中的版本号
-      let configContent = fs.readFileSync(this.srcFiles.configJs, 'utf8');
-      configContent = configContent.replace(
-        /version:\s*['"](.+)['"]/,
-        `version: '${this.currentVersion}'`
-      );
-      fs.writeFileSync(this.srcFiles.configJs, configContent, 'utf8');
-      console.log(`✅ 已更新 config.js 版本号为: ${this.currentVersion}`);
+      // 需要更新版本号的文件列表
+      const filesToUpdate = [
+        {
+          path: this.srcFiles.configJs,
+          regex: /version:\s*['"](.+)['"]/,
+          replacement: `version: '${this.currentVersion}'`,
+          name: 'config.js'
+        },
+        {
+          path: this.srcFiles.indexJs,
+          regex: /@version\s+([\d.]+)/,
+          replacement: `@version ${this.currentVersion}`,
+          name: 'index.js'
+        },
+        {
+          path: this.srcFiles.versionJs,
+          regex: /VERSION\s*=\s*['"](.+)['"]/,
+          replacement: `VERSION = '${this.currentVersion}'`,
+          name: 'version.js'
+        },
+        {
+          path: path.join(this.projectRoot, 'build.js'),
+          regex: /@version\s+([\d.]+)/,
+          replacement: `@version ${this.currentVersion}`,
+          name: 'build.js'
+        }
+      ];
 
-      // 更新index.js中的版本号（UserScript元数据）
-      let indexContent = fs.readFileSync(this.srcFiles.indexJs, 'utf8');
-      indexContent = indexContent.replace(
-        /@version\s+([\d.]+)/,
-        `@version ${this.currentVersion}`
-      );
-      fs.writeFileSync(this.srcFiles.indexJs, indexContent, 'utf8');
-      console.log(`✅ 已更新 index.js 版本号为: ${this.currentVersion}`);
+      // 遍历所有文件并更新版本号
+      filesToUpdate.forEach(file => {
+        if (fs.existsSync(file.path)) {
+          let content = fs.readFileSync(file.path, 'utf8');
+          content = content.replace(file.regex, file.replacement);
+          fs.writeFileSync(file.path, content, 'utf8');
+          console.log(`✅ 已更新 ${file.name} 版本号为: ${this.currentVersion}`);
+        }
+      });
 
-      // 更新build.js中的版本号注释
-      let buildContent = fs.readFileSync(path.join(this.projectRoot, 'build.js'), 'utf8');
-      buildContent = buildContent.replace(
-        /@version\s+([\d.]+)/,
-        `@version ${this.currentVersion}`
-      );
-      fs.writeFileSync(path.join(this.projectRoot, 'build.js'), buildContent, 'utf8');
-      console.log(`✅ 已更新 build.js 版本号为: ${this.currentVersion}`);
+      // 同时更新version.js中的版本历史记录（仅在有版本升级时）
+      if (fs.existsSync(this.srcFiles.versionJs)) {
+        const currentDate = new Date().toISOString().split('T')[0];
+        let versionContent = fs.readFileSync(this.srcFiles.versionJs, 'utf8');
+        
+        // 检查是否需要添加新版本历史记录
+        if (!versionContent.includes(`version: '${this.currentVersion}'`) && 
+            !versionContent.includes(`version: "${this.currentVersion}"`)) {
+          // 在VERSION_HISTORY数组的开头添加新版本记录
+          const newVersionEntry = `  {
+    version: '${this.currentVersion}',
+    date: '${currentDate}',
+    changes: ['自动版本更新']
+  }`;
+          
+          // 插入新版本记录到数组顶部
+          versionContent = versionContent.replace(
+            /export const VERSION_HISTORY = \[\s*\{/, 
+            `export const VERSION_HISTORY = [\n${newVersionEntry},\n  {`
+          );
+          
+          fs.writeFileSync(this.srcFiles.versionJs, versionContent, 'utf8');
+          console.log(`✅ 已更新版本历史记录，添加版本: ${this.currentVersion}`);
+        }
+      }
 
     } catch (error) {
       console.error('更新版本号失败:', error.message);

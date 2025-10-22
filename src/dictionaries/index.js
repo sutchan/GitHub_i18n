@@ -4,11 +4,13 @@
  */
 import { codespacesDictionary } from './codespaces.js';
 import { exploreDictionary } from './explore.js';
+import { commonDictionary } from './common.js';
 
 /**
  * 翻译词典对象，包含所有需要翻译的字符串
  */
 export const translationModule = {
+    "common": commonDictionary,
     "codespaces": codespacesDictionary,
     "explore": exploreDictionary
     // 可以根据需要添加更多页面的词典

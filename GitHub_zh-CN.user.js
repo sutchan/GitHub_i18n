@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.43
+// @version 1.8.49
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -87,7 +87,7 @@ function getVersionFromComment() {
  * 配置对象，包含所有可配置项
  */
 export const CONFIG = {
-    "version": "1.8.42",
+    "version": "1.8.43",
     "debounceDelay": 500,
     "routeChangeDelay": 500,
     "debugMode": true,
@@ -868,6 +868,7 @@ export const versionChecker = {
  * 翻译词典对象，包含所有需要翻译的字符串
  */
 export const translationModule = {
+    "common": commonDictionary,
     "codespaces": codespacesDictionary,
     "explore": exploreDictionary
     // 可以根据需要添加更多页面的词典
