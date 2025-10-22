@@ -1,6 +1,6 @@
 // Web界面交互逻辑模块
 // 作者: SutChan
-// 版本: 1.8.43
+// 版本: 1.8.44
 
 // 全局配置和常量定义
 const API_BASE_URL = '/utils';
@@ -52,7 +52,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 设置页面表单验证
   setupPageFormValidation();
+  
+  // 初始化高级模式切换功能
+  initializeAdvancedMode();
 });
+
+/**
+ * 切换高级模式状态
+ * 控制高级配置项的显示和隐藏
+ */
+function toggleAdvancedMode() {
+  const isAdvancedMode = document.getElementById('advancedModeToggle').checked;
+  
+  // 保存设置到localStorage
+  localStorage.setItem('advancedMode', isAdvancedMode);
+  
+  // 添加/移除高级模式类，控制所有高级配置项的显示
+  if (isAdvancedMode) {
+    document.body.classList.add('advanced-mode-active');
+  } else {
+    document.body.classList.remove('advanced-mode-active');
+  }
+}
+
+/**
+ * 初始化高级模式功能
+ * 加载保存的状态并绑定切换事件
+ */
+function initializeAdvancedMode() {
+  const toggle = document.getElementById('advancedModeToggle');
+  if (toggle) {
+    // 从localStorage加载上次保存的状态
+    const savedMode = localStorage.getItem('advancedMode') === 'true';
+    toggle.checked = savedMode;
+    
+    // 初始应用模式状态
+    if (savedMode) {
+      document.body.classList.add('advanced-mode-active');
+    }
+    
+    // 绑定切换事件
+    toggle.addEventListener('change', toggleAdvancedMode);
+  }
+}
 
 // 显示用户脚本设置模态框
 function showUserScriptModal() {

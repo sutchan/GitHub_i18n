@@ -8,6 +8,70 @@
   <link href="utils/dist/tailwind.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="utils/dist/custom.css" rel="stylesheet">
+  <style>
+    /* 高级模式切换开关样式 */
+    .slider {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+
+    .slider input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-dot {
+      position: absolute;
+      cursor: pointer;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 2px;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+
+    .toggle-dot:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 0;
+      bottom: 0;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #3f51b5;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #3f51b5;
+    }
+
+    input:checked + .slider .toggle-dot {
+      transform: translateX(20px);
+    }
+
+    /* 简易模式下隐藏高级配置项 */
+    .config-section-advanced {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    /* 高级模式下显示高级配置项 */
+    .advanced-mode-active .config-section-advanced {
+      display: block;
+      opacity: 1;
+    }
+  </style>
 </head>
 
 <body class="font-inter bg-gray-50 min-h-screen flex flex-col">
@@ -103,17 +167,30 @@
             <!-- 配置设置选项卡内容 -->
             <div id="tabConfigContent" class="tab-pane p-6" role="tabpanel">
               <div class="flex justify-between items-center mb-4">
-                <div class="flex items-center space-x-2">
-                  <button id="resetConfigBtn" type="button"
-                    class="text-gray-500 hover:text-gray-700 text-sm transition-colors">
-                    <i class="fa fa-refresh mr-1"></i>重置
-                  </button>
+              <div class="flex items-center space-x-2">
+                <button id="resetConfigBtn" type="button"
+                  class="text-gray-500 hover:text-gray-700 text-sm transition-colors">
+                  <i class="fa fa-refresh mr-1"></i>重置
+                </button>
+              </div>
+              <div class="flex items-center space-x-4">
+                <!-- 简易/高级设置切换开关 -->
+                <div class="flex items-center">
+                  <label for="advancedModeToggle" class="text-sm text-gray-600 mr-2">高级设置</label>
+                  <div class="relative inline-block w-10 h-5">
+                    <input type="checkbox" id="advancedModeToggle" class="opacity-0 w-0 h-0">
+                    <span class="slider round bg-gray-300 transition-colors duration-300 ease-in-out absolute cursor-pointer top-0 left-0 right-0 bottom-0" 
+                          data-checked-text="高级" data-unchecked-text="简易">
+                      <span class="toggle-dot absolute h-4 w-4 left-0.5 bottom-0.5 bg-white rounded-full transition-transform duration-300 ease-in-out"></span>
+                    </span>
+                  </div>
                 </div>
                 <button id="saveSettingsBtn" type="button"
                   class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
                   <i class="fa fa-save mr-1"></i>保存
                 </button>
               </div>
+            </div>
 
               <!-- 基本设置 -->
               <div class="mb-6 fade-in">
@@ -160,26 +237,26 @@
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
                       value="30000">
                   </div>
-                  <div>
+                  <div class="config-section-advanced">
                     <label class="block text-sm font-medium text-gray-700 mb-1">最大重试次数</label>
                     <input type="number" id="maxRetries"
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
                       value="3">
                   </div>
-                  <div>
+                  <div class="config-section-advanced">
                     <label class="block text-sm font-medium text-gray-700 mb-1">重试延迟(ms)</label>
                     <input type="number" id="retryDelay"
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
                       value="2000">
                   </div>
-                  <div>
+                  <div class="config-section-advanced">
                     <label class="block text-sm font-medium text-gray-700 mb-1">请求间隔(ms)</label>
                     <input type="number" id="requestDelay"
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
                       value="1000">
                   </div>
                 </div>
-                <div class="mt-4">
+                <div class="mt-4 config-section-advanced">
                   <label class="block text-sm font-medium text-gray-700 mb-1">User-Agent</label>
                   <input type="text" id="userAgent"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus"
@@ -192,10 +269,6 @@
                 <h3 class="text-md font-medium text-gray-700 mb-4 flex items-center">
                   <i class="fa fa-search mr-2 text-primary"></i>字符串匹配设置
                 </h3>
-                <div class="flex items-center space-x-2 mb-4">
-                  <input type="checkbox" id="exactMatchOnly" class="w-4 h-4 text-primary focus:ring-primary rounded">
-                  <label for="exactMatchOnly" class="text-sm font-medium text-gray-700">只翻译全文匹配的字符串</label>
-                </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">忽略的单词（用逗号分隔）</label>
                   <input type="text" id="ignoreWords"
@@ -203,22 +276,28 @@
                     value="GitHub,API,URL,HTTP,HTTPS">
                   <p class="text-xs text-gray-500 mt-1">这些单词出现在任何字符串中时，该字符串将被忽略</p>
                 </div>
-                <div class="mt-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-1">忽略的正则表达式模式（一行一个）</label>
-                  <textarea id="ignorePatterns"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus h-20"></textarea>
-                  <p class="text-xs text-gray-500 mt-1">匹配这些正则表达式的字符串将被忽略</p>
-                </div>
-                <div class="mt-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-1">必须包含的正则表达式模式（一行一个）</label>
-                  <textarea id="includePatterns"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus h-20"></textarea>
-                  <p class="text-xs text-gray-500 mt-1">字符串必须匹配至少一个这些正则表达式才会被提取</p>
+                <div class="mt-4 config-section-advanced">
+                  <div class="flex items-center space-x-2 mb-4">
+                    <input type="checkbox" id="exactMatchOnly" class="w-4 h-4 text-primary focus:ring-primary rounded">
+                    <label for="exactMatchOnly" class="text-sm font-medium text-gray-700">只翻译全文匹配的字符串</label>
+                  </div>
+                  <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">忽略的正则表达式模式（一行一个）</label>
+                    <textarea id="ignorePatterns"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus h-20"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">匹配这些正则表达式的字符串将被忽略</p>
+                  </div>
+                  <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">必须包含的正则表达式模式（一行一个）</label>
+                    <textarea id="includePatterns"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus h-20"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">字符串必须匹配至少一个这些正则表达式才会被提取</p>
+                  </div>
                 </div>
               </div>
 
               <!-- 调试设置 -->
-              <div class="fade-in">
+              <div class="fade-in config-section-advanced">
                 <h3 class="text-md font-medium text-gray-700 mb-4 flex items-center">
                   <i class="fa fa-bug mr-2 text-primary"></i>调试设置
                 </h3>
@@ -493,12 +572,12 @@
               <input type="number" id="scriptMaxTranslationLength"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="500">
             </div>
-            <div>
+            <div class="config-section-advanced">
               <label class="block text-sm font-medium text-gray-700 mb-1">翻译超时(ms)</label>
               <input type="number" id="scriptTranslationTimeout"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="3000">
             </div>
-            <div>
+            <div class="config-section-advanced">
               <label class="block text-sm font-medium text-gray-700 mb-1">请求间隔(ms)</label>
               <input type="number" id="scriptRequestDelay"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none input-focus" value="500">
@@ -509,7 +588,7 @@
         <!-- 脚本行为设置 -->
         <div>
           <h4 class="text-sm font-medium text-gray-700 mb-3">脚本行为配置</h4>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 config-section-advanced">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">路由变化延迟(ms)</label>
               <input type="number" id="scriptRouteChangeDelay"
@@ -525,7 +604,7 @@
             <input type="checkbox" id="scriptCheckUpdate" class="w-4 h-4 text-primary focus:ring-primary rounded">
             <label for="scriptCheckUpdate" class="text-sm font-medium text-gray-700">启用更新检测</label>
           </div>
-          <div class="mt-4 flex items-center space-x-2">
+          <div class="mt-4 flex items-center space-x-2 config-section-advanced">
             <input type="checkbox" id="scriptEnableDeepObserver"
               class="w-4 h-4 text-primary focus:ring-primary rounded">
             <label for="scriptEnableDeepObserver" class="text-sm font-medium text-gray-700">启用深度DOM观察</label>
