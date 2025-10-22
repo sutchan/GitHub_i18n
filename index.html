@@ -329,9 +329,17 @@
 
             <!-- GitHub页面配置选项卡内容 -->
             <div id="tabPagesContent" class="tab-pane p-6 hidden" role="tabpanel">
-              <div class="flex justify-between items-center mb-4">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                 <h2 class="text-lg font-semibold text-gray-800">GitHub页面配置</h2>
-                <div class="flex space-x-2">
+                <div class="flex space-x-2 w-full sm:w-auto">
+                  <button id="exportPagesBtn" type="button"
+                    class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
+                    <i class="fa fa-download mr-1"></i>导出配置
+                  </button>
+                  <label for="importPagesFile" class="cursor-pointer bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
+                    <i class="fa fa-upload mr-1"></i>导入配置
+                    <input type="file" id="importPagesFile" class="hidden" accept=".json">
+                  </label>
                   <button id="savePagesBtn" type="button"
                     class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-md text-sm btn-hover shadow-button">
                     <i class="fa fa-save mr-1"></i>保存

@@ -5,13 +5,18 @@
  * 当前工具版本号
  * @type {string}
  */
-export const VERSION = '1.8.49';
+export const VERSION = '1.8.50';
 
 /**
  * 版本历史记录
  * @type {Array<{version: string, date: string, changes: string[]}>}
  */
 export const VERSION_HISTORY = [
+  {
+    version: '1.8.50',
+    date: '2025-10-22',
+    changes: ['自动版本更新']
+  },
   {
     version: '1.8.49',
     date: '2025-10-22',

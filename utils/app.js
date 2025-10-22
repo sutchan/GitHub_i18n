@@ -1,6 +1,6 @@
 // Web界面交互逻辑模块
 // 作者: SutChan
-// 版本: 1.8.45
+// 版本: 1.8.46
 
 // 全局配置和常量定义
 const API_BASE_URL = '/utils';
@@ -445,7 +445,7 @@ function bindEvents() {
     }
   }
 
-  // 导入文件选择（为了兼容性保留此事件监听）
+  // 导入文件选择
   const importFileInput = document.getElementById('importPagesFile');
   if (importFileInput) {
     importFileInput.addEventListener('change', importPages);
@@ -2876,41 +2876,64 @@ async function importPages(event) {
       }
     });
 
-    // 获取现有页面配置
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {}, DEFAULT_TIMEOUT);
-    let currentPages = await response.json();
-
-    // 合并配置（去重）
-    const existingUrls = new Set(currentPages.map(page => page.url));
-    const newPages = importedPages.filter(page => !existingUrls.has(page.url));
-    const mergedPages = [...currentPages, ...newPages];
-
-    // 保存合并后的配置
-    const saveResponse = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(mergedPages)
-    }, DEFAULT_TIMEOUT);
-
-    if (!saveResponse.ok) {
-      throw new Error(`服务器响应错误: ${saveResponse.status} ${saveResponse.statusText}`);
-    }
-
-    const saveResult = await saveResponse.json();
-
-    if (saveResult.success) {
+    // 检查是否在开发环境或静态服务器环境
+    const isStaticServer = window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1');
+    
+    if (isStaticServer) {
+      // 在开发环境中，直接保存到localStorage
+      addLog('在开发环境中导入页面配置，保存到本地存储', 'info');
+      localStorage.setItem('pagesConfig', JSON.stringify(importedPages));
+      
       // 重新加载页面配置
       await loadPagesConfig();
+      
+      addLog(`成功导入 ${importedPages.length} 个页面配置`, 'success');
+      return;
+    }
 
-      // 显示成功消息
-      addLog(`成功导入 ${newPages.length} 个新页面配置`, 'success');
-      if (newPages.length < importedPages.length) {
-        addLog(`已跳过 ${importedPages.length - newPages.length} 个重复的页面配置`, 'info');
+    try {
+      // 获取现有页面配置
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {}, DEFAULT_TIMEOUT);
+      let currentPages = await response.json();
+
+      // 合并配置（去重）
+      const existingUrls = new Set(currentPages.map(page => page.url));
+      const newPages = importedPages.filter(page => !existingUrls.has(page.url));
+      const mergedPages = [...currentPages, ...newPages];
+
+      // 保存合并后的配置
+      const saveResponse = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(mergedPages)
+      }, DEFAULT_TIMEOUT);
+
+      if (!saveResponse.ok) {
+        throw new Error(`服务器响应错误: ${saveResponse.status} ${saveResponse.statusText}`);
       }
-    } else {
-      addLog(`导入页面配置失败: ${saveResult.message || '未知错误'}`, 'error');
+
+      const saveResult = await saveResponse.json();
+
+      if (saveResult.success) {
+        // 重新加载页面配置
+        await loadPagesConfig();
+
+        // 显示成功消息
+        addLog(`成功导入 ${newPages.length} 个新页面配置`, 'success');
+        if (newPages.length < importedPages.length) {
+          addLog(`已跳过 ${importedPages.length - newPages.length} 个重复的页面配置`, 'info');
+        }
+      } else {
+        addLog(`导入页面配置失败: ${saveResult.message || '未知错误'}`, 'error');
+      }
+    } catch (serverError) {
+      // 如果服务器操作失败，尝试作为备用方案保存到localStorage
+      addLog(`服务器操作失败，尝试保存到本地存储: ${serverError}`, 'warning');
+      localStorage.setItem('pagesConfig', JSON.stringify(importedPages));
+      await loadPagesConfig();
+      addLog(`已将 ${importedPages.length} 个页面配置保存到本地存储（临时解决方案）`, 'info');
     }
   } catch (error) {
     addLog(`导入页面配置时发生错误: ${error}`, 'error');
@@ -2924,9 +2947,40 @@ async function importPages(event) {
 // 导出页面配置
 async function exportPages() {
   try {
-    // 获取当前页面配置
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {}, DEFAULT_TIMEOUT);
-    const pages = await response.json();
+    let pages = [];
+    
+    // 检查是否在开发环境或静态服务器环境
+    const isStaticServer = window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1');
+    
+    if (isStaticServer) {
+      // 在开发环境中，尝试从localStorage获取
+      const savedPages = localStorage.getItem('pagesConfig');
+      if (savedPages) {
+        pages = JSON.parse(savedPages);
+        addLog('从本地存储获取页面配置进行导出', 'info');
+      } else {
+        // 如果localStorage中没有，使用默认配置
+        pages = window.pagesConfig || [];
+        addLog('使用当前内存中的页面配置进行导出', 'info');
+      }
+    } else {
+      try {
+        // 尝试从服务器获取
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/pages`, {}, DEFAULT_TIMEOUT);
+        pages = await response.json();
+      } catch (serverError) {
+        // 如果服务器操作失败，尝试从localStorage获取作为备用
+        addLog(`服务器操作失败，尝试从本地存储获取: ${serverError}`, 'warning');
+        const savedPages = localStorage.getItem('pagesConfig');
+        if (savedPages) {
+          pages = JSON.parse(savedPages);
+          addLog('从本地存储获取页面配置进行导出', 'info');
+        } else {
+          pages = window.pagesConfig || [];
+          addLog('使用当前内存中的页面配置进行导出', 'info');
+        }
+      }
+    }
 
     // 验证数据
     if (!Array.isArray(pages) || pages.length === 0) {
@@ -2952,9 +3006,10 @@ async function exportPages() {
       URL.revokeObjectURL(url);
     }, 100);
 
-    addLog('页面配置已成功导出', 'success');
+    addLog(`页面配置已成功导出 (${pages.length} 个页面)`, 'success');
   } catch (error) {
     addLog(`导出页面配置时发生错误: ${error}`, 'error');
+    alert(`导出失败: ${error.message}`);
   }
 }
 
