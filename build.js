@@ -7,7 +7,6 @@
 
 const fs = require('fs');
 const path = require('path');
-// const { execSync } = require('child_process'); // 暂时注释掉未使用的模块
 
 class BuildManager {
   constructor() {
@@ -21,7 +20,9 @@ class BuildManager {
       mainScript: this.outputFile,
       apiDir: path.join(this.projectRoot, 'api')
     };
-    this.currentVersion = '1.8.26'; // 初始版本号
+    this.currentVersion = null; // 将在readCurrentVersion中初始化
+    // 初始化版本号
+    this.readCurrentVersion();
   }
 
   /**

@@ -16,6 +16,12 @@ export const translationCore = {
     dictionary: {},
     
     /**
+     * 翻译缓存，用于存储已翻译过的文本
+     * @type {Map<string, string>}
+     */
+    translationCache: new Map(),
+    
+    /**
      * 初始化词典
      */
     initDictionary() {
@@ -42,7 +48,7 @@ export const translationCore = {
             });
             
             if (CONFIG.debugMode) {
-                console.log('[GitHub 中文翻译] 翻译完成');
+                console.log('[GitHub 中文翻译] 翻译完成，已翻译元素数量:', elements.length);
             }
         } catch (error) {
             console.error('[GitHub 中文翻译] 翻译过程中出错:', error);
@@ -54,30 +60,72 @@ export const translationCore = {
      * @returns {HTMLElement[]} 需要翻译的元素数组
      */
     getElementsToTranslate() {
-        const elements = [];
+        // 使用Set避免重复添加元素，提高性能
+        const uniqueElements = new Set();
         
         // 获取主选择器匹配的元素
         CONFIG.selectors.primary.forEach(selector => {
-            const matchedElements = document.querySelectorAll(selector);
-            matchedElements.forEach(element => {
-                // 避免重复添加
-                if (!elements.includes(element)) {
-                    elements.push(element);
+            try {
+                const matchedElements = document.querySelectorAll(selector);
+                matchedElements.forEach(element => {
+                    // 过滤不应该翻译的元素
+                    if (this.shouldTranslateElement(element)) {
+                        uniqueElements.add(element);
+                    }
+                });
+            } catch (error) {
+                if (CONFIG.debugMode) {
+                    console.warn(`[GitHub 中文翻译] 选择器 "${selector}" 解析失败:`, error);
                 }
-            });
+            }
         });
         
         // 获取弹出菜单元素
         CONFIG.selectors.popupMenus.forEach(selector => {
-            const matchedElements = document.querySelectorAll(selector);
-            matchedElements.forEach(element => {
-                if (!elements.includes(element)) {
-                    elements.push(element);
+            try {
+                const matchedElements = document.querySelectorAll(selector);
+                matchedElements.forEach(element => {
+                    // 过滤不应该翻译的元素
+                    if (this.shouldTranslateElement(element)) {
+                        uniqueElements.add(element);
+                    }
+                });
+            } catch (error) {
+                if (CONFIG.debugMode) {
+                    console.warn(`[GitHub 中文翻译] 选择器 "${selector}" 解析失败:`, error);
                 }
-            });
+            }
         });
         
-        return elements;
+        return Array.from(uniqueElements);
+    },
+    
+    /**
+     * 判断元素是否应该被翻译
+     * @param {HTMLElement} element - 要检查的元素
+     * @returns {boolean} 是否应该翻译
+     */
+    shouldTranslateElement(element) {
+        // 避免翻译特定类型的元素
+        const skipTags = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'];
+        if (skipTags.includes(element.tagName.toLowerCase())) {
+            return false;
+        }
+        
+        // 避免翻译具有特定属性的元素
+        if (element.hasAttribute('data-no-translate') || 
+            element.hasAttribute('translate') && element.getAttribute('translate') === 'no') {
+            return false;
+        }
+        
+        // 避免翻译具有特定类名的元素
+        const skipClasses = ['language-', 'highlight', 'token', 'no-translate'];
+        const classList = element.className;
+        if (classList && skipClasses.some(cls => classList.includes(cls))) {
+            return false;
+        }
+        
+        return true;
     },
     
     /**
@@ -85,12 +133,6 @@ export const translationCore = {
      * @param {HTMLElement} element - 要翻译的元素
      */
     translateElement(element) {
-        // 避免翻译特定类型的元素
-        const skipElements = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select'];
-        if (skipElements.includes(element.tagName.toLowerCase())) {
-            return;
-        }
-        
         // 遍历元素的所有文本节点
         const childNodes = Array.from(element.childNodes);
         childNodes.forEach(node => {
@@ -115,24 +157,54 @@ export const translationCore = {
         // 去除文本中的多余空白字符
         const normalizedText = text.trim();
         
+        // 检查缓存
+        if (CONFIG.performance.enableTranslationCache && this.translationCache.has(normalizedText)) {
+            return this.translationCache.get(normalizedText);
+        }
+        
         // 直接查找精确匹配
+        let result = null;
         if (this.dictionary[normalizedText]) {
             const translation = this.dictionary[normalizedText];
             // 避免返回标记为待翻译的文本
             if (!translation.startsWith('待翻译: ')) {
-                return translation;
+                result = translation;
             }
         }
         
-        // 如果启用了部分匹配
-        if (CONFIG.performance.enablePartialMatch) {
+        // 如果启用了部分匹配且尚未找到结果
+        if (result === null && CONFIG.performance.enablePartialMatch) {
             for (const [key, value] of Object.entries(this.dictionary)) {
-                if (normalizedText.includes(key) && !value.startsWith('待翻译: ')) {
-                    return normalizedText.replace(new RegExp(key, 'g'), value);
+                // 只对较长的键进行部分匹配，避免意外替换
+                if (key.length > 3 && normalizedText.includes(key) && !value.startsWith('待翻译: ')) {
+                    result = normalizedText.replace(new RegExp(key, 'g'), value);
+                    // 只返回第一个匹配的结果，避免多次替换导致的问题
+                    break;
                 }
             }
         }
         
-        return null;
+        // 更新缓存
+        if (CONFIG.performance.enableTranslationCache) {
+            // 限制缓存大小
+            if (this.translationCache.size >= CONFIG.performance.maxDictSize) {
+                // 删除最旧的缓存项（Map保持插入顺序）
+                const firstKey = this.translationCache.keys().next().value;
+                this.translationCache.delete(firstKey);
+            }
+            this.translationCache.set(normalizedText, result);
+        }
+        
+        return result;
+    },
+    
+    /**
+     * 清除翻译缓存
+     */
+    clearCache() {
+        this.translationCache.clear();
+        if (CONFIG.debugMode) {
+            console.log('[GitHub 中文翻译] 翻译缓存已清除');
+        }
     }
 };
