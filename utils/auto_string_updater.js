@@ -1,4 +1,3 @@
-@ -1, 1227 + 0, 0 @@
 // auto_string_updater.js
 // 用于自动化从GitHub网站抓取字符串并更新翻译词典的工具
 // 作者: SutChan
