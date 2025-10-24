@@ -1,6 +1,6 @@
 {
   "name": "github-auto-string-updater",
-  "version": "1.8.55",
+  "version": "1.8.56",
   "description": "GitHub字符串自动化更新工具",
   "main": "auto_string_updater.js",
   "scripts": {

@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.54
+// @version 1.8.57
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -90,7 +90,7 @@ export const CONFIG = {
     "version": "1.8.51",
     "debounceDelay": 500,
     "routeChangeDelay": 500,
-    "debugMode": true,
+    "debugMode": false,
     "updateCheck": {
         "enabled": true,
         "intervalHours": 24,
@@ -1286,9 +1286,7 @@ export const pageMonitor = {
             // 设置DOM变化监听
             this.setupDomObserver();
             
-            if (CONFIG.debugMode) {
-                console.log('[GitHub 中文翻译] 页面监控已初始化');
-            }
+            // 页面监控已初始化
         } catch (error) {
             console.error('[GitHub 中文翻译] 页面监控初始化失败:', error);
         }
@@ -1389,9 +1387,7 @@ export const pageMonitor = {
                     
                     if (hasImportantChange) {
                         this.translateWithThrottle();
-                    } else if (CONFIG.debugMode && CONFIG.performance.logAllMutations) {
-                        console.log(`[GitHub 中文翻译] 检测到非重要变化，跳过翻译，变化数量: ${mutations.length}`);
-                    }
+                    // 非重要变化，跳过翻译
                 } catch (error) {
                     console.error('[GitHub 中文翻译] 处理DOM变化时出错:', error);
                 }
@@ -1400,9 +1396,7 @@ export const pageMonitor = {
             // 开始观察文档
             if (document.body) {
                 this.observer.observe(document.body, observerConfig);
-                if (CONFIG.debugMode) {
-                    console.log('[GitHub 中文翻译] DOM观察器已启动');
-                }
+                // DOM观察器已启动
             } else {
                 console.error('[GitHub 中文翻译] document.body不存在，无法启动观察器');
                 // 尝试延迟启动
@@ -1463,18 +1457,14 @@ export const pageMonitor = {
                 this.observer.disconnect();
                 this.observer = null;
                 
-                if (CONFIG.debugMode) {
-                    console.log('[GitHub 中文翻译] DOM观察器已断开连接');
-                }
+                // DOM观察器已断开连接
             }
             
             // 重置状态
             this.lastPath = '';
             this.lastTranslateTimestamp = 0;
             
-            if (CONFIG.debugMode) {
-                console.log('[GitHub 中文翻译] 页面监控已停止');
-            }
+            // 页面监控已停止
         } catch (error) {
             console.error('[GitHub 中文翻译] 停止监控时出错:', error);
         }
@@ -1670,50 +1660,16 @@ async function init() {
     try {
         // 检查更新
         if (CONFIG.updateCheck.enabled) {
-            versionChecker.checkForUpdates().then(hasUpdate => {
-                if (CONFIG.debugMode) {
-                    console.log(`[GitHub 中文翻译] 更新检查完成，${hasUpdate ? '发现新版本' : '当前已是最新版本'}`);
-                }
-            }).catch(err => {
-                if (CONFIG.debugMode) {
-                    console.error('[GitHub 中文翻译] 更新检查失败:', err);
-                }
+            versionChecker.checkForUpdates().catch(() => {
+                // 静默失败，不影响用户体验
             });
         }
         
         // 初始化翻译核心功能
-        if (CONFIG.debugMode) {
-            console.log(`[GitHub 中文翻译] 开始初始化翻译核心...`);
-        }
-        
-        // 执行初始翻译
         translationCore.translate();
         
         // 初始化页面监控
         pageMonitor.init();
-        
-        // 在调试模式下，提供工具到全局作用域
-        if (CONFIG.debugMode) {
-            // 加载工具类
-            const { AutoStringUpdater, DictionaryProcessor } = loadTools();
-            
-            // 初始化并挂载工具
-            window.GitHubTranslationHelper = stringExtractor;
-            window.AutoStringUpdater = new AutoStringUpdater();
-            window.DictionaryProcessor = new DictionaryProcessor();
-            
-            console.log(`[GitHub 中文翻译] 脚本 v${CONFIG.version} 初始化成功`);
-            console.log('[GitHub 中文翻译] 开发工具已加载到全局作用域:');
-            console.log('  - 字符串提取工具: window.GitHubTranslationHelper');
-            console.log('  - 自动更新工具: window.AutoStringUpdater');
-            console.log('  - 词典处理工具: window.DictionaryProcessor');
-            console.log('\n使用示例:');
-            console.log('  // 收集页面字符串');
-            console.log('  GitHubTranslationHelper.collectStrings(true)');
-            console.log('  // 查看更新报告');
-            console.log('  AutoStringUpdater.showReportInConsole()');
-            console.log('  // 查看词典统计');
-            console.log('  DictionaryProcessor.showStatisticsInConsole()');
         }
     } catch (error) {
         console.error('[GitHub 中文翻译] 脚本初始化失败:', error);

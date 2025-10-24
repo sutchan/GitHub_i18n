@@ -1664,7 +1664,9 @@ async function loadPagesConfig() {
         } else {
           pages.forEach((page, index) => {
             // 验证每个页面配置的必需字段
-            if (!page.url || (!page.selectors && !page.selector)) {
+            // 允许有selectors或selector的页面没有url（如首页配置）
+            if ((!page.url && !page.selectors && !page.selector) || 
+                (page.url && !page.selectors && !page.selector)) {
               console.warn(`页面配置 ${index} 缺少必需字段（url或selectors/selector）:`, page);
               return;
             }
