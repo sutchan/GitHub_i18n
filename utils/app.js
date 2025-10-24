@@ -4,7 +4,7 @@
 
 // 全局配置和常量定义
 const API_BASE_URL = '/utils';
-const DEFAULT_TIMEOUT = 5000;
+const DEFAULT_TIMEOUT = 2000; // 减少超时时间，更快地降级到本地模式
 
 // 当前的SSE连接
 let eventSource = null;
@@ -523,10 +523,17 @@ async function checkServerStatus() {
     const response = await fetchWithTimeout(`${API_BASE_URL}/api/stats`, {
       method: 'GET'
     }, DEFAULT_TIMEOUT);
-    return response.ok;
+    
+    if (response.ok) {
+      return true;
+    } else {
+      // 服务器返回404或其他错误状态码
+      addLog(`服务器返回错误状态码: ${response.status}，将使用降级模式`, 'warning');
+      return true; // 即使服务器返回错误，也允许继续运行（将使用本地模式）
+    }
   } catch (error) {
     // 如果连接失败，记录警告但不阻止工具运行
-    addLog(`服务器状态检查失败: ${error.message}，将尝试使用降级模式`, 'warning');
+    addLog(`无法连接到服务器: ${error.message}，将使用降级模式`, 'warning');
     return true; // 即使服务器不可用，也允许继续运行（将使用本地模式）
   }
 }
@@ -546,7 +553,7 @@ function startEventSource() {
       eventSource = new EventSource(`${API_BASE_URL}/api/run`);
     } catch (error) {
       // 如果SSE连接失败，降级使用本地模拟
-      addLog('SSE连接失败，使用本地模拟模式运行任务', 'warning');
+      addLog('无法建立服务器连接，使用本地模式运行任务', 'warning');
       
       // 模拟连接成功
       setTimeout(() => {
@@ -1814,12 +1821,18 @@ async function loadStats() {
     
     try {
       // 优先尝试从服务器加载真实统计信息
-      addLog('尝试加载真实统计数据', 'info');
+      addLog('尝试加载统计数据', 'info');
       const response = await fetchWithTimeout(`${API_BASE_URL}/api/stats.json`, {}, DEFAULT_TIMEOUT);
+      
+      if (!response.ok) {
+        // 服务器返回错误状态码，直接降级到本地模式
+        throw new Error(`服务器返回错误: ${response.status}`);
+      }
+      
       stats = await response.json();
     } catch (error) {
       // 如果加载失败，降级使用本地计算的真实数据
-      addLog('无法从API获取统计数据，使用本地计算的真实数据', 'warning');
+      addLog('服务器数据不可用，使用本地模式', 'warning');
       stats = await calculateLocalStats();
     }
 
