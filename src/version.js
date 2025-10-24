@@ -4,6 +4,7 @@
 /**
  * 当前工具版本号
  * @type {string}
+ * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
 export const VERSION = '1.8.59';
 
@@ -15,66 +16,16 @@ export const VERSION_HISTORY = [
   {
     version: '1.8.59',
     date: '2025-10-24',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.58',
-    date: '2025-10-24',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.57',
-    date: '2025-10-24',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.56',
-    date: '2025-10-22',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.55',
-    date: '2025-10-22',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.54',
-    date: '2025-10-22',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.53',
-    date: '2025-10-22',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.52',
-    date: '2025-10-22',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.51',
-    date: '2025-10-22',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.50',
-    date: '2025-10-22',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.49',
-    date: '2025-10-22',
-    changes: ['自动版本更新']
+    changes: ['优化版本号管理系统', '统一版本号源']
   },
   {
     version: '1.8.37',
-    date: new Date().toISOString().split('T')[0],
+    date: '2023-12-18',
     changes: ['修复utils/app.js文件中的语法错误']
   },
   {
     version: '1.8.29',
-    date: new Date().toISOString().split('T')[0],
+    date: '2023-12-17',
     changes: [
       '完成所有文件版本号同步',
       '更新构建系统补丁版本',

@@ -3,6 +3,9 @@
  * 包含脚本所有可配置项
  */
 
+// 导入版本常量（从单一版本源）
+import { VERSION } from './version.js';
+
 /**
  * 从用户脚本头部注释中提取版本号
  * @returns {string} 版本号
@@ -16,10 +19,10 @@ function getVersionFromComment() {
         }
         
         // 如果GM_info不可用，返回配置中的版本号
-        return CONFIG.version;
+        return VERSION;
     } catch (e) {
         // 出错时返回配置中的版本号
-        return CONFIG.version;
+        return VERSION;
     }
 }
 
@@ -27,7 +30,7 @@ function getVersionFromComment() {
  * 配置对象，包含所有可配置项
  */
 export const CONFIG = {
-    "version": "1.8.51",
+    "version": VERSION,
     "debounceDelay": 500,
     "routeChangeDelay": 500,
     "debugMode": false,

@@ -27,19 +27,22 @@ class BuildManager {
   }
 
   /**
-   * 读取当前版本号
+   * 读取当前版本号 - 从单一版本源（version.js）读取
    * @returns {string} 当前版本号
    */
   readCurrentVersion() {
     try {
-      // 从config.js读取版本号
-      const configContent = fs.readFileSync(this.srcFiles.configJs, 'utf8');
-      const match = configContent.match(/version:\s*['"](.+)['"]/);
+      // 直接从version.js读取版本号作为单一版本源
+      const versionContent = fs.readFileSync(this.srcFiles.versionJs, 'utf8');
+      const match = versionContent.match(/VERSION\s*=\s*['"](.+)['"]/);
       if (match && match[1]) {
         this.currentVersion = match[1];
         return match[1];
       }
-
+      
+      // 降级方案：尝试从其他文件读取版本号
+      console.warn('无法从version.js读取版本号，尝试从其他文件读取...');
+      
       // 从index.js读取版本号（包含UserScript元数据）
       const indexContent = fs.readFileSync(this.srcFiles.indexJs, 'utf8');
       const indexMatch = indexContent.match(/@version\s+([\d.]+)/);
@@ -47,6 +50,15 @@ class BuildManager {
         this.currentVersion = indexMatch[1];
         return indexMatch[1];
       }
+      
+      // 从config.js读取版本号
+      const configContent = fs.readFileSync(this.srcFiles.configJs, 'utf8');
+      const configMatch = configContent.match(/version:\s*['"](.+)['"]/);
+      if (configMatch && configMatch[1]) {
+        this.currentVersion = configMatch[1];
+        return configMatch[1];
+      }
+      
     } catch (error) {
       console.error('读取版本号失败:', error.message);
     }
@@ -88,31 +100,27 @@ class BuildManager {
   updateVersionInFiles() {
     try {
       // 需要更新版本号的文件列表
+      // 注意：version.js是单一版本源，应该首先更新它
       const filesToUpdate = [
         {
-          path: this.srcFiles.configJs,
-          regex: /version:\s*['"](.+)['"]/,
-          replacement: `version: '${this.currentVersion}'`,
-          name: 'config.js'
+          path: this.srcFiles.versionJs,
+          regex: /VERSION\s*=\s*['"](.+)['"]/,
+          replacement: `VERSION = '${this.currentVersion}'`,
+          name: 'version.js' // 单一版本源，优先更新
         },
         {
           path: this.srcFiles.indexJs,
           regex: /@version\s+([\d.]+)/,
           replacement: `@version ${this.currentVersion}`,
-          name: 'index.js'
-        },
-        {
-          path: this.srcFiles.versionJs,
-          regex: /VERSION\s*=\s*['"](.+)['"]/,
-          replacement: `VERSION = '${this.currentVersion}'`,
-          name: 'version.js'
+          name: 'index.js' // UserScript元数据
         },
         {
           path: path.join(this.projectRoot, 'build.js'),
           regex: /@version\s+([\d.]+)/,
           replacement: `@version ${this.currentVersion}`,
-          name: 'build.js'
+          name: 'build.js' // 构建脚本
         }
+        // config.js不需要在这里更新，因为它从version.js导入VERSION
       ];
 
       // 遍历所有文件并更新版本号
@@ -133,21 +141,26 @@ class BuildManager {
         // 检查是否需要添加新版本历史记录
         if (!versionContent.includes(`version: '${this.currentVersion}'`) && 
             !versionContent.includes(`version: "${this.currentVersion}"`)) {
+          // 从命令行参数或环境变量获取更新说明
+          const updateNote = process.env.UPDATE_NOTE || process.argv.find(arg => arg.startsWith('--note='))?.replace('--note=', '') || '自动版本更新';
+          const changes = updateNote.split('|').map(note => note.trim());
+          
           // 在VERSION_HISTORY数组的开头添加新版本记录
           const newVersionEntry = `  {
     version: '${this.currentVersion}',
     date: '${currentDate}',
-    changes: ['自动版本更新']
+    changes: [${changes.map(change => `'${change}'`).join(', ')}]
   }`;
           
           // 插入新版本记录到数组顶部
           versionContent = versionContent.replace(
-            /export const VERSION_HISTORY = \[\s*\{/, 
+            /export const VERSION_HISTORY = \[\s*\{/,
             `export const VERSION_HISTORY = [\n${newVersionEntry},\n  {`
           );
           
           fs.writeFileSync(this.srcFiles.versionJs, versionContent, 'utf8');
           console.log(`✅ 已更新版本历史记录，添加版本: ${this.currentVersion}`);
+          console.log(`   更新内容: ${changes.join(', ')}`);
         }
       }
 
