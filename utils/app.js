@@ -1573,6 +1573,135 @@ async function loadConfig() {
   }
 }
 
+// 定义默认页面配置
+function getDefaultPagesConfig() {
+  return [
+    {
+      "url": "https://github.com",
+      "name": "GitHub首页",
+      "priority": 1,
+      "enabled": true,
+      "categories": ["homepage", "navigation"],
+      "selectors": ["main", "nav", "footer"],
+      "excludeSelectors": ["[data-testid=hovercard]", "[data-ga-click]"],
+      "selector": "main",
+      "module": "common"
+    },
+    {
+      "url": "https://github.com/explore",
+      "name": "探索页面",
+      "priority": 2,
+      "enabled": true,
+      "categories": ["explore", "discovery"],
+      "selectors": ["main"],
+      "excludeSelectors": ["[data-testid=hovercard]"],
+      "selector": "main",
+      "module": "explore"
+    },
+    {
+      "url": "https://github.com/login",
+      "name": "登录页面",
+      "priority": 3,
+      "enabled": true,
+      "categories": ["auth", "forms"],
+      "selectors": ["main"],
+      "excludeSelectors": [],
+      "selector": "main",
+      "module": "common"
+    }
+  ];
+}
+
+// 渲染页面配置表格
+function renderPagesTable(pages) {
+  const tableBody = document.getElementById('pagesTableBody');
+  if (!tableBody) return;
+  
+  tableBody.innerHTML = '';
+  
+  pages.forEach((page, index) => {
+    const newRow = document.createElement('tr');
+    newRow.setAttribute('data-index', index);
+    newRow.setAttribute('data-url', escapeHTML(page.url));
+    newRow.setAttribute('data-selector', escapeHTML(page.selector));
+    newRow.setAttribute('data-module', escapeHTML(page.module));
+    newRow.className = 'hover:bg-gray-50 transition-colors';
+    newRow.innerHTML = `
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <input type="checkbox" class="page-checkbox rounded border-gray-300 text-primary focus:ring-primary/50">
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-900">
+                        <div class="flex items-center">
+                            <div class="max-w-md overflow-hidden text-ellipsis whitespace-nowrap relative" title="${escapeHTML(page.url)}">
+                                ${escapeHTML(page.url)}
+                            </div>
+                            <button class="ml-2 text-gray-400 hover:text-primary copy-url transition-colors" data-url="${escapeHTML(page.url)}" aria-label="复制URL">
+                                <i class="fa fa-copy"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.selector)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.module)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="text-primary hover:text-primary/80 mr-3 edit-page transition-colors" aria-label="编辑">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                        <button class="text-danger hover:text-danger/80 delete-page transition-colors" aria-label="删除">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                        <button class="text-secondary hover:text-secondary/80 ml-3 test-page transition-colors" aria-label="测试" data-url="${escapeHTML(page.url)}">
+                            <i class="fa fa-external-link"></i>
+                        </button>
+                    </td>
+                `;
+    tableBody.appendChild(newRow);
+
+    // 绑定事件
+    newRow.querySelector('.edit-page').addEventListener('click', function () {
+      showEditPageModal(index);
+    });
+
+    newRow.querySelector('.delete-page').addEventListener('click', function () {
+      deletePage(index);
+    });
+
+    newRow.querySelector('.copy-url').addEventListener('click', function () {
+      copyUrlToClipboard(this.getAttribute('data-url'));
+    });
+
+    newRow.querySelector('.test-page').addEventListener('click', function () {
+      testPageUrl(this.getAttribute('data-url'));
+    });
+
+    newRow.querySelector('.page-checkbox').addEventListener('change', function () {
+      updateSelectedPagesStatus();
+    });
+  });
+  
+  updatePagesCount();
+}
+
+// 带超时的fetch函数
+function fetchWithTimeout(url, options = {}, timeout = 5000) {
+  return new Promise((resolve, reject) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+      reject(new Error(`请求超时: ${timeout}ms后未响应`));
+    }, timeout);
+
+    fetch(url, { ...options, signal: controller.signal })
+      .then(response => {
+        clearTimeout(timeoutId);
+        resolve(response);
+      })
+      .catch(error => {
+        clearTimeout(timeoutId);
+        reject(error);
+      });
+  });
+}
+
 // 加载页面配置
 async function loadPagesConfig() {
   try {
@@ -1583,112 +1712,15 @@ async function loadPagesConfig() {
       // 在开发环境中，提供默认页面配置
       addLog('在开发环境中运行，使用默认页面配置', 'info');
       
-      // 使用默认页面配置，确保包含完整的必要字段
-      const defaultPages = [
-        {
-          "url": "https://github.com",
-          "name": "GitHub首页",
-          "priority": 1,
-          "enabled": true,
-          "categories": ["homepage", "navigation"],
-          "selectors": ["main", "nav", "footer"],
-          "excludeSelectors": ["[data-testid=hovercard]", "[data-ga-click]"],
-          "selector": "main",
-          "module": "common"
-        },
-        {
-          "url": "https://github.com/explore",
-          "name": "探索页面",
-          "priority": 2,
-          "enabled": true,
-          "categories": ["explore", "discovery"],
-          "selectors": ["main"],
-          "excludeSelectors": ["[data-testid=hovercard]"],
-          "selector": "main",
-          "module": "explore"
-        },
-        {
-          "url": "https://github.com/login",
-          "name": "登录页面",
-          "priority": 3,
-          "enabled": true,
-          "categories": ["auth", "forms"],
-          "selectors": ["main"],
-          "excludeSelectors": [],
-          "selector": "main",
-          "module": "common"
-        }
-      ];
+      // 使用默认页面配置
+      const defaultPages = getDefaultPagesConfig();
       
       // 存储页面配置到全局变量
       window.pagesConfig = defaultPages;
       localStorage.setItem('pagesConfig', JSON.stringify(defaultPages));
       
       // 更新页面表格UI
-      const tableBody = document.getElementById('pagesTableBody');
-      if (tableBody) {
-        tableBody.innerHTML = '';
-        defaultPages.forEach((page, index) => {
-          const newRow = document.createElement('tr');
-          newRow.setAttribute('data-index', index);
-          newRow.setAttribute('data-url', escapeHTML(page.url));
-          newRow.setAttribute('data-selector', escapeHTML(page.selector));
-          newRow.setAttribute('data-module', escapeHTML(page.module));
-          newRow.className = 'hover:bg-gray-50 transition-colors';
-          newRow.innerHTML = `
-                          <td class="px-4 py-4 whitespace-nowrap">
-                              <input type="checkbox" class="page-checkbox rounded border-gray-300 text-primary focus:ring-primary/50">
-                          </td>
-                          <td class="px-6 py-4 text-sm text-gray-900">
-                              <div class="flex items-center">
-                                  <div class="max-w-md overflow-hidden text-ellipsis whitespace-nowrap relative" title="${escapeHTML(page.url)}">
-                                      ${escapeHTML(page.url)}
-                                  </div>
-                                  <button class="ml-2 text-gray-400 hover:text-primary copy-url transition-colors" data-url="${escapeHTML(page.url)}" aria-label="复制URL">
-                                      <i class="fa fa-copy"></i>
-                                  </button>
-                              </div>
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.selector)}</td>
-                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.module)}</td>
-                          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                              <button class="text-primary hover:text-primary/80 mr-3 edit-page transition-colors" aria-label="编辑">
-                                  <i class="fa fa-pencil"></i>
-                              </button>
-                              <button class="text-danger hover:text-danger/80 delete-page transition-colors" aria-label="删除">
-                                  <i class="fa fa-trash"></i>
-                              </button>
-                              <button class="text-secondary hover:text-secondary/80 ml-3 test-page transition-colors" aria-label="测试" data-url="${escapeHTML(page.url)}">
-                                  <i class="fa fa-external-link"></i>
-                              </button>
-                          </td>
-                      `;
-          tableBody.appendChild(newRow);
-
-          // 绑定事件
-          newRow.querySelector('.edit-page').addEventListener('click', function () {
-            showEditPageModal(index);
-          });
-
-          newRow.querySelector('.delete-page').addEventListener('click', function () {
-            deletePage(index);
-          });
-
-          newRow.querySelector('.copy-url').addEventListener('click', function () {
-            copyUrlToClipboard(this.getAttribute('data-url'));
-          });
-
-          newRow.querySelector('.test-page').addEventListener('click', function () {
-            testPageUrl(this.getAttribute('data-url'));
-          });
-
-          newRow.querySelector('.page-checkbox').addEventListener('change', function () {
-            updateSelectedPagesStatus();
-          });
-        });
-        
-        updatePagesCount();
-      }
+      renderPagesTable(defaultPages);
       
       return;
     }
@@ -1699,26 +1731,6 @@ async function loadPagesConfig() {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        // 使用带超时的fetch
-        const fetchWithTimeout = (url, options = {}, timeout = 5000) => {
-          return new Promise((resolve, reject) => {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => {
-              controller.abort();
-              reject(new Error(`请求超时: ${timeout}ms后未响应`));
-            }, timeout);
-
-            fetch(url, { ...options, signal: controller.signal })
-              .then(response => {
-                clearTimeout(timeoutId);
-                resolve(response);
-              })
-              .catch(error => {
-                clearTimeout(timeoutId);
-                reject(error);
-              });
-          });
-        };
 
         const response = await fetchWithTimeout('/utils/api/pages.json');
 
@@ -1874,112 +1886,15 @@ async function loadPagesConfig() {
 
     // 在错误情况下使用默认页面配置，确保应用可以继续工作
     try {
-      // 设置默认页面配置
-      const defaultPages = [
-        {
-          "url": "https://github.com",
-          "name": "GitHub首页",
-          "priority": 1,
-          "enabled": true,
-          "categories": ["homepage", "navigation"],
-          "selectors": ["main", "nav", "footer"],
-          "excludeSelectors": ["[data-testid=hovercard]", "[data-ga-click]"],
-          "selector": "main",
-          "module": "common"
-        },
-        {
-          "url": "https://github.com/explore",
-          "name": "探索页面",
-          "priority": 2,
-          "enabled": true,
-          "categories": ["explore", "discovery"],
-          "selectors": ["main"],
-          "excludeSelectors": ["[data-testid=hovercard]"],
-          "selector": "main",
-          "module": "explore"
-        },
-        {
-          "url": "https://github.com/login",
-          "name": "登录页面",
-          "priority": 3,
-          "enabled": true,
-          "categories": ["auth", "forms"],
-          "selectors": ["main"],
-          "excludeSelectors": [],
-          "selector": "main",
-          "module": "common"
-        }
-      ];
+      // 使用默认页面配置
+      const defaultPages = getDefaultPagesConfig();
       
       // 存储默认页面配置到全局变量
       window.pagesConfig = defaultPages;
       localStorage.setItem('pagesConfig', JSON.stringify(defaultPages));
       
       // 更新UI显示默认配置
-      const tableBody = document.getElementById('pagesTableBody');
-      if (tableBody) {
-        tableBody.innerHTML = '';
-        defaultPages.forEach((page, index) => {
-          const newRow = document.createElement('tr');
-          newRow.setAttribute('data-index', index);
-          newRow.setAttribute('data-url', escapeHTML(page.url));
-          newRow.setAttribute('data-selector', escapeHTML(page.selector));
-          newRow.setAttribute('data-module', escapeHTML(page.module));
-          newRow.className = 'hover:bg-gray-50 transition-colors';
-          newRow.innerHTML = `
-                          <td class="px-4 py-4 whitespace-nowrap">
-                              <input type="checkbox" class="page-checkbox rounded border-gray-300 text-primary focus:ring-primary/50">
-                          </td>
-                          <td class="px-6 py-4 text-sm text-gray-900">
-                              <div class="flex items-center">
-                                  <div class="max-w-md overflow-hidden text-ellipsis whitespace-nowrap relative" title="${escapeHTML(page.url)}">
-                                      ${escapeHTML(page.url)}
-                                  </div>
-                                  <button class="ml-2 text-gray-400 hover:text-primary copy-url transition-colors" data-url="${escapeHTML(page.url)}" aria-label="复制URL">
-                                      <i class="fa fa-copy"></i>
-                                  </button>
-                              </div>
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.selector)}</td>
-                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.module)}</td>
-                          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                              <button class="text-primary hover:text-primary/80 mr-3 edit-page transition-colors" aria-label="编辑">
-                                  <i class="fa fa-pencil"></i>
-                              </button>
-                              <button class="text-danger hover:text-danger/80 delete-page transition-colors" aria-label="删除">
-                                  <i class="fa fa-trash"></i>
-                              </button>
-                              <button class="text-secondary hover:text-secondary/80 ml-3 test-page transition-colors" aria-label="测试" data-url="${escapeHTML(page.url)}">
-                                  <i class="fa fa-external-link"></i>
-                              </button>
-                          </td>
-                      `;
-          tableBody.appendChild(newRow);
-
-          // 绑定事件
-          newRow.querySelector('.edit-page').addEventListener('click', function () {
-            showEditPageModal(index);
-          });
-
-          newRow.querySelector('.delete-page').addEventListener('click', function () {
-            deletePage(index);
-          });
-
-          newRow.querySelector('.copy-url').addEventListener('click', function () {
-            copyUrlToClipboard(this.getAttribute('data-url'));
-          });
-
-          newRow.querySelector('.test-page').addEventListener('click', function () {
-            testPageUrl(this.getAttribute('data-url'));
-          });
-
-          newRow.querySelector('.page-checkbox').addEventListener('change', function () {
-            updateSelectedPagesStatus();
-          });
-        });
-        
-        updatePagesCount();
-      }
+      renderPagesTable(defaultPages);
     } catch (uiError) {
       console.error('更新UI失败:', uiError);
     }
