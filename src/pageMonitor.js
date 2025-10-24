@@ -140,7 +140,7 @@ export const pageMonitor = {
                     
                     if (hasImportantChange) {
                         this.translateWithThrottle();
-                    // 非重要变化，跳过翻译
+                    } // 非重要变化，跳过翻译
                 } catch (error) {
                     console.error('[GitHub 中文翻译] 处理DOM变化时出错:', error);
                 }

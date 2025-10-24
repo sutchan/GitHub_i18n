@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.57
+// @version 1.8.59
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -1387,7 +1387,7 @@ export const pageMonitor = {
                     
                     if (hasImportantChange) {
                         this.translateWithThrottle();
-                    // 非重要变化，跳过翻译
+                    } // 非重要变化，跳过翻译
                 } catch (error) {
                     console.error('[GitHub 中文翻译] 处理DOM变化时出错:', error);
                 }
@@ -1670,7 +1670,6 @@ async function init() {
         
         // 初始化页面监控
         pageMonitor.init();
-        }
     } catch (error) {
         console.error('[GitHub 中文翻译] 脚本初始化失败:', error);
     }

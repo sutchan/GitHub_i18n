@@ -26,7 +26,6 @@ async function init() {
         
         // 初始化页面监控
         pageMonitor.init();
-        }
     } catch (error) {
         console.error('[GitHub 中文翻译] 脚本初始化失败:', error);
     }
