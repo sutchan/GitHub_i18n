@@ -39,9 +39,7 @@ export const pageMonitor = {
             // 设置DOM变化监听
             this.setupDomObserver();
             
-            if (CONFIG.debugMode) {
-                console.log('[GitHub 中文翻译] 页面监控已初始化');
-            }
+            // 页面监控已初始化
         } catch (error) {
             console.error('[GitHub 中文翻译] 页面监控初始化失败:', error);
         }
@@ -142,9 +140,7 @@ export const pageMonitor = {
                     
                     if (hasImportantChange) {
                         this.translateWithThrottle();
-                    } else if (CONFIG.debugMode && CONFIG.performance.logAllMutations) {
-                        console.log(`[GitHub 中文翻译] 检测到非重要变化，跳过翻译，变化数量: ${mutations.length}`);
-                    }
+                    // 非重要变化，跳过翻译
                 } catch (error) {
                     console.error('[GitHub 中文翻译] 处理DOM变化时出错:', error);
                 }
@@ -153,9 +149,7 @@ export const pageMonitor = {
             // 开始观察文档
             if (document.body) {
                 this.observer.observe(document.body, observerConfig);
-                if (CONFIG.debugMode) {
-                    console.log('[GitHub 中文翻译] DOM观察器已启动');
-                }
+                // DOM观察器已启动
             } else {
                 console.error('[GitHub 中文翻译] document.body不存在，无法启动观察器');
                 // 尝试延迟启动
@@ -216,18 +210,14 @@ export const pageMonitor = {
                 this.observer.disconnect();
                 this.observer = null;
                 
-                if (CONFIG.debugMode) {
-                    console.log('[GitHub 中文翻译] DOM观察器已断开连接');
-                }
+                // DOM观察器已断开连接
             }
             
             // 重置状态
             this.lastPath = '';
             this.lastTranslateTimestamp = 0;
             
-            if (CONFIG.debugMode) {
-                console.log('[GitHub 中文翻译] 页面监控已停止');
-            }
+            // 页面监控已停止
         } catch (error) {
             console.error('[GitHub 中文翻译] 停止监控时出错:', error);
         }

@@ -30,7 +30,7 @@ export const CONFIG = {
     "version": "1.8.51",
     "debounceDelay": 500,
     "routeChangeDelay": 500,
-    "debugMode": true,
+    "debugMode": false,
     "updateCheck": {
         "enabled": true,
         "intervalHours": 24,
