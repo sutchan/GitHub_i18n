@@ -1754,77 +1754,8 @@ async function loadPagesConfig() {
         window.pagesConfig = processedPages;
         localStorage.setItem('pagesConfig', JSON.stringify(processedPages));
 
-        // 检查是否为空数组，显示友好的空状态提示
-        if (processedPages.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">没有配置的页面，请点击"添加页面"按钮添加新页面</td></tr>';
-        } else {
-          processedPages.forEach((page, index) => {
-            // 验证每个页面配置的必需字段
-            // 允许有selectors或selector的页面没有url（如首页配置）
-            if ((!page.url && !page.selectors && !page.selector) || 
-                (page.url && !page.selectors && !page.selector)) {
-              console.warn(`页面配置 ${index} 缺少必需字段（url或selectors/selector）:`, page);
-              return;
-            }
-
-            const newRow = document.createElement('tr');
-            newRow.setAttribute('data-index', index);
-            newRow.setAttribute('data-url', escapeHTML(page.url));
-            newRow.setAttribute('data-selector', escapeHTML(page.selector));
-            newRow.setAttribute('data-module', escapeHTML(page.module));
-            newRow.className = 'hover:bg-gray-50 transition-colors';
-            newRow.innerHTML = `
-                            <td class="px-4 py-4 whitespace-nowrap">
-                                <input type="checkbox" class="page-checkbox rounded border-gray-300 text-primary focus:ring-primary/50">
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-900">
-                                <div class="flex items-center">
-                                    <div class="max-w-md overflow-hidden text-ellipsis whitespace-nowrap relative" title="${escapeHTML(page.url)}">
-                                        ${escapeHTML(page.url)}
-                                    </div>
-                                    <button class="ml-2 text-gray-400 hover:text-primary copy-url transition-colors" data-url="${escapeHTML(page.url)}" aria-label="复制URL">
-                                        <i class="fa fa-copy"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.selector)}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.module)}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-primary hover:text-primary/80 mr-3 edit-page transition-colors" aria-label="编辑">
-                                    <i class="fa fa-pencil"></i>
-                                </button>
-                                <button class="text-danger hover:text-danger/80 delete-page transition-colors" aria-label="删除">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                                <button class="text-secondary hover:text-secondary/80 ml-3 test-page transition-colors" aria-label="测试" data-url="${escapeHTML(page.url)}">
-                                    <i class="fa fa-external-link"></i>
-                                </button>
-                            </td>
-                        `;
-            tableBody.appendChild(newRow);
-
-            // 绑定事件
-            newRow.querySelector('.edit-page').addEventListener('click', function () {
-              showEditPageModal(index);
-            });
-
-            newRow.querySelector('.delete-page').addEventListener('click', function () {
-              deletePage(index);
-            });
-
-            newRow.querySelector('.copy-url').addEventListener('click', function () {
-              copyUrlToClipboard(this.getAttribute('data-url'));
-            });
-
-            newRow.querySelector('.test-page').addEventListener('click', function () {
-              testPageUrl(this.getAttribute('data-url'));
-            });
-
-            newRow.querySelector('.page-checkbox').addEventListener('change', function () {
-              updateSelectedPagesStatus();
-            });
-          });
-        }
+        // 使用统一的表格渲染函数
+        renderPagesTable(processedPages);
 
         // 更新页面计数
         updatePagesCount();
