@@ -1090,26 +1090,7 @@ async function saveUserScriptSettings() {
 
     console.log('准备发送请求到/api/config');
 
-    // 使用带超时的fetch
-    const fetchWithTimeout = (url, options = {}, timeout = 5000) => {
-      return new Promise((resolve, reject) => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-          reject(new Error(`请求超时: ${timeout}ms后未响应`));
-        }, timeout);
-
-        fetch(url, { ...options, signal: controller.signal })
-          .then(response => {
-            clearTimeout(timeoutId);
-            resolve(response);
-          })
-          .catch(error => {
-            clearTimeout(timeoutId);
-            reject(error);
-          });
-      });
-    };
+    // 使用全局定义的fetchWithTimeout函数
 
     // 1. 保存到配置文件（保留原有功能）
     const configResponse = await fetchWithTimeout(`${API_BASE_URL}/api/config`, {
@@ -1461,26 +1442,7 @@ async function loadConfig() {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        // 使用带超时的fetch
-        const fetchWithTimeout = (url, options = {}, timeout = 3000) => {
-          return new Promise((resolve, reject) => {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => {
-              controller.abort();
-              reject(new Error(`请求超时: ${timeout}ms后未响应`));
-            }, timeout);
-
-            fetch(url, { ...options, signal: controller.signal })
-              .then(response => {
-                clearTimeout(timeoutId);
-                resolve(response);
-              })
-              .catch(error => {
-                clearTimeout(timeoutId);
-                reject(error);
-              });
-          });
-        };
+        // 使用全局定义的fetchWithTimeout函数
 
         const response = await fetchWithTimeout(`${API_BASE_URL}/api/config.json`, {
           method: 'GET'
