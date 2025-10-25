@@ -3,8 +3,11 @@
 // 版本: 1.8.46
 
 // 全局配置和常量定义
-const API_BASE_URL = '/utils';
-const DEFAULT_TIMEOUT = 2000; // 减少超时时间，更快地降级到本地模式
+// 注意：如果使用本地开发环境，API_BASE_URL需要设置为空字符串''
+// 使用相对路径，浏览器会自动使用当前域名
+const API_BASE_URL = ''; // 修改为空字符串，避免不必要的404错误
+const DEFAULT_TIMEOUT = 1000; // 进一步减少超时时间，更快地降级到本地模式
+const IS_SERVER_ENABLED = false; // 明确禁用服务器连接，避免不必要的错误
 
 // 当前的SSE连接
 let eventSource = null;
@@ -518,6 +521,12 @@ async function runTool() {
 
 // 检查服务器状态
 async function checkServerStatus() {
+  // 如果服务器连接被禁用，直接返回true并使用降级模式
+  if (!IS_SERVER_ENABLED) {
+    addLog('服务器连接已禁用，将使用本地模式运行', 'info');
+    return true;
+  }
+  
   try {
     // 尝试连接服务器获取状态
     const response = await fetchWithTimeout(`${API_BASE_URL}/api/stats`, {
@@ -533,6 +542,7 @@ async function checkServerStatus() {
     }
   } catch (error) {
     // 如果连接失败，记录警告但不阻止工具运行
+    // 注意：在开发环境中出现404错误是正常的，因为服务器可能未运行
     addLog(`无法连接到服务器: ${error.message}，将使用降级模式`, 'warning');
     return true; // 即使服务器不可用，也允许继续运行（将使用本地模式）
   }
@@ -548,6 +558,25 @@ function startEventSource() {
 
   // 创建新的SSE连接
   try {
+    // 如果服务器连接被禁用，直接使用本地模式
+    if (!IS_SERVER_ENABLED) {
+      addLog('服务器连接已禁用，使用本地模式运行任务', 'info');
+      
+      // 模拟连接成功
+      setTimeout(() => {
+        updateStatus('running');
+        const toggleBtn = document.getElementById('toggleBtn');
+        toggleBtn.innerHTML = '<i class="fa fa-stop mr-2"></i>停止抓取';
+        toggleBtn.classList.remove('bg-primary', 'hover:bg-primary/90');
+        toggleBtn.classList.add('bg-danger', 'hover:bg-danger/90');
+        
+        // 模拟一些进度更新
+        simulateServerProgress();
+      }, 500);
+      
+      return; // 避免继续执行
+    }
+    
     // 优先尝试创建实际的SSE连接
     try {
       eventSource = new EventSource(`${API_BASE_URL}/api/run`);
@@ -1643,27 +1672,6 @@ function renderPagesTable(pages) {
   updatePagesCount();
 }
 
-// 带超时的fetch函数
-function fetchWithTimeout(url, options = {}, timeout = 5000) {
-  return new Promise((resolve, reject) => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-      reject(new Error(`请求超时: ${timeout}ms后未响应`));
-    }, timeout);
-
-    fetch(url, { ...options, signal: controller.signal })
-      .then(response => {
-        clearTimeout(timeoutId);
-        resolve(response);
-      })
-      .catch(error => {
-        clearTimeout(timeoutId);
-        reject(error);
-      });
-  });
-}
-
 // 加载页面配置
 async function loadPagesConfig() {
   try {
@@ -1806,21 +1814,27 @@ async function loadStats() {
   try {
     let stats;
     
-    try {
-      // 优先尝试从服务器加载真实统计信息
-      addLog('尝试加载统计数据', 'info');
-      const response = await fetchWithTimeout(`${API_BASE_URL}/api/stats.json`, {}, DEFAULT_TIMEOUT);
-      
-      if (!response.ok) {
-        // 服务器返回错误状态码，直接降级到本地模式
-        throw new Error(`服务器返回错误: ${response.status}`);
-      }
-      
-      stats = await response.json();
-    } catch (error) {
-      // 如果加载失败，降级使用本地计算的真实数据
-      addLog('服务器数据不可用，使用本地模式', 'warning');
+    // 如果服务器连接被禁用，直接使用本地模式
+    if (!IS_SERVER_ENABLED) {
+      addLog('服务器连接已禁用，使用本地统计数据', 'info');
       stats = await calculateLocalStats();
+    } else {
+      try {
+        // 优先尝试从服务器加载真实统计信息
+        addLog('尝试加载统计数据', 'info');
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/stats.json`, {}, DEFAULT_TIMEOUT);
+        
+        if (!response.ok) {
+          // 服务器返回错误状态码，直接降级到本地模式
+          throw new Error(`服务器返回错误: ${response.status}`);
+        }
+        
+        stats = await response.json();
+      } catch (error) {
+        // 如果加载失败，降级使用本地计算的真实数据
+        addLog('服务器数据不可用，使用本地模式', 'warning');
+        stats = await calculateLocalStats();
+      }
     }
 
     // 安全地更新统计数据DOM元素
