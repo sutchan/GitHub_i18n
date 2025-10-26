@@ -2,7 +2,7 @@
  * 开发工具模块
  * 包含字符串提取、自动更新和词典处理等开发工具
  */
-import { CONFIG } from './config.js';
+// 删除未使用的CONFIG导入
 import { utils } from './utils.js';
 import { translationModule } from './dictionaries/index.js';
 

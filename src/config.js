@@ -6,6 +6,9 @@
 // 导入版本常量（从单一版本源）
 import { VERSION } from './version.js';
 
+// 定义GM_info以避免未定义错误
+const GM_info = typeof window !== 'undefined' && window.GM_info || {};
+
 /**
  * 从用户脚本头部注释中提取版本号
  * @returns {string} 版本号

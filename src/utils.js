@@ -63,10 +63,9 @@ export const utils = {
      */
     debounce(func, delay, options = {}) {
         const { leading = false } = options;
-        let timeout, lastArgs, lastThis, result;
+        let timeout, result;
         
         const later = (context, args) => {
-            lastArgs = lastThis = null;
             result = func.apply(context, args);
         };
         
@@ -272,7 +271,7 @@ export const utils = {
             if (obj instanceof Object) {
                 const clonedObj = {};
                 for (const key in obj) {
-                    if (obj.hasOwnProperty(key)) {
+                    if (Object.prototype.hasOwnProperty.call(obj, key)) {
                         clonedObj[key] = this.deepClone(obj[key]);
                     }
                 }

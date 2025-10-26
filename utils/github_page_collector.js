@@ -46,13 +46,6 @@ function log(level, message, details = null) {
 }
 
 /**
- * 休眠函数
- */
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
  * 下载网页内容
  */
 async function downloadPage(url, retryCount = 0) {

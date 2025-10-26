@@ -3,6 +3,14 @@
 // 作者: SutChan
 // 版本: 1.8.16
 
+/**
+ * 从DOM元素提取文本内容的辅助函数
+ * @param {HTMLElement} element - 要提取文本的元素
+ * @param {Array} strings - 存储提取文本的数组
+ * @param {Set} seen - 跟踪已处理的文本，避免重复
+ */
+// extractTextFromElement 函数已移至文件下方
+
 const fs = require('fs').promises;
 const path = require('path');
 const { JSDOM } = require('jsdom');
@@ -468,7 +476,7 @@ function isLikelyCodeSnippet(text) {
   // 常见的代码特征：花括号、分号、等号、括号等
   const codePatterns = [
     // 包含常见代码符号
-    /[{}()\[\];=<>]+/,
+    /[{}()[\];=<>]+/,
     // 可能是HTML标签
     /<\/?\w+>/,
     // 可能是URL参数或查询字符串
@@ -494,11 +502,40 @@ function isLikelyCodeSnippet(text) {
 }
 
 /**
- * 从HTML中提取文本字符串
- * @param {string} html - HTML内容
+ * 从DOM元素提取文本内容的辅助函数
+ * @param {HTMLElement} element - 要提取文本的元素
+ * @param {Array} strings - 存储提取文本的数组
+ * @param {Set} seen - 跟踪已处理的文本，避免重复
  * @param {string} module - 字符串所属模块
- * @returns {Array<{text: string, module: string}>}
  */
+function extractTextFromElement(element, strings, seen, module) {
+  // 定义需要排除的标签
+  const excludedTags = ['script', 'style', 'noscript', 'svg', 'canvas', 'audio', 'video'];
+  
+  try {
+    const tagName = element.tagName.toLowerCase();
+    if (excludedTags.includes(tagName)) {
+      return;
+    }
+
+    // 获取文本内容
+    const text = element.textContent.trim();
+
+    // 应用过滤规则
+    if (text && filterString(text) && !seen.has(text)) {
+      seen.add(text);
+      strings.push({ text, module });
+    }
+
+    // 递归处理子元素
+    Array.from(element.children).forEach(child => {
+      extractTextFromElement(child, strings, seen, module);
+    });
+  } catch (error) {
+    log('error', `从元素提取文本错误: ${error.message}`, error);
+  }
+}
+
 function extractStrings(html, module) {
   try {
     // 检查输入
@@ -517,46 +554,12 @@ function extractStrings(html, module) {
     const strings = [];
     const seen = new Set();
 
-    // 提取所有文本内容的辅助函数
-    function extractTextFromElement(element) {
-      try {
-        // 检查元素是否有效
-        if (!element || !element.tagName) {
-          return;
-        }
-
-        const tagName = element.tagName.toLowerCase();
-        const excludedTags = ['script', 'style', 'noscript', 'svg', 'canvas', 'iframe', 'input', 'textarea', 'select', 'option'];
-
-        if (excludedTags.includes(tagName)) {
-          return;
-        }
-
-        // 获取文本内容
-        const text = element.textContent.trim();
-
-        // 应用过滤规则
-        if (text && filterString(text) && !seen.has(text)) {
-          seen.add(text);
-          strings.push({ text, module });
-        }
-
-        // 递归处理子元素
-        Array.from(element.children).forEach(child => {
-          extractTextFromElement(child);
-        });
-      } catch (error) {
-        log('error', `从元素提取文本错误: ${error.message}`, error);
-      }
-    }
-
-    // 开始提取文本
-    extractTextFromElement(document.body);
+    // 使用提取函数
+    extractTextFromElement(document.body, strings, seen, module);
 
     // 更新统计数据
     STATS.extractedCount += strings.length;
 
-    window.close();
     return strings;
   } catch (error) {
     log('error', `提取字符串错误: ${error.message}`, error);
@@ -723,7 +726,7 @@ async function updateTranslationDictionary(scriptContent, newStrings) {
       if (!moduleRegex) {
         // 转义模块名中的特殊字符
         const escapedModule = module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        moduleRegex = new RegExp(`(const\s+${escapedModule}\s*=\s*{[\s\S]*?})`);
+        moduleRegex = new RegExp(`(const ${escapedModule} = {[\\s\\S]*?})`);
         moduleRegexCache.set(module, moduleRegex);
       }
 

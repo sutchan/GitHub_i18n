@@ -103,9 +103,5 @@ function getFormattedVersion() {
   return `GitHub自动化字符串更新工具 v${VERSION}`;
 }
 
-// ES模块导出
-export {
-  VERSION,
-  VERSION_HISTORY,
-  getFormattedVersion
-};
+// 导出格式化版本函数
+export { getFormattedVersion };

@@ -3,11 +3,9 @@
  * 整合所有模块并初始化脚本
  */
 import { CONFIG } from './config.js';
-import { utils } from './utils.js';
 import { versionChecker } from './versionChecker.js';
 import { translationCore } from './translationCore.js';
 import { pageMonitor } from './pageMonitor.js';
-import { loadTools, stringExtractor } from './tools.js';
 
 /**
  * 初始化脚本

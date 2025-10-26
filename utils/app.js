@@ -737,6 +737,11 @@ function simulateServerProgress() {
   const skipped = extracted - added; // 剩余的被跳过
   const startTime = Date.now();
   
+  // 定义getStatus函数
+  function getStatus() {
+    return document.getElementById('processStatus')?.textContent || 'unknown';
+  }
+
   const interval = setInterval(() => {
     // 如果状态不再是running，则停止模拟
     if (getStatus() !== 'running') {
@@ -1859,6 +1864,9 @@ async function loadStats() {
     // 获取用户脚本中已存在的字符串数量
     try {
       const userScriptPath = document.getElementById('userScriptPath')?.value || '';
+      
+      // 定义是否为静态服务器环境
+      const isStaticServer = true; // 默认为静态服务器环境
       
       // 在静态服务器环境下，提供模拟数据而不是直接返回
       if (!userScriptPath) {
@@ -3062,29 +3070,6 @@ function sortPagesTable(column) {
   rows.forEach(row => tableBody.appendChild(row));
 }
 
-// 切换高级模式显示
-function toggleAdvancedMode(isAdvanced) {
-  // 获取所有高级配置区域
-  const advancedSections = document.querySelectorAll('.config-section-advanced');
-
-  // 根据模式显示或隐藏高级配置项
-  advancedSections.forEach(section => {
-    if (isAdvanced) {
-      section.classList.remove('hidden');
-    } else {
-      section.classList.add('hidden');
-    }
-  });
-
-  // 添加过渡动画效果
-  setTimeout(() => {
-    advancedSections.forEach(section => {
-      section.classList.toggle('opacity-0', !isAdvanced);
-      section.classList.toggle('opacity-100', isAdvanced);
-    });
-  }, 10);
-}
-
 // 显示添加字符串模态框
 function showAddStringModal() {
   const modal = document.getElementById('addStringModal');
@@ -3226,8 +3211,8 @@ async function calculateLocalStats() {
       }
     }
     
-    // 获取用户脚本路径
-    const userScriptPath = document.getElementById('userScriptPath')?.value || '';
+    // 获取用户脚本路径 (注释掉未使用的变量)
+    // const userScriptPath = document.getElementById('userScriptPath')?.value || '';
     
     // 尝试获取脚本中的字符串数量
     let existingCount = 0;
