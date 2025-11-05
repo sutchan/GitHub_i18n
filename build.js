@@ -13,7 +13,8 @@ class BuildManager {
     this.projectRoot = process.cwd();
     this.buildDir = path.join(this.projectRoot, 'dist');
     this.srcDir = path.join(this.projectRoot, 'src');
-    this.outputFile = path.join(this.projectRoot, 'GitHub_zh-CN.user.js');
+    // 将输出文件直接设置到dist目录，避免根目录冗余
+    this.outputFile = path.join(this.buildDir, 'GitHub_zh-CN.user.js');
     this.srcFiles = {
       indexJs: path.join(this.srcDir, 'index.js'),
       configJs: path.join(this.srcDir, 'config.js'),
@@ -39,10 +40,10 @@ class BuildManager {
         this.currentVersion = match[1];
         return match[1];
       }
-      
+
       // 降级方案：尝试从其他文件读取版本号
       console.warn('无法从version.js读取版本号，尝试从其他文件读取...');
-      
+
       // 从index.js读取版本号（包含UserScript元数据）
       const indexContent = fs.readFileSync(this.srcFiles.indexJs, 'utf8');
       const indexMatch = indexContent.match(/@version\s+([\d.]+)/);
@@ -50,7 +51,7 @@ class BuildManager {
         this.currentVersion = indexMatch[1];
         return indexMatch[1];
       }
-      
+
       // 从config.js读取版本号
       const configContent = fs.readFileSync(this.srcFiles.configJs, 'utf8');
       const configMatch = configContent.match(/version:\s*['"](.+)['"]/);
@@ -58,7 +59,7 @@ class BuildManager {
         this.currentVersion = configMatch[1];
         return configMatch[1];
       }
-      
+
     } catch (error) {
       console.error('读取版本号失败:', error.message);
     }
@@ -137,27 +138,27 @@ class BuildManager {
       if (fs.existsSync(this.srcFiles.versionJs)) {
         const currentDate = new Date().toISOString().split('T')[0];
         let versionContent = fs.readFileSync(this.srcFiles.versionJs, 'utf8');
-        
+
         // 检查是否需要添加新版本历史记录
-        if (!versionContent.includes(`version: '${this.currentVersion}'`) && 
-            !versionContent.includes(`version: "${this.currentVersion}"`)) {
+        if (!versionContent.includes(`version: '${this.currentVersion}'`) &&
+          !versionContent.includes(`version: "${this.currentVersion}"`)) {
           // 从命令行参数或环境变量获取更新说明
           const updateNote = process.env.UPDATE_NOTE || process.argv.find(arg => arg.startsWith('--note='))?.replace('--note=', '') || '自动版本更新';
           const changes = updateNote.split('|').map(note => note.trim());
-          
+
           // 在VERSION_HISTORY数组的开头添加新版本记录
           const newVersionEntry = `  {
     version: '${this.currentVersion}',
     date: '${currentDate}',
     changes: [${changes.map(change => `'${change}'`).join(', ')}]
   }`;
-          
+
           // 插入新版本记录到数组顶部
           versionContent = versionContent.replace(
             /export const VERSION_HISTORY = \[\s*\{/,
             `export const VERSION_HISTORY = [\n${newVersionEntry},\n  {`
           );
-          
+
           fs.writeFileSync(this.srcFiles.versionJs, versionContent, 'utf8');
           console.log(`✅ 已更新版本历史记录，添加版本: ${this.currentVersion}`);
           console.log(`   更新内容: ${changes.join(', ')}`);
@@ -182,7 +183,8 @@ class BuildManager {
       'node_modules',   // Node.js 模块目录
       '*.log',          // 日志文件
       '*.tmp',          // 临时文件
-      'GitHub_zh-CN_TEMP.user.js' // 临时用户脚本
+      'GitHub_zh-CN_TEMP.user.js', // 临时用户脚本
+      'GitHub_zh-CN.user.js' // 清理根目录的用户脚本，避免冗余
     ];
 
     itemsToClean.forEach(item => {
@@ -225,13 +227,13 @@ class BuildManager {
    */
   mergeSourceFiles() {
     console.log('🔄 开始合并源代码文件...');
-    
+
     // 读取index.js文件作为入口
     const indexContent = fs.readFileSync(this.srcFiles.indexJs, 'utf8');
-    
+
     // 移除import语句，因为我们会将所有代码合并到一个文件中
     let mergedCode = indexContent.replace(/import\s+[^;]+;\s*/g, '');
-    
+
     // 获取所有需要合并的文件
     const filesToMerge = [
       path.join(this.srcDir, 'config.js'),
@@ -245,7 +247,7 @@ class BuildManager {
       path.join(this.srcDir, 'tools.js'),
       path.join(this.srcDir, 'main.js')
     ];
-    
+
     // 合并所有文件内容
     filesToMerge.forEach(filePath => {
       if (fs.existsSync(filePath)) {
@@ -258,52 +260,45 @@ class BuildManager {
         console.log(`✅ 已合并: ${path.relative(this.srcDir, filePath)}`);
       }
     });
-    
+
     return mergedCode;
   }
-  
+
   /**
    * 构建用户脚本
    */
   buildUserScript() {
-    
+
     try {
+      // 确保构建目录存在
+      this.createBuildDir();
+
       // 合并所有源文件
       const mergedCode = this.mergeSourceFiles();
-      
+
       // 写入到输出文件
       fs.writeFileSync(this.outputFile, mergedCode, 'utf8');
-      console.log(`✅ 已生成: ${path.basename(this.outputFile)}`);
-      
+      console.log(`✅ 已生成: ${path.relative(this.projectRoot, this.outputFile)}`);
+
       return true;
     } catch (error) {
       console.error('❌ 构建用户脚本失败:', error.message);
       return false;
     }
   }
-  
+
   /**
    * 复制文件到分发目录
    */
   copyFilesToDist() {
-    this.createBuildDir();
-
-    // 确保用户脚本已构建
-    if (!fs.existsSync(this.outputFile)) {
-      console.error('❌ 用户脚本不存在，请先构建');
-      return;
-    }
-
-    // 复制主要文件到dist目录
-    const destScript = path.join(this.buildDir, path.basename(this.outputFile));
-    fs.copyFileSync(this.outputFile, destScript);
-    console.log(`✅ 已复制: ${path.basename(this.outputFile)}`);
+    // 由于输出文件已经直接放在dist目录，这个方法现在主要用于记录日志
+    console.log(`✅ 用户脚本已直接生成到分发目录: ${this.buildDir}`);
+    console.log(`✅ 文件位置: ${path.relative(this.projectRoot, this.outputFile)}`);
 
     // API目录已直接位于根目录，不再需要复制到dist目录
     console.log('✅ API目录已直接位于根目录，无需复制到dist目录');
-    
-    
-    console.log(`✅ 所有文件已复制到分发目录: ${this.buildDir}`);
+
+    console.log(`✅ 构建产物已准备就绪`);
   }
 
   /**
@@ -341,7 +336,7 @@ class BuildManager {
       // 构建用户脚本
       console.log('🏗️  开始构建用户脚本...');
       this.buildUserScript();
-      
+
       // 复制到分发目录
       if (copyToDist) {
         console.log('📋 复制文件到分发目录...');

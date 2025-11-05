@@ -1,6 +1,6 @@
 {
   "name": "github-i18n",
-  "version": "1.8.56",
+  "version": "1.8.59",
   "description": "GitHub中文翻译脚本 - 提供GitHub界面的本地化翻译",
   "main": "GitHub_zh-CN.user.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "node": ">=12.0.0"
   },
   "devDependencies": {
-    "eslint": "^8.57.0"
+    "eslint": "^8.57.1"
   },
   "dependencies": {
     "eventsource": "^4.0.0"

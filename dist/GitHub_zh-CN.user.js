@@ -63,6 +63,10 @@ startScript();
  * 包含脚本所有可配置项
  */
 
+// 导入版本常量（从单一版本源）
+// 定义GM_info以避免未定义错误
+const GM_info = typeof window !== 'undefined' && window.GM_info || {};
+
 /**
  * 从用户脚本头部注释中提取版本号
  * @returns {string} 版本号
@@ -76,10 +80,10 @@ function getVersionFromComment() {
         }
         
         // 如果GM_info不可用，返回配置中的版本号
-        return CONFIG.version;
+        return VERSION;
     } catch (e) {
         // 出错时返回配置中的版本号
-        return CONFIG.version;
+        return VERSION;
     }
 }
 
@@ -87,7 +91,7 @@ function getVersionFromComment() {
  * 配置对象，包含所有可配置项
  */
 export const CONFIG = {
-    "version": "1.8.51",
+    "version": VERSION,
     "debounceDelay": 500,
     "routeChangeDelay": 500,
     "debugMode": false,
@@ -207,10 +211,9 @@ export const utils = {
      */
     debounce(func, delay, options = {}) {
         const { leading = false } = options;
-        let timeout, lastArgs, lastThis, result;
+        let timeout, result;
         
         const later = (context, args) => {
-            lastArgs = lastThis = null;
             result = func.apply(context, args);
         };
         
@@ -416,7 +419,7 @@ export const utils = {
             if (obj instanceof Object) {
                 const clonedObj = {};
                 for (const key in obj) {
-                    if (obj.hasOwnProperty(key)) {
+                    if (Object.prototype.hasOwnProperty.call(obj, key)) {
                         clonedObj[key] = this.deepClone(obj[key]);
                     }
                 }
@@ -1495,6 +1498,7 @@ export const pageMonitor = {
  * 开发工具模块
  * 包含字符串提取、自动更新和词典处理等开发工具
  */
+// 删除未使用的CONFIG导入
 /**
  * 字符串提取器对象
  */
