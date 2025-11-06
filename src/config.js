@@ -55,7 +55,15 @@ export const CONFIG = {
         "enableDeepObserver": true,
         "enablePartialMatch": false,
         "maxDictSize": 2000,
-        "enableTranslationCache": true
+        "enableTranslationCache": true,
+        "batchSize": 50,
+        "batchDelay": 0,
+        "logTiming": false,
+        "cacheExpiration": 3600000, // 缓存过期时间（毫秒）
+        "minTextLengthToTranslate": 3, // 最小翻译文本长度
+        "minTranslateInterval": 500, // 最小翻译间隔（毫秒）
+        "observeAttributes": true, // 是否观察属性变化
+        "importantAttributes": ["title", "alt", "aria-label", "placeholder", "data-hovercard-url", "data-hovercard-type"] // 重要的属性列表
     },
     "selectors": {
         "primary": [

@@ -201,7 +201,7 @@ export const versionChecker = {
 
     /**
      * 显示更新通知
-     * 使用更安全的事件处理方式
+     * 使用安全的DOM操作而不是innerHTML
      * @param {string} newVersion - 新版本号
      */
     showUpdateNotification(newVersion) {
@@ -221,7 +221,7 @@ export const versionChecker = {
         }
         
         try {
-            // 创建通知元素
+            // 创建通知元素 - 安全的DOM操作
             const notification = document.createElement('div');
             notification.className = 'fixed bottom-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-50 max-w-md transform transition-all duration-300 translate-y-0 opacity-100';
             
@@ -229,33 +229,83 @@ export const versionChecker = {
             const notificationId = `github-zh-update-${Date.now()}`;
             notification.id = notificationId;
             
-            notification.innerHTML = `
-                <div class="flex items-start">
-                    <div class="flex-shrink-0 bg-blue-100 rounded-full p-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <div class="ml-3 flex-1">
-                        <p class="text-sm font-medium text-blue-800">GitHub 中文翻译脚本更新</p>
-                        <p class="text-sm text-blue-700 mt-1">发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。</p>
-                        <div class="mt-3 flex space-x-2">
-                            <a id="${notificationId}-update-btn" href="${CONFIG.updateCheck.scriptUrl || '#'}" target="_blank" rel="noopener noreferrer"
-                                class="inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 transition-colors">
-                                立即更新
-                            </a>
-                            <button id="${notificationId}-later-btn"
-                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors">
-                                稍后
-                            </button>
-                            <button id="${notificationId}-dismiss-btn"
-                                class="inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">
-                                不再提醒
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
+            // 创建flex容器
+            const flexContainer = document.createElement('div');
+            flexContainer.className = 'flex items-start';
+            notification.appendChild(flexContainer);
+            
+            // 创建图标容器
+            const iconContainer = document.createElement('div');
+            iconContainer.className = 'flex-shrink-0 bg-blue-100 rounded-full p-2';
+            flexContainer.appendChild(iconContainer);
+            
+            // 创建SVG图标
+            const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svgIcon.setAttribute('class', 'h-6 w-6 text-blue-600');
+            svgIcon.setAttribute('fill', 'none');
+            svgIcon.setAttribute('viewBox', '0 0 24 24');
+            svgIcon.setAttribute('stroke', 'currentColor');
+            iconContainer.appendChild(svgIcon);
+            
+            // 创建SVG路径
+            const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathElement.setAttribute('stroke-linecap', 'round');
+            pathElement.setAttribute('stroke-linejoin', 'round');
+            pathElement.setAttribute('stroke-width', '2');
+            pathElement.setAttribute('d', 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z');
+            svgIcon.appendChild(pathElement);
+            
+            // 创建内容容器
+            const contentContainer = document.createElement('div');
+            contentContainer.className = 'ml-3 flex-1';
+            flexContainer.appendChild(contentContainer);
+            
+            // 创建标题
+            const titleElement = document.createElement('p');
+            titleElement.className = 'text-sm font-medium text-blue-800';
+            titleElement.textContent = 'GitHub 中文翻译脚本更新';
+            contentContainer.appendChild(titleElement);
+            
+            // 创建消息文本 - 安全地设置文本内容
+            const messageElement = document.createElement('p');
+            messageElement.className = 'text-sm text-blue-700 mt-1';
+            messageElement.textContent = `发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。`;
+            contentContainer.appendChild(messageElement);
+            
+            // 创建按钮容器
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'mt-3 flex space-x-2';
+            contentContainer.appendChild(buttonsContainer);
+            
+            // 创建更新按钮 - 安全地设置URL
+            const updateButton = document.createElement('a');
+            updateButton.id = `${notificationId}-update-btn`;
+            updateButton.href = CONFIG.updateCheck.scriptUrl || '#';
+            updateButton.target = '_blank';
+            updateButton.rel = 'noopener noreferrer';
+            updateButton.className = 'inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 transition-colors';
+            updateButton.textContent = '立即更新';
+            buttonsContainer.appendChild(updateButton);
+            
+            // 创建稍后按钮
+            const laterButton = document.createElement('button');
+            laterButton.id = `${notificationId}-later-btn`;
+            laterButton.className = 'inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors';
+            laterButton.textContent = '稍后';
+            laterButton.addEventListener('click', () => {
+                this.hideNotification(notification, false);
+            });
+            buttonsContainer.appendChild(laterButton);
+            
+            // 创建不再提醒按钮
+            const dismissButton = document.createElement('button');
+            dismissButton.id = `${notificationId}-dismiss-btn`;
+            dismissButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors';
+            dismissButton.textContent = '不再提醒';
+            dismissButton.addEventListener('click', () => {
+                this.hideNotification(notification, true);
+            });
+            buttonsContainer.appendChild(dismissButton);
             
             // 添加到DOM
             if (document.body) {
@@ -263,15 +313,6 @@ export const versionChecker = {
                 
                 // 记录本次通知的版本
                 localStorage.setItem(notificationVersionKey, newVersion);
-                
-                // 添加事件监听器
-                document.getElementById(`${notificationId}-later-btn`).addEventListener('click', () => {
-                    this.hideNotification(notification, false);
-                });
-                
-                document.getElementById(`${notificationId}-dismiss-btn`).addEventListener('click', () => {
-                    this.hideNotification(notification, true);
-                });
                 
                 // 自动隐藏（可选）
                 if (CONFIG.updateCheck.autoHideNotification !== false) {

@@ -6,13 +6,23 @@
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-export const VERSION = '1.8.59';
+export const VERSION = '1.8.61';
 
 /**
  * 版本历史记录
  * @type {Array<{version: string, date: string, changes: string[]}>}
  */
 export const VERSION_HISTORY = [
+  {
+    version: '1.8.61',
+    date: '2025-11-06',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.60',
+    date: '2024-01-15',
+    changes: ['修复XSS安全漏洞', '优化翻译性能和DOM操作', '改进缓存管理策略', '增强错误处理机制']
+  },
   {
     version: '1.8.59',
     date: '2025-10-24',
