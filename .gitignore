@@ -15,3 +15,4 @@ github_string_fetcher.js
 # 保留的构建工具文件不忽略
 # build-tool.html
 # merge-script.js
+/test

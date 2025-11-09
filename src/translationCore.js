@@ -34,6 +34,62 @@ export const translationCore = {
     },
     
     /**
+     * 当前页面模式
+     * @type {string}
+     */
+    currentPageMode: null,
+    
+    /**
+     * 页面模式配置，定义不同页面模式的特定翻译策略
+     */
+    pageModeConfig: {
+        default: {
+            batchSize: CONFIG.performance.batchSize,
+            enablePartialMatch: CONFIG.performance.enablePartialMatch
+        },
+        search: {
+            batchSize: 100, // 搜索页面可能有更多元素
+            enablePartialMatch: false // 搜索页面更注重精确匹配
+        },
+        repository: {
+            batchSize: 50,
+            enablePartialMatch: false
+        },
+        issues: {
+            batchSize: 75,
+            enablePartialMatch: true // 问题描述可能包含需要部分匹配的文本
+        },
+        pullRequests: {
+            batchSize: 75,
+            enablePartialMatch: true // PR描述和评论可能需要部分匹配
+        },
+        explore: {
+            batchSize: 100,
+            enablePartialMatch: false
+        },
+        notifications: {
+            batchSize: 60,
+            enablePartialMatch: true // 通知内容可能需要部分匹配
+        },
+        marketplace: {
+            batchSize: 80,
+            enablePartialMatch: true // 插件描述可能需要部分匹配
+        },
+        codespaces: {
+            batchSize: 50,
+            enablePartialMatch: false
+        },
+        wiki: {
+            batchSize: 120,
+            enablePartialMatch: true // Wiki页面内容可能需要部分匹配
+        },
+        actions: {
+            batchSize: 60,
+            enablePartialMatch: false
+        }
+    },
+    
+    /**
      * 初始化词典
      */
     initDictionary() {
@@ -50,6 +106,54 @@ export const translationCore = {
     },
     
     /**
+     * 检测当前页面模式
+     * @returns {string} 当前页面模式
+     */
+    detectPageMode() {
+        try {
+            const currentPath = window.location.pathname;
+            
+            // 优先检测精确匹配的特殊页面
+            for (const [mode, pattern] of Object.entries(CONFIG.pagePatterns)) {
+                if (pattern && pattern instanceof RegExp && pattern.test(currentPath)) {
+                    // 特殊处理仓库页面的匹配优先级
+                    if (mode === 'repository') {
+                        // 确保不是其他更具体的仓库子页面
+                        const isSubPage = ['issues', 'pullRequests', 'projects', 'wiki', 'actions', 'packages', 'security', 'insights']
+                            .some(subMode => CONFIG.pagePatterns[subMode]?.test(currentPath));
+                        if (!isSubPage) {
+                            this.currentPageMode = mode;
+                            return mode;
+                        }
+                    } else {
+                        this.currentPageMode = mode;
+                        return mode;
+                    }
+                }
+            }
+            
+            // 默认模式
+            this.currentPageMode = 'default';
+            return 'default';
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.warn('[GitHub 中文翻译] 检测页面模式失败:', error);
+            }
+            this.currentPageMode = 'default';
+            return 'default';
+        }
+    },
+    
+    /**
+     * 获取当前页面模式的配置
+     * @returns {Object} 页面模式配置
+     */
+    getCurrentPageModeConfig() {
+        const mode = this.currentPageMode || this.detectPageMode();
+        return this.pageModeConfig[mode] || this.pageModeConfig.default;
+    },
+    
+    /**
      * 执行翻译
      * 支持翻译整个页面或指定的元素区域
      * @param {HTMLElement[]} [targetElements] - 可选的目标元素数组，只翻译这些元素
@@ -59,6 +163,14 @@ export const translationCore = {
         // 确保词典已初始化
         if (!this.dictionary || Object.keys(this.dictionary).length === 0) {
             this.initDictionary();
+        }
+        
+        // 检测当前页面模式
+        const pageMode = this.detectPageMode();
+        const modeConfig = this.getCurrentPageModeConfig();
+        
+        if (CONFIG.debugMode) {
+            console.log(`[GitHub 中文翻译] 当前页面模式: ${pageMode}`, modeConfig);
         }
         
         // 重置性能统计数据
@@ -195,7 +307,8 @@ export const translationCore = {
      * @returns {Promise<void>} 处理完成的Promise
      */
     processElementsInBatches(elements) {
-        const batchSize = CONFIG.performance.batchSize || 50; // 每批处理的元素数量
+        const modeConfig = this.getCurrentPageModeConfig();
+        const batchSize = modeConfig.batchSize || CONFIG.performance.batchSize || 50; // 每批处理的元素数量
         const delay = CONFIG.performance.batchDelay || 0; // 批处理之间的延迟
         
         // 如果元素数组为空或无效，直接返回
@@ -846,7 +959,11 @@ export const translationCore = {
         }
         
         // 3. 如果启用了部分匹配且尚未找到结果
-        if (result === null && CONFIG.performance.enablePartialMatch) {
+        const modeConfig = this.getCurrentPageModeConfig();
+        const enablePartialMatch = modeConfig.enablePartialMatch !== undefined ? 
+            modeConfig.enablePartialMatch : CONFIG.performance.enablePartialMatch;
+            
+        if (result === null && enablePartialMatch) {
             result = this.performPartialTranslation(normalizedText);
         }
         
