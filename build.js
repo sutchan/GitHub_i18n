@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.62
+ * @version 1.8.63
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -231,8 +231,9 @@ class BuildManager {
     // 读取index.js文件作为入口
     const indexContent = fs.readFileSync(this.srcFiles.indexJs, 'utf8');
 
-    // 移除import语句，因为我们会将所有代码合并到一个文件中
-    let mergedCode = indexContent.replace(/import\s+[^;]+;\s*/g, '');
+    // 移除import语句，使用更健壮的正则表达式
+    let mergedCode = indexContent.replace(/import\s+.*?from\s+['"][^'"]+['"][^;]*;\s*/gs, '');
+    mergedCode = mergedCode.replace(/import\s+\{[^}]+\}\s*from\s+['"][^'"]+['"][^;]*;\s*/gs, '');
 
     // 获取所有需要合并的文件
     const filesToMerge = [
@@ -252,10 +253,22 @@ class BuildManager {
     filesToMerge.forEach(filePath => {
       if (fs.existsSync(filePath)) {
         const fileContent = fs.readFileSync(filePath, 'utf8');
-        // 移除文件中的import语句
-        const cleanContent = fileContent.replace(/import\s+[^;]+;\s*/g, '')
-          .replace(/export\s+default\s+/g, '')
-          .replace(/export\s+\{[^}]+\}\s*;?\s*/g, '');
+
+        // 使用更健壮的正则表达式移除所有ES模块语法
+        let cleanContent = fileContent;
+
+        // 移除所有import语句
+        cleanContent = cleanContent.replace(/import\s+.*?from\s+['"][^'"]+['"][^;]*;\s*/gs, '');
+        cleanContent = cleanContent.replace(/import\s+\{[^}]+\}\s*from\s+['"][^'"]+['"][^;]*;\s*/gs, '');
+
+        // 移除所有export语句
+        // 移除export default
+        cleanContent = cleanContent.replace(/export\s+default\s+/g, '');
+        // 移除export { ... } 形式的导出
+        cleanContent = cleanContent.replace(/export\s+\{[^}]+\}\s*;?\s*/g, '');
+        // 移除export function/const/class声明
+        cleanContent = cleanContent.replace(/export\s+(function|const|let|class)\s+/g, '$1 ');
+
         mergedCode += '\n\n' + cleanContent;
         console.log(`✅ 已合并: ${path.relative(this.srcDir, filePath)}`);
       }

@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.62
+// @version 1.8.63
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -90,7 +90,7 @@ function getVersionFromComment() {
 /**
  * 配置对象，包含所有可配置项
  */
-export const CONFIG = {
+const CONFIG = {
   "version": VERSION,
   "debounceDelay": 500,
   "routeChangeDelay": 500,
@@ -193,7 +193,7 @@ export const CONFIG = {
 /**
  * 工具函数集合
  */
-export const utils = {
+const utils = {
     /**
      * 节流函数，用于限制高频操作的执行频率
      * 支持返回Promise
@@ -498,7 +498,7 @@ export const utils = {
 /**
  * 版本检查器对象
  */
-export const versionChecker = {
+const versionChecker = {
     /**
      * 检查版本更新
      * 支持重试机制和更详细的错误处理
@@ -950,7 +950,7 @@ export const versionChecker = {
 /**
  * 翻译词典对象，包含所有需要翻译的字符串
  */
-export const translationModule = {
+const translationModule = {
     "common": commonDictionary,
     "codespaces": codespacesDictionary,
     "explore": exploreDictionary
@@ -961,7 +961,7 @@ export const translationModule = {
  * 合并所有词典为一个完整的词典对象
  * @returns {Object} 合并后的词典
  */
-export function mergeAllDictionaries() {
+function mergeAllDictionaries() {
     const merged = {};
     for (const module in translationModule) {
         Object.assign(merged, translationModule[module]);
@@ -973,7 +973,7 @@ export function mergeAllDictionaries() {
  * Codespaces 页面翻译词典
  */
 
-export const codespacesDictionary = {
+const codespacesDictionary = {
     "Skip to content": "待翻译: Skip to content",
     "You signed in with another tab or window. Reload to refresh your session.": "待翻译: You signed in with another tab or window. Reload to refresh your session.",
     "Reload": "待翻译: Reload",
@@ -996,7 +996,7 @@ export const codespacesDictionary = {
  * Explore 页面翻译词典
  */
 
-export const exploreDictionary = {
+const exploreDictionary = {
   "Navigation Menu": "导航菜单",
   "Toggle navigation": "切换导航",
   "Sign in\n          \n              \n    \n        \n    \n\nAppearance settings": "登录\n          \n              \n    \n        \n    \n\n外观设置",
@@ -1132,7 +1132,7 @@ export const exploreDictionary = {
 /**
  * 翻译核心对象
  */
-export const translationCore = {
+const translationCore = {
     /**
      * 合并后的完整词典
      * @type {Object}
@@ -2384,7 +2384,7 @@ export const translationCore = {
 /**
  * 页面监控对象
  */
-export const pageMonitor = {
+const pageMonitor = {
     /**
      * 观察器实例
      * @type {MutationObserver|null}
@@ -3614,7 +3614,7 @@ export const pageMonitor = {
 /**
  * 字符串提取器对象
  */
-export const stringExtractor = {
+const stringExtractor = {
     /**
      * 收集页面上的字符串
      * @param {boolean} showInConsole - 是否在控制台显示结果
@@ -3666,7 +3666,7 @@ export const stringExtractor = {
 /**
  * 自动字符串更新器类
  */
-export class AutoStringUpdater {
+class AutoStringUpdater {
     constructor() {
         this.processedCount = 0;
     }
@@ -3709,7 +3709,7 @@ export class AutoStringUpdater {
 /**
  * 词典处理器类
  */
-export class DictionaryProcessor {
+class DictionaryProcessor {
     constructor() {
         this.processedCount = 0;
     }
@@ -3757,7 +3757,7 @@ export class DictionaryProcessor {
  * 加载工具类
  * @returns {Object} 包含工具类的对象
  */
-export function loadTools() {
+function loadTools() {
     return { 
         stringExtractor, 
         AutoStringUpdater, 
