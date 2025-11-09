@@ -1,1 +1,42 @@
-{\n  "name": "github-i18n",\n  "version": "1.8.60",\n  "description": "GitHub中文翻译脚本 - 提供GitHub界面的本地化翻译",\n  "main": "GitHub_zh-CN.user.js",\n  "scripts": {\n    "build": "node build.js",\n    "build:major": "node build.js --major",\n    "build:minor": "node build.js --minor",\n    "build:patch": "node build.js --patch",\n    "clean": "node build.js --no-upgrade --no-copy",\n    "validate": "node -e \"const BuildManager = require('./build.js'); const bm = new BuildManager(); console.log(bm.validateBuild());\"",\n    "test": "npx jest"\n  },\n  "keywords": [\n    "github",\n    "i18n",\n    "translation",\n    "chinese",\n    "userscript"\n  ],\n  "author": "Sut (https://github.com/sutchan)",\n  "license": "MIT",\n  "repository": {\n    "type": "git",\n    "url": "https://github.com/sutchan/GitHub_i18n.git"\n  },\n  "engines": {\n    "node": ">=12.0.0"\n  },\n  "devDependencies": {\n    "@babel/core": "^7.28.5",\n    "@babel/preset-env": "^7.28.5",\n    "babel-jest": "^30.2.0",\n    "eslint": "^8.57.1",\n    "jest": "^30.2.0"\n  },\n  "dependencies": {\n    "eventsource": "^4.0.0"\n  },\n  "type": "commonjs"\n}\n
+{
+  "name": "github-i18n",
+  "version": "1.8.60",
+  "description": "GitHub中文翻译脚本 - 提供GitHub界面的本地化翻译",
+  "main": "GitHub_zh-CN.user.js",
+  "scripts": {
+    "build": "node build.js",
+    "build:major": "node build.js --major",
+    "build:minor": "node build.js --minor",
+    "build:patch": "node build.js --patch",
+    "clean": "node build.js --no-upgrade --no-copy",
+    "validate": "node -e \"const BuildManager = require('./build.js'); const bm = new BuildManager(); console.log(bm.validateBuild());\"",
+    "test": "npx jest"
+  },
+  "keywords": [
+    "github",
+    "i18n",
+    "translation",
+    "chinese",
+    "userscript"
+  ],
+  "author": "Sut (https://github.com/sutchan)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sutchan/GitHub_i18n.git"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "babel-jest": "^30.2.0",
+    "eslint": "^8.57.1",
+    "jest": "^30.2.0"
+  },
+  "dependencies": {
+    "eventsource": "^4.0.0"
+  },
+  "type": "commonjs"
+}

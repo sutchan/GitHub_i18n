@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.63
+// @version 1.8.65
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -39,20 +39,7 @@
 // 导入开发工具
 // 导入主初始化函数
 // 导出所有公开模块
-export {
-  CONFIG,
-  utils,
-  versionChecker,
-  translationCore,
-  translationModule,
-  pageMonitor,
-  stringExtractor,
-  AutoStringUpdater,
-  DictionaryProcessor,
-  loadTools,
-  init,
-  startScript
-};
+
 
 // 启动脚本
 startScript();
@@ -182,7 +169,6 @@ const CONFIG = {
     "trending": /\/trending/
   }
 };
-
 
 
 /**
@@ -961,7 +947,7 @@ const translationModule = {
  * 合并所有词典为一个完整的词典对象
  * @returns {Object} 合并后的词典
  */
-function mergeAllDictionaries() {
+$1function mergeAllDictionaries() {
     const merged = {};
     for (const module in translationModule) {
         Object.assign(merged, translationModule[module]);
@@ -972,7 +958,6 @@ function mergeAllDictionaries() {
 /**
  * Codespaces 页面翻译词典
  */
-
 const codespacesDictionary = {
     "Skip to content": "待翻译: Skip to content",
     "You signed in with another tab or window. Reload to refresh your session.": "待翻译: You signed in with another tab or window. Reload to refresh your session.",
@@ -995,7 +980,6 @@ const codespacesDictionary = {
 /**
  * Explore 页面翻译词典
  */
-
 const exploreDictionary = {
   "Navigation Menu": "导航菜单",
   "Toggle navigation": "切换导航",
@@ -3757,7 +3741,7 @@ class DictionaryProcessor {
  * 加载工具类
  * @returns {Object} 包含工具类的对象
  */
-function loadTools() {
+$1function loadTools() {
     return { 
         stringExtractor, 
         AutoStringUpdater, 

@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.63
+ * @version 1.8.65
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -231,9 +231,13 @@ class BuildManager {
     // 读取index.js文件作为入口
     const indexContent = fs.readFileSync(this.srcFiles.indexJs, 'utf8');
 
-    // 移除import语句，使用更健壮的正则表达式
-    let mergedCode = indexContent.replace(/import\s+.*?from\s+['"][^'"]+['"][^;]*;\s*/gs, '');
-    mergedCode = mergedCode.replace(/import\s+\{[^}]+\}\s*from\s+['"][^'"]+['"][^;]*;\s*/gs, '');
+    // 移除import语句，使用增强的正则表达式
+    let mergedCode = indexContent;
+
+    // 移除所有类型的import语句（包括空行和注释）
+    mergedCode = mergedCode.replace(/^\s*import\s+.*?from\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
+    mergedCode = mergedCode.replace(/^\s*import\s+\{[^}]+\}\s*from\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
+    mergedCode = mergedCode.replace(/^\s*import\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
 
     // 获取所有需要合并的文件
     const filesToMerge = [
@@ -252,27 +256,56 @@ class BuildManager {
     // 合并所有文件内容
     filesToMerge.forEach(filePath => {
       if (fs.existsSync(filePath)) {
-        const fileContent = fs.readFileSync(filePath, 'utf8');
+        let fileContent = fs.readFileSync(filePath, 'utf8');
 
-        // 使用更健壮的正则表达式移除所有ES模块语法
-        let cleanContent = fileContent;
+        // 移除所有ES模块语法，使用全面的正则表达式
 
-        // 移除所有import语句
-        cleanContent = cleanContent.replace(/import\s+.*?from\s+['"][^'"]+['"][^;]*;\s*/gs, '');
-        cleanContent = cleanContent.replace(/import\s+\{[^}]+\}\s*from\s+['"][^'"]+['"][^;]*;\s*/gs, '');
+        // 1. 移除所有类型的import语句（行首匹配，包括注释和空行）
+        fileContent = fileContent.replace(/^\s*import\s+.*?from\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
+        fileContent = fileContent.replace(/^\s*import\s+\{[^}]+\}\s*from\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
+        fileContent = fileContent.replace(/^\s*import\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
+        fileContent = fileContent.replace(/^\s*import\s+type\s+.*?from\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
 
-        // 移除所有export语句
+        // 2. 移除所有类型的export语句
         // 移除export default
-        cleanContent = cleanContent.replace(/export\s+default\s+/g, '');
-        // 移除export { ... } 形式的导出
-        cleanContent = cleanContent.replace(/export\s+\{[^}]+\}\s*;?\s*/g, '');
-        // 移除export function/const/class声明
-        cleanContent = cleanContent.replace(/export\s+(function|const|let|class)\s+/g, '$1 ');
+        fileContent = fileContent.replace(/^\s*export\s+default\s+/gm, '');
 
-        mergedCode += '\n\n' + cleanContent;
+        // 移除export { ... } 形式的导出
+        fileContent = fileContent.replace(/^\s*export\s+\{[^}]+\}\s*;?\s*(?:\n|$)/gm, '');
+        fileContent = fileContent.replace(/^\s*export\s+\*\s+from\s+['"][^'"]+['"]\s*;?\s*(?:\n|$)/gm, '');
+        fileContent = fileContent.replace(/^\s*export\s+\*\s+as\s+\w+\s+from\s+['"][^'"]+['"]\s*;?\s*(?:\n|$)/gm, '');
+
+        // 移除export function/const/class/let/var声明（包括箭头函数形式）
+        fileContent = fileContent.replace(/^\s*export\s+(?:async\s+)?function\s+/gm, '$1function ');
+        fileContent = fileContent.replace(/^\s*export\s+const\s+\w+\s*=\s*(?:async\s+)?function\s*/gm, 'const $1 = $2function ');
+        fileContent = fileContent.replace(/^\s*export\s+const\s+\w+\s*=\s*\(/gm, 'const $1 = (');
+        fileContent = fileContent.replace(/^\s*export\s+(const|let|var)\s+/gm, '$1 ');
+        fileContent = fileContent.replace(/^\s*export\s+class\s+/gm, 'class ');
+        fileContent = fileContent.replace(/^\s*export\s+interface\s+/gm, 'interface ');
+        fileContent = fileContent.replace(/^\s*export\s+type\s+/gm, 'type ');
+
+        // 确保没有遗漏的export语句
+        fileContent = fileContent.replace(/export\s+/g, '');
+
+        mergedCode += '\n\n' + fileContent;
         console.log(`✅ 已合并: ${path.relative(this.srcDir, filePath)}`);
       }
     });
+
+    // 最后检查并确保所有export关键字都被移除
+    // 检查并移除所有剩余的export语句，包括export { ... }形式
+    let previousCode;
+    do {
+      previousCode = mergedCode;
+      // 移除export { ... } 语句块
+      mergedCode = mergedCode.replace(/export\s*\{[^}]+\}\s*;?/gs, '');
+      // 移除任何剩余的export关键字
+      mergedCode = mergedCode.replace(/export\s+/g, '');
+    } while (previousCode !== mergedCode); // 循环直到没有更多变化
+
+    if (mergedCode.includes('export')) {
+      console.warn('⚠️  警告: 合并后的代码中仍存在export字符串');
+    }
 
     return mergedCode;
   }
