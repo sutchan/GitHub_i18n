@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GitHub 中文翻译配置文件
  * 包含脚本所有可配置项
  */
@@ -6,8 +6,8 @@
 // 导入版本常量（从单一版本源）
 import { VERSION } from './version.js';
 
-// 定义GM_info以避免未定义错误
-const GM_info = typeof window !== 'undefined' && window.GM_info || {};
+// 定义greasemonkeyInfo以避免未定义错误，使用空值合并运算符提高代码可读性
+const greasemonkeyInfo = typeof window !== 'undefined' ? window.GM_info ?? {} : {};
 
 /**
  * 从用户脚本头部注释中提取版本号
@@ -16,12 +16,12 @@ const GM_info = typeof window !== 'undefined' && window.GM_info || {};
 function getVersionFromComment() {
   try {
     // 作为用户脚本，我们可以直接从当前执行环境中提取版本信息
-    const versionMatch = GM_info?.script?.version;
+    const versionMatch = greasemonkeyInfo?.script?.version;
     if (versionMatch) {
       return versionMatch;
     }
 
-    // 如果GM_info不可用，返回配置中的版本号
+    // 如果greasemonkeyInfo不可用，返回配置中的版本号
     return VERSION;
   } catch (e) {
     // 出错时返回配置中的版本号

@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.65
+ * @version 1.8.67
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -245,6 +245,7 @@ class BuildManager {
       path.join(this.srcDir, 'utils.js'),
       path.join(this.srcDir, 'versionChecker.js'),
       path.join(this.srcDir, 'dictionaries/index.js'),
+      path.join(this.srcDir, 'dictionaries/common.js'),
       path.join(this.srcDir, 'dictionaries/codespaces.js'),
       path.join(this.srcDir, 'dictionaries/explore.js'),
       path.join(this.srcDir, 'translationCore.js'),

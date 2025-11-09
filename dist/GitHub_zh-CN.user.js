@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.65
+// @version 1.8.67
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -45,14 +45,14 @@
 startScript();
 
 
-/**
+﻿/**
  * GitHub 中文翻译配置文件
  * 包含脚本所有可配置项
  */
 
 // 导入版本常量（从单一版本源）
-// 定义GM_info以避免未定义错误
-const GM_info = typeof window !== 'undefined' && window.GM_info || {};
+// 定义greasemonkeyInfo以避免未定义错误，使用空值合并运算符提高代码可读性
+const greasemonkeyInfo = typeof window !== 'undefined' ? window.GM_info ?? {} : {};
 
 /**
  * 从用户脚本头部注释中提取版本号
@@ -61,12 +61,12 @@ const GM_info = typeof window !== 'undefined' && window.GM_info || {};
 function getVersionFromComment() {
   try {
     // 作为用户脚本，我们可以直接从当前执行环境中提取版本信息
-    const versionMatch = GM_info?.script?.version;
+    const versionMatch = greasemonkeyInfo?.script?.version;
     if (versionMatch) {
       return versionMatch;
     }
 
-    // 如果GM_info不可用，返回配置中的版本号
+    // 如果greasemonkeyInfo不可用，返回配置中的版本号
     return VERSION;
   } catch (e) {
     // 出错时返回配置中的版本号
@@ -954,6 +954,8 @@ $1function mergeAllDictionaries() {
     }
     return merged;
 }
+
+/**\n * 通用翻译词典\n * 包含所有页面共用的翻译字符串\n */\n\nconst commonDictionary = {\n    "common": {\n        "search": "搜索",\n        "new": "新建",\n        "actions": "操作",\n        "settings": "设置",\n        "help": "帮助",\n        "sign_in": "登录",\n        "sign_up": "注册"\n    }\n};
 
 /**
  * Codespaces 页面翻译词典
