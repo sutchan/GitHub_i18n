@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.69
+// @version 1.8.71
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -45,131 +45,63 @@
 startScript();
 
 
-﻿/**
- * GitHub 中文翻译配置文件
- * 包含脚本所有可配置项
- */
-
-// 导入版本常量（从单一版本源）
-// 定义greasemonkeyInfo以避免未定义错误，使用空值合并运算符提高代码可读性
-const greasemonkeyInfo = typeof window !== 'undefined' ? window.GM_info ?? {} : {};
-
-/**
- * 从用户脚本头部注释中提取版本号
- * @returns {string} 版本号
- */
-function getVersionFromComment() {
-  try {
-    // 作为用户脚本，我们可以直接从当前执行环境中提取版本信息
-    const versionMatch = greasemonkeyInfo?.script?.version;
-    if (versionMatch) {
-      return versionMatch;
-    }
-
-    // 如果greasemonkeyInfo不可用，返回配置中的版本号
-    return VERSION;
-  } catch (e) {
-    // 出错时返回配置中的版本号
-    return VERSION;
-  }
-}
-
-/**
- * 配置对象，包含所有可配置项
- */
-const CONFIG = {
-  "version": VERSION,
-  "debounceDelay": 500,
-  "routeChangeDelay": 500,
-  "debugMode": false,
-  "updateCheck": {
-    "enabled": true,
-    "intervalHours": 24,
-    "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js",
-    "autoUpdateVersion": true
+// 作者: Sut\n// 此文件用于统一管理GitHub自动化字符串更新工具的版本信息\n\n/**\n * 当前工具版本号\n * @type {string}\n * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取\n */\nconst VERSION = '1.8.71';\n\n/**\n * 版本历史记录\n * @type {Array<{version: string, date: string, changes: string[]}>}\n */\nconst VERSION_HISTORY = [
+  {
+    version: '1.8.71',
+    date: '2025-11-09',
+    changes: ['自动版本更新']
   },
-  "externalTranslation": {
-    "enabled": false,
-    "minLength": 20,
-    "maxLength": 500,
-    "timeout": 3000,
-    "requestInterval": 500,
-    "cacheSize": 500
+  {
+    version: '1.8.70',
+    date: '2025-11-09',
+    changes: ['自动版本更新']
   },
-  "performance": {
-    "enableDeepObserver": true,
-    "enablePartialMatch": false,
-    "maxDictSize": 2000,
-    "enableTranslationCache": true,
-    "batchSize": 50,
-    "batchDelay": 0,
-    "logTiming": false,
-    "cacheExpiration": 3600000, // 缓存过期时间（毫秒）
-    "minTextLengthToTranslate": 3, // 最小翻译文本长度
-    "minTranslateInterval": 500, // 最小翻译间隔（毫秒）
-    "observeAttributes": true, // 是否观察属性变化
-    "importantAttributes": ["title", "alt", "aria-label", "placeholder", "data-hovercard-url", "data-hovercard-type"], // 重要的属性列表
-    "importantElements": [
-      ".HeaderNavlink", ".js-selected-navigation-item", ".js-issue-title",
-      ".js-commit-message", ".js-details-container", ".js-comment-body",
-      ".js-activity-item", ".js-blob-content", ".js-repo-description",
-      ".js-issue-row", ".js-pinned-issue-list-item", ".js-project-card-content",
-      ".js-user-profile-bio", ".js-header-search-input", ".js-file-line"
-    ], // 重要内容元素
-    "ignoreElements": [
-      "script", "style", "link", "meta", "svg", "canvas",
-      "pre", "code", "kbd", "samp", ".blob-code-inner", ".file-line",
-      ".highlight", ".language-*", ".mermaid", ".mathjax",
-      ".js-zeroclipboard-button", ".js-minimizable-content",
-      ".reponav-dropdown", ".dropdown-caret", ".avatar", ".emoji"
-    ], // 忽略翻译的元素
-    "mutationThreshold": 30, // 单次突变数量阈值
-    "contentChangeWeight": 1, // 内容变化权重
-    "importantChangeWeight": 2, // 重要变化权重
-    "translationTriggerRatio": 0.3 // 触发翻译的变化比例
+  {
+    version: '1.8.69',
+    date: '2025-11-09',
+    changes: ['自动版本更新']
   },
-  "selectors": {
-    "primary": [
-      "h1, h2, h3, h4, h5, h6",
-      "p, span, a, button",
-      "label, strong, em",
-      "li, td, th",
-      ".btn, .button",
-      ".link, .text",
-      ".nav-item, .menu-item"
-    ],
-    "popupMenus": [
-      ".dropdown-menu",
-      ".menu-dropdown",
-      ".context-menu",
-      ".notification-popover"
-    ]
+  {
+    version: '1.8.68',
+    date: '2025-11-09',
+    changes: ['自动版本更新']
   },
-  "pagePatterns": {
-    "search": /\/search/,
-    "repository": /\/[\w-]+\/[\w-]+/,
-    "issues": /\/[\w-]+\/[\w-]+\/issues/,
-    "pullRequests": /\/[\w-]+\/[\w-]+\/pull/,
-    "settings": /\/settings/,
-    "dashboard": /^\/$/,
-    "explore": /\/explore/,
-    "codespaces": /\/codespaces/,
-    "notifications": /\/notifications/,
-    "profile": /\/[\w-]+$/,
-    "organizations": /\/organizations/,
-    "projects": /\/[\w-]+\/[\w-]+\/projects/,
-    "wiki": /\/[\w-]+\/[\w-]+\/wiki/,
-    "actions": /\/[\w-]+\/[\w-]+\/actions/,
-    "packages": /\/[\w-]+\/[\w-]+\/packages/,
-    "security": /\/[\w-]+\/[\w-]+\/security/,
-    "insights": /\/[\w-]+\/[\w-]+\/insights/,
-    "marketplace": /\/marketplace/,
-    "topics": /\/topics/,
-    "stars": /\/stars/,
-    "trending": /\/trending/
-  }
-};
-
+  {
+    version: '1.8.67',
+    date: '2025-11-09',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.66',
+    date: '2025-11-09',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.65',
+    date: '2025-11-09',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.64',
+    date: '2025-11-09',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.63',
+    date: '2025-11-09',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.62',
+    date: '2025-11-08',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.61',
+    date: '2025-11-06',
+    changes: ['自动版本更新']
+  },
+  {\n    version: '1.8.60',\n    date: '2024-01-15',\n    changes: ['修复XSS安全漏洞', '优化翻译性能和DOM操作', '改进缓存管理策略', '增强错误处理机制']\n  },\n  {\n    version: '1.8.59',\n    date: '2025-10-24',\n    changes: ['优化版本号管理系统', '统一版本号源']\n  },\n  {\n    version: '1.8.37',\n    date: '2023-12-18',\n    changes: ['修复utils/app.js文件中的语法错误']\n  },\n  {\n    version: '1.8.29',\n    date: '2023-12-17',\n    changes: [\n      '完成所有文件版本号同步',\n      '更新构建系统补丁版本',\n      '优化项目版本管理'\n    ]\n  },\n  {\n    version: '1.8.25',\n    date: '2023-12-18',\n    changes: [\n      '更新构建系统'\n    ]\n  },\n  {\n    version: '1.8.24',\n    date: '2023-12-17',\n    changes: [\n      '同步版本号'\n    ]\n  },\n  {\n    version: '1.8.21',\n    date: '2023-12-17',\n    changes: [\n      '实现版本自动更新检查功能',\n      '修复代码语法错误',\n      '完善翻译选择器配置',\n      '清理重复代码'\n    ]\n  },\n  {\n    version: '1.8.16',\n    date: '2023-12-17',\n    changes: [\n      '清理项目冗余文件'\n    ]\n  },\n  {\n    version: '1.8.15',\n    date: '2023-12-16',\n    changes: [\n      '修复服务器进程终止时的空指针错误'\n    ]\n  },\n  {\n    version: '1.8.14',\n    date: '2023-12-16',\n    changes: [\n      '增强GitHub页面配置功能，添加重复页面地址检查'\n    ]\n  },\n  {\n    version: '1.8.13',\n    date: '2023-12-15',\n    changes: [\n      '合并开始抓取和停止按钮为单个可切换状态的按钮',\n      '优化按钮状态切换逻辑'\n    ]\n  },\n  {\n    version: '1.8.12',\n    date: '2023-12-14',\n    changes: [\n      '添加工具状态重置功能',\n      '修复工具卡住问题'\n    ]\n  }\n];\n\n/**\n * 获取格式化的版本信息\n * @returns {string} 格式化的版本字符串\n */\nfunction getFormattedVersion() {\n  return `GitHub自动化字符串更新工具 v${VERSION}`;\n}\n\n// 导出格式化版本函数\n{ getFormattedVersion };\n
 
 /**
  * 工具函数模块
@@ -476,6 +408,132 @@ const utils = {
         }
     }
 };
+
+﻿/**
+ * GitHub 中文翻译配置文件
+ * 包含脚本所有可配置项
+ */
+
+// 导入版本常量（从单一版本源）
+// 定义greasemonkeyInfo以避免未定义错误，使用空值合并运算符提高代码可读性
+const greasemonkeyInfo = typeof window !== 'undefined' ? window.GM_info ?? {} : {};
+
+/**
+ * 从用户脚本头部注释中提取版本号
+ * @returns {string} 版本号
+ */
+function getVersionFromComment() {
+  try {
+    // 作为用户脚本，我们可以直接从当前执行环境中提取版本信息
+    const versionMatch = greasemonkeyInfo?.script?.version;
+    if (versionMatch) {
+      return versionMatch;
+    }
+
+    // 如果greasemonkeyInfo不可用，返回配置中的版本号
+    return VERSION;
+  } catch (e) {
+    // 出错时返回配置中的版本号
+    return VERSION;
+  }
+}
+
+/**
+ * 配置对象，包含所有可配置项
+ */
+const CONFIG = {
+  "version": VERSION,
+  "debounceDelay": 500,
+  "routeChangeDelay": 500,
+  "debugMode": false,
+  "updateCheck": {
+    "enabled": true,
+    "intervalHours": 24,
+    "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js",
+    "autoUpdateVersion": true
+  },
+  "externalTranslation": {
+    "enabled": false,
+    "minLength": 20,
+    "maxLength": 500,
+    "timeout": 3000,
+    "requestInterval": 500,
+    "cacheSize": 500
+  },
+  "performance": {
+    "enableDeepObserver": true,
+    "enablePartialMatch": false,
+    "maxDictSize": 2000,
+    "enableTranslationCache": true,
+    "batchSize": 50,
+    "batchDelay": 0,
+    "logTiming": false,
+    "cacheExpiration": 3600000, // 缓存过期时间（毫秒）
+    "minTextLengthToTranslate": 3, // 最小翻译文本长度
+    "minTranslateInterval": 500, // 最小翻译间隔（毫秒）
+    "observeAttributes": true, // 是否观察属性变化
+    "importantAttributes": ["title", "alt", "aria-label", "placeholder", "data-hovercard-url", "data-hovercard-type"], // 重要的属性列表
+    "importantElements": [
+      ".HeaderNavlink", ".js-selected-navigation-item", ".js-issue-title",
+      ".js-commit-message", ".js-details-container", ".js-comment-body",
+      ".js-activity-item", ".js-blob-content", ".js-repo-description",
+      ".js-issue-row", ".js-pinned-issue-list-item", ".js-project-card-content",
+      ".js-user-profile-bio", ".js-header-search-input", ".js-file-line"
+    ], // 重要内容元素
+    "ignoreElements": [
+      "script", "style", "link", "meta", "svg", "canvas",
+      "pre", "code", "kbd", "samp", ".blob-code-inner", ".file-line",
+      ".highlight", ".language-*", ".mermaid", ".mathjax",
+      ".js-zeroclipboard-button", ".js-minimizable-content",
+      ".reponav-dropdown", ".dropdown-caret", ".avatar", ".emoji"
+    ], // 忽略翻译的元素
+    "mutationThreshold": 30, // 单次突变数量阈值
+    "contentChangeWeight": 1, // 内容变化权重
+    "importantChangeWeight": 2, // 重要变化权重
+    "translationTriggerRatio": 0.3 // 触发翻译的变化比例
+  },
+  "selectors": {
+    "primary": [
+      "h1, h2, h3, h4, h5, h6",
+      "p, span, a, button",
+      "label, strong, em",
+      "li, td, th",
+      ".btn, .button",
+      ".link, .text",
+      ".nav-item, .menu-item"
+    ],
+    "popupMenus": [
+      ".dropdown-menu",
+      ".menu-dropdown",
+      ".context-menu",
+      ".notification-popover"
+    ]
+  },
+  "pagePatterns": {
+    "search": /\/search/,
+    "repository": /\/[\w-]+\/[\w-]+/,
+    "issues": /\/[\w-]+\/[\w-]+\/issues/,
+    "pullRequests": /\/[\w-]+\/[\w-]+\/pull/,
+    "settings": /\/settings/,
+    "dashboard": /^\/$/,
+    "explore": /\/explore/,
+    "codespaces": /\/codespaces/,
+    "notifications": /\/notifications/,
+    "profile": /\/[\w-]+$/,
+    "organizations": /\/organizations/,
+    "projects": /\/[\w-]+\/[\w-]+\/projects/,
+    "wiki": /\/[\w-]+\/[\w-]+\/wiki/,
+    "actions": /\/[\w-]+\/[\w-]+\/actions/,
+    "packages": /\/[\w-]+\/[\w-]+\/packages/,
+    "security": /\/[\w-]+\/[\w-]+\/security/,
+    "insights": /\/[\w-]+\/[\w-]+\/insights/,
+    "marketplace": /\/marketplace/,
+    "topics": /\/topics/,
+    "stars": /\/stars/,
+    "trending": /\/trending/
+  }
+};
+
 
 /**
  * 版本更新检查模块

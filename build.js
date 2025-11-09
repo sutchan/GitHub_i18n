@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.69
+ * @version 1.8.71
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -239,10 +239,11 @@ class BuildManager {
     mergedCode = mergedCode.replace(/^\s*import\s+\{[^}]+\}\s*from\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
     mergedCode = mergedCode.replace(/^\s*import\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
 
-    // 获取所有需要合并的文件
+    // 获取所有需要合并的文件（确保依赖顺序正确）
     const filesToMerge = [
-      path.join(this.srcDir, 'config.js'),
+      path.join(this.srcDir, 'version.js'), // 首先合并版本文件，作为依赖源
       path.join(this.srcDir, 'utils.js'),
+      path.join(this.srcDir, 'config.js'),
       path.join(this.srcDir, 'versionChecker.js'),
       path.join(this.srcDir, 'dictionaries/index.js'),
       path.join(this.srcDir, 'dictionaries/common.js'),
