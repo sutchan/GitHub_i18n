@@ -1,1 +1,16 @@
-/**\n * 通用翻译词典\n * 包含所有页面共用的翻译字符串\n */\n\nexport const commonDictionary = {\n    "common": {\n        "search": "搜索",\n        "new": "新建",\n        "actions": "操作",\n        "settings": "设置",\n        "help": "帮助",\n        "sign_in": "登录",\n        "sign_up": "注册"\n    }\n};
+/**
+ * 通用翻译词典
+ * 包含所有页面共用的翻译字符串
+ */
+
+export const commonDictionary = {
+  "common": {
+    "search": "搜索",
+    "new": "新建",
+    "actions": "操作",
+    "settings": "设置",
+    "help": "帮助",
+    "sign_in": "登录",
+    "sign_up": "注册"
+  }
+};

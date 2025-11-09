@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.68
+// @version 1.8.69
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -955,7 +955,21 @@ function mergeAllDictionaries() {
     return merged;
 }
 
-/**\n * 通用翻译词典\n * 包含所有页面共用的翻译字符串\n */\n\nconst commonDictionary = {\n    "common": {\n        "search": "搜索",\n        "new": "新建",\n        "actions": "操作",\n        "settings": "设置",\n        "help": "帮助",\n        "sign_in": "登录",\n        "sign_up": "注册"\n    }\n};
+/**
+ * 通用翻译词典
+ * 包含所有页面共用的翻译字符串
+ */const commonDictionary = {
+  "common": {
+    "search": "搜索",
+    "new": "新建",
+    "actions": "操作",
+    "settings": "设置",
+    "help": "帮助",
+    "sign_in": "登录",
+    "sign_up": "注册"
+  }
+};
+
 
 /**
  * Codespaces 页面翻译词典
