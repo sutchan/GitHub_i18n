@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.67
+ * @version 1.8.68
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -277,9 +277,9 @@ class BuildManager {
         fileContent = fileContent.replace(/^\s*export\s+\*\s+as\s+\w+\s+from\s+['"][^'"]+['"]\s*;?\s*(?:\n|$)/gm, '');
 
         // 移除export function/const/class/let/var声明（包括箭头函数形式）
-        fileContent = fileContent.replace(/^\s*export\s+(?:async\s+)?function\s+/gm, '$1function ');
-        fileContent = fileContent.replace(/^\s*export\s+const\s+\w+\s*=\s*(?:async\s+)?function\s*/gm, 'const $1 = $2function ');
-        fileContent = fileContent.replace(/^\s*export\s+const\s+\w+\s*=\s*\(/gm, 'const $1 = (');
+        fileContent = fileContent.replace(/^\s*export\s+(?:async\s+)?function\s+/gm, 'function ');
+        fileContent = fileContent.replace(/^\s*export\s+const\s+(\w+)\s*=\s*((?:async\s+)?)function\s*/gm, 'const $1 = $2function ');
+        fileContent = fileContent.replace(/^\s*export\s+const\s+(\w+)\s*=\s*\(/gm, 'const $1 = (');
         fileContent = fileContent.replace(/^\s*export\s+(const|let|var)\s+/gm, '$1 ');
         fileContent = fileContent.replace(/^\s*export\s+class\s+/gm, 'class ');
         fileContent = fileContent.replace(/^\s*export\s+interface\s+/gm, 'interface ');
