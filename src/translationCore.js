@@ -792,7 +792,7 @@ export const translationCore = {
     }
 
     // 检查是否全是数字和特殊符号
-    if (/^[0-9.,\s\-\+\(\)\[\]\{\}\/\*\^\$\#\@\!\~\`\|\:\;"'\?\>]+\$/i.test(textContent)) {
+    if (/^[0-9.,\s()[\]{}/*^$#@!~`|:;"'?>+-]+$/i.test(textContent)) {
       return false;
     }
 
@@ -874,7 +874,6 @@ export const translationCore = {
     // 处理所有文本节点
     textNodesToProcess.forEach(node => {
       // 保存原始节点位置的引用
-      const nextSibling = node.nextSibling;
       const parentNode = node.parentNode;
 
       // 移除原始节点
@@ -887,7 +886,16 @@ export const translationCore = {
       if (translatedText && typeof translatedText === 'string' && translatedText !== originalText) {
         try {
           // 确保翻译文本是有效的字符串，去除可能导致问题的字符
-          const safeTranslatedText = String(translatedText).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
+          const controlChars = [
+            '\u0000', '\u0001', '\u0002', '\u0003', '\u0004', '\u0005', '\u0006', '\u0007',
+            '\u0008', '\u000B', '\u000C', '\u000E', '\u000F', '\u0010', '\u0011', '\u0012',
+            '\u0013', '\u0014', '\u0015', '\u0016', '\u0017', '\u0018', '\u0019', '\u001A',
+            '\u001B', '\u001C', '\u001D', '\u001E', '\u001F', '\u007F'
+          ];
+          let safeTranslatedText = String(translatedText);
+          controlChars.forEach(char => {
+            safeTranslatedText = safeTranslatedText.split(char).join('');
+          });
           // 创建新的文本节点
           const translatedNode = document.createTextNode(safeTranslatedText);
           fragment.appendChild(translatedNode);
@@ -1048,7 +1056,7 @@ export const translationCore = {
         key.length > textLen ||
         value.startsWith('待翻译: ') ||
         // 避免对纯数字或特殊字符的匹配
-        /^[0-9.,\s\-\+\(\)\[\]\{\}\/\*\^\$\#\@\!\~\`\|\:\;"'\?\>]+$/i.test(key)) {
+        /^[0-9.,\s[\]{}/*^$#@!~`|:;"'?>+-()]+$/i.test(key)) {
         continue;
       }
 
@@ -1148,7 +1156,7 @@ export const translationCore = {
       const cacheEntries = Array.from(this.translationCache.entries());
 
       // 1. 先移除null值的缓存项
-      const nonNullEntries = cacheEntries.filter(([key, value]) => {
+      const nonNullEntries = cacheEntries.filter(([, value]) => {
         return value !== null && typeof value === 'string';
       });
 
@@ -1198,7 +1206,6 @@ export const translationCore = {
 
       try {
         // 更安全的回退策略：删除30%的条目，优先删除较长的键
-        const maxSize = CONFIG.performance.maxDictSize || 1000;
         const entriesToRemove = Math.max(10, Math.floor(this.translationCache.size * 0.3));
 
         // 转换为数组并按键长度降序排序（优先删除长键）
