@@ -1,4 +1,59 @@
-// 作者: Sut\n// 此文件用于统一管理GitHub自动化字符串更新工具的版本信息\n\n/**\n * 当前工具版本号\n * @type {string}\n * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取\n */\nexport const VERSION = '1.8.72';\n\n/**\n * 版本历史记录\n * @type {Array<{version: string, date: string, changes: string[]}>}\n */\nexport const VERSION_HISTORY = [
+// 作者: Sut\n// 此文件用于统一管理GitHub自动化字符串更新工具的版本信息\n\n/**\n * 当前工具版本号\n * @type {string}\n * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取\n */\nexport const VERSION = '1.8.83';\n\n/**\n * 版本历史记录\n * @type {Array<{version: string, date: string, changes: string[]}>}\n */\nexport const VERSION_HISTORY = [
+  {
+    version: '1.8.83',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.82',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.81',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.80',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.79',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.78',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.77',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.76',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.75',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.74',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.73',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
   {
     version: '1.8.72',
     date: '2025-11-09',

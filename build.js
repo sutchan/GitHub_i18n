@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.72
+ * @version 1.8.83
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -239,6 +239,13 @@ class BuildManager {
     mergedCode = mergedCode.replace(/^\s*import\s+\{[^}]+\}\s*from\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
     mergedCode = mergedCode.replace(/^\s*import\s+['"][^'"]+['"][^;]*;\s*(?:\n|$)/gm, '');
 
+    // 移除导入相关的注释行
+    mergedCode = mergedCode.replace(/^\s*\/\/\s*导入[^\n]*\n/gm, '');
+    // 移除导出相关的注释行
+    mergedCode = mergedCode.replace(/^\s*\/\/\s*导出[^\n]*\n/gm, '');
+    // 清理连续的空行
+    mergedCode = mergedCode.replace(/\n{3,}/g, '\n\n');
+
     // 获取所有需要合并的文件（确保依赖顺序正确）
     const filesToMerge = [
       path.join(this.srcDir, 'version.js'), // 首先合并版本文件，作为依赖源
@@ -289,6 +296,49 @@ class BuildManager {
         // 确保没有遗漏的export语句
         fileContent = fileContent.replace(/export\s+/g, '');
 
+        // 对于version.js文件，优化版本历史记录显示，只保留最新版本
+        if (filePath.includes('version.js')) {
+          // 替换完整版本历史为只包含当前版本的简化版本
+          const versionRegex = /const\s+VERSION\s*=\s*['"]([^'"]+)['"];/;
+          const versionMatch = fileContent.match(versionRegex);
+          const currentVersion = versionMatch ? versionMatch[1] : this.currentVersion;
+
+          // 简化版本历史记录，只保留当前版本和最近的几个重要版本
+          fileContent = fileContent.replace(
+            /const\s+VERSION_HISTORY\s*=\s*\[([\s\S]+?)\];/,
+            `const VERSION_HISTORY = [\n  {\n    version: '${currentVersion}',\n    date: '${new Date().toISOString().split('T')[0]}',\n    changes: ['当前版本']\n  }\n];`
+          );
+        }
+
+        // 对version.js文件进行特殊处理，清理冗余内容
+        if (filePath.includes('version.js')) {
+          // 先找到getFormattedVersion函数定义
+          const functionMatch = fileContent.match(/function getFormattedVersion\([^\)]*\)\s*\{[^\}]*\}/);
+          if (functionMatch) {
+            // 获取函数定义部分
+            const functionDef = functionMatch[0];
+            // 查找函数定义之后的内容
+            const functionIndex = fileContent.indexOf(functionDef);
+            const afterFunction = fileContent.substring(functionIndex + functionDef.length);
+
+            // 查找工具函数模块开始的位置
+            const utilsModuleStart = afterFunction.indexOf('/**\n * 工具函数模块');
+
+            if (utilsModuleStart !== -1) {
+              // 保留函数定义和工具函数模块之间的必要内容
+              const newContent = fileContent.substring(0, functionIndex + functionDef.length) + afterFunction.substring(utilsModuleStart);
+              fileContent = newContent;
+            }
+          }
+        } else {
+          // 对于其他文件，使用通用的导出语句清理
+          fileContent = fileContent.replace(/\/\/\s*导出[^\n]*\n+/g, '');
+          fileContent = fileContent.replace(/\{\s*\w+\s*\}\s*;?\s*/g, '');
+        }
+
+        // 清理连续的空行
+        fileContent = fileContent.replace(/\n{3,}/g, '\n\n');
+
         mergedCode += '\n\n' + fileContent;
         console.log(`✅ 已合并: ${path.relative(this.srcDir, filePath)}`);
       }
@@ -322,7 +372,12 @@ class BuildManager {
       this.createBuildDir();
 
       // 合并所有源文件
-      const mergedCode = this.mergeSourceFiles();
+      let mergedCode = this.mergeSourceFiles();
+
+      // 最终清理：移除version.js中的无效导出语句和相关注释
+      mergedCode = mergedCode.replace(/\/\/ 导出格式化版本函数\s*(\{[^}]*\}\s*;?)?\s*/g, '');
+      mergedCode = mergedCode.replace(/\s*\{\s*getFormattedVersion\s*\}\s*;?\s*/g, '');
+      mergedCode = mergedCode.replace(/\s*\/\/ 导出格式化版本函数\s*\n?\s*/g, '');
 
       // 写入到输出文件
       fs.writeFileSync(this.outputFile, mergedCode, 'utf8');

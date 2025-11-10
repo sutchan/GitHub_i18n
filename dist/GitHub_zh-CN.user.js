@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.72
+// @version 1.8.83
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -30,83 +30,18 @@
 // @downloadURL  https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js
 // ==/UserScript==
 
-// 导入配置
-// 导入工具函数
-// 导入版本检查器
-// 导入翻译核心
-// 导入词典模块
-// 导入页面监控
-// 导入开发工具
-// 导入主初始化函数
-// 导出所有公开模块
-
 
 // 启动脚本
 startScript();
 
 
-// 作者: Sut\n// 此文件用于统一管理GitHub自动化字符串更新工具的版本信息\n\n/**\n * 当前工具版本号\n * @type {string}\n * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取\n */\nconst VERSION = '1.8.72';\n\n/**\n * 版本历史记录\n * @type {Array<{version: string, date: string, changes: string[]}>}\n */\nconst VERSION_HISTORY = [
+// 作者: Sut\n// 此文件用于统一管理GitHub自动化字符串更新工具的版本信息\n\n/**\n * 当前工具版本号\n * @type {string}\n * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取\n */\nconst VERSION = '1.8.83';\n\n/**\n * 版本历史记录\n * @type {Array<{version: string, date: string, changes: string[]}>}\n */\nconst VERSION_HISTORY = [
   {
-    version: '1.8.72',
-    date: '2025-11-09',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.71',
-    date: '2025-11-09',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.70',
-    date: '2025-11-09',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.69',
-    date: '2025-11-09',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.68',
-    date: '2025-11-09',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.67',
-    date: '2025-11-09',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.66',
-    date: '2025-11-09',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.65',
-    date: '2025-11-09',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.64',
-    date: '2025-11-09',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.63',
-    date: '2025-11-09',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.62',
-    date: '2025-11-08',
-    changes: ['自动版本更新']
-  },
-  {
-    version: '1.8.61',
-    date: '2025-11-06',
-    changes: ['自动版本更新']
-  },
-  {\n    version: '1.8.60',\n    date: '2024-01-15',\n    changes: ['修复XSS安全漏洞', '优化翻译性能和DOM操作', '改进缓存管理策略', '增强错误处理机制']\n  },\n  {\n    version: '1.8.59',\n    date: '2025-10-24',\n    changes: ['优化版本号管理系统', '统一版本号源']\n  },\n  {\n    version: '1.8.37',\n    date: '2023-12-18',\n    changes: ['修复utils/app.js文件中的语法错误']\n  },\n  {\n    version: '1.8.29',\n    date: '2023-12-17',\n    changes: [\n      '完成所有文件版本号同步',\n      '更新构建系统补丁版本',\n      '优化项目版本管理'\n    ]\n  },\n  {\n    version: '1.8.25',\n    date: '2023-12-18',\n    changes: [\n      '更新构建系统'\n    ]\n  },\n  {\n    version: '1.8.24',\n    date: '2023-12-17',\n    changes: [\n      '同步版本号'\n    ]\n  },\n  {\n    version: '1.8.21',\n    date: '2023-12-17',\n    changes: [\n      '实现版本自动更新检查功能',\n      '修复代码语法错误',\n      '完善翻译选择器配置',\n      '清理重复代码'\n    ]\n  },\n  {\n    version: '1.8.16',\n    date: '2023-12-17',\n    changes: [\n      '清理项目冗余文件'\n    ]\n  },\n  {\n    version: '1.8.15',\n    date: '2023-12-16',\n    changes: [\n      '修复服务器进程终止时的空指针错误'\n    ]\n  },\n  {\n    version: '1.8.14',\n    date: '2023-12-16',\n    changes: [\n      '增强GitHub页面配置功能，添加重复页面地址检查'\n    ]\n  },\n  {\n    version: '1.8.13',\n    date: '2023-12-15',\n    changes: [\n      '合并开始抓取和停止按钮为单个可切换状态的按钮',\n      '优化按钮状态切换逻辑'\n    ]\n  },\n  {\n    version: '1.8.12',\n    date: '2023-12-14',\n    changes: [\n      '添加工具状态重置功能',\n      '修复工具卡住问题'\n    ]\n  }\n];\n\n/**\n * 获取格式化的版本信息\n * @returns {string} 格式化的版本字符串\n */\nfunction getFormattedVersion() {\n  return `GitHub自动化字符串更新工具 v${VERSION}`;\n}\n\n// 导出格式化版本函数\n{ getFormattedVersion };\n
+    version: '1.8.83',
+    date: '2025-11-10',
+    changes: ['当前版本']
+  }
+];\n\n/**\n * 获取格式化的版本信息\n * @returns {string} 格式化的版本字符串\n */\nfunction getFormattedVersion() {\n  return `GitHub自动化字符串更新工具 v${VERSION}`;\n}\n\n\n\n
 
 /**
  * 工具函数模块
@@ -120,12 +55,12 @@ const utils = {
     /**
      * 节流函数，用于限制高频操作的执行频率
      * 支持返回Promise
-     * @param {Function} func - 要节流的函数
-     * @param {number} limit - 限制时间（毫秒）
-     * @param {Object} options - 配置选项
-     * @param {boolean} options.leading - 是否在开始时执行（默认true）
-     * @param {boolean} options.trailing - 是否在结束后执行（默认true）
-     * @returns {Function} 节流后的函数
+     * @param func - 要节流的函数
+     * @param limit - 限制时间（毫秒）
+     * @param options - 配置选项
+     * @param options.leading - 是否在开始时执行（默认true）
+     * @param options.trailing - 是否在结束后执行（默认true）
+     * @returns 节流后的函数
      */
     throttle(func, limit, options = {}) {
         const { leading = true, trailing = true } = options;
@@ -165,11 +100,11 @@ const utils = {
     /**
      * 防抖函数，延迟执行函数直到停止触发一段时间
      * 支持返回Promise
-     * @param {Function} func - 要防抖的函数
-     * @param {number} delay - 延迟时间（毫秒）
-     * @param {Object} options - 配置选项
-     * @param {boolean} options.leading - 是否在开始时执行一次（默认false）
-     * @returns {Function} 防抖后的函数
+     * @param func - 要防抖的函数
+     * @param delay - 延迟时间（毫秒）
+     * @param options - 配置选项
+     * @param options.leading - 是否在开始时执行一次（默认false）
+     * @returns 防抖后的函数
      */
     debounce(func, delay, options = {}) {
         const { leading = false } = options;
@@ -197,7 +132,7 @@ const utils = {
     
     /**
      * 延迟函数，返回Promise的setTimeout
-     * @param {number} ms - 延迟时间（毫秒）
+     * @param ms - 延迟时间（毫秒）
      * @returns {Promise<void>}
      */
     delay(ms) {
@@ -206,8 +141,8 @@ const utils = {
 
     /**
      * 转义正则表达式中的特殊字符
-     * @param {string} string - 要转义的字符串
-     * @returns {string} 转义后的字符串
+     * @param string - 要转义的字符串
+     * @returns 转义后的字符串
      */
     escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -215,7 +150,7 @@ const utils = {
     
     /**
      * 安全地解析JSON字符串
-     * @param {string} jsonString - JSON字符串
+     * @param jsonString - JSON字符串
      * @param {*} defaultValue - 解析失败时的默认值
      * @returns {*} 解析结果或默认值
      */
@@ -231,8 +166,8 @@ const utils = {
     /**
      * 安全地序列化对象为JSON字符串
      * @param {*} obj - 要序列化的对象
-     * @param {string} defaultValue - 序列化失败时的默认值
-     * @returns {string} JSON字符串或默认值
+     * @param defaultValue - 序列化失败时的默认值
+     * @returns JSON字符串或默认值
      */
     safeJSONStringify(obj, defaultValue = '{}') {
         try {
@@ -245,7 +180,7 @@ const utils = {
     
     /**
      * 获取当前页面路径
-     * @returns {string} 当前页面的路径
+     * @returns 当前页面的路径
      */
     getCurrentPath() {
         return window.location.pathname;
@@ -253,7 +188,7 @@ const utils = {
     
     /**
      * 获取完整的当前页面URL（包含查询参数）
-     * @returns {string} 完整的URL
+     * @returns 完整的URL
      */
     getCurrentUrl() {
         return window.location.href;
@@ -261,8 +196,8 @@ const utils = {
     
     /**
      * 判断当前页面是否匹配某个路径模式
-     * @param {RegExp} pattern - 路径模式
-     * @returns {boolean} 是否匹配
+     * @param pattern - 路径模式
+     * @returns 是否匹配
      */
     isCurrentPathMatch(pattern) {
         return pattern.test(this.getCurrentPath());
@@ -270,19 +205,19 @@ const utils = {
     
     /**
      * 从URL获取查询参数
-     * @param {string} name - 参数名
-     * @param {string} url - URL字符串，默认使用当前页面URL
+     * @param name - 参数名
+     * @param url - URL字符串，默认使用当前页面URL
      * @returns {string|null} 参数值或null
      */
     getQueryParam(name, url = window.location.href) {
-        const match = RegExp(`[?&]${name}=([^&]*)`).exec(url);
+        const match = RegExp(`[?&]$=([^&]*)`).exec(url);
         return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
     },
     
     /**
      * 获取URL中的所有查询参数
-     * @param {string} url - URL字符串，默认使用当前页面URL
-     * @returns {Object} 查询参数对象
+     * @param url - URL字符串，默认使用当前页面URL
+     * @returns 查询参数对象
      */
     getAllQueryParams(url = window.location.href) {
         const params = {};
@@ -295,10 +230,10 @@ const utils = {
     
     /**
      * 收集DOM树中的所有文本节点内容
-     * @param {HTMLElement} element - 要收集文本的起始元素
+     * @param element - 要收集文本的起始元素
      * @param {Set<string>} resultSet - 用于存储结果的Set集合
-     * @param {Object} options - 配置选项
-     * @param {number} options.maxLength - 最大文本长度（默认200）
+     * @param options - 配置选项
+     * @param options.maxLength - 最大文本长度（默认200）
      * @param {string[]} options.skipTags - 跳过的标签名数组
      */
     collectTextNodes(element, resultSet, options = {}) {
@@ -330,7 +265,7 @@ const utils = {
                         text.length > 0 && 
                         text.length < maxLength && 
                         !/^\d+$/.test(text) &&
-                        !/^[\s\p{P}\p{S}]+$/u.test(text)) {
+                        !/^[\s\p\p]+$/u.test(text)) {
                         resultSet.add(text);
                     }
                 } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -345,7 +280,7 @@ const utils = {
     
     /**
      * 安全地访问对象属性，避免嵌套属性访问出错
-     * @param {Object} obj - 目标对象
+     * @param obj - 目标对象
      * @param {string|string[]} path - 属性路径，如'a.b.c'或['a','b','c']
      * @param {*} defaultValue - 获取失败时的默认值
      * @returns {*} 属性值或默认值
@@ -395,9 +330,9 @@ const utils = {
     
     /**
      * 安全地执行函数，捕获可能的异常
-     * @param {Function} fn - 要执行的函数
+     * @param fn - 要执行的函数
      * @param {*} defaultValue - 执行失败时的默认返回值
-     * @param {Object} context - 函数执行上下文
+     * @param context - 函数执行上下文
      * @param {...*} args - 函数参数
      * @returns {*} 函数返回值或默认值
      */
@@ -425,7 +360,7 @@ const greasemonkeyInfo = typeof window !== 'undefined' ? window.GM_info ?? {} : 
 
 /**
  * 从用户脚本头部注释中提取版本号
- * @returns {string} 版本号
+ * @returns 版本号
  */
 function getVersionFromComment() {
   try {
@@ -589,7 +524,7 @@ const versionChecker = {
             }
             
             if (CONFIG.debugMode) {
-                console.log(`[GitHub 中文翻译] 当前版本: ${CONFIG.version}, 远程版本: ${remoteVersion}`);
+                console.log(`[GitHub 中文翻译] 当前版本: ${CONFIG.version}, 远程版本: $`);
             }
             
             // 比较版本号
@@ -631,9 +566,9 @@ const versionChecker = {
     
     /**
      * 带重试机制的网络请求
-     * @param {string} url - 请求URL
-     * @param {number} maxRetries - 最大重试次数
-     * @param {number} retryDelay - 重试间隔（毫秒）
+     * @param url - 请求URL
+     * @param maxRetries - 最大重试次数
+     * @param retryDelay - 重试间隔（毫秒）
      * @returns {Promise<string>} 响应文本
      */
     async fetchWithRetry(url, maxRetries = 2, retryDelay = 1000) {
@@ -642,7 +577,7 @@ const versionChecker = {
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
             try {
                 if (CONFIG.debugMode && attempt > 0) {
-                    console.log(`[GitHub 中文翻译] 重试更新检查 (${attempt}/${maxRetries})...`);
+                    console.log(`[GitHub 中文翻译] 重试更新检查 ($/$)...`);
                 }
                 
                 // 自定义超时控制
@@ -685,7 +620,7 @@ const versionChecker = {
     /**
      * 从脚本内容中提取版本号
      * 支持多种版本号格式
-     * @param {string} content - 脚本内容
+     * @param content - 脚本内容
      * @returns {string|null} 提取的版本号或null
      */
     extractVersion(content) {
@@ -713,9 +648,9 @@ const versionChecker = {
 
     /**
      * 比较版本号，判断是否有新版本
-     * @param {string} newVersion - 新版本号
-     * @param {string} currentVersion - 当前版本号
-     * @returns {boolean} 是否有新版本
+     * @param newVersion - 新版本号
+     * @param currentVersion - 当前版本号
+     * @returns 是否有新版本
      */
     isNewerVersion(newVersion, currentVersion) {
         // 将版本号转换为数组进行比较
@@ -741,7 +676,7 @@ const versionChecker = {
     /**
      * 显示更新通知
      * 使用安全的DOM操作而不是innerHTML
-     * @param {string} newVersion - 新版本号
+     * @param newVersion - 新版本号
      */
     showUpdateNotification(newVersion) {
         const notificationKey = 'githubZhUpdateNotificationDismissed';
@@ -754,7 +689,7 @@ const versionChecker = {
         if (localStorage.getItem(notificationKey) === 'dismissed' || 
             lastNotifiedVersion === newVersion) {
             if (CONFIG.debugMode && lastNotifiedVersion === newVersion) {
-                console.log(`[GitHub 中文翻译] 已经通知过版本 ${newVersion} 的更新`);
+                console.log(`[GitHub 中文翻译] 已经通知过版本 $的更新`);
             }
             return;
         }
@@ -808,7 +743,7 @@ const versionChecker = {
             // 创建消息文本 - 安全地设置文本内容
             const messageElement = document.createElement('p');
             messageElement.className = 'text-sm text-blue-700 mt-1';
-            messageElement.textContent = `发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。`;
+            messageElement.textContent = `发现新版本 $，建议更新以获得更好的翻译体验。`;
             contentContainer.appendChild(messageElement);
             
             // 创建按钮容器
@@ -818,7 +753,7 @@ const versionChecker = {
             
             // 创建更新按钮 - 安全地设置URL
             const updateButton = document.createElement('a');
-            updateButton.id = `${notificationId}-update-btn`;
+            updateButton.id = `$-update-btn`;
             updateButton.href = CONFIG.updateCheck.scriptUrl || '#';
             updateButton.target = '_blank';
             updateButton.rel = 'noopener noreferrer';
@@ -828,7 +763,7 @@ const versionChecker = {
             
             // 创建稍后按钮
             const laterButton = document.createElement('button');
-            laterButton.id = `${notificationId}-later-btn`;
+            laterButton.id = `$-later-btn`;
             laterButton.className = 'inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors';
             laterButton.textContent = '稍后';
             laterButton.addEventListener('click', () => {
@@ -838,7 +773,7 @@ const versionChecker = {
             
             // 创建不再提醒按钮
             const dismissButton = document.createElement('button');
-            dismissButton.id = `${notificationId}-dismiss-btn`;
+            dismissButton.id = `$-dismiss-btn`;
             dismissButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors';
             dismissButton.textContent = '不再提醒';
             dismissButton.addEventListener('click', () => {
@@ -861,7 +796,7 @@ const versionChecker = {
                 }
                 
                 if (CONFIG.debugMode) {
-                    console.log(`[GitHub 中文翻译] 显示更新通知: 版本 ${newVersion}`);
+                    console.log(`[GitHub 中文翻译] 显示更新通知: 版本 $`);
                 }
             }
         } catch (error) {
@@ -871,8 +806,8 @@ const versionChecker = {
     
     /**
      * 隐藏通知元素（带动画效果）
-     * @param {HTMLElement} notification - 通知元素
-     * @param {boolean} permanently - 是否永久隐藏
+     * @param notification - 通知元素
+     * @param permanently - 是否永久隐藏
      */
     hideNotification(notification, permanently = false) {
         try {
@@ -900,7 +835,7 @@ const versionChecker = {
     
     /**
      * 记录版本历史
-     * @param {string} version - 版本号
+     * @param version - 版本号
      */
     recordVersionHistory(version) {
         try {
@@ -931,7 +866,7 @@ const versionChecker = {
     
     /**
      * 更新本地存储中的版本号
-     * @param {string} newVersion - 新版本号
+     * @param newVersion - 新版本号
      */
     updateVersionInStorage(newVersion) {
         try {
@@ -944,7 +879,7 @@ const versionChecker = {
             localStorage.setItem('githubZhCachedVersion', utils.safeJSONStringify(cacheData));
             
             if (CONFIG.debugMode) {
-                console.log(`[GitHub 中文翻译] 已缓存新版本号: ${newVersion} (缓存时间: ${new Date().toLocaleString()})`);
+                console.log(`[GitHub 中文翻译] 已缓存新版本号: $(缓存时间: ${new Date().toLocaleString()})`);
             }
             
             return true;
@@ -1008,7 +943,7 @@ const translationModule = {
 
 /**
  * 合并所有词典为一个完整的词典对象
- * @returns {Object} 合并后的词典
+ * @returns 合并后的词典
  */
 function mergeAllDictionaries() {
     const merged = {};
@@ -1198,8 +1133,7 @@ const exploreDictionary = {
 const translationCore = {
   /**
    * 合并后的完整词典
-   * @type {Object}
-   */
+   * @type */
   dictionary: {},
 
   /**
@@ -1221,8 +1155,7 @@ const translationCore = {
 
   /**
    * 当前页面模式
-   * @type {string}
-   */
+   * @type */
   currentPageMode: null,
 
   /**
@@ -1293,7 +1226,7 @@ const translationCore = {
 
   /**
    * 检测当前页面模式
-   * @returns {string} 当前页面模式
+   * @returns 当前页面模式
    */
   detectPageMode() {
     try {
@@ -1332,7 +1265,7 @@ const translationCore = {
 
   /**
    * 获取当前页面模式的配置
-   * @returns {Object} 页面模式配置
+   * @returns 页面模式配置
    */
   getCurrentPageModeConfig() {
     const mode = this.currentPageMode || this.detectPageMode();
@@ -1356,7 +1289,7 @@ const translationCore = {
     const modeConfig = this.getCurrentPageModeConfig();
 
     if (CONFIG.debugMode) {
-      console.log(`[GitHub 中文翻译] 当前页面模式: ${pageMode}`, modeConfig);
+      console.log(`[GitHub 中文翻译] 当前页面模式: $`, modeConfig);
     }
 
     // 重置性能统计数据
@@ -1480,7 +1413,7 @@ const translationCore = {
   logPerformanceData() {
     if (CONFIG.debugMode && CONFIG.performance.logTiming) {
       const duration = Date.now() - this.performanceData.translateStartTime;
-      console.log(`[GitHub 中文翻译] 翻译完成 - 耗时: ${duration}ms, 处理元素: ${this.performanceData.elementsProcessed}, ` +
+      console.log(`[GitHub 中文翻译] 翻译完成 - 耗时: $ms, 处理元素: ${this.performanceData.elementsProcessed}, ` +
         `翻译文本: ${this.performanceData.textsTranslated}, 缓存命中: ${this.performanceData.cacheHits}, ` +
         `缓存未命中: ${this.performanceData.cacheMisses}`);
     }
@@ -1540,7 +1473,7 @@ const translationCore = {
           // 性能日志记录
           if (CONFIG.performance.logTiming && (endIndex % (batchSize * 5) === 0 || endIndex === validElements.length)) {
             const progress = Math.round((endIndex / validElements.length) * 100);
-            console.log(`[GitHub 中文翻译] 翻译进度: ${progress}%, 已处理: ${endIndex}/${validElements.length} 元素`);
+            console.log(`[GitHub 中文翻译] 翻译进度: $%, 已处理: $/${validElements.length} 元素`);
           }
 
           if (endIndex < validElements.length) {
@@ -1598,12 +1531,12 @@ const translationCore = {
             });
 
             if (CONFIG.debugMode) {
-              console.log(`[GitHub 中文翻译] 找到关键元素: ${selector}, 数量: ${elements.length}`);
+              console.log(`[GitHub 中文翻译] 找到关键元素: $, 数量: ${elements.length}`);
             }
           }
         } catch (err) {
           if (CONFIG.debugMode) {
-            console.warn(`[GitHub 中文翻译] 查询选择器失败: ${selector}`, err);
+            console.warn(`[GitHub 中文翻译] 查询选择器失败: $`, err);
           }
           // 继续处理其他选择器
         }
@@ -1633,7 +1566,7 @@ const translationCore = {
 
       // 记录统计信息
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: ${processedElements}, 失败: ${failedElements}`);
+        console.log(`[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: $, 失败: $`);
       }
 
       resolve();
@@ -1663,7 +1596,7 @@ const translationCore = {
           }
         });
         if (CONFIG.debugMode && CONFIG.performance.logTiming) {
-          console.log(`[GitHub 中文翻译] 合并查询选择器: ${combinedSelector}, 结果数量: ${allElements.length}`);
+          console.log(`[GitHub 中文翻译] 合并查询选择器: $, 结果数量: ${allElements.length}`);
         }
         return Array.from(uniqueElements);
       } catch (error) {
@@ -1686,7 +1619,7 @@ const translationCore = {
         });
       } catch (error) {
         if (CONFIG.debugMode) {
-          console.warn(`[GitHub 中文翻译] 选择器 "${selector}" 解析失败:`, error);
+          console.warn(`[GitHub 中文翻译] 选择器 "$" 解析失败:`, error);
         }
       }
     });
@@ -1698,8 +1631,8 @@ const translationCore = {
   /**
    * 判断元素是否应该被翻译
    * 优化版：增加更多过滤条件和快速路径
-   * @param {HTMLElement} element - 要检查的元素
-   * @returns {boolean} 是否应该翻译
+   * @param element - 要检查的元素
+   * @returns 是否应该翻译
    */
   shouldTranslateElement(element) {
     // 快速路径：无效元素检查
@@ -1988,8 +1921,8 @@ const translationCore = {
   /**
    * 翻译单个元素
    * 性能优化：使用更高效的DOM遍历和翻译策略
-   * @param {HTMLElement} element - 要翻译的元素
-   * @returns {boolean} 是否成功翻译了元素
+   * @param element - 要翻译的元素
+   * @returns 是否成功翻译了元素
    */
   translateElement(element) {
     // 快速检查：避免无效元素
@@ -2114,7 +2047,7 @@ const translationCore = {
   /**
    * 获取文本的翻译结果
    * 优化版：改进缓存策略、添加更智能的文本处理
-   * @param {string} text - 原始文本
+   * @param text - 原始文本
    * @returns {string|null} 翻译后的文本，如果没有找到翻译则返回null
    */
   getTranslatedText(text) {
@@ -2199,7 +2132,7 @@ const translationCore = {
   /**
    * 执行部分翻译匹配
    * 优化版：使用智能匹配算法和优先级排序
-   * @param {string} text - 要翻译的文本
+   * @param text - 要翻译的文本
    * @returns {string|null} - 翻译后的文本
    */
   performPartialTranslation(text) {
@@ -2360,7 +2293,7 @@ const translationCore = {
 
       if (CONFIG.debugMode) {
         const removedCount = oldSize - this.translationCache.size;
-        console.log(`[GitHub 中文翻译] 缓存已清理，从${oldSize}项减少到${this.translationCache.size}项，移除了${removedCount}项`);
+        console.log(`[GitHub 中文翻译] 缓存已清理，从$项减少到${this.translationCache.size}项，移除了$项`);
       }
 
       // 更新性能数据
@@ -2444,7 +2377,7 @@ const translationCore = {
   /**
    * 更新词典
    * 支持动态更新词典内容
-   * @param {Object} newDictionary - 新的词典条目
+   * @param newDictionary - 新的词典条目
    */
   updateDictionary(newDictionary) {
     try {
@@ -2483,14 +2416,12 @@ const pageMonitor = {
     
     /**
      * 最后翻译的路径
-     * @type {string}
-     */
+     * @type */
     lastPath: '',
     
     /**
      * 最后翻译的时间戳
-     * @type {number}
-     */
+     * @type */
     lastTranslateTimestamp: 0,
     
     /**
@@ -2550,7 +2481,7 @@ const pageMonitor = {
             this.lastPath = currentPath;
             
             if (CONFIG.debugMode) {
-                console.log(`[GitHub 中文翻译] 页面路径变化: ${currentPath}`);
+                console.log(`[GitHub 中文翻译] 页面路径变化: $`);
             }
             
             // 延迟执行翻译，等待页面内容加载完成
@@ -2614,7 +2545,7 @@ const pageMonitor = {
     
     /**
      * 延迟执行翻译
-     * @param {number} delay - 延迟毫秒数
+     * @param delay - 延迟毫秒数
      */
     async delayedTranslate(delay = 0) {
         try {
@@ -2663,7 +2594,7 @@ const pageMonitor = {
     /**
      * 批处理元素翻译
      * @param {HTMLElement[]} elements - 要翻译的元素数组
-     * @param {number} batchSize - 每批处理的元素数量
+     * @param batchSize - 每批处理的元素数量
      */
     async processElementsInBatches(elements, batchSize) {
         const performanceConfig = {
@@ -2681,7 +2612,7 @@ const pageMonitor = {
     
     /**
      * 处理翻译错误
-     * @param {Error} error - 错误对象
+     * @param error - 错误对象
      */
     async handleTranslationError(error) {
         this.handleError('翻译过程', error);
@@ -2701,11 +2632,11 @@ const pageMonitor = {
     
     /**
      * 统一错误处理
-     * @param {string} operation - 操作名称
-     * @param {Error} error - 错误对象
+     * @param operation - 操作名称
+     * @param error - 错误对象
      */
     handleError(operation, error) {
-        const errorMessage = `[GitHub 中文翻译] ${operation}时出错: ${error.message}`;
+        const errorMessage = `[GitHub 中文翻译] $时出错: ${error.message}`;
         if (CONFIG.debugMode) {
             console.error(errorMessage, error);
         } else {
@@ -2820,8 +2751,8 @@ const pageMonitor = {
     /**
      * 选择最佳的DOM观察根节点
      * 减少观察的DOM范围，提高性能
-     * @param {string} pageMode - 页面模式
-     * @returns {HTMLElement} 最佳观察根节点
+     * @param pageMode - 页面模式
+     * @returns 最佳观察根节点
      */
     selectOptimalRootNode(pageMode) {
         // 如果没有提供页面模式，则自动检测
@@ -2911,8 +2842,8 @@ const pageMonitor = {
     /**
      * 获取优化的观察器配置
      * 根据页面模式和复杂度动态调整观察选项
-     * @param {string} pageMode - 页面模式
-     * @returns {Object} 优化的MutationObserver配置
+     * @param pageMode - 页面模式
+     * @returns 优化的MutationObserver配置
      */
     getOptimizedObserverConfig(pageMode) {
         // 如果没有提供页面模式，则自动检测
@@ -2952,7 +2883,7 @@ const pageMonitor = {
     
     /**
      * 判断是否为复杂页面
-     * @returns {boolean} 是否为复杂页面
+     * @returns 是否为复杂页面
      */
     isComplexPage() {
         const complexPaths = [
@@ -2969,7 +2900,7 @@ const pageMonitor = {
     /**
      * 检测当前页面模式
      * 复用translationCore中的页面模式检测逻辑
-     * @returns {string} 当前页面模式
+     * @returns 当前页面模式
      */
     detectPageMode() {
         return translationCore.detectPageMode();
@@ -2977,8 +2908,8 @@ const pageMonitor = {
     
     /**
      * 根据页面模式获取快速路径阈值
-     * @param {string} pageMode - 页面模式
-     * @returns {number} 快速路径阈值
+     * @param pageMode - 页面模式
+     * @returns 快速路径阈值
      */
     getQuickPathThresholdByPageMode(pageMode) {
         const thresholds = {
@@ -2994,8 +2925,8 @@ const pageMonitor = {
     
     /**
      * 获取页面模式特定的阈值
-     * @param {string} pageMode - 页面模式
-     * @returns {number} 页面模式特定的阈值
+     * @param pageMode - 页面模式
+     * @returns 页面模式特定的阈值
      */
     getModeSpecificThreshold(pageMode) {
         const thresholds = {
@@ -3010,8 +2941,8 @@ const pageMonitor = {
     
     /**
      * 根据页面模式获取最小文本长度
-     * @param {string} pageMode - 页面模式
-     * @returns {number} 最小文本长度
+     * @param pageMode - 页面模式
+     * @returns 最小文本长度
      */
     getMinTextLengthByPageMode(pageMode) {
         const lengths = {
@@ -3025,9 +2956,9 @@ const pageMonitor = {
     
     /**
      * 根据页面模式判断是否应该跳过元素
-     * @param {HTMLElement} element - 元素
-     * @param {string} pageMode - 页面模式
-     * @returns {boolean} 是否应该跳过
+     * @param element - 元素
+     * @param pageMode - 页面模式
+     * @returns 是否应该跳过
      */
     shouldSkipElementByPageMode(element, pageMode) {
         if (!element || !pageMode) return false;
@@ -3070,8 +3001,8 @@ const pageMonitor = {
      * 智能判断是否需要触发翻译
      * 比简单的变化检测更高效
      * @param {MutationRecord[]} mutations - 变更记录数组
-     * @param {string} pageMode - 当前页面模式
-     * @returns {boolean} 是否需要触发翻译
+     * @param pageMode - 当前页面模式
+     * @returns 是否需要触发翻译
      */
     shouldTriggerTranslation(mutations, pageMode) {
         // 如果没有提供页面模式，则自动检测
@@ -3178,9 +3109,9 @@ const pageMonitor = {
     
     /**
      * 判断元素是否为重要元素
-     * @param {HTMLElement} element - 要检查的元素
+     * @param element - 要检查的元素
      * @param {string[]} importantElements - 重要元素选择器数组
-     * @returns {boolean} 是否为重要元素
+     * @returns 是否为重要元素
      */
     isImportantElement(element, importantElements, cache, pageMode) {
         try {
@@ -3243,9 +3174,9 @@ const pageMonitor = {
     
     /**
      * 判断是否应该忽略元素的变化
-     * @param {Node} node - 要检查的节点
+     * @param node - 要检查的节点
      * @param {string[]} ignoreElements - 忽略元素选择器数组
-     * @returns {boolean} 是否应该忽略
+     * @returns 是否应该忽略
      */
     shouldIgnoreElement(node, ignoreElements, cache, pageMode) {
         try {
@@ -3315,8 +3246,8 @@ const pageMonitor = {
     
     /**
      * 判断是否为内容相关的DOM变化
-     * @param {MutationRecord} mutation - 变更记录
-     * @returns {boolean} 是否为内容相关变化
+     * @param mutation - 变更记录
+     * @returns 是否为内容相关变化
      */
     isContentRelatedMutation(mutation, pageMode) {
         try {
@@ -3400,9 +3331,9 @@ const pageMonitor = {
     
     /**
      * 判断节点是否需要翻译
-     * @param {Node} node - 要检查的节点
-     * @param {string} pageMode - 当前页面模式
-     * @returns {boolean} 是否需要翻译
+     * @param node - 要检查的节点
+     * @param pageMode - 当前页面模式
+     * @returns 是否需要翻译
      */
     isTranslatableNode(node, pageMode) {
         // 如果没有提供页面模式，则自动检测
@@ -3452,8 +3383,8 @@ const pageMonitor = {
     
     /**
      * 检查元素是否包含可翻译的子元素
-     * @param {HTMLElement} element - 要检查的元素
-     * @returns {boolean} 是否包含可翻译的子元素
+     * @param element - 要检查的元素
+     * @returns 是否包含可翻译的子元素
      */
     hasTranslatableChildren(element) {
         // 快速检查：只查看前10个子元素
@@ -3485,8 +3416,8 @@ const pageMonitor = {
     
     /**
      * 获取页面模式特定的文本变化阈值
-     * @param {string} pageMode - 页面模式
-     * @returns {Object} 阈值配置
+     * @param pageMode - 页面模式
+     * @returns 阈值配置
      */
     getTextChangeThreshold(pageMode) {
         const defaultThresholds = { minLength: 5, lengthDiffThreshold: 3 };
@@ -3512,8 +3443,8 @@ const pageMonitor = {
      * 检测重要的DOM变化
      * 只在有实际内容变化时触发翻译
      * @param {MutationRecord[]} mutations - 变更记录数组
-     * @param {string} pageMode - 页面模式
-     * @returns {boolean} 是否有需要触发翻译的重要变化
+     * @param pageMode - 页面模式
+     * @returns 是否有需要触发翻译的重要变化
      */
     detectImportantChanges(mutations, pageMode) {
         try {
@@ -3707,7 +3638,7 @@ const pageMonitor = {
 const stringExtractor = {
     /**
      * 收集页面上的字符串
-     * @param {boolean} showInConsole - 是否在控制台显示结果
+     * @param showInConsole - 是否在控制台显示结果
      * @returns {Set<string>} 收集到的字符串集合
      */
     collectStrings(showInConsole = true) {
@@ -3724,7 +3655,7 @@ const stringExtractor = {
     
     /**
      * 查找未翻译的字符串
-     * @param {boolean} showInConsole - 是否在控制台显示结果
+     * @param showInConsole - 是否在控制台显示结果
      * @returns {Set<string>} 未翻译的字符串集合
      */
     findUntranslatedStrings(showInConsole = true) {
@@ -3772,7 +3703,7 @@ class AutoStringUpdater {
     
     /**
      * 生成更新报告
-     * @returns {Object} 更新报告对象
+     * @returns 更新报告对象
      */
     generateUpdateReport() {
         const stringsToAdd = this.findStringsToAdd();
@@ -3806,7 +3737,7 @@ class DictionaryProcessor {
     
     /**
      * 合并词典
-     * @returns {Object} 合并后的词典
+     * @returns 合并后的词典
      */
     mergeDictionaries() {
         const merged = {};
@@ -3818,7 +3749,7 @@ class DictionaryProcessor {
     
     /**
      * 验证词典
-     * @returns {Object} 词典验证结果
+     * @returns 词典验证结果
      */
     validateDictionary() {
         const dictionary = this.mergeDictionaries();
@@ -3845,7 +3776,7 @@ class DictionaryProcessor {
 
 /**
  * 加载工具类
- * @returns {Object} 包含工具类的对象
+ * @returns 包含工具类的对象
  */
 function loadTools() {
     return { 
@@ -3896,6 +3827,5 @@ function startScript() {
     }
 }
 
-// 导出函数供其他模块使用
 // 🕒 启动脚本
 startScript();
