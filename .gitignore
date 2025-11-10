@@ -15,3 +15,4 @@ github_string_fetcher.js
 
 # 测试文件不忽略，确保测试代码被版本控制
 # /test
+test-*
