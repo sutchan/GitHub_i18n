@@ -501,12 +501,12 @@ class BuildManager {
       const versionFunction = versionFunctionMatch[0];
       // 修复版本比较函数中的语法错误
       const fixedFunction = versionFunction
-        .replace(/function isNewerVersion\(\$1\)/, 'function isNewerVersion(newVersion, currentVersion)') // 修复参数
+        .replace(/function isNewerVersion\([^)]*\)/, 'function isNewerVersion(newVersion, currentVersion)') // 修复参数
         .replace(/\s*,\s*\)/g, ')') // 移除参数列表末尾的逗号
         .replace(/\{\s*,/g, '{')     // 移除代码块开始处的逗号
         .replace(/,\s*\}/g, '}')     // 移除代码块结束前的逗号
-        .replace(/const newVersionParts = newVersion.split\('.',\s*10\)/g, 'const newVersionParts = newVersion.split(\'.\', 10);') // 添加分号
-        .replace(/const currentVersionParts = currentVersion.split\('.',\s*10\)/g, 'const currentVersionParts = currentVersion.split(\'.\', 10);'); // 添加分号
+        .replace(/const newParts = newVersion\.split\(\'\.\'\)\.map\(Number\)/g, '        const newParts = newVersion.split(\'.\').map(Number);') // 修复缩进和添加分号
+        .replace(/const currentParts = currentVersion\.split\(\'\.\'\)\.map\(Number\)/g, '        const currentParts = currentVersion.split(\'.\').map(Number);'); // 修复缩进和添加分号
 
       if (fixedFunction !== versionFunction) {
         fileContent = fileContent.replace(versionFunction, fixedFunction);
