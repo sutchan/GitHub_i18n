@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.89
+ * @version 1.8.92
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -372,107 +372,227 @@ class BuildManager {
    */
   fixBuildOutput(outputFilePath) {
     console.log('🔧 开始修复构建产物中的问题...');
-    
+
     let fileContent = fs.readFileSync(outputFilePath, 'utf8');
     let hasChanges = false;
     let changesCount = 0;
-    
+
     // 1. 修复字符串模板语法错误
     const templateFixes = [
-        { pattern: /已经通知过版本 \$的更新/, replacement: "已经通知过版本 ${newVersion}的更新" },
-        { pattern: /发现新版本 \$，/, replacement: "发现新版本 ${newVersion}，" },
-        { pattern: /显示更新通知: 版本 \$/, replacement: "显示更新通知: 版本 ${newVersion}" },
-        { pattern: /已缓存新版本号: \$\(缓存时间:/, replacement: "已缓存新版本号: ${newVersion}(缓存时间:" }
+      { pattern: /已经通知过版本 \$的更新/, replacement: "已经通知过版本 ${newVersion}的更新" },
+      { pattern: /发现新版本 \$，/, replacement: "发现新版本 ${newVersion}，" },
+      { pattern: /显示更新通知: 版本 \$/, replacement: "显示更新通知: 版本 ${newVersion}" },
+      { pattern: /已缓存新版本号: \$\(缓存时间:/, replacement: "已缓存新版本号: ${newVersion}(缓存时间:" }
     ];
-    
+
     templateFixes.forEach(({ pattern, replacement }) => {
-        const originalCount = (fileContent.match(pattern) || []).length;
-        if (originalCount > 0) {
-            fileContent = fileContent.replace(pattern, replacement);
-            hasChanges = true;
-            changesCount += originalCount;
-        }
+      const originalCount = (fileContent.match(pattern) || []).length;
+      if (originalCount > 0) {
+        fileContent = fileContent.replace(pattern, replacement);
+        hasChanges = true;
+        changesCount += originalCount;
+      }
     });
-    
+
     // 2. 修复按钮ID中的$符号
     const buttonIdFixes = [
-        { pattern: /id = `\$-update-btn`/, replacement: "id = `notificationId-update-btn`" },
-        { pattern: /id = `\$-later-btn`/, replacement: "id = `notificationId-later-btn`" },
-        { pattern: /id = `\$-dismiss-btn`/, replacement: "id = `notificationId-dismiss-btn`" }
+      { pattern: /id = `\$-update-btn`/, replacement: "id = `notificationId-update-btn`" },
+      { pattern: /id = `\$-later-btn`/, replacement: "id = `notificationId-later-btn`" },
+      { pattern: /id = `\$-dismiss-btn`/, replacement: "id = `notificationId-dismiss-btn`" }
     ];
-    
+
     buttonIdFixes.forEach(({ pattern, replacement }) => {
-        const originalCount = (fileContent.match(pattern) || []).length;
-        if (originalCount > 0) {
-            fileContent = fileContent.replace(pattern, replacement);
-            hasChanges = true;
-            changesCount += originalCount;
-        }
+      const originalCount = (fileContent.match(pattern) || []).length;
+      if (originalCount > 0) {
+        fileContent = fileContent.replace(pattern, replacement);
+        hasChanges = true;
+        changesCount += originalCount;
+      }
     });
-    
+
     // 3. 移除重复的注释
     const duplicateComments = [
-        { pattern: /\/\*\*\s*翻译词典合并模块\s*\*\/\s*\/\*\*/, replacement: "/*" },
-        { pattern: /\/\*\*\s*GitHub 中文翻译主入口文件\s*\*\/\s*\/\*\*/, replacement: "/*" }
+      { pattern: /\/\*\*\s*翻译词典合并模块\s*\*\/\s*\/\*\*/, replacement: "/*" },
+      { pattern: /\/\*\*\s*GitHub 中文翻译主入口文件\s*\*\/\s*\/\*\*/, replacement: "/*" }
     ];
-    
+
     duplicateComments.forEach(({ pattern, replacement }) => {
-        const originalCount = (fileContent.match(pattern) || []).length;
-        if (originalCount > 0) {
-            fileContent = fileContent.replace(pattern, replacement);
-            hasChanges = true;
-            changesCount += originalCount;
-        }
+      const originalCount = (fileContent.match(pattern) || []).length;
+      if (originalCount > 0) {
+        fileContent = fileContent.replace(pattern, replacement);
+        hasChanges = true;
+        changesCount += originalCount;
+      }
     });
-    
+
     // 4. 修复函数调用末尾多余的大括号和格式问题
     const functionCallFixes = [
-        { pattern: /if \(!response\.ok\) \{\s*throw new Error\(`HTTP错误! 状态码: \${response\.status}`\)\s*\}\s*\}/g, 
-          replacement: "if (!response.ok) {\n                    throw new Error(`HTTP错误! 状态码: ${response.status}`)\n                }" },
-        { pattern: /if \(attempt === maxRetries\) \{\s*throw error\s*\}\s*\}/g, 
-          replacement: "if (attempt === maxRetries) {\n                    throw error\n                }" },
-        { pattern: /if \(match && match\[1\]\) \{\s*return match\[1\]\s*\}\s*\}/g, 
-          replacement: "if (match && match[1]) {\n                return match[1]\n            }" },
-        { pattern: /if \(newPart > currentPart\) \{\s*return true\s*\}\s*\}/g, 
-          replacement: "if (newPart > currentPart) {\n                return true\n            }" },
-        { pattern: /\}\s*\}/g, replacement: "\}\n        }" },
+      {
+        pattern: /if \(!response\.ok\) \{\s*throw new Error\(`HTTP错误! 状态码: \${response\.status}`\)\s*\}\s*\}/g,
+        replacement: "if (!response.ok) {\n                    throw new Error(`HTTP错误! 状态码: ${response.status}`)\n                }"
+      },
+      {
+        pattern: /if \(attempt === maxRetries\) \{\s*throw error\s*\}\s*\}/g,
+        replacement: "if (attempt === maxRetries) {\n                    throw error\n                }"
+      },
+      {
+        pattern: /if \(match && match\[1\]\) \{\s*return match\[1\]\s*\}\s*\}/g,
+        replacement: "if (match && match[1]) {\n                return match[1]\n            }"
+      },
+      {
+        pattern: /if \(newPart > currentPart\) \{\s*return true\s*\}\s*\}/g,
+        replacement: "if (newPart > currentPart) {\n                return true\n            }"
+      },
+      { pattern: /\}\s*\}/g, replacement: "\}\n        }" },
     ];
-    
+
     functionCallFixes.forEach(({ pattern, replacement }) => {
-        const originalCount = (fileContent.match(pattern) || []).length;
-        if (originalCount > 0) {
-            fileContent = fileContent.replace(pattern, replacement);
-            hasChanges = true;
-            changesCount += originalCount;
-        }
+      const originalCount = (fileContent.match(pattern) || []).length;
+      if (originalCount > 0) {
+        fileContent = fileContent.replace(pattern, replacement);
+        hasChanges = true;
+        changesCount += originalCount;
+      }
     });
-    
+
     // 5. 修复对象赋值后的多余分号和空格
     const extraSemicolonCount = (fileContent.match(/\}\s*\s*;/g) || []).length;
     if (extraSemicolonCount > 0) {
-        fileContent = fileContent.replace(/\}\s*\s*;/g, '};');
-        hasChanges = true;
-        changesCount += extraSemicolonCount;
+      fileContent = fileContent.replace(/\}\s*\s*;/g, '};');
+      hasChanges = true;
+      changesCount += extraSemicolonCount;
     }
-    
+
     // 6. 移除可能的BOM字符
     if (fileContent.charCodeAt(0) === 0xFEFF) {
-        fileContent = fileContent.substring(1);
+      fileContent = fileContent.substring(1);
+      hasChanges = true;
+      changesCount++;
+    }
+
+    // 7. 修复DOM操作中的语法错误 - 特别针对appendChild调用
+    // 修复appendChild调用中可能出现的语法错误
+    const domOperationFixes = [
+      // 修复appendChild调用中的语法错误，处理逗号问题
+      { pattern: /appendChild\(\s*(\w+),/g, replacement: "appendChild($1)" },
+      // 修复appendChild调用末尾的语法错误，使用捕获组
+      { pattern: /appendChild\(\s*(\w+)\s*\)\s*,/g, replacement: "appendChild($1);" },
+      // 修复括号不匹配的问题，使用捕获组
+      { pattern: /appendChild\(\s*(\w+)\s*\),/g, replacement: "appendChild($1)" },
+      // 修复可能存在的错误语法模式，使用捕获组
+      { pattern: /\((\w+),\s*\w+\)/g, replacement: "($1)" },
+      // 修复嵌套appendChild调用中的语法问题
+      { pattern: /appendChild\(\s*(\w+)\.appendChild\(/g, replacement: "appendChild($1.appendChild(" }
+    ];
+
+    domOperationFixes.forEach(({ pattern, replacement }) => {
+      const originalCount = (fileContent.match(pattern) || []).length;
+      if (originalCount > 0) {
+        fileContent = fileContent.replace(pattern, replacement);
+        hasChanges = true;
+        changesCount += originalCount;
+      }
+    });
+
+    // 8. 针对版本比较函数的特殊修复，确保其语法正确
+    // 检查并修复isNewerVersion函数中的语法错误
+    const versionFunctionMatch = fileContent.match(/function isNewerVersion\([^)]*\)\s*{[^}]*}/);
+    if (versionFunctionMatch) {
+      const versionFunction = versionFunctionMatch[0];
+      // 修复版本比较函数中的语法错误
+      const fixedFunction = versionFunction
+        .replace(/function isNewerVersion\(\$1\)/, 'function isNewerVersion(newVersion, currentVersion)') // 修复参数
+        .replace(/\s*,\s*\)/g, ')') // 移除参数列表末尾的逗号
+        .replace(/\{\s*,/g, '{')     // 移除代码块开始处的逗号
+        .replace(/,\s*\}/g, '}')     // 移除代码块结束前的逗号
+        .replace(/const newVersionParts = newVersion.split\('.',\s*10\)/g, 'const newVersionParts = newVersion.split(\'.\', 10);') // 添加分号
+        .replace(/const currentVersionParts = currentVersion.split\('.',\s*10\)/g, 'const currentVersionParts = currentVersion.split(\'.\', 10);'); // 添加分号
+
+      if (fixedFunction !== versionFunction) {
+        fileContent = fileContent.replace(versionFunction, fixedFunction);
         hasChanges = true;
         changesCount++;
+      }
     }
-    
+
+    // 9. 修复事件监听器中的$1参数问题
+    const eventListenerFixes = [
+      { pattern: /\(this\.hideNotification\(\$1\)\)/g, replacement: '(this.hideNotification(notificationId))' },
+      { pattern: /hideNotification\(\$1\)/g, replacement: 'hideNotification(notificationId)' }
+    ];
+
+    eventListenerFixes.forEach(({ pattern, replacement }) => {
+      const originalCount = (fileContent.match(pattern) || []).length;
+      if (originalCount > 0) {
+        fileContent = fileContent.replace(pattern, replacement);
+        hasChanges = true;
+        changesCount += originalCount;
+      }
+    });
+
+    // 10. 修复按钮ID中的模板字符串问题
+    const btnIdFixes = [
+      { pattern: /id = `notificationId-update-btn`/, replacement: "id = `\${notificationId}-update-btn`" },
+      { pattern: /id = `notificationId-later-btn`/, replacement: "id = `\${notificationId}-later-btn`" },
+      { pattern: /id = `notificationId-dismiss-btn`/, replacement: "id = `\${notificationId}-dismiss-btn`" }
+    ];
+
+    btnIdFixes.forEach(({ pattern, replacement }) => {
+      const originalCount = (fileContent.match(pattern) || []).length;
+      if (originalCount > 0) {
+        fileContent = fileContent.replace(pattern, replacement);
+        hasChanges = true;
+        changesCount += originalCount;
+      }
+    });
+
+    // 11. 检查并修复所有DOM操作函数调用中的语法错误
+    const domFunctions = ['appendChild', 'insertBefore', 'replaceChild', 'removeChild'];
+    domFunctions.forEach(func => {
+      // 查找并修复所有这些DOM函数调用中的语法错误
+      const regex = new RegExp(`${func}\(\s*([^)]*)\),`, 'g');
+      const count = (fileContent.match(regex) || []).length;
+      if (count > 0) {
+        // 移除函数调用后的逗号，保留参数并添加分号
+        fileContent = fileContent.replace(regex, `${func}($1);`);
+        hasChanges = true;
+        changesCount += count;
+      }
+    });
+
+    // 12. 为DOM操作代码块添加分号并统一缩进
+    // 修复DOM操作代码块中的格式问题，确保每个语句都有分号
+    const domStatementFixes = [
+      { pattern: /(\w+\.createElement\([^)]*\))/g, replacement: '$1;' },
+      { pattern: /(\w+\.setAttribute\([^)]*\))/g, replacement: '$1;' },
+      { pattern: /(\w+\.className\s*=\s*[^;]*)(?![;])/g, replacement: '$1;' },
+      { pattern: /(\w+\.textContent\s*=\s*[^;]*)(?![;])/g, replacement: '$1;' },
+      { pattern: /(\w+\.href\s*=\s*[^;]*)(?![;])/g, replacement: '$1;' },
+      { pattern: /(\w+\.target\s*=\s*[^;]*)(?![;])/g, replacement: '$1;' },
+      { pattern: /(\w+\.rel\s*=\s*[^;]*)(?![;])/g, replacement: '$1;' },
+      { pattern: /(\w+\.id\s*=\s*[^;]*)(?![;])/g, replacement: '$1;' }
+    ];
+
+    domStatementFixes.forEach(({ pattern, replacement }) => {
+      const originalCount = (fileContent.match(pattern) || []).length;
+      if (originalCount > 0) {
+        fileContent = fileContent.replace(pattern, replacement);
+        hasChanges = true;
+        changesCount += originalCount;
+      }
+    });
+
     if (hasChanges) {
-        // 保存修复后的文件
-        fs.writeFileSync(outputFilePath, fileContent, 'utf8');
-        console.log(`✅ 构建产物修复完成，共进行了 ${changesCount} 处修改`);
+      // 保存修复后的文件
+      fs.writeFileSync(outputFilePath, fileContent, 'utf8');
+      console.log(`✅ 构建产物修复完成，共进行了 ${changesCount} 处修改`);
     } else {
-        console.log('✅ 构建产物无需修复，没有发现问题');
+      console.log('✅ 构建产物无需修复，没有发现问题');
     }
-    
+
     return hasChanges;
   }
-  
+
   /**
    * 构建用户脚本
    */
@@ -502,7 +622,7 @@ class BuildManager {
       // 写入到输出文件
       fs.writeFileSync(this.outputFile, mergedCode, 'utf8');
       console.log(`✅ 已生成: ${path.relative(this.projectRoot, this.outputFile)}`);
-      
+
       // 修复构建产物中的问题
       this.fixBuildOutput(this.outputFile);
 

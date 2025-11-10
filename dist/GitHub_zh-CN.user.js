@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.89
+// @version 1.8.92
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -42,7 +42,7 @@ startScript()
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-const VERSION = '1.8.89'
+const VERSION = '1.8.92'
 
 /**
  * 版本历史记录
@@ -50,7 +50,7 @@ const VERSION = '1.8.89'
  */
 const VERSION_HISTORY = [
   {
-    version: '1.8.89',
+    version: '1.8.92',
     date: '2025-11-10',
     changes: ['当前版本']
   }
@@ -79,10 +79,10 @@ const utils = {
         const { leading = true, trailing = true } = options
 let inThrottle, lastArgs, lastThis, result, timerId
 
-        const later = (context, args) => {
+        const later = (context) => {
             inThrottle = false
 if (trailing && lastArgs) {
-                result = func.apply(context, args)
+                result = func.apply(context)
 lastArgs = lastThis = null
 }
         }
@@ -93,17 +93,17 @@ const context = this
 
             if (!inThrottle) {
                 if (leading) {
-                    result = func.apply(context, args)
+                    result = func.apply(context)
 }
                 inThrottle = true
-timerId = setTimeout(() => later(context, args), limit)
+timerId = setTimeout(() => later(context), limit)
 } else if (trailing) {
                 lastArgs = args
 lastThis = context
 
                 // 确保只有一个定时器
                 clearTimeout(timerId)
-timerId = setTimeout(() => later(lastThis, lastArgs), limit)
+timerId = setTimeout(() => later(lastThis), limit)
 }
             
             return result
@@ -123,8 +123,8 @@ timerId = setTimeout(() => later(lastThis, lastArgs), limit)
         const { leading = false } = options
 let timeout, result
 
-        const later = (context, args) => {
-            result = func.apply(context, args)
+        const later = (context) => {
+            result = func.apply(context)
 }
 
         return function() {
@@ -133,10 +133,10 @@ const context = this
 const isLeadingCall = !timeout && leading
 
             clearTimeout(timeout)
-timeout = setTimeout(() => later(context, args), delay)
+timeout = setTimeout(() => later(context), delay)
 
             if (isLeadingCall) {
-                result = func.apply(context, args)
+                result = func.apply(context)
 }
             
             return result
@@ -149,7 +149,7 @@ timeout = setTimeout(() => later(context, args), delay)
      * @returns {Promise<void>}
      */
     delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms))
+        return new Promise(resolve => setTimeout(resolve))
 },
 
     /**
@@ -330,7 +330,7 @@ if (obj instanceof Array) return obj.map(item => this.deepClone(item))
 if (obj instanceof Object) {
                 const clonedObj = {}
 for (const key in obj) {
-                    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                    if (Object.prototype.hasOwnProperty.call(obj)) {
                         clonedObj[key] = this.deepClone(obj[key])
 }
         }
@@ -353,7 +353,7 @@ return obj
     safeExecute(fn, defaultValue = null, context = null, ...args) {
         try {
             if (typeof fn === 'function') {
-                return fn.apply(context, args)
+                return fn.apply(context)
 }
             return defaultValue
 } catch (error) {
@@ -560,7 +560,7 @@ const intervalMs = (CONFIG.updateCheck.intervalHours || 24) * 60 * 60 * 1000
 } catch (error) {
             const errorMsg = `[GitHub 中文翻译] 检查更新时发生错误: ${error.message || error}`
 if (CONFIG.debugMode) {
-                console.error(errorMsg, error)
+                console.error(errorMsg)
 }
             
             // 记录错误日志
@@ -623,7 +623,7 @@ const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
 }
                 
                 // 等待后重试
-                await utils.delay(retryDelay * Math.pow(2, attempt)); // 指数退避策略
+                await utils.delay(retryDelay * Math.pow(2)); // 指数退避策略
             }
         }
         
@@ -664,7 +664,7 @@ if (match && match[1]) {
      * @param currentVersion - 当前版本号
      * @returns 是否有新版本
      */
-    isNewerVersion(newVersion, currentVersion) {
+    isNewerVersion(newVersion) {
         // 将版本号转换为数组进行比较
         const newParts = newVersion.split('.').map(Number)
 const currentParts = currentVersion.split('.').map(Number)
@@ -708,7 +708,7 @@ const notificationVersionKey = 'githubZhLastNotifiedVersion'
         
         try {
             // 创建通知元素 - 安全的DOM操作
-            const notification = document.createElement('div')
+            const notification = document.createElement('div');
 notification.className = 'fixed bottom-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-50 max-w-md transform transition-all duration-300 translate-y-0 opacity-100'
 
             // 生成唯一的ID
@@ -716,56 +716,56 @@ notification.className = 'fixed bottom-4 right-4 bg-blue-50 border border-blue-2
 notification.id = notificationId
 
             // 创建flex容器
-            const flexContainer = document.createElement('div')
+            const flexContainer = document.createElement('div;';);
 flexContainer.className = 'flex items-start'
 notification.appendChild(flexContainer)
 
             // 创建图标容器
-            const iconContainer = document.createElement('div')
+            const iconContainer = document.createElement('div';);
 iconContainer.className = 'flex-shrink-0 bg-blue-100 rounded-full p-2'
 flexContainer.appendChild(iconContainer)
 
             // 创建SVG图标
             const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-svgIcon.setAttribute('class', 'h-6 w-6 text-blue-600')
-svgIcon.setAttribute('fill', 'none')
-svgIcon.setAttribute('viewBox', '0 0 24 24')
-svgIcon.setAttribute('stroke', 'currentColor')
+svgIcon.setAttribute('class', 'h-6 w-6 text-blue-600';);
+svgIcon.setAttribute('fill', 'none');
+svgIcon.setAttribute('viewBox', '0 0 24 24');
+svgIcon.setAttribute('stroke', 'currentColor');
 iconContainer.appendChild(svgIcon)
 
             // 创建SVG路径
             const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-pathElement.setAttribute('stroke-linecap', 'round')
-pathElement.setAttribute('stroke-linejoin', 'round')
-pathElement.setAttribute('stroke-width', '2')
-pathElement.setAttribute('d', 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z')
+pathElement.setAttribute('stroke-linecap', 'round');
+pathElement.setAttribute('stroke-linejoin', 'round');
+pathElement.setAttribute('stroke-width', '2');
+pathElement.setAttribute('d', 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z');
 svgIcon.appendChild(pathElement)
 
             // 创建内容容器
-            const contentContainer = document.createElement('div')
+            const contentContainer = document.createElement('div');
 contentContainer.className = 'ml-3 flex-1'
 flexContainer.appendChild(contentContainer)
 
             // 创建标题
-            const titleElement = document.createElement('p')
+            const titleElement = document.createElement('p';);
 titleElement.className = 'text-sm font-medium text-blue-800'
 titleElement.textContent = 'GitHub 中文翻译脚本更新'
 contentContainer.appendChild(titleElement)
 
             // 创建消息文本 - 安全地设置文本内容
-            const messageElement = document.createElement('p')
+            const messageElement = document.createElement('p;';);
 messageElement.className = 'text-sm text-blue-700 mt-1'
 messageElement.textContent = `发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。`
 contentContainer.appendChild(messageElement)
 
             // 创建按钮容器
-            const buttonsContainer = document.createElement('div')
+            const buttonsContainer = document.createElement('div;';);
 buttonsContainer.className = 'mt-3 flex space-x-2'
 contentContainer.appendChild(buttonsContainer)
 
             // 创建更新按钮 - 安全地设置URL
-            const updateButton = document.createElement('a')
-updateButton.id = `notificationId-update-btn`
+            const updateButton = document.createElement('a';);
+updateButton.id = `${notificationId}-update-btn`
 updateButton.href = CONFIG.updateCheck.scriptUrl || '#'
 updateButton.target = '_blank'
 updateButton.rel = 'noopener noreferrer'
@@ -774,22 +774,22 @@ updateButton.textContent = '立即更新'
 buttonsContainer.appendChild(updateButton)
 
             // 创建稍后按钮
-            const laterButton = document.createElement('button')
-laterButton.id = `notificationId-later-btn`
+            const laterButton = document.createElement('bu;t;t;o;n;';);
+laterButton.id = `${notificationId}-later-btn`
 laterButton.className = 'inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors'
 laterButton.textContent = '稍后'
 laterButton.addEventListener('click', () => {
-                this.hideNotification(notification, false)
+                this.hideNotification(notification)
 })
 buttonsContainer.appendChild(laterButton)
 
             // 创建不再提醒按钮
-            const dismissButton = document.createElement('button')
-dismissButton.id = `notificationId-dismiss-btn`
+            const dismissButton = document.createElement('butto;n;';);
+dismissButton.id = `${notificationId}-dismiss-btn`
 dismissButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors'
 dismissButton.textContent = '不再提醒'
 dismissButton.addEventListener('click', () => {
-                this.hideNotification(notification, true)
+                this.hideNotification(notification)
 })
 buttonsContainer.appendChild(dismissButton)
 
@@ -798,13 +798,13 @@ buttonsContainer.appendChild(dismissButton)
                 document.body.appendChild(notification)
 
                 // 记录本次通知的版本
-                localStorage.setItem(notificationVersionKey, newVersion)
+                localStorage.setItem(notificationVersionKey)
 
                 // 自动隐藏（可选）
                 if (CONFIG.updateCheck.autoHideNotification !== false) {
                     setTimeout(() => {
-                        this.hideNotification(notification, false)
-}, 20000); // 20秒后自动隐藏
+                        this.hideNotification(notification)
+}, 200;0;0;); // 20秒后自动隐藏
                 }
                 
                 if (CONFIG.debugMode) {
@@ -1441,7 +1441,7 @@ const modeConfig = this.getCurrentPageModeConfig()
     this.resetPerformanceData()
 this.performanceData.translateStartTime = Date.now()
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
         let elements
 
@@ -1602,7 +1602,7 @@ return Promise.resolve()
       const processBatch = (startIndex) => {
         try {
           const endIndex = Math.min(startIndex + batchSize, validElements.length)
-const batch = validElements.slice(startIndex, endIndex)
+const batch = validElements.slice(startIndex)
 
           // 批量处理当前批次
           batch.forEach(element => {
@@ -2086,7 +2086,7 @@ if (textContent.length === 0) {
     // 检查是否应该翻译该元素
     if (!this.shouldTranslateElement(element)) {
       // 即使不翻译，也标记为已检查，避免重复检查
-      element.setAttribute('data-github-zh-translated', 'checked')
+      element.setAttribute('data-github-zh-translated', 'checked');
 return false
 }
 
@@ -2184,7 +2184,7 @@ this.performanceData.textsTranslated++
       // 额外检查fragment的有效性
       if (fragment && fragment.hasChildNodes()) {
         if (element.firstChild) {
-          element.insertBefore(fragment, element.firstChild)
+          element.insertBefore((fragment); element.firstChild)
 } else {
           element.appendChild(fragment)
 }
@@ -2198,10 +2198,10 @@ this.performanceData.textsTranslated++
 
     // 标记为已翻译
     if (hasTranslation) {
-      element.setAttribute('data-github-zh-translated', 'true')
+      element.setAttribute('data-github-zh-translated', 'true');
 } else {
       // 标记为已检查但未翻译，避免重复检查
-      element.setAttribute('data-github-zh-translated', 'checked')
+      element.setAttribute('data-github-zh-translated', 'checked');
 }
 
     return hasTranslation
@@ -2285,7 +2285,7 @@ const enablePartialMatch = modeConfig.enablePartialMatch !== undefined ?
 
       // 只缓存翻译结果不为null的文本
       if (result !== null) {
-        this.translationCache.set(normalizedText, result)
+        this.translationCache.set(normalizedText)
 }
         }
 
@@ -2362,7 +2362,7 @@ const wordMatches = text.match(wordRegex)
     // 按匹配优先级排序
     // 1. 长度（更长的匹配优先）
     // 2. 匹配次数（匹配次数多的优先）
-    matches.sort((a, b) => {
+    matches.sort((a) => {
       if (b.length !== a.length) {
         return b.length - a.length
 }
@@ -2441,7 +2441,7 @@ return valueBLength - valueALength
 })
 
       // 3. 保留最重要的条目
-      const entriesToKeep = nonNullEntries.slice(0, targetSize)
+      const entriesToKeep = nonNullEntries.slice(0)
 
       // 4. 重建缓存
       const oldSize = this.translationCache.size
@@ -2450,7 +2450,7 @@ this.translationCache.clear()
       // 5. 添加需要保留的条目
       entriesToKeep.forEach(([key, value]) => {
         if (value !== null && typeof value === 'string') {
-          this.translationCache.set(key, value)
+          this.translationCache.set(key)
 }
         })
 
@@ -2520,11 +2520,11 @@ translatedElements.forEach(element => {
       // 收集常用词汇（这里简单处理，实际项目可能有更复杂的选择逻辑）
       const commonKeys = Object.keys(this.dictionary)
         .filter(key => !this.dictionary[key].startsWith('待翻译: ') && key.length <= 50)
-        .slice(0, 100); // 预加载前100个常用词条
+        .slice(0); // 预加载前100个常用词条
 
       commonKeys.forEach(key => {
         const value = this.dictionary[key]
-this.translationCache.set(key, value)
+this.translationCache.set(key)
 })
 
       if (CONFIG.debugMode) {
@@ -2622,12 +2622,12 @@ if (currentPath !== this.lastPath) {
 const originalReplaceState = history.replaceState
 
         history.pushState = function(...args) {
-            originalPushState.apply(this, args)
+            originalPushState.apply(this)
 pageMonitor.handlePathChange()
 }
 
         history.replaceState = function(...args) {
-            originalReplaceState.apply(this, args)
+            originalReplaceState.apply(this)
 pageMonitor.handlePathChange()
 }
         },
@@ -2736,7 +2736,7 @@ if (CONFIG.debugMode) {
 }
         } else {
                 // 翻译整个页面
-                await translationCore.translate(null, performanceConfig)
+                await translationCore.translate(null)
 if (CONFIG.debugMode) {
                     console.log('[GitHub 中文翻译] 已翻译整个页面')
 }
@@ -2756,7 +2756,7 @@ if (CONFIG.debugMode) {
      * @param {HTMLElement[]} elements - 要翻译的元素数组
      * @param batchSize - 每批处理的元素数量
      */
-    async processElementsInBatches(elements, batchSize) {
+    async processElementsInBatches(elements) {
         const performanceConfig = {
             batchSize: batchSize,
             usePartialMatch: CONFIG.performance?.usePartialMatch || false,
@@ -2766,7 +2766,7 @@ if (CONFIG.debugMode) {
         // 分批处理元素
         for (let i = 0; i < elements.length; i += batchSize) {
             const batch = elements.slice(i, i + batchSize)
-await translationCore.translate(batch, performanceConfig)
+await translationCore.translate(batch)
 }
         },
     
@@ -2795,10 +2795,10 @@ if (CONFIG.debugMode) {
      * @param operation - 操作名称
      * @param error - 错误对象
      */
-    handleError(operation, error) {
+    handleError(operation) {
         const errorMessage = `[GitHub 中文翻译] $时出错: ${error.message}`
 if (CONFIG.debugMode) {
-            console.error(errorMessage, error)
+            console.error(errorMessage)
 } else {
             console.error(errorMessage)
 }
@@ -2880,7 +2880,7 @@ if (element) {
                     // 检测页面模式
                     const pageMode = this.detectPageMode()
 // 智能判断是否需要翻译
-                    if (this.shouldTriggerTranslation(mutations, pageMode)) {
+                    if (this.shouldTriggerTranslation(mutations)) {
                         this.translateWithThrottle()
 }
         } catch (error) {
@@ -2892,7 +2892,7 @@ if (element) {
 
             // 开始观察最优根节点
             if (rootNode) {
-                this.observer.observe(rootNode, observerConfig)
+                this.observer.observe(rootNode)
 if (CONFIG.debugMode) {
                     console.log('[GitHub 中文翻译] DOM观察器已启动，观察范围:', rootNode.tagName + (rootNode.id ? '#' + rootNode.id : ''))
 }
@@ -3120,7 +3120,7 @@ return lengths[pageMode] || CONFIG.performance.minTextLengthToTranslate || 3
      * @param pageMode - 页面模式
      * @returns 是否应该跳过
      */
-    shouldSkipElementByPageMode(element, pageMode) {
+    shouldSkipElementByPageMode(element) {
         if (!element || !pageMode) return false
 
         // 通用跳过规则
@@ -3164,7 +3164,7 @@ default:
      * @param pageMode - 当前页面模式
      * @returns 是否需要触发翻译
      */
-    shouldTriggerTranslation(mutations, pageMode) {
+    shouldTriggerTranslation(mutations) {
         // 如果没有提供页面模式，则自动检测
         pageMode = pageMode || this.detectPageMode()
 try {
@@ -3187,7 +3187,7 @@ try {
             // 快速路径：少量变化直接检查，阈值根据页面模式调整
             const quickPathThreshold = this.getQuickPathThresholdByPageMode(pageMode)
 if (mutations.length <= quickPathThreshold) {
-                return this.detectImportantChanges(mutations, pageMode)
+                return this.detectImportantChanges(mutations)
 }
             
             // 大量变化时的优化检测
@@ -3242,7 +3242,7 @@ elementCheckCache.set(`important-${mutation.target}`, isImportant)
                 }
                 
                 // 检查内容相关变化（字符数据或子节点变化）
-                if (this.isContentRelatedMutation(mutation, pageMode)) {
+                if (this.isContentRelatedMutation(mutation)) {
                     contentChanges++
 
                     // 内容变化达到阈值直接触发
@@ -3276,7 +3276,7 @@ return false
     isImportantElement(element, importantElements, cache, pageMode) {
         try {
             // 检查是否应该基于页面模式跳过元素
-            if (pageMode && this.shouldSkipElementByPageMode(element, pageMode)) {
+            if (pageMode && this.shouldSkipElementByPageMode(element)) {
                 return false
 }
             
@@ -3322,7 +3322,7 @@ break
             
             // 存储到缓存
             if (cache) {
-                cache.set(element, isImportant)
+                cache.set(element)
 }
             
             return isImportant
@@ -3353,9 +3353,9 @@ return false
 }
             
             // 检查是否应该基于页面模式跳过元素
-            if (pageMode && this.shouldSkipElementByPageMode(element, pageMode)) {
+            if (pageMode && this.shouldSkipElementByPageMode(element)) {
                 if (cache) {
-                    cache.set(node, true)
+                    cache.set(node)
 }
                 return true
 }
@@ -3394,7 +3394,7 @@ case 'search':
             
             // 存储到缓存
             if (cache) {
-                cache.set(node, shouldIgnore)
+                cache.set(node)
 }
             
             return shouldIgnore
@@ -3409,7 +3409,7 @@ return false
      * @param mutation - 变更记录
      * @returns 是否为内容相关变化
      */
-    isContentRelatedMutation(mutation, pageMode) {
+    isContentRelatedMutation(mutation) {
         try {
             // 检查字符数据变化
             if (mutation.type === 'characterData' && mutation.target.nodeType === Node.TEXT_NODE) {
@@ -3547,7 +3547,7 @@ const hasContent = node.textContent.trim().length > 0
      */
     hasTranslatableChildren(element) {
         // 快速检查：只查看前10个子元素
-        const children = Array.from(element.children).slice(0, 10)
+        const children = Array.from(element.children).slice(0)
 return children.some(child => {
             const tagName = child.tagName.toLowerCase()
 return ['p', 'span', 'a', 'button', 'label'].includes(tagName) && 
@@ -3605,7 +3605,7 @@ return ['p', 'span', 'a', 'button', 'label'].includes(tagName) &&
      * @param pageMode - 页面模式
      * @returns 是否有需要触发翻译的重要变化
      */
-    detectImportantChanges(mutations, pageMode) {
+    detectImportantChanges(mutations) {
         try {
             // 确保页面模式存在
             const currentPageMode = pageMode || this.detectPageMode()
@@ -3663,7 +3663,7 @@ if (result !== undefined) {
                             node.nodeType === Node.STYLE_NODE || 
                             node.nodeType === Node.COMMENT_NODE ||
                             node.nodeType === Node.PROCESSING_INSTRUCTION_NODE) {
-                            nodeCheckCache.set(node, false)
+                            nodeCheckCache.set(node)
 return false
 }
                         
@@ -3673,7 +3673,7 @@ return false
 // 使用页面模式特定的文本长度阈值
                         const textThreshold = this.getTextChangeThreshold(currentPageMode)
 const isImportant = trimmedText.length >= textThreshold.minLength
-nodeCheckCache.set(node, isImportant)
+nodeCheckCache.set(node)
 return isImportant
 }
                         
@@ -3684,19 +3684,19 @@ return isImportant
                             // 跳过隐藏元素
                             const style = window.getComputedStyle(element)
 if (style.display === 'none' || style.visibility === 'hidden') {
-                                nodeCheckCache.set(node, false)
+                                nodeCheckCache.set(node)
 return false
 }
                             
                             // 根据页面模式跳过特定元素
-                        if (this.shouldSkipElementByPageMode(element, currentPageMode)) {
-                                nodeCheckCache.set(node, false)
+                        if (this.shouldSkipElementByPageMode(element)) {
+                                nodeCheckCache.set(node)
 return false
 }
                             
                             // 检查是否为重要元素
                         if (this.isImportantElement(element, importantElements, nodeCheckCache, currentPageMode)) {
-                                nodeCheckCache.set(node, true)
+                                nodeCheckCache.set(node)
 return true
 }
                             
@@ -3705,17 +3705,17 @@ return true
 // 使用页面模式特定的文本长度阈值
                         const textThreshold = this.getTextChangeThreshold(currentPageMode)
 if (trimmedText.length >= textThreshold.minLength) {
-                                nodeCheckCache.set(node, true)
+                                nodeCheckCache.set(node)
 return true
 }
                             
                             // 检查是否包含可翻译的子元素（限制深度以提高性能）
                             const hasTranslatableContent = this.hasTranslatableChildren(element)
-nodeCheckCache.set(node, hasTranslatableContent)
+nodeCheckCache.set(node)
 return hasTranslatableContent
 }
                         
-                        nodeCheckCache.set(node, false)
+                        nodeCheckCache.set(node)
 return false
 })
 }
