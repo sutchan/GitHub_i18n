@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.92
+// @version 1.8.93
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -42,7 +42,7 @@ startScript()
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-const VERSION = '1.8.92'
+const VERSION = '1.8.93'
 
 /**
  * 版本历史记录
@@ -50,7 +50,7 @@ const VERSION = '1.8.92'
  */
 const VERSION_HISTORY = [
   {
-    version: '1.8.92',
+    version: '1.8.93',
     date: '2025-11-10',
     changes: ['当前版本']
   }
@@ -664,10 +664,10 @@ if (match && match[1]) {
      * @param currentVersion - 当前版本号
      * @returns 是否有新版本
      */
-    isNewerVersion(newVersion) {
+    isNewerVersion(newVersion, currentVersion) {
         // 将版本号转换为数组进行比较
-        const newParts = newVersion.split('.').map(Number)
-const currentParts = currentVersion.split('.').map(Number)
+        const newParts = newVersion.split('.').map(Number);
+        const currentParts = currentVersion.split('.').map(Number);
 
         // 比较每个部分
         for (let i = 0; i < Math.max(newParts.length, currentParts.length); i++) {
