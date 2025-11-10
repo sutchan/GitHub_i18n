@@ -111,7 +111,7 @@ export const pageMonitor = {
             const now = Date.now();
             // 从配置中读取性能参数，确保有默认值
             const minInterval = CONFIG.performance?.minTranslateInterval || 500; // 最小翻译间隔，默认500ms
-            const batchSize = CONFIG.performance?.batchSize || 100; // 批处理大小
+            // 批处理大小配置，通过函数参数传入
             const useSmartThrottling = CONFIG.performance?.useSmartThrottling !== false; // 智能节流开关
             
             // 智能节流逻辑
@@ -151,7 +151,7 @@ export const pageMonitor = {
      * 延迟执行翻译
      * @param {number} delay - 延迟毫秒数
      */
-    async delayedTranslate(delay = 0) {
+    async delayedTranslate() {
         try {
             // 确保性能配置正确应用
             const performanceConfig = {
@@ -251,7 +251,7 @@ export const pageMonitor = {
         this.errorCount = (this.errorCount || 0) + 1;
         
         // 如果错误过多，考虑重启监控
-        if (this.errorCount > CONFIG.performance?.maxErrorCount || 5) {
+        if (this.errorCount > (CONFIG.performance?.maxErrorCount || 5)) {
             if (CONFIG.debugMode) {
                 console.log('[GitHub 中文翻译] 错误次数过多，尝试重启监控');
             }
@@ -360,11 +360,11 @@ export const pageMonitor = {
      */
     selectOptimalRootNode(pageMode) {
         // 如果没有提供页面模式，则自动检测
-        pageMode = pageMode || this.detectPageMode();
+        const effectivePageMode = pageMode || this.detectPageMode();
         // 根据页面模式定制候选选择器优先级
         let candidateSelectors;
-        
-        switch (pageMode) {
+        // 基于页面模式的候选选择器列表
+        switch (effectivePageMode) {
             case 'search':
                 candidateSelectors = [
                     '.codesearch-results', // 搜索结果容器
@@ -451,7 +451,7 @@ export const pageMonitor = {
      */
     getOptimizedObserverConfig(pageMode) {
         // 如果没有提供页面模式，则自动检测
-        pageMode = pageMode || this.detectPageMode();
+        // 使用传入的页面模式或自动检测
         // 基础配置
         const baseConfig = {
             childList: true,  // 监听子节点变化
@@ -939,9 +939,8 @@ export const pageMonitor = {
      * @param {string} pageMode - 当前页面模式
      * @returns {boolean} 是否需要翻译
      */
-    isTranslatableNode(node, pageMode) {
-        // 如果没有提供页面模式，则自动检测
-        pageMode = pageMode || this.detectPageMode();
+    isTranslatableNode(node) {
+        // 不再需要页面模式参数，简化函数逻辑
         // 跳过脚本、样式等
         if (node.nodeType === Node.SCRIPT_NODE || 
             node.nodeType === Node.STYLE_NODE || 
@@ -1062,7 +1061,7 @@ export const pageMonitor = {
             
             // 从配置中读取性能参数
             const { 
-                minTextLengthToTranslate = 3,
+                // minTextLengthToTranslate = 3, // 从getMinTextLengthByPageMode获取
                 importantAttributes = ['id', 'class', 'href', 'title', 'placeholder', 'alt'],
                 importantElements = ['.btn', '.link', '.header', '.title', '.nav-item']
             } = CONFIG.performance;

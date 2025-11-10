@@ -313,7 +313,7 @@ class BuildManager {
         // 对version.js文件进行特殊处理，清理冗余内容
         if (filePath.includes('version.js')) {
           // 先找到getFormattedVersion函数定义
-          const functionMatch = fileContent.match(/function getFormattedVersion\([^\)]*\)\s*\{[^\}]*\}/);
+          const functionMatch = fileContent.match(/function getFormattedVersion\([^)]*\)\s*\{[^}]*\}/);
           if (functionMatch) {
             // 获取函数定义部分
             const functionDef = functionMatch[0];

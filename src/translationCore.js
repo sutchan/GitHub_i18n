@@ -1056,7 +1056,7 @@ export const translationCore = {
         key.length > textLen ||
         value.startsWith('待翻译: ') ||
         // 避免对纯数字或特殊字符的匹配
-        /^[0-9.,\s[\]{}/*^$#@!~`|:;"'?>+-()]+$/i.test(key)) {
+        /^[0-9.,\s()[\]{}/*^$#@!~`|:;"'?>+-]+$/i.test(key)) {
         continue;
       }
 
