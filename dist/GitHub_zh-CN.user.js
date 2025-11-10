@@ -712,26 +712,26 @@ const notificationVersionKey = 'githubZhLastNotifiedVersion'
 notification.className = 'fixed bottom-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-50 max-w-md transform transition-all duration-300 translate-y-0 opacity-100'
 
             // 生成唯一的ID
-            const notificationId = `github-zh-update-${Date.now()}`
-notification.id = notificationId
+            const notificationId = `github-zh-update-${Date.now()}`;
+            notification.id = notificationId;
 
             // 创建flex容器
-            const flexContainer = document.createElement('div;';);
-flexContainer.className = 'flex items-start'
-notification.appendChild(flexContainer)
+            const flexContainer = document.createElement('div');
+            flexContainer.className = 'flex items-start';
+            notification.appendChild(flexContainer);
 
             // 创建图标容器
-            const iconContainer = document.createElement('div';);
-iconContainer.className = 'flex-shrink-0 bg-blue-100 rounded-full p-2'
-flexContainer.appendChild(iconContainer)
+            const iconContainer = document.createElement('div');
+            iconContainer.className = 'flex-shrink-0 bg-blue-100 rounded-full p-2';
+            flexContainer.appendChild(iconContainer);
 
             // 创建SVG图标
-            const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-svgIcon.setAttribute('class', 'h-6 w-6 text-blue-600';);
-svgIcon.setAttribute('fill', 'none');
-svgIcon.setAttribute('viewBox', '0 0 24 24');
-svgIcon.setAttribute('stroke', 'currentColor');
-iconContainer.appendChild(svgIcon)
+            const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svgIcon.setAttribute('class', 'h-6 w-6 text-blue-600');
+            svgIcon.setAttribute('fill', 'none');
+            svgIcon.setAttribute('viewBox', '0 0 24 24');
+            svgIcon.setAttribute('stroke', 'currentColor');
+            iconContainer.appendChild(svgIcon);
 
             // 创建SVG路径
             const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path')
