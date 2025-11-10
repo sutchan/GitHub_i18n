@@ -6,6 +6,7 @@
 *.code-workspace
 *.bak
 github_string_fetcher.js
+.eslintrc.js
 
 # Node.js 相关文件（可选忽略）
 /node_modules
