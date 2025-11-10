@@ -7,6 +7,7 @@
 *.bak
 github_string_fetcher.js
 .eslintrc.js
+.gitattributes
 
 # Node.js 相关文件（可选忽略）
 /node_modules
