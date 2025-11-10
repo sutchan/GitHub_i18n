@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.109
+ * @version 1.8.115
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -553,9 +553,24 @@ class BuildManager {
     fileContent = fileContent.replace(/;\s*\)/g, ')');
     fileContent = fileContent.replace(/;\s*{/g, ' {');
 
-    // 新增：修复变量声明中的错误分号
+    // 新增：修复变量声明中的错误分号 - 更精确的匹配
     fileContent = fileContent.replace(/(const|let|var);\s+([\w$]+)/g, '$1 $2');
     fileContent = fileContent.replace(/(const|let|var);\s+([\w$]+)/g, '$1 $2'); // 再运行一次以确保完全修复
+    fileContent = fileContent.replace(/(const|let|var)\s*;\s*([\w$]+)/g, '$1 $2'); // 处理额外空格情况
+    fileContent = fileContent.replace(/(const|let|var);\s*([\w$]+)/g, '$1 $2'); // 更宽松的匹配模式
+    fileContent = fileContent.replace(/(const|let|var)\s*;\s*([\w$]+)\s*=/g, '$1 $2 ='); // 特别处理带等号的情况
+    // 新增：修复连续的变量声明中的分号问题
+    fileContent = fileContent.replace(/(const|let|var);\s+([\w$]+)\s*=/g, '$1 $2 =');
+    fileContent = fileContent.replace(/(const|let|var)\s*;\s*([\w$]+)\s*=/g, '$1 $2 =');
+    fileContent = fileContent.replace(/(const|let|var);\s*([\w$]+)\s*=\s*/g, '$1 $2 = ');
+    // 修复变量声明后的多余分号
+    fileContent = fileContent.replace(/(const|let|var)\s+([\w$]+)\s*=\s*([^;]+);;/g, '$1 $2 = $3;');
+    // 修复DOM元素创建后的多余分号 - 增强版
+    fileContent = fileContent.replace(/(document\.createElement\([^)]+\));\s*;/g, '$1;');
+    fileContent = fileContent.replace(/(document\.createElementNS\([^)]+\));\s*;/g, '$1;');
+    // 处理连续的DOM操作（变量声明后立即设置属性）
+    fileContent = fileContent.replace(/(const|let|var)\s+(\w+)\s*=\s*(document\.createElement[^;]+);\s*;/g, '$1 $2 = $3;');
+    fileContent = fileContent.replace(/(const|let|var)\s+(\w+)\s*=\s*(document\.createElementNS[^;]+);\s*;/g, '$1 $2 = $3;');
 
     // 新增：修复CSS类名中的错误分号（应该是空格）
     // 修复class="..."格式
@@ -575,6 +590,19 @@ class BuildManager {
       const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
       return `className="${className}"`;
     });
+    // 新增：修复CSS类名中的特殊情况（类名包含数字前的分号）
+    fileContent = fileContent.replace(/class\s*=\s*['"]([^'"]*?);(\d+)([^'"]*)['"]/g, (match, p1, p2, p3) => {
+      const className = (p1 + ' ' + p2 + p3).replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      return `class="${className}"`;
+    });
+    fileContent = fileContent.replace(/setAttribute\(\s*['"]class['"]\s*,\s*['"]([^'"]*?);(\d+)([^'"]*)['"]\s*\)/g, (match, p1, p2, p3) => {
+      const className = (p1 + ' ' + p2 + p3).replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      return `setAttribute("class", "${className}")`;
+    });
+    fileContent = fileContent.replace(/className\s*=\s*['"]([^'"]*?);(\d+)([^'"]*)['"]/g, (match, p1, p2, p3) => {
+      const className = (p1 + ' ' + p2 + p3).replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      return `className="${className}"`;
+    });
 
     // 11. 修复字符串连接问题 - 增强版
     fileContent = fileContent.replace(/'([^']*)'\s*'([^']*)'/g, "'$1$2'");
@@ -589,33 +617,117 @@ class BuildManager {
     fileContent = fileContent.replace(/\)\s*'([^';]+)'/g, ", '$1'");
     fileContent = fileContent.replace(/\)\s*"([^"]+)"/g, ", \"$1\"");
 
-    // 新增：修复方法定义中的错误语法
+    // 新增：修复方法定义中的错误语法 - 更精确的匹配
+    // 修复普通方法定义
     fileContent = fileContent.replace(/(\w+)\s*\(.*?\);\s*\{/g, (match, p1) => {
       // 提取参数部分
       const paramsMatch = match.match(/\((.*?)\)/);
       const params = paramsMatch ? paramsMatch[1] : '';
       return `${p1}(${params}) {`;
     });
+    // 修复空参数方法定义
+    fileContent = fileContent.replace(/(\w+)\s*\(\s*\);\s*\{/g, '$1() {');
+    // 修复带默认参数的方法定义
+    fileContent = fileContent.replace(/(\w+)\s*\(([^=]+?=[^)]+?)\);\s*\{/g, '$1($2) {');
+    // 修复带参数的方法定义（更精确的匹配）
+    fileContent = fileContent.replace(/(\w+)\s*\(([^)]+)\);\s*\{/g, '$1($2) {');
+    // 再次运行以确保完全修复
     fileContent = fileContent.replace(/(\w+)\s*\(.*?\);\s*\{/g, (match, p1) => {
-      // 再次运行以确保完全修复
       const paramsMatch = match.match(/\((.*?)\)/);
       const params = paramsMatch ? paramsMatch[1] : '';
       return `${p1}(${params}) {`;
     });
+    fileContent = fileContent.replace(/(\w+)\s*\(.*?\);\s*\{/g, (match, p1) => {
+      const paramsMatch = match.match(/\((.*?)\)/);
+      const params = paramsMatch ? paramsMatch[1] : '';
+      return `${p1}(${params}) {`;
+    }); // 第三次运行以确保完全修复
+    fileContent = fileContent.replace(/(\w+)\s*\(.*?\);\s*\{/g, (match, p1) => {
+      const paramsMatch = match.match(/\((.*?)\)/);
+      const params = paramsMatch ? paramsMatch[1] : '';
+      return `${p1}(${params}) {`;
+    }); // 第四次运行以确保完全修复
 
-    // 新增：修复try-catch中的语法错误
+    // 新增：修复try-catch中的语法错误 - 更精确的匹配
     fileContent = fileContent.replace(/try;\s*{/g, 'try {');
+    fileContent = fileContent.replace(/try\s*;\s*{/g, 'try {'); // 处理额外空格情况
+    fileContent = fileContent.replace(/try\s*;\s*\{/g, 'try {'); // 更宽松的匹配模式
+    fileContent = fileContent.replace(/try;\s*\{/g, 'try {'); // 最宽松的匹配模式
     fileContent = fileContent.replace(/catch\s*\(([^)]+)\);\s*{/g, 'catch ($1) {');
+    fileContent = fileContent.replace(/catch\s*\(([^)]+)\)\s*;\s*{/g, 'catch ($1) {'); // 处理额外空格情况
+    fileContent = fileContent.replace(/catch\s*\(([^)]+)\)\s*;\s*\{/g, 'catch ($1) {'); // 更宽松的匹配模式
+    fileContent = fileContent.replace(/catch\s*\(([^)]+)\);\s*\{/g, 'catch ($1) {'); // 最宽松的匹配模式
     fileContent = fileContent.replace(/finally;\s*{/g, 'finally {');
+    fileContent = fileContent.replace(/finally\s*;\s*{/g, 'finally {'); // 处理额外空格情况
+    fileContent = fileContent.replace(/finally\s*;\s*\{/g, 'finally {'); // 更宽松的匹配模式
+    fileContent = fileContent.replace(/finally;\s*\{/g, 'finally {'); // 最宽松的匹配模式
 
     // 新增：修复嵌套的分号问题
     fileContent = fileContent.replace(/;\s*;/g, ';');
     fileContent = fileContent.replace(/;;/g, ';');
+    fileContent = fileContent.replace(/;;/g, ';'); // 再运行一次以确保完全修复
+    fileContent = fileContent.replace(/;;/g, ';'); // 第三次运行以确保完全修复
+    fileContent = fileContent.replace(/;;/g, ';'); // 第四次运行以确保完全修复
     fileContent = fileContent.replace(/}\s*;\s*}/g, '}}');
     fileContent = fileContent.replace(/}\s*;\s*}/g, '}}'); // 再运行一次以确保完全修复
 
+    // 新增：修复类名中的特殊数字分号组合
+    fileContent = fileContent.replace(/className\s*=\s*['"]([^'"]*)flex-shrink-;0([^'"]*)['"]/g, (match, p1, p2) => {
+      const className = (p1 + 'flex-shrink-0' + p2).replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      return `className="${className}"`;
+    });
+    // 修复setAttribute中的特殊类名分号问题
+    fileContent = fileContent.replace(/setAttribute\(\s*['"](class|className)['"]\s*,\s*['"]([^'"]*)flex-shrink-;0([^'"]*)['"]\s*\)/g, (match, attr, p1, p2) => {
+      const className = (p1 + 'flex-shrink-0' + p2).replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      return `setAttribute("${attr}", "${className}")`;
+    });
+    // 新增：修复flex-shrink-0类名的特殊情况 - 增强版
+    fileContent = fileContent.replace(/flex-shrink-;0/g, 'flex-shrink-0');
+    fileContent = fileContent.replace(/flex-shrink-;0\s*/g, 'flex-shrink-0 ');
+    fileContent = fileContent.replace(/\s*flex-shrink-;0\s*/g, ' flex-shrink-0 ');
+    // 处理className赋值中的flex-shrink-0特殊情况
+    fileContent = fileContent.replace(/className\s*=\s*['"]([^'"]*)flex-shrink-;0([^'"]*)['"]/g, (match, p1, p2) => {
+      const className = (p1 + 'flex-shrink-0' + p2).replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      return `className="${className}"`;
+    });
+    // 更精确地处理flex-shrink-0前后都有分号的情况
+    fileContent = fileContent.replace(/;flex-shrink-;0;/g, ' flex-shrink-0 ');
+    // 修复CSS属性中的分号问题
+    fileContent = fileContent.replace(/([a-zA-Z-]+);\s*([\d]+(?:px|em|rem|%|vh|vw|fr|s)?)\s*/gi, '$1: $2 ');
+    fileContent = fileContent.replace(/([a-zA-Z-]+);\s*([^;\s]+)/gi, '$1: $2');
+    // 新增：修复更多CSS类名中的分号问题
+    fileContent = fileContent.replace(/class="([^"]+?)";\s*/g, (match, p1) => {
+      const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      return `class="${className}"`;
+    });
+    fileContent = fileContent.replace(/className="([^"]+?)";\s*/g, (match, p1) => {
+      const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      return `className="${className}"`;
+    });
+    // 修复setAttribute调用后的多余分号 - 增强版
+    fileContent = fileContent.replace(/(setAttribute\([^)]+\));\s*;/g, '$1;');
+    // 修复连续的setAttribute调用中的语法问题
+    fileContent = fileContent.replace(/(\w+)\.setAttribute\("([^"]+)",\s*"([^"]+)"\);\s*;/g, '$1.setAttribute("$2", "$3");');
+    fileContent = fileContent.replace(/(\w+)\.setAttribute\('([^']+)',\s*'([^']+)'\);\s*;/g, "$1.setAttribute('$2', '$3');");
+    // 处理多个连续的setAttribute调用
+    fileContent = fileContent.replace(/(\w+)\.setAttribute\([^)]+\);\s*(\w+)\.setAttribute/g, '$1.setAttribute($2);\n    $3.setAttribute');
+    // 修复setAttribute中的属性值分号问题（特别是viewBox等属性）
+    fileContent = fileContent.replace(/setAttribute\(\s*['"]viewBox['"]\s*,\s*['"]([^'"]*);([^'"]*)['"]\s*\)/g, (match, p1, p2) => {
+      // viewBox属性值应该用空格分隔，而不是分号
+      const value = (p1 + ' ' + p2).replace(/;\s*/g, ' ').trim();
+      return `setAttribute("viewBox", "${value}")`;
+    });
+    fileContent = fileContent.replace(/setAttribute\(\s*['"]([^'"]+)['"]\s*,\s*['"]([^'"]*);([^'"]*)['"]\s*\)/g, (match, attr, p1, p2) => {
+      // 根据属性类型决定是否将分号替换为空格
+      if (['viewBox', 'style'].includes(attr)) {
+        const value = (p1 + ' ' + p2).replace(/;\s*/g, ' ').trim();
+        return `setAttribute("${attr}", "${value}")`;
+      }
+      return match;
+    });
+
     // 12. 多轮语法清理循环 - 增强版
-    for (let i = 0; i < 5; i++) { // 增加迭代次数以确保彻底清理
+    for (let i = 0; i < 10; i++) { // 增加迭代次数到10次以确保彻底清理
       // 再次修复括号匹配问题
       fileContent = fileContent.replace(/\(\s*\)/g, '()');
       fileContent = fileContent.replace(/\[\s*\]/g, '[]');
@@ -624,10 +736,78 @@ class BuildManager {
       // 再次修复分号缺失和多余分号
       fileContent = fileContent.replace(/(\}|\)|\]|;|\w)\s+(\{|\w)/g, '$1; $2');
       fileContent = fileContent.replace(/;\s*;/g, ';');
+      fileContent = fileContent.replace(/;;/g, ';'); // 额外的分号清理
+      fileContent = fileContent.replace(/;;/g, ';'); // 再次清理
+      fileContent = fileContent.replace(/;;/g, ';'); // 第三次清理
 
       // 修复可能的括号嵌套问题
       fileContent = fileContent.replace(/\(\s*\(\s*([^()]+?)\s*\)\s*\)/g, '($1)');
       fileContent = fileContent.replace(/\[\s*\[\s*([^\[\]]+?)\s*\]\s*\]/g, '[$1]');
+      // 修复注释中的错误语法 - 增强版
+      fileContent = fileContent.replace(/\*\s*@param\s*;/g, ' * @param ');
+      fileContent = fileContent.replace(/\*\s*@returns\s*;/g, ' * @returns ');
+      fileContent = fileContent.replace(/\*\s*@type\s*;/g, ' * @type ');
+      fileContent = fileContent.replace(/\*\s*@param;/g, ' * @param ');
+      fileContent = fileContent.replace(/\*\s*@returns;/g, ' * @returns ');
+      fileContent = fileContent.replace(/\*\s*@type;/g, ' * @type ');
+      fileContent = fileContent.replace(/\*\s*@param;\s+([^\n]+)/g, ' * @param $1');
+      // 修复注释参数后面的多余分号
+      fileContent = fileContent.replace(/@param\s+([^;\n]+);/g, '@param $1');
+      fileContent = fileContent.replace(/@returns\s+([^;\n]+);/g, '@returns $1');
+      fileContent = fileContent.replace(/@type\s+([^;\n]+);/g, '@type $1');
+
+      // 额外修复括号内多余逗号
+      fileContent = fileContent.replace(/\(\s*([^,()]+?)\s*,\s*\)/g, '($1)');
+      fileContent = fileContent.replace(/\[\s*([^,\[\]]+?)\s*,\s*\]/g, '[$1]');
+      fileContent = fileContent.replace(/,\s*\)/g, ')'); // 更直接地修复括号末尾的逗号
+      fileContent = fileContent.replace(/,\s*\]/g, ']'); // 修复数组括号末尾的逗号
+
+      // 额外修复类名中的分号问题 - 增强版
+      fileContent = fileContent.replace(/class="([^"]*?);(\d+)([^"]*)"/g, (match, p1, p2, p3) => {
+        const className = (p1 + ' ' + p2 + p3).replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+        return `class="${className}"`;
+      });
+      // 更全面地修复类名中的分号问题
+      fileContent = fileContent.replace(/class="([^"]*)"/g, (match, p1) => {
+        const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+        return `class="${className}"`;
+      });
+      fileContent = fileContent.replace(/className="([^"]*)"/g, (match, p1) => {
+        const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+        return `className="${className}"`;
+      });
+      // 修复setAttribute中的类名问题
+      fileContent = fileContent.replace(/setAttribute\(\s*['"](class|className)['"]\s*,\s*['"]([^'"]*)['"]\s*\)/g, (match, attr, p1) => {
+        const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+        return `setAttribute("${attr}", "${className}")`;
+      });
+
+      // 修复变量声明中的错误分号（在循环中再次运行）
+      fileContent = fileContent.replace(/(const|let|var);\s+([\w$]+)/g, '$1 $2');
+      fileContent = fileContent.replace(/(const|let|var)\s*;\s*([\w$]+)/g, '$1 $2');
+
+      // 修复方法定义中的错误分号（在循环中再次运行）
+      fileContent = fileContent.replace(/(\w+)\s*\(.*?\);\s*\{/g, (match, p1) => {
+        const paramsMatch = match.match(/\((.*?)\)/);
+        const params = paramsMatch ? paramsMatch[1] : '';
+        return `${p1}(${params}) {`;
+      });
+
+      // 修复try-catch中的错误分号（在循环中再次运行）
+      fileContent = fileContent.replace(/try;\s*{/g, 'try {');
+      fileContent = fileContent.replace(/catch\s*\(([^)]+)\);\s*{/g, 'catch ($1) {');
+      fileContent = fileContent.replace(/finally;\s*{/g, 'finally {');
+
+      // 修复CSS类名中的特殊分号问题
+      fileContent = fileContent.replace(/flex-shrink-;0/g, 'flex-shrink-0');
+      fileContent = fileContent.replace(/className="([^"]+)";\s*/g, (match, p1) => {
+        const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
+        return `className="${className}"`;
+      });
+      // 在循环中再次修复setAttribute调用后的多余分号
+      fileContent = fileContent.replace(/(setAttribute\([^)]+\));\s*;/g, '$1;');
+      // 修复DOM元素创建和属性设置的连续调用问题
+      fileContent = fileContent.replace(/(document\.createElement(?:NS)?\([^)]+\));\s*;/g, '$1;');
 
       // 再次处理括号末尾的多余逗号
       fileContent = fileContent.replace(/\s*,\s*\)/g, ')');
@@ -637,6 +817,13 @@ class BuildManager {
     // 13. 修复简单变量周围的括号
     fileContent = fileContent.replace(/\(\s*(\w+)\s*\)/g, '($1)');
     fileContent = fileContent.replace(/\(\(\s*(\w+)\s*\)\)/g, '($1)'); // 修复嵌套括号
+    // 14. 最终的分号清理
+    fileContent = fileContent.replace(/;;/g, ';');
+    fileContent = fileContent.replace(/;;/g, ';');
+    fileContent = fileContent.replace(/;;/g, ';');
+    // 15. 修复注释中的参数标记错误
+    fileContent = fileContent.replace(/\*\s*@param;\s*([^\n]+)/g, ' * @param $1');
+    fileContent = fileContent.replace(/\*\s*@param\s*;\s*([^\n]+)/g, ' * @param $1');
     fileContent = fileContent.replace(/\(\s*\)/g, '()'); // 空括号标准化
 
     // 8. 修复连续的括号问题
