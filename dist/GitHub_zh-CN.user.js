@@ -734,44 +734,44 @@ notification.className = 'fixed bottom-4 right-4 bg-blue-50 border border-blue-2
             iconContainer.appendChild(svgIcon);
 
             // 创建SVG路径
-            const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-pathElement.setAttribute('stroke-linecap', 'round');
-pathElement.setAttribute('stroke-linejoin', 'round');
-pathElement.setAttribute('stroke-width', '2');
-pathElement.setAttribute('d', 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z');
-svgIcon.appendChild(pathElement)
+            const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathElement.setAttribute('stroke-linecap', 'round');
+            pathElement.setAttribute('stroke-linejoin', 'round');
+            pathElement.setAttribute('stroke-width', '2');
+            pathElement.setAttribute('d', 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z');
+            svgIcon.appendChild(pathElement);
 
             // 创建内容容器
             const contentContainer = document.createElement('div');
-contentContainer.className = 'ml-3 flex-1'
-flexContainer.appendChild(contentContainer)
+            contentContainer.className = 'ml-3 flex-1';
+            flexContainer.appendChild(contentContainer);
 
             // 创建标题
-            const titleElement = document.createElement('p';);
-titleElement.className = 'text-sm font-medium text-blue-800'
-titleElement.textContent = 'GitHub 中文翻译脚本更新'
-contentContainer.appendChild(titleElement)
+            const titleElement = document.createElement('p');
+            titleElement.className = 'text-sm font-medium text-blue-800';
+            titleElement.textContent = 'GitHub 中文翻译脚本更新';
+            contentContainer.appendChild(titleElement);
 
             // 创建消息文本 - 安全地设置文本内容
-            const messageElement = document.createElement('p;';);
-messageElement.className = 'text-sm text-blue-700 mt-1'
-messageElement.textContent = `发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。`
-contentContainer.appendChild(messageElement)
+            const messageElement = document.createElement('p');
+            messageElement.className = 'text-sm text-blue-700 mt-1';
+            messageElement.textContent = `发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。`;
+            contentContainer.appendChild(messageElement);
 
             // 创建按钮容器
-            const buttonsContainer = document.createElement('div;';);
-buttonsContainer.className = 'mt-3 flex space-x-2'
-contentContainer.appendChild(buttonsContainer)
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'mt-3 flex space-x-2';
+            contentContainer.appendChild(buttonsContainer);
 
             // 创建更新按钮 - 安全地设置URL
-            const updateButton = document.createElement('a';);
-updateButton.id = `${notificationId}-update-btn`
-updateButton.href = CONFIG.updateCheck.scriptUrl || '#'
-updateButton.target = '_blank'
-updateButton.rel = 'noopener noreferrer'
-updateButton.className = 'inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 transition-colors'
-updateButton.textContent = '立即更新'
-buttonsContainer.appendChild(updateButton)
+            const updateButton = document.createElement('a');
+            updateButton.id = `${notificationId}-update-btn`;
+            updateButton.href = CONFIG.updateCheck.scriptUrl || '#';
+            updateButton.target = '_blank';
+            updateButton.rel = 'noopener noreferrer';
+            updateButton.className = 'inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 transition-colors';
+            updateButton.textContent = '立即更新';
+            buttonsContainer.appendChild(updateButton);
 
             // 创建稍后按钮
             const laterButton = document.createElement('bu;t;t;o;n;';);
