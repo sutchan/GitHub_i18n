@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.100
+ * @version 1.8.102
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -463,6 +463,80 @@ class BuildManager {
       changesCount += extraSemicolonCount;
     }
 
+    // 5. 修复括号不匹配的问题
+    // 这是一个简单的修复，实际的括号匹配可能需要更复杂的算法
+    // 这里只处理一些常见的模式
+    fileContent = fileContent.replace(/\(\s*\)/g, '()'); // 空括号标准化
+    fileContent = fileContent.replace(/\(\s*(\w+)\s*\)/g, '($1)'); // 修复简单变量周围的括号
+    fileContent = fileContent.replace(/\(\(\s*(\w+)\s*\)\)/g, '($1)'); // 修复嵌套括号
+    fileContent = fileContent.replace(/\(\s*\)\s*\)/g, '()'); // 修复连续的空括号
+    fileContent = fileContent.replace(/\(\(\s*\)\)/g, '()'); // 修复嵌套的空括号
+    
+    // 新增：修复函数调用中的多余括号 - 更严格的模式
+    fileContent = fileContent.replace(/removeChild\(\(\s*(\w+)\s*\)/g, 'removeChild($1');
+    fileContent = fileContent.replace(/appendChild\(\(\s*(\w+)\s*\)/g, 'appendChild($1');
+    fileContent = fileContent.replace(/insertBefore\(\(\s*(\w+)\s*\)/g, 'insertBefore($1');
+    fileContent = fileContent.replace(/replaceChild\(\(\s*(\w+)\s*\)/g, 'replaceChild($1');
+    
+    // 新增：修复函数调用中的多余括号 - 精确匹配
+    fileContent = fileContent.replace(/removeChild\(\(\s*(\w+)\s*\)\)/g, 'removeChild($1)');
+    fileContent = fileContent.replace(/appendChild\(\(\s*(\w+)\s*\)\)/g, 'appendChild($1)');
+    fileContent = fileContent.replace(/insertBefore\(\(\s*(\w+)\s*\)\)/g, 'insertBefore($1)');
+    fileContent = fileContent.replace(/replaceChild\(\(\s*(\w+)\s*\)\)/g, 'replaceChild($1)');
+    
+    // 新增：处理参数周围的括号
+    fileContent = fileContent.replace(/(\w+)\(\(\s*(\w+)\s*\)\)/g, '$1($2)');
+    fileContent = fileContent.replace(/(\w+)\(\(\s*(\w+)\s*\)/g, '$1($2');
+    
+    // 新增：修复removeChild中的嵌套括号
+    fileContent = fileContent.replace(/removeChild\(\(\s*(node)\s*\)/g, 'removeChild($1');
+    fileContent = fileContent.replace(/appendChild\(\(\s*(node)\s*\)/g, 'appendChild($1');
+    
+    // 新增：修复括号内的变量引用
+    fileContent = fileContent.replace(/\(\s*\(\s*(\w+)\s*\)\s*\)/g, '($1)');
+    
+    // 新增：修复console.log/error中的括号不匹配
+    fileContent = fileContent.replace(/console\.(log|error)\(([^)]+)\)\)\s*/g, 'console.$1($2)');
+    fileContent = fileContent.replace(/console\.(log|error)\(([^)]+)\)\s*\)/g, 'console.$1($2)');
+    
+    // 新增：修复console调用中的字符串连接问题
+    fileContent = fileContent.replace(/console\.(log|error)\(([^)]+)\)\s*(["'])/g, 'console.$1($2, $3');
+    fileContent = fileContent.replace(/console\.(log|error)\(([^)]+)\)(\s*\))\s*(["'])/g, 'console.$1($2, $4');
+    fileContent = fileContent.replace(/console\.(log|error)\(([^)]+)\)([^,])\s*["']([^"']+)["']/g, 'console.$1($2$3, "$4"');
+    fileContent = fileContent.replace(/console\.(log|error)\(([^)]+)\)([^,])\s*'([^']+)'/g, "console.$1($2$3, '$4'");
+    
+    // 新增：修复数组定义中的语法错误
+    fileContent = fileContent.replace(/\[\s*([^\]]+)\s*,\s*\]/g, '[$1]');
+    fileContent = fileContent.replace(/\[\s*([^\]]+)\s*,\s*\]/g, '[$1]'); // 再次执行以防嵌套问题
+    
+    // 新增：修复数组声明中的错误格式
+    fileContent = fileContent.replace(/const\s+(\w+)\s*=\s*\[\s*;/g, 'const $1 = [');
+    fileContent = fileContent.replace(/const\s+(\w+)\s*=\s*\[\s*([^;]+);/g, 'const $1 = [$2];');
+    fileContent = fileContent.replace(/(\w+)\s*=\s*\[\s*;/g, '$1 = [');
+    fileContent = fileContent.replace(/(\w+)\s*=\s*\[\s*([^;]+);/g, '$1 = [$2];');
+    
+    // 新增：修复数组元素末尾的语法错误
+    fileContent = fileContent.replace(/(\u[0-9a-fA-F]{4}),\s*\)/g, '$1');
+    fileContent = fileContent.replace(/\(\s*\)/g, '()');
+    
+    // 新增：修复对象属性访问中的错误
+    fileContent = fileContent.replace(/\.\(\s*(\w+)\s*\)/g, '.$1');
+    
+    // 新增：修复条件判断中的括号问题
+    fileContent = fileContent.replace(/if\(\(\s*([^)]+)\s*\)\)/g, 'if($1)');
+    fileContent = fileContent.replace(/while\(\(\s*([^)]+)\s*\)\)/g, 'while($1)');
+    fileContent = fileContent.replace(/for\(\(\s*([^)]+)\s*\)/g, 'for($1');
+    
+    // 新增：修复函数定义中的括号问题
+    fileContent = fileContent.replace(/function\s+\w+\(\(\s*([^)]+)\s*\)/g, 'function $&');
+    fileContent = fileContent.replace(/=>(\s*(\w+)\s*)/g, '=> $1');
+    
+    // 新增：修复箭头函数中的括号问题
+    fileContent = fileContent.replace(/=>(\(\s*(\w+)\s*\))/g, '=> $2');
+    
+    // 新增：修复try/catch语句中的括号问题
+    fileContent = fileContent.replace(/catch\(\(\s*(\w+)\s*\)\)/g, 'catch($1)');
+
     // 6. 移除可能的BOM字符
     if (fileContent.charCodeAt(0) === 0xFEFF) {
       fileContent = fileContent.substring(1);
@@ -635,12 +709,17 @@ class BuildManager {
     // 13. 运行JavaScript语法检查，尝试捕获和修复可能的语法错误
     // 这是一个防御性措施，确保修复后的代码语法正确
     try {
-      // 我们可以添加更高级的语法检查逻辑，但现在先专注于appendChild的修复
-      // 检测并警告可能存在的语法错误模式
+      // 更全面的语法错误模式检测
       const suspiciousPatterns = [
         { pattern: /appendChild\(.*,.*\)/g, description: "appendChild调用中包含逗号" },
         { pattern: /\(\s*,\s*\)/g, description: "空括号内有逗号" },
-        { pattern: /appendChild\(\s*\)/g, description: "appendChild调用缺少参数" }
+        { pattern: /appendChild\(\s*\)/g, description: "appendChild调用缺少参数" },
+        { pattern: /removeChild\(\(\s*\w+\s*\)/g, description: "removeChild调用中多余括号" },
+        { pattern: /console\.(log|error)\([^)]+\)\)\s*/g, description: "console调用括号不匹配" },
+        { pattern: /\[\s*[^\]]+\s*,\s*\)/g, description: "数组定义末尾有逗号" },
+        { pattern: /\(\s*\)\s*\)/g, description: "连续多余的右括号" },
+        { pattern: /\(\(\s*[^)]+\s*\)\)/g, description: "多余的嵌套括号" },
+        { pattern: /catch\(\(\s*\w+\s*\)\)/g, description: "catch语句括号不匹配" }
       ];
       
       suspiciousPatterns.forEach(({ pattern, description }) => {
@@ -649,6 +728,89 @@ class BuildManager {
           console.warn(`⚠️  警告: 发现${suspiciousCount}处可能的${description}语法错误模式`);
         }
       });
+      
+      // 新增：修复console.log/error中的多个右括号问题
+      let consoleErrorFixed = false;
+      do {
+        const originalLength = fileContent.length;
+        fileContent = fileContent.replace(/console\.(log|error)\(([^)]+)\)(\s*)\)/g, 'console.$1($2)$3');
+        consoleErrorFixed = fileContent.length !== originalLength;
+        if (consoleErrorFixed) {
+          hasChanges = true;
+          changesCount++;
+        }
+      } while (consoleErrorFixed);
+      
+      // 新增：修复连续的右括号
+      let extraBracketsFixed = false;
+      do {
+        const originalLength = fileContent.length;
+        fileContent = fileContent.replace(/\)\s*\)/g, ')');
+        extraBracketsFixed = fileContent.length !== originalLength;
+        if (extraBracketsFixed) {
+          hasChanges = true;
+          changesCount++;
+        }
+      } while (extraBracketsFixed);
+      
+      // 新增：修复数组末尾的语法错误
+      fileContent = fileContent.replace(/\[\s*([^\]]+)\s*,\s*\]/g, '[$1]');
+      
+      // 新增：修复函数调用中的参数错误
+      fileContent = fileContent.replace(/\(\s*\(\s*([^)]+)\s*\)\s*\)/g, '($1)');
+      
+      // 新增：修复函数调用中的括号错误 - 更全面的模式
+      const functionCalls = ['removeChild', 'appendChild', 'insertBefore', 'replaceChild', 'createElement', 'createTextNode'];
+      functionCalls.forEach(func => {
+        // 修复函数调用中的多余左括号
+        fileContent = fileContent.replace(new RegExp(`${func}\\(\\(`, 'g'), `${func}(`);
+        // 修复函数调用中的多余右括号
+        fileContent = fileContent.replace(new RegExp(`\\)\\)\\s*;`, 'g'), ');');
+      });
+      
+      // 新增：修复console调用中的格式问题
+      fileContent = fileContent.replace(/console\.(log|error)\(([^)]+)\)(\s*[\);])/g, 'console.$1($2)$3');
+      
+      // 新增：修复文本节点处理中的语法错误
+      fileContent = fileContent.replace(/const\s+(\w+)\s*=\s*node\.nodeValue;/g, 'const $1 = node.nodeValue;');
+      fileContent = fileContent.replace(/const\s+(\w+)\s*=\s*this\.getTranslatedText\(([^)]+)\)/g, 'const $1 = this.getTranslatedText($2);');
+      
+      // 新增：修复数组处理中的语法错误
+      fileContent = fileContent.replace(/const\s+(\w+)\s*=\s*\[\s*;/g, 'const $1 = [');
+      fileContent = fileContent.replace(/const\s+(\w+)\s*=\s*\[\s*(.+?),\s*\)/g, 'const $1 = [$2];');
+      
+      // 新增：修复DOM操作中的常见错误
+      fileContent = fileContent.replace(/parentNode\.removeChild\(\(node\)/g, 'parentNode.removeChild(node)');
+      fileContent = fileContent.replace(/parentNode\.appendChild\(\(node\)/g, 'parentNode.appendChild(node)');
+      
+      // 新增：防御性修复 - 确保所有语句都以分号结束
+      const lines = fileContent.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line && !line.endsWith(';') && !line.endsWith('{') && !line.endsWith('}') && 
+            !line.startsWith('//') && !line.startsWith('/*') && !line.startsWith('*') &&
+            !line.includes(';') && !line.includes('}') && !line.endsWith(')') &&
+            !line.endsWith(',') && !line.endsWith(':') && !line.endsWith('?')) {
+          // 简单的启发式判断，可能会有误判，但作为最后手段
+          lines[i] = line + ';';
+          hasChanges = true;
+          changesCount++;
+        }
+      }
+      fileContent = lines.join('\n');
+      
+      // 新增：最终的语法清理 - 移除多余的括号和逗号
+      // 连续应用多次以处理嵌套情况
+      for (let i = 0; i < 3; i++) {
+        // 移除多余的括号
+        fileContent = fileContent.replace(/\(\(\s*([^)]+)\s*\)\)/g, '($1)');
+        // 移除括号后的逗号
+        fileContent = fileContent.replace(/\)\s*,\s*;/g, ');');
+        // 移除函数调用后的额外右括号
+        fileContent = fileContent.replace(/\)\s*\)/g, ')');
+        // 修复数组定义中的错误
+        fileContent = fileContent.replace(/\[\s*([^\]]+)\s*,\s*\]/g, '[$1]');
+      }
     } catch (error) {
       console.error('语法检查过程中出错:', error);
     }
