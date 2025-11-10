@@ -1057,7 +1057,7 @@ export const translationCore = {
       if (text.includes(key)) {
         // 尝试将key视为一个完整的单词进行匹配
         // 使用单词边界的正则表达式
-        const wordRegex = new RegExp(`\\b${utils.escapeRegExp(key)}\\b`, 'gi');
+        const wordRegex = new RegExp('\\b' + utils.escapeRegExp(key) + '\\b', 'gi');
         const wordMatches = text.match(wordRegex);
 
         if (wordMatches && wordMatches.length > 0) {

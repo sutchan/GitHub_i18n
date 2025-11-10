@@ -1,22 +1,17 @@
 /.trae
 /.vscode
+/node_modules
+/build
 /utils/api
-/docs
-/utils
 *.code-workspace
 *.bak
 github_string_fetcher.js
-.eslintrc.js
-.gitattributes
-package-lock.json
-package.json
 
-# Node.js 相关文件（可选忽略）
-/node_modules
-/package-lock.json
-/build
+# 保留重要配置文件
+# .eslintrc.js - 代码规范配置
+# .gitattributes - Git属性配置
+# package.json - 项目配置
+# package-lock.json - 依赖锁定
 
-# 保留的构建工具文件不忽略
-# build-tool.html
-# merge-script.js
-/test
+# 测试文件不忽略，确保测试代码被版本控制
+# /test
