@@ -8,6 +8,8 @@
 github_string_fetcher.js
 .eslintrc.js
 .gitattributes
+package-lock.json
+package.json
 
 # Node.js 相关文件（可选忽略）
 /node_modules
