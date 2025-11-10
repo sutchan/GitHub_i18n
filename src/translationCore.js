@@ -886,8 +886,10 @@ export const translationCore = {
       // 如果有翻译结果且与原文不同，创建翻译后的文本节点
       if (translatedText && typeof translatedText === 'string' && translatedText !== originalText) {
         try {
+          // 确保翻译文本是有效的字符串，去除可能导致问题的字符
+          const safeTranslatedText = String(translatedText).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
           // 创建新的文本节点
-          const translatedNode = document.createTextNode(translatedText);
+          const translatedNode = document.createTextNode(safeTranslatedText);
           fragment.appendChild(translatedNode);
 
           hasTranslation = true;
@@ -906,11 +908,19 @@ export const translationCore = {
     });
 
     // 将处理后的片段重新添加到原始位置
-    if (fragment.hasChildNodes()) {
-      if (element.firstChild) {
-        element.insertBefore(fragment, element.firstChild);
-      } else {
-        element.appendChild(fragment);
+    try {
+      // 额外检查fragment的有效性
+      if (fragment && fragment.hasChildNodes()) {
+        if (element.firstChild) {
+          element.insertBefore(fragment, element.firstChild);
+        } else {
+          element.appendChild(fragment);
+        }
+      }
+    } catch (appendError) {
+      // 安全处理：如果添加片段失败，至少记录错误
+      if (CONFIG.debugMode) {
+        console.error('[GitHub 中文翻译] 添加文档片段失败:', appendError, '元素:', element);
       }
     }
 
