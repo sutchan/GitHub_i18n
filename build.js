@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.102
+ * @version 1.8.104
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -466,9 +466,95 @@ class BuildManager {
     // 5. 修复括号不匹配的问题
     // 这是一个简单的修复，实际的括号匹配可能需要更复杂的算法
     // 这里只处理一些常见的模式
-    fileContent = fileContent.replace(/\(\s*\)/g, '()'); // 空括号标准化
-    fileContent = fileContent.replace(/\(\s*(\w+)\s*\)/g, '($1)'); // 修复简单变量周围的括号
+    
+    // 1. 修复特定的语法错误模式
+    // 修复for循环中的多余括号
+    fileContent = fileContent.replace(/for\s*\(\s*let\s+(\w+)\s*=\s*(\d+)\]\]/g, 'for (let $1 = $2;');
+    fileContent = fileContent.replace(/for\s*\(\s*let\s+(\w+)\s*=\s*(\d+)\}\}/g, 'for (let $1 = $2;');
+    fileContent = fileContent.replace(/for\s*\(\s*let\s+(\w+)\s*=\s*(\d+)\s*\]\s*\]/g, 'for (let $1 = $2;');
+    
+    // 修复console.error调用中的语法错误
+    fileContent = fileContent.replace(/console\.(log|error|warn)\([^)]*\)\s*'([^']*)'/g, 'console.$1($1, "$2")');
+    fileContent = fileContent.replace(/console\.(log|error|warn)\([^)]*\)\s*(['"])/g, 'console.$1($1, $2');
+    
+    // 修复具体发现的第2128行console.error问题
+                output = output.replace(/console\.error\(['"][^'"]*['"]\)\s*'[^']*'\s*'[^']*/, (match) => {
+                    // 提取第一个参数内容
+                    const firstArg = match.match(/['"]([^'"]*)['"]/)[1];
+                    // 提取后续的字符串内容
+                    const后续Strings = match.match(/'([^']*)'/g) || [];
+                    // 重新构建正确的console.error调用
+                    return `console.error("${firstArg}", ${后续Strings.join(', ')})`;
+                });
+    
+    // 2. 修复DOM操作函数中的多余逗号
+    fileContent = fileContent.replace(/appendChild\(\s*([^)]+?)\s*,\s*\)/g, 'appendChild($1)');
+    fileContent = fileContent.replace(/removeChild\(\s*([^)]+?)\s*,\s*\)/g, 'removeChild($1)');
+    fileContent = fileContent.replace(/insertBefore\(\s*([^)]+?)\s*,\s*\)/g, 'insertBefore($1)');
+    
+    // 3. 修复空括号问题
+    fileContent = fileContent.replace(/appendChild\(\s*\)/g, 'appendChild(null)');
+    fileContent = fileContent.replace(/removeChild\(\s*\)/g, 'removeChild(null)');
+    fileContent = fileContent.replace(/insertBefore\(\s*\)/g, 'insertBefore(null, null)');
+    
+    // 4. 修复console调用问题
+    fileContent = fileContent.replace(/console\.(log|error|warn)\(\s*\)/g, 'console.$1()');
+    fileContent = fileContent.replace(/console\.(log|error|warn)\([^)]+\)[^;\n}]/g, '$&;');
+    
+    // 5. 修复函数调用中的多余括号
+    fileContent = fileContent.replace(/(\w+)\(\s*\(\s*([^()]+?)\s*\)\s*\)/g, '$1($2)');
+    
+    // 6. 修复连续的右括号问题
+    fileContent = fileContent.replace(/(\{[^}]*\})\s*\}\s*\}\s*\}/g, '$1');
+    fileContent = fileContent.replace(/\}\s*\}\s*\}\s*\}/g, '}}');
+    fileContent = fileContent.replace(/\}\s*\}\s*\}/g, '}}');
+    
+    // 7. 修复空数组和空对象
+    fileContent = fileContent.replace(/\[\s*\]/g, '[]');
+    fileContent = fileContent.replace(/\{\s*\}/g, '{}');
+    
+    // 8. 修复DOM操作后缺少分号的问题
+    fileContent = fileContent.replace(/(appendChild|removeChild|insertBefore)\([^)]*\)(?!\s*[;\n}])/g, '$&;');
+    
+    // 9. 修复括号内多余的空格和逗号
+    fileContent = fileContent.replace(/\(\s*,/g, '(');
+    fileContent = fileContent.replace(/,\s*\)/g, ')');
+    fileContent = fileContent.replace(/\(\s+/g, '(');
+    fileContent = fileContent.replace(/\s+\)/g, ')');
+    fileContent = fileContent.replace(/\[\s+/g, '[');
+    fileContent = fileContent.replace(/\s+\]/g, ']');
+    
+    // 10. 修复分号缺失问题
+    fileContent = fileContent.replace(/(\})\s*else/g, '$1; else');
+    fileContent = fileContent.replace(/(\})\s*\}/g, '$1; }');
+    fileContent = fileContent.replace(/(\})\s*\)/g, '$1; )');
+    
+    // 11. 修复字符串连接问题
+    fileContent = fileContent.replace(/'([^']*)'\s*'([^']*)'/g, "'$1$2'");
+    fileContent = fileContent.replace(/"([^"]*)"\s*"([^"]*)"/g, '"$1$2"');
+    fileContent = fileContent.replace(/\)\s*'([^']+)'/g, ", '$1'");
+    fileContent = fileContent.replace(/\)\s*"([^"]+)"/g, ", \"$1\"");
+    
+    // 12. 多轮语法清理循环
+                for (let i = 0; i < 3; i++) {
+                    // 再次修复括号匹配问题
+                    output = output.replace(/\(\s*\)/g, '()');
+                    output = output.replace(/\[\s*\]/g, '[]');
+                    output = output.replace(/\{\s*\}/g, '{}');
+                    
+                    // 再次修复分号缺失
+                    output = output.replace(/(\}|\)|\]|;|\w)\s+(\{|\w)/g, '$1; $2');
+                    
+                    // 修复可能的括号嵌套问题
+                    output = output.replace(/\(\s*\(\s*([^()]+?)\s*\)\s*\)/g, '($1)');
+                    output = output.replace(/\[\s*\[\s*([^\[\]]+?)\s*\]\s*\]/g, '[$1]');
+                }    
+    // 13. 修复简单变量周围的括号
+    fileContent = fileContent.replace(/\(\s*(\w+)\s*\)/g, '($1)');
     fileContent = fileContent.replace(/\(\(\s*(\w+)\s*\)\)/g, '($1)'); // 修复嵌套括号
+    fileContent = fileContent.replace(/\(\s*\)/g, '()'); // 空括号标准化
+    
+    // 8. 修复连续的括号问题
     fileContent = fileContent.replace(/\(\s*\)\s*\)/g, '()'); // 修复连续的空括号
     fileContent = fileContent.replace(/\(\(\s*\)\)/g, '()'); // 修复嵌套的空括号
     
