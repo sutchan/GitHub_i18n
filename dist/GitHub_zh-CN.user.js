@@ -818,11 +818,15 @@ const versionChecker = {
 
     /**
      * 隐藏通知元素（带动画效果）
-     * @param notification - 通知元素
+     * @param notificationId - 通知元素ID
      * @param permanently - 是否永久隐藏
      */
-    hideNotification(notification, permanently = false) {
+    hideNotification(notificationId, permanently = false) {
       try {
+        // 通过ID查找通知元素
+        const notification = document.getElementById(notificationId);
+        if (!notification) return;
+
         // 添加动画效果
         notification.style.transform = 'translateY(20px)';
         notification.style.opacity = '0';
