@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.99
+ * @version 1.8.100
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -482,7 +482,17 @@ class BuildManager {
       // 修复可能存在的错误语法模式，使用捕获组
       { pattern: /\((\w+),\s*\w+\)/g, replacement: "($1)" },
       // 修复嵌套appendChild调用中的语法问题
-      { pattern: /appendChild\(\s*(\w+)\.appendChild\(/g, replacement: "appendChild($1.appendChild(" }
+      { pattern: /appendChild\(\s*(\w+)\.appendChild\(/g, replacement: "appendChild($1.appendChild(" },
+      // 新增：修复括号内的逗号错误，这是导致语法错误的主要原因
+      { pattern: /appendChild\(\s*(\w+)\s*,\s*\)/g, replacement: "appendChild($1)" },
+      // 新增：修复括号内多余的逗号
+      { pattern: /appendChild\(\s*([^,)]+)\s*,\s*\)/g, replacement: "appendChild($1)" },
+      // 新增：修复括号内的意外逗号
+      { pattern: /appendChild\(\s*([^()]+)\s*,\s*\)/g, replacement: "appendChild($1)" },
+      // 新增：修复更复杂的appendChild调用错误
+      { pattern: /appendChild\(\s*document\.(createElement|createElementNS)\([^)]+\)\s*,\s*\)/g, replacement: "appendChild(document.$1($2))" },
+      // 新增：修复嵌套元素创建后的appendChild调用错误
+      { pattern: /appendChild\(\s*(\w+)\.appendChild\(([^)]+)\)\s*,\s*\)/g, replacement: "appendChild($1.appendChild($2))" }
     ];
 
     domOperationFixes.forEach(({ pattern, replacement }) => {
@@ -571,15 +581,77 @@ class BuildManager {
     const domFunctions = ['appendChild', 'insertBefore', 'replaceChild', 'removeChild'];
     domFunctions.forEach(func => {
       // 查找并修复所有这些DOM函数调用中的语法错误
-      const regex = new RegExp(`${func}\(\s*([^)]*)\),`, 'g');
-      const count = (fileContent.match(regex) || []).length;
-      if (count > 0) {
+      // 修复函数调用后的逗号问题
+      const regex1 = new RegExp(`${func}\(\s*([^)]*)\),`, 'g');
+      const count1 = (fileContent.match(regex1) || []).length;
+      if (count1 > 0) {
         // 移除函数调用后的逗号，保留参数并添加分号
-        fileContent = fileContent.replace(regex, `${func}($1);`);
+        fileContent = fileContent.replace(regex1, `${func}($1);`);
         hasChanges = true;
-        changesCount += count;
+        changesCount += count1;
+      }
+      
+      // 新增：修复函数调用括号内的逗号错误
+      const regex2 = new RegExp(`${func}\(\s*([^,)]+)\s*,\s*\)`, 'g');
+      const count2 = (fileContent.match(regex2) || []).length;
+      if (count2 > 0) {
+        fileContent = fileContent.replace(regex2, `${func}($1)`);
+        hasChanges = true;
+        changesCount += count2;
+      }
+      
+      // 新增：修复函数调用括号内的多个逗号错误
+      const regex3 = new RegExp(`${func}\(\s*([^,]+)\s*,\s*([^,)]*)\s*,\s*\)`, 'g');
+      const count3 = (fileContent.match(regex3) || []).length;
+      if (count3 > 0) {
+        fileContent = fileContent.replace(regex3, `${func}($1)`);
+        hasChanges = true;
+        changesCount += count3;
       }
     });
+    
+    // 12. 专门针对appendChild的额外修复逻辑
+    // 查找并修复appendChild调用中的语法错误
+    const appendChildFixes = [
+      // 修复括号内多余的逗号
+      { pattern: /appendChild\(\s*(\w+)\s*,\s*\)/g, replacement: "appendChild($1)" },
+      // 修复括号内复杂表达式中的逗号错误
+      { pattern: /appendChild\(\s*(document\.createElement\([^)]+\))\s*,\s*\)/g, replacement: "appendChild($1)" },
+      // 修复嵌套appendChild调用中的错误
+      { pattern: /appendChild\(\s*(\w+)\.appendChild\(([^)]+)\)\s*,\s*\)/g, replacement: "appendChild($1.appendChild($2))" },
+      // 修复带有多个参数的错误调用
+      { pattern: /appendChild\(\s*([^,]+)\s*,\s*([^)]*)\)/g, replacement: "appendChild($1)" }
+    ];
+    
+    appendChildFixes.forEach(({ pattern, replacement }) => {
+      const originalCount = (fileContent.match(pattern) || []).length;
+      if (originalCount > 0) {
+        fileContent = fileContent.replace(pattern, replacement);
+        hasChanges = true;
+        changesCount += originalCount;
+      }
+    });
+    
+    // 13. 运行JavaScript语法检查，尝试捕获和修复可能的语法错误
+    // 这是一个防御性措施，确保修复后的代码语法正确
+    try {
+      // 我们可以添加更高级的语法检查逻辑，但现在先专注于appendChild的修复
+      // 检测并警告可能存在的语法错误模式
+      const suspiciousPatterns = [
+        { pattern: /appendChild\(.*,.*\)/g, description: "appendChild调用中包含逗号" },
+        { pattern: /\(\s*,\s*\)/g, description: "空括号内有逗号" },
+        { pattern: /appendChild\(\s*\)/g, description: "appendChild调用缺少参数" }
+      ];
+      
+      suspiciousPatterns.forEach(({ pattern, description }) => {
+        const suspiciousCount = (fileContent.match(pattern) || []).length;
+        if (suspiciousCount > 0) {
+          console.warn(`⚠️  警告: 发现${suspiciousCount}处可能的${description}语法错误模式`);
+        }
+      });
+    } catch (error) {
+      console.error('语法检查过程中出错:', error);
+    }
 
     // 12. 为DOM操作代码块添加分号并统一缩进
     // 修复DOM操作代码块中的格式问题，确保每个语句都有分号

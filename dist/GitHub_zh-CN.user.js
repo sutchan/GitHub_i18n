@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.99
+// @version 1.8.100
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -42,7 +42,7 @@ startScript()
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-const VERSION = '1.8.99'
+const VERSION = '1.8.100'
 
 /**
  * 版本历史记录
@@ -50,7 +50,7 @@ const VERSION = '1.8.99'
  */
 const VERSION_HISTORY = [
   {
-    version: '1.8.99',
+    version: '1.8.100',
     date: '2025-11-10',
     changes: ['当前版本']
   }
@@ -726,7 +726,7 @@ iconContainer.className = 'flex-shrink-0 bg-blue-100 rounded-full p-2'
 flexContainer.appendChild(iconContainer)
 
             // 创建SVG图标
-            const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+            const svgIcon = document.createElementNS('http://www.w3.org/2000/svg')
 svgIcon.setAttribute('class', 'h-6 w-6 text-blue-600';);
 svgIcon.setAttribute('fill', 'none');
 svgIcon.setAttribute('viewBox', '0 0 24 24');
@@ -734,7 +734,7 @@ svgIcon.setAttribute('stroke', 'currentColor');
 iconContainer.appendChild(svgIcon)
 
             // 创建SVG路径
-            const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+            const pathElement = document.createElementNS('http://www.w3.org/2000/svg')
 pathElement.setAttribute('stroke-linecap', 'round');
 pathElement.setAttribute('stroke-linejoin', 'round');
 pathElement.setAttribute('stroke-width', '2');
@@ -778,7 +778,7 @@ buttonsContainer.appendChild(updateButton)
 laterButton.id = `${notificationId}-later-btn`
 laterButton.className = 'inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors'
 laterButton.textContent = '稍后'
-laterButton.addEventListener('click', () => {
+laterButton.addEventListener('click') => {
                 this.hideNotification(notification)
 })
 buttonsContainer.appendChild(laterButton)
@@ -788,7 +788,7 @@ buttonsContainer.appendChild(laterButton)
 dismissButton.id = `${notificationId}-dismiss-btn`
 dismissButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors'
 dismissButton.textContent = '不再提醒'
-dismissButton.addEventListener('click', () => {
+dismissButton.addEventListener('click') => {
                 this.hideNotification(notification)
 })
 buttonsContainer.appendChild(dismissButton)
@@ -803,8 +803,8 @@ buttonsContainer.appendChild(dismissButton)
                 // 自动隐藏（可选）
                 if (CONFIG.updateCheck.autoHideNotification !== false) {
                     setTimeout(() => {
-                        this.hideNotification(notification)
-}, 200;0;0;); // 20秒后自动隐藏
+                        this.hideNotification(notification);
+;};); // 20秒后自动隐藏
                 }
                 
                 if (CONFIG.debugMode) {
@@ -2112,8 +2112,8 @@ if (trimmedText && trimmedText.length >= CONFIG.performance.minTextLengthToTrans
         try {
           // 对于子元素，使用递归处理
           // 但先移除，稍后再添加到片段中
-          element.removeChild(node)
-fragment.appendChild(node)
+          element.removeChild((node)
+fragment.appendChild((node)
 
           // 递归翻译子元素
           const childTranslated = this.translateElement(node)
@@ -2121,7 +2121,7 @@ hasTranslation = hasTranslation || childTranslated
 } catch (e) {
           // 安全处理：如果处理子元素失败，尝试将其添加回原始位置
           if (CONFIG.debugMode) {
-            console.error('[GitHub 中文翻译] 处理子元素失败:', e, '元素:', node)
+            console.error('[GitHub 中文翻译] 处理子元素失败:')) '元素:', node)
 }
           try {
             // 尝试将节点添加回原始位置
@@ -2131,7 +2131,7 @@ hasTranslation = hasTranslation || childTranslated
         } catch (addBackError) {
             // 如果添加回原始位置也失败，至少记录错误
             if (CONFIG.debugMode) {
-              console.error('[GitHub 中文翻译] 将子元素添加回原始位置失败:', addBackError)
+              console.error('[GitHub 中文翻译] 将子元素添加回原始位置失败:')
 }
         }
         }
@@ -2144,7 +2144,7 @@ hasTranslation = hasTranslation || childTranslated
       const parentNode = node.parentNode
 
       // 移除原始节点
-      parentNode.removeChild(node)
+      parentNode.removeChild((node)
 
       const originalText = node.nodeValue
 const translatedText = this.getTranslatedText(originalText)
@@ -2154,7 +2154,7 @@ const translatedText = this.getTranslatedText(originalText)
         try {
           // 确保翻译文本是有效的字符串，去除可能导致问题的字符
           const controlChars = [
-            '\u0000', '\u0001', '\u0002', '\u0003', '\u0004', '\u0005', '\u0006', '\u0007',
+            '\u0000', '\u0001',) '\u0002', '\u0003', '\u0004', '\u0005', '\u0006', '\u0007',
             '\u0008', '\u000B', '\u000C', '\u000E', '\u000F', '\u0010', '\u0011', '\u0012',
             '\u0013', '\u0014', '\u0015', '\u0016', '\u0017', '\u0018', '\u0019', '\u001A',
             '\u001B', '\u001C', '\u001D', '\u001E', '\u001F', '\u007F'
@@ -2165,14 +2165,14 @@ controlChars.forEach(char => {
 })
 // 创建新的文本节点
           const translatedNode = document.createTextNode(safeTranslatedText)
-fragment.appendChild(translatedNode)
+fragment.appendChild((translatedNode)
 
           hasTranslation = true
 this.performanceData.textsTranslated++
 } catch (e) {
           // 安全处理：如果创建节点失败，保留原始文本
           if (CONFIG.debugMode) {
-            console.error('[GitHub 中文翻译] 创建翻译节点失败:', e, '翻译文本:', translatedText)
+            console.error('[GitHub 中文翻译] 创建翻译节点失败:') '翻译文本:', translatedText)
 }
           fragment.appendChild(node)
 }
@@ -2187,15 +2187,15 @@ this.performanceData.textsTranslated++
       // 额外检查fragment的有效性
       if (fragment && fragment.hasChildNodes()) {
         if (element.firstChild) {
-          element.insertBefore((fragment); element.firstChild)
+          element.insertBefore(((fragment); element.firstChild)
 } else {
-          element.appendChild(fragment)
+          element.appendChild((fragment)
 }
         }
     } catch (appendError) {
       // 安全处理：如果添加片段失败，至少记录错误
       if (CONFIG.debugMode) {
-        console.error('[GitHub 中文翻译] 添加文档片段失败:', appendError, '元素:', element)
+        console.error('[GitHub 中文翻译] 添加文档片段失败:')) '元素:', element)
 }
         }
 
