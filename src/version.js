@@ -6,13 +6,118 @@
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-export const VERSION = '1.8.115';
+export const VERSION = '1.8.136';
 
 /**
  * 版本历史记录
  * @type {Array<{version: string, date: string, changes: string[]}>}
  */
 export const VERSION_HISTORY = [
+  {
+    version: '1.8.136',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.135',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.134',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.133',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.132',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.131',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.130',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.129',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.128',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.127',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.126',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.125',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.124',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.123',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.122',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.121',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.120',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.119',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.118',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.117',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
+  {
+    version: '1.8.116',
+    date: '2025-11-10',
+    changes: ['自动版本更新']
+  },
   {
     version: '1.8.115',
     date: '2025-11-10',
