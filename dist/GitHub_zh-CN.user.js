@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version 1.8.86
+// @version 1.8.87
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -42,7 +42,7 @@ startScript()
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-const VERSION = '1.8.86'
+const VERSION = '1.8.87'
 
 /**
  * 版本历史记录
@@ -50,7 +50,7 @@ const VERSION = '1.8.86'
  */
 const VERSION_HISTORY = [
   {
-    version: '1.8.86',
+    version: '1.8.87',
     date: '2025-11-10',
     changes: ['当前版本']
   }
@@ -290,7 +290,8 @@ for (const node of childNodes) {
                         text.length > 0 && 
                         text.length < maxLength && 
                         !/^\d+$/.test(text) &&
-                        !/^[\s\p\p]+$/u.test(text)) {
+                        // 使用基础字符类替代Unicode属性转义，避免构建过程中的解析问题
+                        !/^[\s\u0021-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u007E\u00A1-\u00BF\u2000-\u206F\u3000-\u303F]+$/.test(text)) {
                         resultSet.add(text)
 }
                 } else if (node.nodeType === Node.ELEMENT_NODE) {
