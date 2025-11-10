@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.93
+ * @version 1.8.99
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -495,18 +495,19 @@ class BuildManager {
     });
 
     // 8. 针对版本比较函数的特殊修复，确保其语法正确
-    // 检查并修复isNewerVersion函数中的语法错误
-    const versionFunctionMatch = fileContent.match(/function isNewerVersion\([^)]*\)\s*{[^}]*}/);
+    // 检查并修复isNewerVersion函数/方法中的语法错误
+    const versionFunctionPattern = /isNewerVersion\([^)]*\)\s*{[^}]*}/;
+    const versionFunctionMatch = fileContent.match(versionFunctionPattern);
+
     if (versionFunctionMatch) {
       const versionFunction = versionFunctionMatch[0];
-      // 修复版本比较函数中的语法错误
-      const fixedFunction = versionFunction
-        .replace(/function isNewerVersion\([^)]*\)/, 'function isNewerVersion(newVersion, currentVersion)') // 修复参数
-        .replace(/\s*,\s*\)/g, ')') // 移除参数列表末尾的逗号
-        .replace(/\{\s*,/g, '{')     // 移除代码块开始处的逗号
-        .replace(/,\s*\}/g, '}')     // 移除代码块结束前的逗号
-        .replace(/const newParts = newVersion\.split\(\'\.\'\)\.map\(Number\)/g, '        const newParts = newVersion.split(\'.\').map(Number);') // 修复缩进和添加分号
-        .replace(/const currentParts = currentVersion\.split\(\'\.\'\)\.map\(Number\)/g, '        const currentParts = currentVersion.split(\'.\').map(Number);'); // 修复缩进和添加分号
+
+      // 修复参数列表和变量声明
+      let fixedFunction = versionFunction
+        .replace(/isNewerVersion\([^)]*\)/, 'isNewerVersion(newVersion, currentVersion)')
+        .replace(/\s*,\s*\)/g, ')')
+        .replace(/const newParts = newVersion\.split\(["']\.["']\)\.map\(Number\)/g, '        const newParts = newVersion.split(\'.\').map(Number);')
+        .replace(/const currentParts = currentVersion\.split\(["']\.["']\)\.map\(Number\)/g, '        const currentParts = currentVersion.split(\'.\').map(Number);');
 
       if (fixedFunction !== versionFunction) {
         fileContent = fileContent.replace(versionFunction, fixedFunction);
@@ -515,7 +516,27 @@ class BuildManager {
       }
     }
 
-    // 9. 修复事件监听器中的$1参数问题
+    // 9. 修复hideNotification方法，确保使用notificationId参数
+    const hideNotificationPattern = /hideNotification\([^)]*\)\s*{[^}]*}/;
+    const hideNotificationMatch = fileContent.match(hideNotificationPattern);
+
+    if (hideNotificationMatch) {
+      const hideNotificationMethod = hideNotificationMatch[0];
+
+      // 替换参数为notificationId并添加通过ID查找元素的逻辑
+      let fixedMethod = hideNotificationMethod
+        .replace(/hideNotification\([^)]*\)/, 'hideNotification(notificationId, permanently = false)')
+        .replace(/@param notification -/g, '@param notificationId -')
+        .replace(/\{\s*try\s*{/, '{\n        try {\n            // 通过ID查找通知元素\n            const notification = document.getElementById(notificationId);\n            if (!notification) return;');
+
+      if (fixedMethod !== hideNotificationMethod) {
+        fileContent = fileContent.replace(hideNotificationMethod, fixedMethod);
+        hasChanges = true;
+        changesCount++;
+      }
+    }
+
+    // 10. 修复事件监听器中的$1参数问题
     const eventListenerFixes = [
       { pattern: /\(this\.hideNotification\(\$1\)\)/g, replacement: '(this.hideNotification(notificationId))' },
       { pattern: /hideNotification\(\$1\)/g, replacement: 'hideNotification(notificationId)' }
