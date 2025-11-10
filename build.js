@@ -363,6 +363,117 @@ class BuildManager {
   }
 
   /**
+   * 修复构建产物中的问题
+   * 主要处理：
+   * 1. 修复字符串模板语法错误 ($ 替换为 ${})
+   * 2. 移除重复的注释
+   * 3. 修复变量引用问题
+   * 4. 修复函数调用格式问题
+   */
+  fixBuildOutput(outputFilePath) {
+    console.log('🔧 开始修复构建产物中的问题...');
+    
+    let fileContent = fs.readFileSync(outputFilePath, 'utf8');
+    let hasChanges = false;
+    let changesCount = 0;
+    
+    // 1. 修复字符串模板语法错误
+    const templateFixes = [
+        { pattern: /已经通知过版本 \$的更新/, replacement: "已经通知过版本 ${newVersion}的更新" },
+        { pattern: /发现新版本 \$，/, replacement: "发现新版本 ${newVersion}，" },
+        { pattern: /显示更新通知: 版本 \$/, replacement: "显示更新通知: 版本 ${newVersion}" },
+        { pattern: /已缓存新版本号: \$\(缓存时间:/, replacement: "已缓存新版本号: ${newVersion}(缓存时间:" }
+    ];
+    
+    templateFixes.forEach(({ pattern, replacement }) => {
+        const originalCount = (fileContent.match(pattern) || []).length;
+        if (originalCount > 0) {
+            fileContent = fileContent.replace(pattern, replacement);
+            hasChanges = true;
+            changesCount += originalCount;
+        }
+    });
+    
+    // 2. 修复按钮ID中的$符号
+    const buttonIdFixes = [
+        { pattern: /id = `\$-update-btn`/, replacement: "id = `notificationId-update-btn`" },
+        { pattern: /id = `\$-later-btn`/, replacement: "id = `notificationId-later-btn`" },
+        { pattern: /id = `\$-dismiss-btn`/, replacement: "id = `notificationId-dismiss-btn`" }
+    ];
+    
+    buttonIdFixes.forEach(({ pattern, replacement }) => {
+        const originalCount = (fileContent.match(pattern) || []).length;
+        if (originalCount > 0) {
+            fileContent = fileContent.replace(pattern, replacement);
+            hasChanges = true;
+            changesCount += originalCount;
+        }
+    });
+    
+    // 3. 移除重复的注释
+    const duplicateComments = [
+        { pattern: /\/\*\*\s*翻译词典合并模块\s*\*\/\s*\/\*\*/, replacement: "/*" },
+        { pattern: /\/\*\*\s*GitHub 中文翻译主入口文件\s*\*\/\s*\/\*\*/, replacement: "/*" }
+    ];
+    
+    duplicateComments.forEach(({ pattern, replacement }) => {
+        const originalCount = (fileContent.match(pattern) || []).length;
+        if (originalCount > 0) {
+            fileContent = fileContent.replace(pattern, replacement);
+            hasChanges = true;
+            changesCount += originalCount;
+        }
+    });
+    
+    // 4. 修复函数调用末尾多余的大括号和格式问题
+    const functionCallFixes = [
+        { pattern: /if \(!response\.ok\) \{\s*throw new Error\(`HTTP错误! 状态码: \${response\.status}`\)\s*\}\s*\}/g, 
+          replacement: "if (!response.ok) {\n                    throw new Error(`HTTP错误! 状态码: ${response.status}`)\n                }" },
+        { pattern: /if \(attempt === maxRetries\) \{\s*throw error\s*\}\s*\}/g, 
+          replacement: "if (attempt === maxRetries) {\n                    throw error\n                }" },
+        { pattern: /if \(match && match\[1\]\) \{\s*return match\[1\]\s*\}\s*\}/g, 
+          replacement: "if (match && match[1]) {\n                return match[1]\n            }" },
+        { pattern: /if \(newPart > currentPart\) \{\s*return true\s*\}\s*\}/g, 
+          replacement: "if (newPart > currentPart) {\n                return true\n            }" },
+        { pattern: /\}\s*\}/g, replacement: "\}\n        }" },
+    ];
+    
+    functionCallFixes.forEach(({ pattern, replacement }) => {
+        const originalCount = (fileContent.match(pattern) || []).length;
+        if (originalCount > 0) {
+            fileContent = fileContent.replace(pattern, replacement);
+            hasChanges = true;
+            changesCount += originalCount;
+        }
+    });
+    
+    // 5. 修复对象赋值后的多余分号和空格
+    const extraSemicolonCount = (fileContent.match(/\}\s*\s*;/g) || []).length;
+    if (extraSemicolonCount > 0) {
+        fileContent = fileContent.replace(/\}\s*\s*;/g, '};');
+        hasChanges = true;
+        changesCount += extraSemicolonCount;
+    }
+    
+    // 6. 移除可能的BOM字符
+    if (fileContent.charCodeAt(0) === 0xFEFF) {
+        fileContent = fileContent.substring(1);
+        hasChanges = true;
+        changesCount++;
+    }
+    
+    if (hasChanges) {
+        // 保存修复后的文件
+        fs.writeFileSync(outputFilePath, fileContent, 'utf8');
+        console.log(`✅ 构建产物修复完成，共进行了 ${changesCount} 处修改`);
+    } else {
+        console.log('✅ 构建产物无需修复，没有发现问题');
+    }
+    
+    return hasChanges;
+  }
+  
+  /**
    * 构建用户脚本
    */
   buildUserScript() {
@@ -391,6 +502,9 @@ class BuildManager {
       // 写入到输出文件
       fs.writeFileSync(this.outputFile, mergedCode, 'utf8');
       console.log(`✅ 已生成: ${path.relative(this.projectRoot, this.outputFile)}`);
+      
+      // 修复构建产物中的问题
+      this.fixBuildOutput(this.outputFile);
 
       return true;
     } catch (error) {

@@ -108,7 +108,7 @@ timerId = setTimeout(() => later(lastThis, lastArgs), limit)
             
             return result
 }
-},
+        },
     
     /**
      * 防抖函数，延迟执行函数直到停止触发一段时间
@@ -141,7 +141,7 @@ timeout = setTimeout(() => later(context, args), delay)
             
             return result
 }
-},
+        },
     
     /**
      * 延迟函数，返回Promise的setTimeout
@@ -174,7 +174,7 @@ timeout = setTimeout(() => later(context, args), delay)
             console.warn('[GitHub 中文翻译] JSON解析失败:', error)
 return defaultValue
 }
-    },
+        },
     
     /**
      * 安全地序列化对象为JSON字符串
@@ -189,7 +189,7 @@ return defaultValue
             console.warn('[GitHub 中文翻译] JSON序列化失败:', error)
 return defaultValue
 }
-    },
+        },
     
     /**
      * 获取当前页面路径
@@ -282,15 +282,15 @@ for (const node of childNodes) {
                         !/^[\s\u0021-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u007E\u00A1-\u00BF\u2000-\u206F\u3000-\u303F]+$/.test(text)) {
                         resultSet.add(text)
 }
-                } else if (node.nodeType === Node.ELEMENT_NODE) {
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
                     // 递归收集子元素的文本
                     this.collectTextNodes(node, resultSet, options)
 }
-            }
+        }
         } catch (error) {
             console.error('[GitHub 中文翻译] 收集文本节点时出错:', error)
 }
-    },
+        },
     
     /**
      * 安全地访问对象属性，避免嵌套属性访问出错
@@ -315,7 +315,7 @@ let result = obj
 } catch (error) {
             return defaultValue
 }
-    },
+        },
     
     /**
      * 深拷贝对象
@@ -333,14 +333,14 @@ for (const key in obj) {
                     if (Object.prototype.hasOwnProperty.call(obj, key)) {
                         clonedObj[key] = this.deepClone(obj[key])
 }
-                }
+        }
                 return clonedObj
 }
         } catch (error) {
             console.warn('[GitHub 中文翻译] 深拷贝失败:', error)
 return obj
 }
-    },
+        },
     
     /**
      * 安全地执行函数，捕获可能的异常
@@ -360,10 +360,10 @@ return obj
             console.error('[GitHub 中文翻译] 安全执行函数失败:', error)
 return defaultValue
 }
-    }
+        }
 }
 
-﻿/**
+/**
  * GitHub 中文翻译配置文件
  * 包含脚本所有可配置项
  */
@@ -390,7 +390,7 @@ if (versionMatch) {
     // 出错时返回配置中的版本号
     return VERSION
 }
-}
+        }
 
 /**
  * 配置对象，包含所有可配置项
@@ -486,7 +486,7 @@ const CONFIG = {
     "stars": /\/stars/,
     "trending": /\/trending/
   }
-}
+        }
 
 /**
  * 版本更新检查模块
@@ -575,7 +575,7 @@ if (CONFIG.debugMode) {
             
             return false
 }
-    },
+        },
     
     /**
      * 带重试机制的网络请求
@@ -653,8 +653,7 @@ const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
             const match = content.match(pattern)
 if (match && match[1]) {
                 return match[1]
-}
-        }
+            }
         
         return null
 },
@@ -702,7 +701,7 @@ const notificationVersionKey = 'githubZhLastNotifiedVersion'
         if (localStorage.getItem(notificationKey) === 'dismissed' || 
             lastNotifiedVersion === newVersion) {
             if (CONFIG.debugMode && lastNotifiedVersion === newVersion) {
-                console.log(`[GitHub 中文翻译] 已经通知过版本 $的更新`)
+                console.log(`[GitHub 中文翻译] 已经通知过版本 ${newVersion}的更新`)
 }
             return
 }
@@ -756,7 +755,7 @@ contentContainer.appendChild(titleElement)
             // 创建消息文本 - 安全地设置文本内容
             const messageElement = document.createElement('p')
 messageElement.className = 'text-sm text-blue-700 mt-1'
-messageElement.textContent = `发现新版本 $，建议更新以获得更好的翻译体验。`
+messageElement.textContent = `发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。`
 contentContainer.appendChild(messageElement)
 
             // 创建按钮容器
@@ -766,7 +765,7 @@ contentContainer.appendChild(buttonsContainer)
 
             // 创建更新按钮 - 安全地设置URL
             const updateButton = document.createElement('a')
-updateButton.id = `$-update-btn`
+updateButton.id = `notificationId-update-btn`
 updateButton.href = CONFIG.updateCheck.scriptUrl || '#'
 updateButton.target = '_blank'
 updateButton.rel = 'noopener noreferrer'
@@ -776,7 +775,7 @@ buttonsContainer.appendChild(updateButton)
 
             // 创建稍后按钮
             const laterButton = document.createElement('button')
-laterButton.id = `$-later-btn`
+laterButton.id = `notificationId-later-btn`
 laterButton.className = 'inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors'
 laterButton.textContent = '稍后'
 laterButton.addEventListener('click', () => {
@@ -786,7 +785,7 @@ buttonsContainer.appendChild(laterButton)
 
             // 创建不再提醒按钮
             const dismissButton = document.createElement('button')
-dismissButton.id = `$-dismiss-btn`
+dismissButton.id = `notificationId-dismiss-btn`
 dismissButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors'
 dismissButton.textContent = '不再提醒'
 dismissButton.addEventListener('click', () => {
@@ -809,13 +808,13 @@ buttonsContainer.appendChild(dismissButton)
                 }
                 
                 if (CONFIG.debugMode) {
-                    console.log(`[GitHub 中文翻译] 显示更新通知: 版本 $`)
+                    console.log(`[GitHub 中文翻译] 显示更新通知: 版本 ${newVersion}`)
 }
-            }
+        }
         } catch (error) {
             console.error('[GitHub 中文翻译] 创建更新通知失败:', error)
 }
-    },
+        },
     
     /**
      * 隐藏通知元素（带动画效果）
@@ -832,7 +831,7 @@ notification.style.opacity = '0'
                 if (notification.parentNode) {
                     notification.parentNode.removeChild(notification)
 }
-            }, 300)
+        }, 300)
 
             // 如果是永久隐藏，记录到localStorage
             if (permanently) {
@@ -840,11 +839,11 @@ notification.style.opacity = '0'
 if (CONFIG.debugMode) {
                     console.log('[GitHub 中文翻译] 更新通知已永久隐藏')
 }
-            }
+        }
         } catch (error) {
             console.error('[GitHub 中文翻译] 隐藏通知失败:', error)
 }
-    },
+        },
     
     /**
      * 记录版本历史
@@ -875,7 +874,7 @@ let history = utils.safeJSONParse(localStorage.getItem(historyKey), [])
 } catch (error) {
             // 忽略存储错误
         }
-    },
+        },
     
     /**
      * 更新本地存储中的版本号
@@ -892,7 +891,7 @@ let history = utils.safeJSONParse(localStorage.getItem(historyKey), [])
             localStorage.setItem('githubZhCachedVersion', utils.safeJSONStringify(cacheData))
 
             if (CONFIG.debugMode) {
-                console.log(`[GitHub 中文翻译] 已缓存新版本号: $(缓存时间: ${new Date().toLocaleString()})`)
+                console.log(`[GitHub 中文翻译] 已缓存新版本号: ${newVersion}(缓存时间: ${new Date().toLocaleString()})`)
 }
             
             return true
@@ -902,7 +901,7 @@ let history = utils.safeJSONParse(localStorage.getItem(historyKey), [])
 }
             return false
 }
-    },
+        },
     
     /**
      * 获取缓存的版本信息
@@ -915,7 +914,7 @@ return cachedData
 } catch (error) {
             return null
 }
-    },
+        },
     
     /**
      * 清除更新通知的忽略状态
@@ -937,7 +936,7 @@ localStorage.removeItem('githubZhLastNotifiedVersion')
 }
             return false
 }
-    }
+        }
 }
 
 /**
@@ -969,7 +968,8 @@ for (const module in translationModule) {
 /**
  * 通用翻译词典
  * 包含所有页面共用的翻译字符串
- */const commonDictionary = {
+ */
+const commonDictionary = {
   "common": {
     "search": "搜索",
     "new": "新建",
@@ -979,7 +979,7 @@ for (const module in translationModule) {
     "sign_in": "登录",
     "sign_up": "注册"
   }
-}
+        }
 
 /**
  * Codespaces 页面翻译词典
@@ -1351,7 +1351,7 @@ const translationCore = {
       batchSize: 60,
       enablePartialMatch: false
     }
-  },
+        },
 
   /**
    * 初始化词典
@@ -1367,7 +1367,7 @@ const translationCore = {
       console.timeEnd('[GitHub 中文翻译] 词典初始化')
 console.log(`[GitHub 中文翻译] 词典条目数量: ${Object.keys(this.dictionary).length}`)
 }
-  },
+        },
 
   /**
    * 检测当前页面模式
@@ -1389,7 +1389,7 @@ if (!isSubPage) {
               this.currentPageMode = mode
 return mode
 }
-          } else {
+        } else {
             this.currentPageMode = mode
 return mode
 }
@@ -1406,7 +1406,7 @@ return 'default'
       this.currentPageMode = 'default'
 return 'default'
 }
-  },
+        },
 
   /**
    * 获取当前页面模式的配置
@@ -1505,7 +1505,7 @@ reject(recoverError)
               this.logPerformanceData()
 reject(recoverError)
 }
-          })
+        })
 } catch (error) {
         if (CONFIG.debugMode) {
           console.error('[GitHub 中文翻译] 翻译过程中出错:', error)
@@ -1535,7 +1535,7 @@ reject(recoverError)
           this.logPerformanceData()
 reject(recoverError)
 }
-      }
+        }
     })
 },
 
@@ -1550,7 +1550,7 @@ reject(recoverError)
       cacheHits: 0,
       cacheMisses: 0
     }
-},
+        },
 
   /**
    * 记录性能数据
@@ -1562,7 +1562,7 @@ console.log(`[GitHub 中文翻译] 翻译完成 - 耗时: $ms, 处理元素: ${t
         `翻译文本: ${this.performanceData.textsTranslated}, 缓存命中: ${this.performanceData.cacheHits}, ` +
         `缓存未命中: ${this.performanceData.cacheMisses}`)
 }
-  },
+        },
 
   /**
    * 分批处理元素
@@ -1612,7 +1612,7 @@ const batch = validElements.slice(startIndex, endIndex)
               if (CONFIG.debugMode) {
                 console.error('[GitHub 中文翻译] 翻译元素时出错:', error, element)
 }
-            }
+        }
           })
 
           // 性能日志记录
@@ -1629,7 +1629,7 @@ console.log(`[GitHub 中文翻译] 翻译进度: $%, 已处理: $/${validElement
               // 使用requestAnimationFrame确保UI线程不被阻塞
               requestAnimationFrame(() => processBatch(endIndex))
 }
-          } else {
+        } else {
             // 所有批次处理完成
             resolve()
 }
@@ -1639,7 +1639,7 @@ console.log(`[GitHub 中文翻译] 翻译进度: $%, 已处理: $/${validElement
 }
           resolve(); // 即使出错也要完成Promise
         }
-      }
+        }
 
       // 开始处理第一批
       processBatch(0)
@@ -1673,19 +1673,19 @@ if (elements && elements.length > 0) {
               if (el && el instanceof HTMLElement) {
                 criticalElements.push(el)
 }
-            })
+        })
 
             if (CONFIG.debugMode) {
               console.log(`[GitHub 中文翻译] 找到关键元素: $, 数量: ${elements.length}`)
 }
-          }
+        }
         } catch (err) {
           if (CONFIG.debugMode) {
             console.warn(`[GitHub 中文翻译] 查询选择器失败: $`, err)
 }
           // 继续处理其他选择器
         }
-      })
+        })
 
       // 如果没有找到任何关键元素，直接返回
       if (criticalElements.length === 0) {
@@ -1750,7 +1750,7 @@ if (CONFIG.debugMode && CONFIG.performance.logTiming) {
 }
         // 合并查询失败，回退到逐个查询
       }
-    }
+        }
 
     // 逐个查询选择器
     allSelectors.forEach(selector => {
@@ -1766,7 +1766,7 @@ Array.from(matchedElements).forEach(element => {
         if (CONFIG.debugMode) {
           console.warn(`[GitHub 中文翻译] 选择器 "$" 解析失败:`, error)
 }
-      }
+        }
     })
 
     // 过滤无效元素
@@ -1856,7 +1856,7 @@ if (className) {
       if (skipClassPatterns.some(pattern => pattern.test(className))) {
         return false
 }
-    }
+        }
 
     // 检查ID - 通常技术/数据相关ID不翻译
     const id = element.id
@@ -2038,7 +2038,7 @@ if (id) {
       if (skipIdPatterns.some(pattern => pattern.test(id))) {
         return false
 }
-    }
+        }
 
     // 检查元素是否隐藏
     const computedStyle = window.getComputedStyle(element)
@@ -2105,7 +2105,7 @@ const textNodesToProcess = []
 if (trimmedText && trimmedText.length >= CONFIG.performance.minTextLengthToTranslate) {
           textNodesToProcess.push(node)
 }
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
         try {
           // 对于子元素，使用递归处理
           // 但先移除，稍后再添加到片段中
@@ -2125,14 +2125,14 @@ hasTranslation = hasTranslation || childTranslated
             if (!node.parentNode) {
               element.appendChild(node)
 }
-          } catch (addBackError) {
+        } catch (addBackError) {
             // 如果添加回原始位置也失败，至少记录错误
             if (CONFIG.debugMode) {
               console.error('[GitHub 中文翻译] 将子元素添加回原始位置失败:', addBackError)
 }
-          }
         }
-      }
+        }
+        }
     }
 
     // 处理所有文本节点
@@ -2173,11 +2173,11 @@ this.performanceData.textsTranslated++
 }
           fragment.appendChild(node)
 }
-      } else {
+        } else {
         // 没有翻译，保留原始节点
         fragment.appendChild(node)
 }
-    })
+        })
 
     // 将处理后的片段重新添加到原始位置
     try {
@@ -2188,13 +2188,13 @@ this.performanceData.textsTranslated++
 } else {
           element.appendChild(fragment)
 }
-      }
+        }
     } catch (appendError) {
       // 安全处理：如果添加片段失败，至少记录错误
       if (CONFIG.debugMode) {
         console.error('[GitHub 中文翻译] 添加文档片段失败:', appendError, '元素:', element)
 }
-    }
+        }
 
     // 标记为已翻译
     if (hasTranslation) {
@@ -2246,7 +2246,7 @@ return this.translationCache.get(normalizedText)
       if (!translation.startsWith('待翻译: ')) {
         result = translation
 }
-    }
+        }
 
     // 2. 尝试不区分大小写的匹配（仅当文本长度小于某个阈值）
     if (result === null && normalizedText.length <= 100) { // 避免对过长文本进行大小写转换
@@ -2258,12 +2258,12 @@ const upperCaseText = normalizedText.toUpperCase()
 if (!translation.startsWith('待翻译: ')) {
           result = translation
 }
-      } else if (this.dictionary[upperCaseText]) {
+        } else if (this.dictionary[upperCaseText]) {
         const translation = this.dictionary[upperCaseText]
 if (!translation.startsWith('待翻译: ')) {
           result = translation
 }
-      }
+        }
     }
 
     // 3. 如果启用了部分匹配且尚未找到结果
@@ -2287,7 +2287,7 @@ const enablePartialMatch = modeConfig.enablePartialMatch !== undefined ?
       if (result !== null) {
         this.translationCache.set(normalizedText, result)
 }
-    }
+        }
 
     return result
 },
@@ -2351,7 +2351,7 @@ const wordMatches = text.match(wordRegex)
             regex: new RegExp(utils.escapeRegExp(key), 'g')
           })
 }
-      }
+        }
     }
 
     // 如果没有匹配项，返回null
@@ -2384,7 +2384,7 @@ const newResult = result.replace(match.regex, match.value)
         result = newResult
 hasReplaced = true
 }
-    }
+        }
 
     // 返回替换后的文本或null
     return hasReplaced ? result : null
@@ -2452,7 +2452,7 @@ this.translationCache.clear()
         if (value !== null && typeof value === 'string') {
           this.translationCache.set(key, value)
 }
-      })
+        })
 
       if (CONFIG.debugMode) {
         const removedCount = oldSize - this.translationCache.size
@@ -2480,15 +2480,14 @@ cacheEntries.sort(([keyA], [keyB]) => keyB.length - keyA.length)
         for (let i = 0; i < entriesToRemove && i < cacheEntries.length; i++) {
           this.translationCache.delete(cacheEntries[i][0])
 }
-
-      } catch (fallbackError) {
+        } catch (fallbackError) {
         // 最后手段：如果所有清理方法都失败，直接清空缓存
         if (CONFIG.debugMode) {
           console.error('[GitHub 中文翻译] 回退策略也失败，清空整个缓存:', fallbackError)
 }
         this.translationCache.clear()
 }
-    }
+        }
   },
 
   /**
@@ -2506,7 +2505,7 @@ translatedElements.forEach(element => {
     if (CONFIG.debugMode) {
       console.log('[GitHub 中文翻译] 翻译缓存已清除，已移除所有翻译标记')
 }
-  },
+        },
 
   /**
    * 预热词典缓存
@@ -2531,10 +2530,10 @@ this.translationCache.set(key, value)
       if (CONFIG.debugMode) {
         console.log(`[GitHub 中文翻译] 缓存预热完成，已预加载${commonKeys.length}个常用词条`)
 }
-    } catch (error) {
+        } catch (error) {
       console.error('[GitHub 中文翻译] 缓存预热失败:', error)
 }
-  },
+        },
 
   /**
    * 更新词典
@@ -2555,10 +2554,10 @@ this.translationCache.set(key, value)
       if (CONFIG.debugMode) {
         console.log(`[GitHub 中文翻译] 词典已更新，新增/修改${Object.keys(newDictionary).length}个条目`)
 }
-    } catch (error) {
+        } catch (error) {
       console.error('[GitHub 中文翻译] 更新词典失败:', error)
 }
-  }
+        }
 }
 
 /**
@@ -2600,7 +2599,7 @@ const pageMonitor = {
         } catch (error) {
             console.error('[GitHub 中文翻译] 页面监控初始化失败:', error)
 }
-    },
+        },
     
     /**
      * 设置路径变化监听
@@ -2631,7 +2630,7 @@ pageMonitor.handlePathChange()
             originalReplaceState.apply(this, args)
 pageMonitor.handlePathChange()
 }
-},
+        },
     
     /**
      * 处理路径变化
@@ -2652,7 +2651,7 @@ this.lastPath = currentPath
 } catch (error) {
             console.error('[GitHub 中文翻译] 路径变化处理失败:', error)
 }
-    },
+        },
     
     /**
      * 带节流的翻译方法
@@ -2702,7 +2701,7 @@ this.delayedTranslate(0)
         } catch (error) {
             this.handleError('translateWithThrottle', error)
 }
-    },
+        },
     
     /**
      * 延迟执行翻译
@@ -2735,13 +2734,13 @@ this.delayedTranslate(0)
 if (CONFIG.debugMode) {
                     console.log(`[GitHub 中文翻译] 已翻译关键区域: ${keyAreas.length} 个`)
 }
-            } else {
+        } else {
                 // 翻译整个页面
                 await translationCore.translate(null, performanceConfig)
 if (CONFIG.debugMode) {
                     console.log('[GitHub 中文翻译] 已翻译整个页面')
 }
-            }
+        }
             
             // 记录完成时间
             if (CONFIG.debugMode && CONFIG.performance?.logTiming) {
@@ -2750,7 +2749,7 @@ if (CONFIG.debugMode) {
         } catch (error) {
             return this.handleTranslationError(error)
 }
-    },
+        },
     
     /**
      * 批处理元素翻译
@@ -2769,7 +2768,7 @@ if (CONFIG.debugMode) {
             const batch = elements.slice(i, i + batchSize)
 await translationCore.translate(batch, performanceConfig)
 }
-    },
+        },
     
     /**
      * 处理翻译错误
@@ -2785,7 +2784,7 @@ await translationCore.translate(batch, performanceConfig)
 if (CONFIG.debugMode) {
                     console.log('[GitHub 中文翻译] 已尝试最小化翻译恢复')
 }
-            } catch (recoverError) {
+        } catch (recoverError) {
                 this.handleError('错误恢复', recoverError)
 }
         }
@@ -2815,7 +2814,7 @@ if (CONFIG.debugMode) {
             setTimeout(() => this.restart(), 1000)
 this.errorCount = 0
 }
-    },
+        },
     
     /**
      * 识别当前页面的关键翻译区域
@@ -2884,10 +2883,10 @@ if (element) {
                     if (this.shouldTriggerTranslation(mutations, pageMode)) {
                         this.translateWithThrottle()
 }
-                } catch (error) {
+        } catch (error) {
                     console.error('[GitHub 中文翻译] 处理DOM变化时出错:', error)
 }
-            }
+        }
 
             this.observer = new MutationObserver(utils.debounce(handleMutations, CONFIG.debounceDelay))
 
@@ -2897,7 +2896,7 @@ if (element) {
 if (CONFIG.debugMode) {
                     console.log('[GitHub 中文翻译] DOM观察器已启动，观察范围:', rootNode.tagName + (rootNode.id ? '#' + rootNode.id : ''))
 }
-            } else {
+        } else {
                 console.error('[GitHub 中文翻译] 无法找到合适的观察节点，回退到body')
 // 尝试延迟启动
                 setTimeout(() => this.setupDomObserver(), 500)
@@ -2907,7 +2906,7 @@ if (CONFIG.debugMode) {
 // 降级方案
             this.setupFallbackMonitoring()
 }
-    },
+        },
     
     /**
      * 选择最佳的DOM观察根节点
@@ -3156,7 +3155,7 @@ case 'search':
 default:
                 return false
 }
-    },
+        },
     
     /**
      * 智能判断是否需要触发翻译
@@ -3228,7 +3227,7 @@ elementCheckCache.set(`important-${mutation.target}`, isImportant)
                     if (isImportant) {
                         return true
 }
-                }
+        }
                 
                 // 检查重要属性变化
                 if (mutation.type === 'attributes') {
@@ -3238,7 +3237,7 @@ elementCheckCache.set(`important-${mutation.target}`, isImportant)
                         if (importantChanges >= 3) {
                             return true
 }
-                    }
+        }
                     continue; // 属性变化检查完毕，继续下一个mutation
                 }
                 
@@ -3250,7 +3249,7 @@ elementCheckCache.set(`important-${mutation.target}`, isImportant)
                     if (contentChanges >= 5) {
                         return true
 }
-                }
+        }
             }
             
             // 计算加权变化比例
@@ -3266,7 +3265,7 @@ const totalChangesChecked = maxCheckCount
             console.error('[GitHub 中文翻译] 判断翻译触发条件时出错:', error)
 return false
 }
-    },
+        },
     
     /**
      * 判断元素是否为重要元素
@@ -3296,7 +3295,7 @@ return false
 } catch (e) {
                     return false; // 选择器无效时跳过
                 }
-            })
+        })
 
             // 页面模式特定的额外检查
             if (!isImportant && pageMode) {
@@ -3319,7 +3318,7 @@ case 'codespaces':
                         isImportant = element.classList.contains('codespace-status')
 break
 }
-            }
+        }
             
             // 存储到缓存
             if (cache) {
@@ -3331,7 +3330,7 @@ break
             console.error('[GitHub 中文翻译] 判断重要元素时出错:', error)
 return false
 }
-    },
+        },
     
     /**
      * 判断是否应该忽略元素的变化
@@ -3368,7 +3367,7 @@ return false
 } catch (e) {
                     return false; // 选择器无效时跳过
                 }
-            })
+        })
 
             // 页面模式特定的忽略规则
             if (!shouldIgnore && pageMode) {
@@ -3391,7 +3390,7 @@ case 'search':
 }
                         break
 }
-            }
+        }
             
             // 存储到缓存
             if (cache) {
@@ -3403,7 +3402,7 @@ case 'search':
             console.error('[GitHub 中文翻译] 判断忽略元素时出错:', error)
 return false
 }
-    },
+        },
     
     /**
      * 判断是否为内容相关的DOM变化
@@ -3474,7 +3473,7 @@ case 'search':
                                     return element.classList.contains('search-result') || 
                                            element.classList.contains('search-match')
 }
-                        }
+        }
                         
                         // 默认接受其他元素
                         return true
@@ -3488,7 +3487,7 @@ case 'search':
             console.error('[GitHub 中文翻译] 判断内容相关变化时出错:', error)
 return false
 }
-    },
+        },
     
     /**
      * 判断节点是否需要翻译
@@ -3597,7 +3596,7 @@ return ['p', 'span', 'a', 'button', 'label'].includes(tagName) &&
             default:
                 return defaultThresholds
 }
-    },
+        },
     
     /**
      * 检测重要的DOM变化
@@ -3638,13 +3637,13 @@ return ['p', 'span', 'a', 'button', 'label'].includes(tagName) &&
 if (trimmedText.length >= textThreshold.minLength) {
                             return true
 }
-                    }
+        }
                     // 重要属性变化检查
                     if (mutation.type === 'attributes' && 
                         importantAttributes.includes(mutation.attributeName)) {
                         return true
 }
-                }
+        }
             }
             
             // 检查是否有实际内容变化
@@ -3742,7 +3741,7 @@ return trimmedText.length >= textThreshold.minLength
             console.error('[GitHub 中文翻译] 检测重要变化时出错:', error)
 return false
 }
-    },
+        },
     
     /**
      * 停止监控
@@ -3764,7 +3763,7 @@ this.lastTranslateTimestamp = 0
         } catch (error) {
             console.error('[GitHub 中文翻译] 停止监控时出错:', error)
 }
-    },
+        },
     
     /**
      * 重新开始监控
@@ -3776,7 +3775,7 @@ this.init()
 } catch (error) {
             console.error('[GitHub 中文翻译] 重新开始监控失败:', error)
 }
-    },
+        },
     
     /**
      * 手动触发翻译
@@ -3785,7 +3784,7 @@ this.init()
     triggerTranslation() {
         this.translateWithThrottle()
 }
-}
+        }
 
 /**
  * 开发工具模块
@@ -3842,7 +3841,7 @@ console.log('未翻译的字符串:', untranslated)
         
         return untranslated
 }
-}
+        }
 
 /**
  * 自动字符串更新器类
@@ -3874,7 +3873,7 @@ return {
             stringsToAdd: Array.from(stringsToAdd),
             totalNew: stringsToAdd.size
         }
-}
+        }
     
     /**
      * 在控制台显示报告
@@ -3885,7 +3884,7 @@ console.log('[GitHub 中文翻译] 字符串更新报告')
 console.log(`📄 页面: ${report.pageTitle}`)
 console.log(`✅ 找到 ${report.totalNew} 个新字符串`)
 }
-}
+        }
 
 /**
  * 词典处理器类
@@ -3920,7 +3919,7 @@ return {
             translatedEntries: total - untranslated,
             completionRate: total > 0 ? ((total - untranslated) / total * 100).toFixed(2) : '0.00'
         }
-}
+        }
     
     /**
      * 在控制台显示统计信息
@@ -3932,7 +3931,7 @@ console.log(`📊 总条目数: ${stats.totalEntries}`)
 console.log(`✅ 已翻译条目: ${stats.translatedEntries}`)
 console.log(`📈 完成率: ${stats.completionRate}%`)
 }
-}
+        }
 
 /**
  * 加载工具类
@@ -3944,7 +3943,7 @@ function loadTools() {
         AutoStringUpdater, 
         DictionaryProcessor 
     }
-}
+        }
 
 /**
  * GitHub 中文翻译主入口文件
@@ -3970,7 +3969,7 @@ async function init() {
 } catch (error) {
         console.error('[GitHub 中文翻译] 脚本初始化失败:', error)
 }
-}
+        }
 
 /**
  * 启动脚本
@@ -3985,7 +3984,7 @@ function startScript() {
         // 如果DOM已经加载完成，直接初始化
         init()
 }
-}
+        }
 
 // 🕒 启动脚本
 startScript();
