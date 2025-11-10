@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.83
+ * @version 1.8.86
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -378,6 +378,15 @@ class BuildManager {
       mergedCode = mergedCode.replace(/\/\/ 导出格式化版本函数\s*(\{[^}]*\}\s*;?)?\s*/g, '');
       mergedCode = mergedCode.replace(/\s*\{\s*getFormattedVersion\s*\}\s*;?\s*/g, '');
       mergedCode = mergedCode.replace(/\s*\/\/ 导出格式化版本函数\s*\n?\s*/g, '');
+
+      // 移除合并过程中产生的多余分号和换行符组合
+      mergedCode = mergedCode.replace(/;\\n\\n/g, '\\n\\n');
+      mergedCode = mergedCode.replace(/;\\n/g, '\\n');
+      mergedCode = mergedCode.replace(/;\s*\n\s*\n/g, '\n\n');
+      mergedCode = mergedCode.replace(/;\s*\n\s*/g, '\n');
+
+      // 将字面的\n转义序列替换为实际的换行符
+      mergedCode = mergedCode.replace(/\\n/g, '\n');
 
       // 写入到输出文件
       fs.writeFileSync(this.outputFile, mergedCode, 'utf8');
