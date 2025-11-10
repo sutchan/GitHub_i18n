@@ -798,13 +798,13 @@ const versionChecker = {
           document.body.appendChild(notification);
 
           // 记录本次通知的版本
-          localStorage.setItem(notificationVersionKey);
+          localStorage.setItem(notificationVersionKey, newVersion);
 
           // 自动隐藏（可选）
           if (CONFIG.updateCheck.autoHideNotification !== false) {
             setTimeout(() => {
-              this.hideNotification(notification);
-            }, 200; 0; 0;); // 20秒后自动隐藏
+              this.hideNotification(notificationId);
+            }, 20000); // 20秒后自动隐藏
           }
 
           if (CONFIG.debugMode) {
