@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.155
+ * @version 1.8.158
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -435,6 +435,35 @@ class BuildManager {
 
     // 首先修复用户脚本头部注释块
     fileContent = this.fixUserScriptHeader(fileContent);
+    
+    // 修复VERSION_HISTORY格式
+    console.log('📝 修复VERSION_HISTORY格式...');
+    // 获取当前版本号
+    const versionMatch = fileContent.match(/const VERSION = '(.*)';/);
+    const currentVersion = versionMatch ? versionMatch[1] : this.currentVersion;
+    console.log(`📌 当前版本: ${currentVersion}`);
+    
+    // 替换整个VERSION_HISTORY定义
+    fileContent = fileContent.replace(/const VERSION_HISTORY = \[.*?\];/s, `const VERSION_HISTORY = [
+  {
+    version: '${currentVersion}',
+    date: '${new Date().toISOString().split('T')[0]}',
+    changes: ['当前版本']
+  }
+];`);
+    
+    // 修复utils对象定义中的语法错误
+    console.log('🛠️  修复utils对象定义...');
+    // 修复throttle函数中的return; function语法错误
+    fileContent = fileContent.replace(/return; function/, 'return function');
+    // 修复对象属性结尾多余的分号
+    fileContent = fileContent.replace(/changes: \['当前版本'\];/, 'changes: [\'当前版本\']');
+    // 修复可能的JSON格式错误
+    fileContent = fileContent.replace(/\}\];/, '\n  }\n];');
+    // 修复options参数默认值语法
+    fileContent = fileContent.replace(/function\(func, limit, options = \{\}\)/, 'function(func, limit, options) {\n        options = options || {};');
+    // 修复解构赋值语法错误
+    fileContent = fileContent.replace(/const \{ leading = true, trailing = true \} = options \|\| \{\};/, 'const leading = options.leading !== false;\n        const trailing = options.trailing !== false;');
 
     let output = fileContent;
     let hasChanges = false;
@@ -1790,18 +1819,15 @@ class BuildManager {
         this.copyFilesToDist();
       }
 
-      // 执行VERSION_HISTORY格式修复
+      // VERSION_HISTORY格式修复已集成到fixBuildOutput方法中
+      console.log('✅ 版本历史修复已在构建过程中完成');
+      
+      // 再次运行一次内置的修复确保万无一失
       try {
-        console.log('🔧 执行VERSION_HISTORY格式修复...');
-        const { execSync } = require('child_process');
-        const fixScriptPath = path.join(__dirname, 'fix_version_history.js');
-        if (fs.existsSync(fixScriptPath)) {
-          execSync('node fix_version_history.js', { stdio: 'inherit' });
-        } else {
-          console.log('⚠️  未找到fix_version_history.js脚本');
-        }
+        console.log('🔧 运行最终修复...');
+        this.fixBuildOutput(this.outputFile);
       } catch (error) {
-        console.error('❌ 执行VERSION_HISTORY格式修复失败:', error.message);
+        console.error('❌ 修复过程中出错:', error.message);
       }
 
       console.log('🎉 构建完成!');
