@@ -1,1 +1,144 @@
-@ -1, 113+0, 0 @@\n/**\n * Tailwind CSS 主样式文件\n * 包含Tailwind的基本指令\n */\n@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n/* 自定义工具类 */\n@layer utilities {\n  .content-auto {\n    content-visibility: auto;\n  }\n\n  /* 减小的日志字体大小 */\n  .log-text {\n    font-size: 0.8rem;\n    line-height: 1.1;\n  }\n\n  .card-shadow {\n    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);\n    transition: all 0.3s ease;\n  }\n\n  .card-shadow:hover {\n    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);\n    transform: translateY(-2px);\n  }\n\n  .btn-hover {\n    transition: all 0.2s ease-in-out;\n  }\n\n  .btn-hover:hover {\n    transform: translateY(-2px);\n  }\n\n  .input-focus {\n    transition: all 0.2s ease;\n  }\n\n  .input-focus:focus {\n    border-color: #4f46e5;\n    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);\n  }\n\n  .progress-indicator {\n    position: relative;\n    overflow: hidden;\n  }\n\n  .progress-indicator::after {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: -100%;\n    width: 100%;\n    height: 100%;\n    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);\n    animation: shimmer 1.5s infinite;\n  }\n\n  @keyframes shimmer {\n    0% {\n      left: -100%;\n    }\n\n    100% {\n      left: 100%;\n    }\n  }\n\n  .fade-in {\n    animation: fadeIn 0.3s ease-in;\n  }\n\n  @keyframes fadeIn {\n    from {\n      opacity: 0;\n      transform: translateY(10px);\n    }\n\n    to {\n      opacity: 1;\n      transform: translateY(0);\n    }\n  }\n\n  /* 进度条动画效果 */\n  .progress-bar {\n    position: relative;\n    overflow: hidden;\n    transition: width 0.5s ease-out, background-color 0.3s ease;\n  }\n\n  /* 进度条流动效果 */\n  .progress-bar::after {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    bottom: 0;\n    right: 0;\n    background-image:\n      linear-gradient(-45deg,\n        rgba(255, 255, 255, 0.2) 25%,\n        transparent 25%,\n        transparent 50%,\n        rgba(255, 255, 255, 0.2) 50%,\n        rgba(255, 255, 255, 0.2) 75%,\n        transparent 75%,\n        transparent);\n    background-size: 50px 50px;\n    animation: progressFlow 1s linear infinite;\n  }\n\n  @keyframes progressFlow {\n    0% {\n      background-position: 0 0;\n    }\n\n    100% {\n      background-position: 50px 50px;\n    }\n  }\n\n  /* 进度条脉冲效果 */\n  .progress-pulse {\n    animation: progressPulse 2s ease-in-out infinite;\n  }\n\n  @keyframes progressPulse {\n\n    0%,\n    100% {\n      opacity: 1;\n    }\n\n    50% {\n      opacity: 0.8;\n    }\n  }\n}\n
+/**
+ * Tailwind CSS 主样式文件
+ * 包含Tailwind的基本指令
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 自定义工具类 */
+@layer utilities {
+  .content-auto {
+    content-visibility: auto;
+  }
+
+  /* 减小的日志字体大小 */
+  .log-text {
+    font-size: 0.8rem;
+    line-height: 1.1;
+  }
+
+  .card-shadow {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .card-shadow:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .btn-hover {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-hover:hover {
+    transform: translateY(-2px);
+  }
+
+  .input-focus {
+    transition: all 0.2s ease;
+  }
+
+  .input-focus:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  .progress-indicator {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-indicator::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      left: -100%;
+    }
+
+    100% {
+      left: 100%;
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* 进度条动画效果 */
+  .progress-bar {
+    position: relative;
+    overflow: hidden;
+    transition: width 0.5s ease-out, background-color 0.3s ease;
+  }
+
+  /* 进度条流动效果 */
+  .progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image:
+      linear-gradient(-45deg,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
+        transparent 75%,
+        transparent);
+    background-size: 50px 50px;
+    animation: progressFlow 1s linear infinite;
+  }
+
+  @keyframes progressFlow {
+    0% {
+      background-position: 0 0;
+    }
+
+    100% {
+      background-position: 50px 50px;
+    }
+  }
+
+  /* 进度条脉冲效果 */
+  .progress-pulse {
+    animation: progressPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes progressPulse {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.8;
+    }
+  }
+}

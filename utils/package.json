@@ -6,12 +6,11 @@
   "scripts": {
     "start": "node auto_string_updater.js",
     "update": "node auto_string_updater.js",
-    "server": "node server.js",
     "build:tailwind": "npx tailwindcss -i ./src/tailwind.css -o ./dist/tailwind.css --minify",
     "dictionary:export": "node dictionary_processor.js export",
     "dictionary:import": "node dictionary_processor.js import",
     "dictionary:optimize": "node dictionary_processor.js optimize",
-    "dictionary:test": "node test_dictionary_processor.js"
+    "clean": "node cleanup.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
