@@ -55,7 +55,7 @@
 
 点击下方链接，Tampermonkey 将自动提示安装脚本：
 
-👉 [**安装最新版脚本**](https://github.com/sutchan/GitHub_i18n/dist/raw/main/GitHub_zh-CN.user.js)
+👉 [**安装最新版脚本**](https://github.com/sutchan/GitHub_i18n/raw/refs/heads/main/dist/GitHub_zh-CN.user.js)
 
 > 💡 安装后刷新任意 GitHub 页面（如 `https://github.com`），即可看到中文界面。
 
@@ -186,7 +186,7 @@ A：工具会在翻译词典中添加新字符串并标记为"待翻译: [原字
 - 如需**新增术语**，可直接修改 `TRANSLATION_DICT` 并提交 PR
 - 自动化工具的改进和优化建议也欢迎提出
 
-> 📌 脚本文件：[`/dist/GitHub_zh-CN.user.js`](GitHub_zh-CN.user.js)
+> 📌 脚本文件：[`/dist/GitHub_zh-CN.user.js`](dist/GitHub_zh-CN.user.js)
 > 🛠️ 工具目录：[`utils/`](utils/)
 
 ---
