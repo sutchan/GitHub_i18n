@@ -55,7 +55,7 @@
 
 点击下方链接，Tampermonkey 将自动提示安装脚本：
 
-👉 [**安装最新版脚本**](https://github.com/sutchan/GitHub_i18n/raw/main/GitHub_zh-CN.user.js)
+👉 [**安装最新版脚本**](https://github.com/sutchan/GitHub_i18n/dist/raw/main/GitHub_zh-CN.user.js)
 
 > 💡 安装后刷新任意 GitHub 页面（如 `https://github.com`），即可看到中文界面。
 
