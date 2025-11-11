@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name; GitHub 中文翻译
 // @namespace; https://github.com/sutchan/GitHub_i18n
-// @version; 1.8.145
+// @version; 1.8.146
 // @description  将 GitHub 界面翻译成中文
 // @author; Sut
 // @match; https://github.com/*
@@ -42,14 +42,14 @@ startScript()
    * @type{string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-const VERSION = '1.8.145';
+const VERSION = '1.8.146';
 
 /**
  * 版本历史记录
    * @type{Array<{version: string, date: string, changes: string[]}>}
  */
 const VERSION_HISTORY = [{
-    version: '1.8.145',
+    version: '1.8.146',
     date: '2025-11-11',
 changes: ['当前版本'];
   }]
