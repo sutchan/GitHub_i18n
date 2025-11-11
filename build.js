@@ -441,14 +441,14 @@ class BuildManager {
 
     // 首先修复用户脚本头部注释块
     fileContent = this.fixUserScriptHeader(fileContent);
-    
+
     // 修复VERSION_HISTORY格式
     console.log('📝 修复VERSION_HISTORY格式...');
     // 获取当前版本号
     const versionMatch = fileContent.match(/const VERSION = '(.*)';/);
     const currentVersion = versionMatch ? versionMatch[1] : this.currentVersion;
     console.log(`📌 当前版本: ${currentVersion}`);
-    
+
     // 替换整个VERSION_HISTORY定义
     fileContent = fileContent.replace(/const VERSION_HISTORY = \[.*?\];/s, `const VERSION_HISTORY = [
   {
@@ -457,19 +457,141 @@ class BuildManager {
     changes: ['当前版本']
   }
 ];`);
-    
+
     // 修复utils对象定义中的语法错误
     console.log('🛠️  修复utils对象定义...');
-    // 修复throttle函数中的return; function语法错误
-    fileContent = fileContent.replace(/return; function/, 'return function');
-    // 修复对象属性结尾多余的分号
-    fileContent = fileContent.replace(/changes: \['当前版本'\];/, 'changes: [\'当前版本\']');
-    // 修复可能的JSON格式错误
-    fileContent = fileContent.replace(/\}\];/, '\n  }\n];');
-    // 修复options参数默认值语法
-    fileContent = fileContent.replace(/function\(func, limit, options = \{\}\)/, 'function(func, limit, options) {\n        options = options || {};');
-    // 修复解构赋值语法错误
-    fileContent = fileContent.replace(/const \{ leading = true, trailing = true \} = options \|\| \{\};/, 'const leading = options.leading !== false;\n        const trailing = options.trailing !== false;');
+
+    // 先修复VERSION_HISTORY格式问题
+    fileContent = fileContent.replace(/const VERSION_HISTORY = \[\{[^}]*?\}\s*\]\]\];\s*\}\]/g, `const VERSION_HISTORY = [
+  {
+    version: '${currentVersion}',
+    date: '${new Date().toISOString().split('T')[0]}',
+    changes: ['当前版本']
+  }
+];`);
+
+    // 使用最安全的方法替换utils对象定义
+    const createUtilsObject = function () {
+      // 创建一个简单的utils对象实现，避免复杂的正则表达式转义问题
+      const utilsCode = `
+const utils = {
+    // 节流函数
+    throttle: function(func, limit) {
+        let inThrottle;
+        return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(function() {
+                    inThrottle = false;
+                }, limit);
+            }
+        };
+    },
+
+    // 防抖函数
+    debounce: function(func, delay) {
+        let timeout;
+        return function() {
+            const args = arguments;
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                func.apply(context, args);
+            }, delay);
+        };
+    },
+
+    // 延迟函数
+    delay: function(ms) {
+        return new Promise(function(resolve) {
+            setTimeout(resolve, ms);
+        });
+    },
+
+    // 简单的字符串转义
+    escapeRegExp: function(string) {
+        // 使用数组定义特殊字符，避免转义问题
+        const specialChars = ['.', '+', '*', '?', '^', '$', '{', '}', '(', ')', '[', ']', '|', '\\'];
+        let result = '';
+        for (let i = 0; i < string.length; i++) {
+            if (specialChars.includes(string[i])) {
+                result += '\\' + string[i];
+            } else {
+                result += string[i];
+            }
+        }
+        return result;
+    },
+
+    // 安全JSON解析
+    safeJSONParse: function(jsonString, defaultValue) {
+        defaultValue = defaultValue || null;
+        try {
+            return JSON.parse(jsonString);
+        } catch (e) {
+            return defaultValue;
+        }
+    },
+
+    // 安全JSON序列化
+    safeJSONStringify: function(obj, defaultValue) {
+        defaultValue = defaultValue || '{}';
+        try {
+            return JSON.stringify(obj);
+        } catch (e) {
+            return defaultValue;
+        }
+    },
+
+    // 获取URL参数
+    getQueryParam: function(name, url) {
+        url = url || window.location.href;
+        const paramName = name + '=';
+        const urlParams = url.split('?')[1] || '';
+        const paramList = urlParams.split('&');
+        for (let i = 0; i < paramList.length; i++) {
+            let param = paramList[i];
+            while (param.charAt(0) == ' ') param = param.substring(1);
+            if (param.indexOf(paramName) == 0) {
+                return decodeURIComponent(param.substring(paramName.length).replace(/\+/g, ' '));
+            }
+        }
+        return '';
+    },
+
+    // 获取所有URL参数
+    getAllQueryParams: function(url) {
+        url = url || window.location.href;
+        const params = {};
+        const urlParams = url.split('?')[1] || '';
+        const paramList = urlParams.split('&');
+        for (let i = 0; i < paramList.length; i++) {
+            const param = paramList[i].split('=');
+            if (param.length >= 2) {
+                params[decodeURIComponent(param[0])] = decodeURIComponent(param[1].replace(/\+/g, ' '));
+            }
+        }
+        return params;
+    }
+};`;
+      return utilsCode;
+    };
+
+    // 查找utils对象的位置并替换
+    const utilsRegex = /const utils = \{[\s\S]*?\};?/;
+    if (utilsRegex.test(fileContent)) {
+      fileContent = fileContent.replace(utilsRegex, createUtilsObject());
+      console.log('✅ utils对象定义已替换为简化版本');
+    } else {
+      console.warn('⚠️  未找到utils对象定义，跳过替换');
+    }
+
+    // 修复getQueryParam和getAllQueryParams方法中的语法错误
+    fileContent = fileContent.replace(/new RegExp\(`\?${ name } = ([^&] +)`\)/, "new RegExp('\\?' + name + '=([^&]+)')");
+    fileContent = fileContent.replace(/new URL\(url\)/, 'new URL(url || window.location.href)');
 
     let output = fileContent;
     let hasChanges = false;
@@ -494,9 +616,9 @@ class BuildManager {
 
     // 2. 修复按钮ID中的$符号
     const buttonIdFixes = [
-      { pattern: /id = `\$-update-btn`/, replacement: "id = `notificationId-update-btn`" },
-      { pattern: /id = `\$-later-btn`/, replacement: "id = `notificationId-later-btn`" },
-      { pattern: /id = `\$-dismiss-btn`/, replacement: "id = `notificationId-dismiss-btn`" }
+      { pattern: /id = `\$-update - btn`/, replacement: "id = `notificationId - update - btn`" },
+      { pattern: /id = `\$ - later - btn`/, replacement: "id = `notificationId - later - btn`" },
+      { pattern: /id = `\$ - dismiss - btn`/, replacement: "id = `notificationId - dismiss - btn`" }
     ];
 
     buttonIdFixes.forEach(({ pattern, replacement }) => {
@@ -526,8 +648,8 @@ class BuildManager {
     // 4. 修复函数调用末尾多余的大括号和格式问题
     const functionCallFixes = [
       {
-        pattern: /if \(!response\.ok\) \{\s*throw new Error\(`HTTP错误! 状态码: \${response\.status}`\)\s*\}\s*\}/g,
-        replacement: "if (!response.ok) {\n                    throw new Error(`HTTP错误! 状态码: ${response.status}`)\n                }"
+        pattern: /if \(!response\.ok\) \{\s*throw new Error\(`HTTP错误! 状态码: \${ response\.status; } `\)\s*\}\s*\}/g,
+        replacement: "if (!response.ok) {\n                    throw new Error(`HTTP错误! 状态码: ${ response.status; } `)\n                }"
       },
       {
         pattern: /if \(attempt === maxRetries\) \{\s*throw error\s*\}\s*\}/g,
@@ -627,7 +749,7 @@ class BuildManager {
     fileContent = fileContent.replace(/catch\(([^)]+)\)\s*\{[\s\S]*?\}\s*;/g, (match) => {
       const catchMatch = match.match(/catch\(([^)]+)\)\s*\{([\s\S]*?)\}\s*;/);
       if (catchMatch) {
-        return `catch(${catchMatch[1]}) {${catchMatch[2]}}`;
+        return 'catch (' + catchMatch[1] + ') {' + catchMatch[2] + '}';
       }
       return match;
     });
@@ -636,7 +758,7 @@ class BuildManager {
     fileContent = fileContent.replace(/catch\(([^)]+)\)\s*\{[\s\S]*?\}\s*;\s*try/g, (match) => {
       const catchMatch = match.match(/catch\(([^)]+)\)\s*\{([\s\S]*?)\}\s*;/);
       if (catchMatch) {
-        return `catch(${catchMatch[1]}) {${catchMatch[2]}}\ntry`;
+        return 'catch (' + catchMatch[1] + ') {' + catchMatch[2] + '} \ntry';
       }
       return match;
     });
@@ -655,6 +777,9 @@ class BuildManager {
     // 修复console.log/error后的缺少分号和大括号不匹配问题
     fileContent = fileContent.replace(/console\.(log|error)\([^)]+\)\s*\}/g, 'console.$1($1);\n        }');
     fileContent = fileContent.replace(/console\.(log|error)\([^)]+\)\s*;/g, 'console.$1($1);');
+
+    // 修复startScript()调用中的双分号问题
+    fileContent = fileContent.replace(/startScript\(\);;/g, 'startScript();');
 
     // 10. 修复if语句和前面代码连在一起的问题
     fileContent = fileContent.replace(/\}\s*\);\s*if\s*\(/g, '}\n    });\n    if (');
@@ -851,7 +976,7 @@ class BuildManager {
     // 修复className属性中的错误分号
     fileContent = fileContent.replace(/className\s*=\s*['"]([^'"]*)['"]/g, (match, p1) => {
       const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
-      return `className="${className}"`;
+      return `className = "${className}"`;
     });
     // 新增：修复CSS类名中的特殊情况（类名包含数字前的分号）
     fileContent = fileContent.replace(/class\s*=\s*['"]([^'"]*?);(\d+)([^'"]*)['"]/g, (match, p1, p2, p3) => {
@@ -864,7 +989,7 @@ class BuildManager {
     });
     fileContent = fileContent.replace(/className\s*=\s*['"]([^'"]*?);(\d+)([^'"]*)['"]/g, (match, p1, p2, p3) => {
       const className = (p1 + ' ' + p2 + p3).replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
-      return `className="${className}"`;
+      return `className = "${className}"`;
     });
 
     // 11. 修复字符串连接问题 - 增强版
@@ -886,7 +1011,7 @@ class BuildManager {
       // 提取参数部分
       const paramsMatch = match.match(/\((.*?)\)/);
       const params = paramsMatch ? paramsMatch[1] : '';
-      return `${p1}(${params}) {`;
+      return p1 + '(' + params + ') {';
     });
     // 修复空参数方法定义
     fileContent = fileContent.replace(/(\w+)\s*\(\s*\);\s*\{/g, '$1() {');
@@ -898,18 +1023,20 @@ class BuildManager {
     fileContent = fileContent.replace(/(\w+)\s*\(.*?\);\s*\{/g, (match, p1) => {
       const paramsMatch = match.match(/\((.*?)\)/);
       const params = paramsMatch ? paramsMatch[1] : '';
-      return `${p1}(${params}) {`;
+      return p1 + '(' + params + ') {';
     });
+    // 第三次运行以确保完全修复
     fileContent = fileContent.replace(/(\w+)\s*\(.*?\);\s*\{/g, (match, p1) => {
       const paramsMatch = match.match(/\((.*?)\)/);
       const params = paramsMatch ? paramsMatch[1] : '';
-      return `${p1}(${params}) {`;
-    }); // 第三次运行以确保完全修复
+      return p1 + '(' + params + ') {';
+    });
+    // 第四次运行以确保完全修复
     fileContent = fileContent.replace(/(\w+)\s*\(.*?\);\s*\{/g, (match, p1) => {
       const paramsMatch = match.match(/\((.*?)\)/);
       const params = paramsMatch ? paramsMatch[1] : '';
-      return `${p1}(${params}) {`;
-    }); // 第四次运行以确保完全修复
+      return p1 + '(' + params + ') {';
+    });
 
     // 增强版：DOM元素创建括号内分号修复（针对具体错误模式）
     // 修复document.createElement括号内分号
@@ -1128,7 +1255,7 @@ class BuildManager {
     // 新增：修复类名中的特殊数字分号组合
     fileContent = fileContent.replace(/className\s*=\s*['"]([^'"]*)flex-shrink-;0([^'"]*)['"]/g, (match, p1, p2) => {
       const className = (p1 + 'flex-shrink-0' + p2).replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
-      return `className="${className}"`;
+      return `className = "${className}"`;
     });
     // 修复setAttribute中的特殊类名分号问题
     fileContent = fileContent.replace(/setAttribute\(\s*['"](class|className)['"]\s*,\s*['"]([^'"]*)flex-shrink-;0([^'"]*)['"]\s*\)/g, (match, attr, p1, p2) => {
@@ -1142,7 +1269,7 @@ class BuildManager {
     // 处理className赋值中的flex-shrink-0特殊情况
     fileContent = fileContent.replace(/className\s*=\s*['"]([^'"]*)flex-shrink-;0([^'"]*)['"]/g, (match, p1, p2) => {
       const className = (p1 + 'flex-shrink-0' + p2).replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
-      return `className="${className}"`;
+      return `className = "${className}"`;
     });
     // 更精确地处理flex-shrink-0前后都有分号的情况
     fileContent = fileContent.replace(/;flex-shrink-;0;/g, ' flex-shrink-0 ');
@@ -1156,7 +1283,7 @@ class BuildManager {
     });
     fileContent = fileContent.replace(/className="([^"]+?)";\s*/g, (match, p1) => {
       const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
-      return `className="${className}"`;
+      return `className = "${className}"`;
     });
     // 修复setAttribute调用后的多余分号 - 增强版
     fileContent = fileContent.replace(/(setAttribute\([^)]+\));\s*;/g, '$1;');
@@ -1179,7 +1306,7 @@ class BuildManager {
     // 直接替换viewBox中的分号为空格
     fileContent = fileContent.replace(/viewBox\s*=\s*['"]([^'"]*);([^'"]*)['"]/g, (match, p1, p2) => {
       const value = (p1 + ' ' + p2).replace(/;\s*/g, ' ').trim();
-      return `viewBox="${value}"`;
+      return `viewBox = "${value}"`;
     });
     fileContent = fileContent.replace(/setAttribute\(\s*['"]([^'"]+)['"]\s*,\s*['"]([^'"]*);([^'"]*)['"]\s*\)/g, (match, attr, p1, p2) => {
       // 根据属性类型决定是否将分号替换为空格
@@ -1245,7 +1372,7 @@ class BuildManager {
       });
       fileContent = fileContent.replace(/className="([^"]*)"/g, (match, p1) => {
         const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
-        return `className="${className}"`;
+        return `className = "${className}"`;
       });
       // 修复setAttribute中的类名问题
       fileContent = fileContent.replace(/setAttribute\(\s*['"](class|className)['"]\s*,\s*['"]([^'"]*)['"]\s*\)/g, (match, attr, p1) => {
@@ -1261,7 +1388,7 @@ class BuildManager {
       fileContent = fileContent.replace(/(\w+)\s*\(.*?\);\s*\{/g, (match, p1) => {
         const paramsMatch = match.match(/\((.*?)\)/);
         const params = paramsMatch ? paramsMatch[1] : '';
-        return `${p1}(${params}) {`;
+        return p1 + '(' + params + ') {';
       });
 
       // 修复try-catch中的错误分号（在循环中再次运行）
@@ -1273,7 +1400,7 @@ class BuildManager {
       fileContent = fileContent.replace(/flex-shrink-;0/g, 'flex-shrink-0');
       fileContent = fileContent.replace(/className="([^"]+)";\s*/g, (match, p1) => {
         const className = p1.replace(/;\s*/g, ' ').replace(/\s+/g, ' ').trim();
-        return `className="${className}"`;
+        return `className = "${className}"`;
       });
       // 在循环中再次修复setAttribute调用后的多余分号
       fileContent = fileContent.replace(/(setAttribute\([^)]+\));\s*;/g, '$1;');
@@ -1466,9 +1593,9 @@ class BuildManager {
 
     // 10. 修复按钮ID中的模板字符串问题
     const btnIdFixes = [
-      { pattern: /id = `notificationId-update-btn`/, replacement: "id = `\${notificationId}-update-btn`" },
-      { pattern: /id = `notificationId-later-btn`/, replacement: "id = `\${notificationId}-later-btn`" },
-      { pattern: /id = `notificationId-dismiss-btn`/, replacement: "id = `\${notificationId}-dismiss-btn`" }
+      { pattern: /id = `notificationId - update - btn`/, replacement: "id = `\${ notificationId; } -update - btn`" },
+      { pattern: /id = `notificationId - later - btn`/, replacement: "id = `\${ notificationId; } -later - btn`" },
+      { pattern: /id = `notificationId - dismiss - btn`/, replacement: "id = `\${ notificationId; } -dismiss - btn`" }
     ];
 
     btnIdFixes.forEach(({ pattern, replacement }) => {
@@ -1485,29 +1612,29 @@ class BuildManager {
     domFunctions.forEach(func => {
       // 查找并修复所有这些DOM函数调用中的语法错误
       // 修复函数调用后的逗号问题
-      const regex1 = new RegExp(`${func}\(\s*([^)]*)\),`, 'g');
+      const regex1 = new RegExp(func + "\(\s*([^)]*)\), ", 'g');
       const count1 = (fileContent.match(regex1) || []).length;
       if (count1 > 0) {
         // 移除函数调用后的逗号，保留参数并添加分号
-        fileContent = fileContent.replace(regex1, `${func}($1);`);
+        fileContent = fileContent.replace(regex1, func + " ($1); ");
         hasChanges = true;
         changesCount += count1;
       }
 
       // 新增：修复函数调用括号内的逗号错误
-      const regex2 = new RegExp(`${func}\(\s*([^,)]+)\s*,\s*\)`, 'g');
+      const regex2 = new RegExp(func + "\(\s*([^,)]+)\s*,\s*\)", 'g');
       const count2 = (fileContent.match(regex2) || []).length;
       if (count2 > 0) {
-        fileContent = fileContent.replace(regex2, `${func}($1)`);
+        fileContent = fileContent.replace(regex2, func + " ($1)");
         hasChanges = true;
         changesCount += count2;
       }
 
       // 新增：修复函数调用括号内的多个逗号错误
-      const regex3 = new RegExp(`${func}\(\s*([^,]+)\s*,\s*([^,)]*)\s*,\s*\)`, 'g');
+      const regex3 = new RegExp(func + "\(\s*([^,]+)\s*,\s*([^,)]*)\s*,\s*\)", 'g');
       const count3 = (fileContent.match(regex3) || []).length;
       if (count3 > 0) {
-        fileContent = fileContent.replace(regex3, `${func}($1)`);
+        fileContent = fileContent.replace(regex3, func + " ($1)");
         hasChanges = true;
         changesCount += count3;
       }
@@ -1554,7 +1681,7 @@ class BuildManager {
       suspiciousPatterns.forEach(({ pattern, description }) => {
         const suspiciousCount = (fileContent.match(pattern) || []).length;
         if (suspiciousCount > 0) {
-          console.warn(`⚠️  警告: 发现${suspiciousCount}处可能的${description}语法错误模式`);
+          console.warn(`⚠️  警告: 发现${suspiciousCount}处可能的${description} 语法错误模式`);
         }
       });
 
@@ -1592,9 +1719,9 @@ class BuildManager {
       const functionCalls = ['removeChild', 'appendChild', 'insertBefore', 'replaceChild', 'createElement', 'createTextNode'];
       functionCalls.forEach(func => {
         // 修复函数调用中的多余左括号
-        fileContent = fileContent.replace(new RegExp(`${func}\\(\\(`, 'g'), `${func}(`);
+        fileContent = fileContent.replace(new RegExp(func + "\\(\\(", 'g'), func + "(");
         // 修复函数调用中的多余右括号
-        fileContent = fileContent.replace(new RegExp(`\\)\\)\\s*;`, 'g'), ');');
+        fileContent = fileContent.replace(new RegExp(`\\) \\) \\s *; `, 'g'), ');');
       });
 
       // 新增：修复console调用中的格式问题
@@ -1751,8 +1878,8 @@ class BuildManager {
       const commonTags = ['name', 'namespace', 'version', 'description', 'author', 'match', 'exclude', 'icon', 'grant', 'resource', 'connect', 'run-at', 'license', 'updateURL', 'downloadURL'];
       commonTags.forEach(tag => {
         // 使用最严格的模式，确保匹配任何格式的@标签分号
-        const strictRegex = new RegExp(`\\/\\/\\s*@${tag}\\s*;\\s*`, 'g');
-        fileContent = fileContent.replace(strictRegex, `// @${tag} `);
+        const strictRegex = new RegExp("\\/\\/\\s*@" + tag + "\\s*;\\s*", 'g');
+        fileContent = fileContent.replace(strictRegex, ";// @" + tag + " ");
       });
 
       // 直接使用fs.writeFileSync确保写入生效
@@ -1827,7 +1954,7 @@ class BuildManager {
 
       // VERSION_HISTORY格式修复已集成到fixBuildOutput方法中
       console.log('✅ 版本历史修复已在构建过程中完成');
-      
+
       // 再次运行一次内置的修复确保万无一失
       try {
         console.log('🔧 运行最终修复...');
