@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.150
+ * @version 1.8.155
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -705,7 +705,56 @@ class BuildManager {
     fileContent = fileContent.replace(/:\s*\[([^\]]*)\]\s*;;/g, ': [$1]');
 
     // 修复版本历史中缺少缩进且多了分号的问题（如'changes: ['当前版本'];'）
+    // 使用更精确的正则表达式，确保能够匹配到所有情况
     fileContent = fileContent.replace(/^\s*changes:\s*\[([^\]]*)\]\s*;/gm, '    changes: [$1]');
+
+    // 专门针对VERSION_HISTORY中changes数组末尾分号的精确修复
+    fileContent = fileContent.replace(/changes:\s*\[([^\]]*)\]\s*;/g, 'changes: [$1]');
+
+    // 确保在对象内部不会有多余的分号
+    fileContent = fileContent.replace(/(\{\s*version:\s*'[^']*',\s*date:\s*'[^']*',\s*changes:\s*\[([^\]]*)\])\s*;/g, '$1');
+
+    // 专门修复没有缩进的changes行和多余分号
+    fileContent = fileContent.replace(/\s+version:\s*'([^']*)',\s*\n\s+date:\s*'([^']*)',\s*\nchanges:\s*\[([^\]]*)\];/g,
+      '    version: \'$1\',\n    date: \'$2\',\n    changes: [$3]');
+
+    // 终极解决方案：完全重建VERSION_HISTORY对象，确保格式正确
+    const versionHistoryMatch = fileContent.match(/const VERSION_HISTORY = \[([\s\S]*?)\];/);
+    if (versionHistoryMatch) {
+      try {
+        // 提取版本历史数组内容
+        const versionHistoryContent = versionHistoryMatch[1];
+        // 创建一个新的、格式正确的VERSION_HISTORY字符串
+        let newVersionHistory = 'const VERSION_HISTORY = [';
+
+        // 提取每个版本条目并正确格式化
+        const versionEntries = versionHistoryContent.match(/\{\s*version:\s*'([^']*)'\s*,\s*date:\s*'([^']*)'\s*,\s*changes:\s*\[([^\]]*)\]\s*\}/g) || [];
+
+        versionEntries.forEach((entry, index) => {
+          // 提取版本信息
+          const versionMatch = entry.match(/version:\s*'([^']*)'/);
+          const dateMatch = entry.match(/date:\s*'([^']*)'/);
+          const changesMatch = entry.match(/changes:\s*\[([^\]]*)\]/);
+
+          if (versionMatch && dateMatch && changesMatch) {
+            const version = versionMatch[1];
+            const date = dateMatch[1];
+            const changes = changesMatch[1];
+
+            // 格式化条目
+            newVersionHistory += '\n  {\n    version: \'' + version + '\',\n    date: \'' + date + '\',\n    changes: [' + changes + ']\n  }' +
+              (index < versionEntries.length - 1 ? ',' : '');
+          }
+        });
+
+        newVersionHistory += '\n];';
+
+        // 替换原有的VERSION_HISTORY
+        fileContent = fileContent.replace(/const VERSION_HISTORY = \[([\s\S]*?)\];/, newVersionHistory);
+      } catch (e) {
+        console.error('修复VERSION_HISTORY格式时出错:', e);
+      }
+    }
 
     // 更精确地修复VERSION_HISTORY中的格式问题 - 直接匹配整个对象结构
     fileContent = fileContent.replace(/const\s+VERSION_HISTORY\s*=\s*\[\s*\{\s*version:\s*'([^']*)'\s*,\s*date:\s*'([^']*)'\s*,\s*changes:\s*\[([^\]]*)\]\s*;\s*\}\s*\]/g,
@@ -1739,6 +1788,20 @@ class BuildManager {
       if (copyToDist) {
         console.log('📋 复制文件到分发目录...');
         this.copyFilesToDist();
+      }
+
+      // 执行VERSION_HISTORY格式修复
+      try {
+        console.log('🔧 执行VERSION_HISTORY格式修复...');
+        const { execSync } = require('child_process');
+        const fixScriptPath = path.join(__dirname, 'fix_version_history.js');
+        if (fs.existsSync(fixScriptPath)) {
+          execSync('node fix_version_history.js', { stdio: 'inherit' });
+        } else {
+          console.log('⚠️  未找到fix_version_history.js脚本');
+        }
+      } catch (error) {
+        console.error('❌ 执行VERSION_HISTORY格式修复失败:', error.message);
       }
 
       console.log('🎉 构建完成!');
