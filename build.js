@@ -406,16 +406,22 @@ class BuildManager {
       // 模式1: 匹配@标签后直接跟分号的情况
       headerBlock = headerBlock.replace(/\/\/\s*@(\w+);/g, '// @$1');
       // 模式2: 匹配@标签后带有空格和分号的情况
+      headerBlock = headerBlock.replace(/\/\/\s*@(\w+)(\s+);/g, '// @$1$2');
       headerBlock = headerBlock.replace(/\/\/\s*@(\w+)\s*;/g, '// @$1 ');
       // 模式3: 匹配@标签后带有值的情况
       headerBlock = headerBlock.replace(/\/\/\s*@(\w+);\s*([\S])/g, '// @$1 $2');
+      // 模式4: 匹配所有@标签后可能有的分号，无论位置
+      headerBlock = headerBlock.replace(/\/\/\s*@(\w+)(\s*);(\s*)/g, '// @$1$3');
 
-      // 常见标签的专门处理
+      // 常见标签的专门处理，使用更严格的模式
       const commonTags = ['name', 'namespace', 'version', 'description', 'author', 'match', 'exclude', 'icon', 'grant', 'resource', 'connect', 'run-at', 'license', 'updateURL', 'downloadURL'];
       commonTags.forEach(tag => {
-        const tagRegex = new RegExp(`\\/\\/\\s*@${tag};`, 'g');
+        const tagRegex = new RegExp(`\\/\\/\\s*@${tag}(\s*);`, 'g');
         headerBlock = headerBlock.replace(tagRegex, `// @${tag}`);
       });
+
+      // 额外修复resource标签格式
+      headerBlock = headerBlock.replace(/\/\/\s*@resource;\s*([^\s]+):\s*(.+)/g, '// @resource $1 $2');
 
       // 替换回原始内容
       fileContent = fileContent.replace(headerBlockMatch[1], headerBlock);

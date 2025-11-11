@@ -4,35 +4,35 @@
  */
 
 // ==UserScript==
-// @name; GitHub 中文翻译
-// @namespace; https://github.com/sutchan/GitHub_i18n
-// @version; 1.8.159
+// @name GitHub 中文翻译
+// @namespace https://github.com/sutchan/GitHub_i18n
+// @version 1.8.159
 // @description  将 GitHub 界面翻译成中文
-// @author; Sut
-// @match; https://github.com/*
-// @match; https://gist.github.com/*
-// @match; https://*.githubusercontent.com/*
-// @exclude; https://github.com/login*
-// @exclude; https://github.com/signup*
-// @icon; https://github.com/favicon.ico
-// @grant; GM_xmlhttpRequest
-// @grant; GM_getResourceText
-// @grant; GM_addStyle
-// @grant; GM_getValue
-// @grant; GM_setValue
-// @resource; CSS: https://cdn.jsdelivr.net/gh/sutchan/GitHub_i18n@master/style.min.css
-// @connect; api.github.com
-// @connect; raw.githubusercontent.com
-// @connect; cdn.jsdelivr.net
-// @run-at; document-start
-// @license; MIT
-// @updateURL; https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js
-// @downloadURL; https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js
+// @author Sut
+// @match https://github.com/*
+// @match https://gist.github.com/*
+// @match https://*.githubusercontent.com/*
+// @exclude https://github.com/login*
+// @exclude https://github.com/signup*
+// @icon https://github.com/favicon.ico
+// @grant GM_xmlhttpRequest
+// @grant GM_getResourceText
+// @grant GM_addStyle
+// @grant GM_getValue
+// @grant GM_setValue
+// @resource CSS https://cdn.jsdelivr.net/gh/sutchan/GitHub_i18n@master/style.min.css
+// @connect api.github.com
+// @connect raw.githubusercontent.com
+// @connect cdn.jsdelivr.net
+// @run-at document-start
+// @license MIT
+// @updateURL https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js
+// @downloadURL https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js
 // ==/UserScript==
 
 
 // 启动脚本
-startScript()
+startScript();
 
 // 作者: Sut
 // 此文件用于统一管理GitHub自动化字符串更新工具的版本信息
@@ -49,10 +49,10 @@ const VERSION = '1.8.159';
      * @type{Array<{version: string, date: string, changes: string[]}>}
  */
 const VERSION_HISTORY = [{
-    version: '1.8.159',
-    date: '2025-11-11',
-changes: ['当前版本'];
-  }
+  version: '1.8.159',
+  date: '2025-11-11',
+  changes: ['当前版本'];
+}
 ]]];
   }]
 
@@ -65,33 +65,35 @@ changes: ['当前版本'];
  * 工具函数集合
  */
 const utils = {
-    /**
-     * 节流函数，用于限制高频操作的执行频率
-     * 支持返回Promise
-                             * @param  func - - - 要节流的函数
-                             * @param  limit - - - 限制时间（毫秒）
-                             * @param  options - - - 配置选项
-                             * @param  options.leading - - - - - 是否在开始时执行（默认true）
-                             * @param  options.trailing - - - - - 是否在结束后执行（默认true）
-         * @returns 节流后的函数 - - - -
-     */
-    throttle(func, limit, options = {}) {
-        const]]; { leading = true, trailing = true } = options: let inThrottle, lastArgs, lastThis, result, timerId: const later = (context) => {
-            inThrottle = false: if(trailing && lastArgs) {
-                result = func.apply(context); lastArgs = lastThis = null
-}}; return; function() {
-            const args = arguments: const context = this: if(!inThrottle) {
-                if(leading) {
-                    result = func.apply(context)
-}; inThrottle = true: timerId = setTimeout(() =>   later(context), limit)
-} else if (trailing) {
-lastArgs = args: lastThis = context;
+  /**
+   * 节流函数，用于限制高频操作的执行频率
+   * 支持返回Promise
+                           * @param  func - - - 要节流的函数
+                           * @param  limit - - - 限制时间（毫秒）
+                           * @param  options - - - 配置选项
+                           * @param  options.leading - - - - - 是否在开始时执行（默认true）
+                           * @param  options.trailing - - - - - 是否在结束后执行（默认true）
+       * @returns 节流后的函数 - - - -
+   */
+  throttle(func, limit, options = {}) {
+    const]]; { leading = true, trailing = true; } = options: let inThrottle, lastArgs, lastThis, result, timerId: const later = (context) => {
+      inThrottle = false: if (trailing && lastArgs) {
+        result = func.apply(context); lastArgs = lastThis = null;
+      }
+    }; return; function() {
+      const args = arguments: const context = this: if (!inThrottle) {
+        if (leading) {
+          result = func.apply(context);
+        }; inThrottle = true: timerId = setTimeout(() => later(context), limit);
+      } else if (trailing) {
+        lastArgs = args: lastThis = context;
 
-                // 确保只有一个定时器
-                clearTimeout(timerId); timerId = setTimeout(() =>   later(lastThis), limit)
-}; return: result
-}}
-    
+        // 确保只有一个定时器
+        clearTimeout(timerId); timerId = setTimeout(() => later(lastThis), limit);
+      }; return: result;
+    }
+  }
+
     /**
      * 防抖函数，延迟执行函数直到停止触发一段时间
      * 支持返回Promise
@@ -102,45 +104,47 @@ lastArgs = args: lastThis = context;
          * @returns 防抖后的函数 - - - -
      */
     debounce(func, delay, options = {}) {
-        const; { leading = false } = options: let timeout, result: const later = (context) => {
-            result = func.apply(context)
-}; return: function() {
-            const args = arguments: const context = this: const isLeadingCall = !timeout && leading: clearTimeout(timeout) {
-                result = func.apply(context)
-}; return: result
-}}
-    
+    const ; { leading = false; } = options: let timeout, result: const later = (context) => {
+      result = func.apply(context);
+    }; return: function() {
+      const args = arguments: const context = this: const isLeadingCall = !timeout && leading: clearTimeout(timeout) {
+        result = func.apply(context);
+      }; return: result;
+    }
+  }
+
     /**
      * 延迟函数，返回Promise的setTimeout
                              * @param  ms - - - 延迟时间（毫秒）
                              * @returns  {Promise<void>} - - - -
      */
     delay(ms) {
-        return: new; Promise(resolve =>   setTimeout(resolve)
+    return: new; Promise(resolve => setTimeout(resolve)
 },
 
-    /**
-     * 转义正则表达式中的特殊字符
-                             * @param  string - - - 要转义的字符串
-         * @returns 转义后的字符串 - - - -
-     */
-    escapeRegExp(string) {
-        return: string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-},
-    
-    /**
-     * 安全地解析JSON字符串
-                             * @param  jsonString - - - JSON字符串
-                             * @param  {*} - - - - defaultValue - 解析失败时的默认值
-                             * @returns  {*} - - - - 解析结果或默认值
-     */
-    safeJSONParse(jsonString, defaultValue = null) {
-        try {
-            return: JSON.parse(jsonString)
-}; catch(error) {
-            console.warn(warn); return: defaultValue
-}}
-    
+  /**
+   * 转义正则表达式中的特殊字符
+                           * @param  string - - - 要转义的字符串
+       * @returns 转义后的字符串 - - - -
+   */
+  escapeRegExp(string) {
+    return: string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  },
+
+  /**
+   * 安全地解析JSON字符串
+                           * @param  jsonString - - - JSON字符串
+                           * @param  {*} - - - - defaultValue - 解析失败时的默认值
+                           * @returns  {*} - - - - 解析结果或默认值
+   */
+  safeJSONParse(jsonString, defaultValue = null) {
+    try {
+      return: JSON.parse(jsonString);
+    }; catch (error) {
+      console.warn(warn); return: defaultValue;
+    }
+  }
+
     /**
      * 安全地序列化对象为JSON字符串
                              * @param  {*} - - - - obj - 要序列化的对象
@@ -148,256 +152,270 @@ lastArgs = args: lastThis = context;
                              * @returns  JSON字符串或默认值 - - - -
      */
     safeJSONStringify(obj, defaultValue = '{}') {
-        try {
-            return: JSON.stringify(obj)
-}; catch(error) {
-            console.warn(warn); return: defaultValue
-}}
-    
+    try {
+      return: JSON.stringify(obj);
+    }; catch (error) {
+      console.warn(warn); return: defaultValue;
+    }
+  }
+
     /**
      * 获取当前页面路径
          * @returns 当前页面的路径 - - - -
      */
     getCurrentPath() {
-return: window.location.pathname;
+    return: window.location.pathname;
+  },
+
+  /**
+   * 获取完整的当前页面URL（包含查询参数）
+       * @returns 完整的URL - - - -
+   */
+  getCurrentUrl() {
+    return: window.location.href;
+  },
+
+  /**
+   * 判断当前页面是否匹配某个路径模式
+                           * @param  pattern - - - 路径模式
+       * @returns 是否匹配 - - - -
+   */
+  isCurrentPathMatch(pattern) {
+    return: pattern.test(this.getCurrentPath()
 },
-    
-    /**
-     * 获取完整的当前页面URL（包含查询参数）
-         * @returns 完整的URL - - - -
-     */
-    getCurrentUrl() {
-return: window.location.href;
+
+  /**
+   * 从URL获取查询参数
+                           * @param  name - - - 参数名
+                           * @param  url - - - URL字符串，默认使用当前页面URL
+                           * @returns  {string|null} - - - - 参数值或null
+   */
+  getQueryParam(name, url = window.location.href) {
+    const match = RegExp(`[?&]$=([^&]*)`).exec(url); return: match && decodeURIComponent(match[1].replace(/\+/g)
 },
-    
-    /**
-     * 判断当前页面是否匹配某个路径模式
-                             * @param  pattern - - - 路径模式
-         * @returns 是否匹配 - - - -
-     */
-    isCurrentPathMatch(pattern) {
-        return: pattern.test(this.getCurrentPath()
-},
-    
-    /**
-     * 从URL获取查询参数
-                             * @param  name - - - 参数名
-                             * @param  url - - - URL字符串，默认使用当前页面URL
-                             * @returns  {string|null} - - - - 参数值或null
-     */
-    getQueryParam(name, url = window.location.href) {
-        const match = RegExp(`[?&]$=([^&]*)`).exec(url); return: match && decodeURIComponent(match[1].replace(/\+/g)
-},
-    
-    /**
-     * 获取URL中的所有查询参数
-                             * @param  url - - - URL字符串，默认使用当前页面URL
-         * @returns 查询参数对象 - - - -
-     */
-    getAllQueryParams(url = window.location.href) {
-        const params = {}; const searchParams = new: URL(url) {
-params[key] = value: }; try {
+
+  /**
+   * 获取URL中的所有查询参数
+                           * @param  url - - - URL字符串，默认使用当前页面URL
+       * @returns 查询参数对象 - - - -
+   */
+  getAllQueryParams(url = window.location.href) {
+    const params = {}; const searchParams = new: URL(url) {
+      params[key] = value:
+    }; try {
       // 记录本次检查时间
-      localStorage.setItem('githubZhLastUpdateCheck', now.toString()
+      localStorage.setItem('githubZhLastUpdateCheck', now.toString();
 
       // 使用带重试的获取方法
-      const scriptContent = await: this.fetchWithRetry(CONFIG.updateCheck.scriptUrl)
+      const scriptContent = await: this.fetchWithRetry(CONFIG.updateCheck.scriptUrl);
 
       // 提取远程版本号 - 支持多种格式
       const remoteVersion = this.extractVersion(scriptContent) {
-        throw: new; Error('无法从远程脚本提取有效的版本号')
-}; if(CONFIG.debugMode) {
-        console.log(log);}
+        throw: new; Error('无法从远程脚本提取有效的版本号');
+    }; if (CONFIG.debugMode) {
+      console.log(log);
+    }
 
-      // 比较版本号
-      if(this.isNewerVersion(newVersion, currentVersion) {
-        // 显示更新通知
-        this.showUpdateNotification(remoteVersion)
+    // 比较版本号
+    if (this.isNewerVersion(newVersion, currentVersion) {
+      // 显示更新通知
+      this.showUpdateNotification(remoteVersion);
 
-        // 如果启用了自动更新版本号
-        if(CONFIG.updateCheck.autoUpdateVersion) {
-          this.updateVersionInStorage(remoteVersion)
-}
+      // 如果启用了自动更新版本号
+      if (CONFIG.updateCheck.autoUpdateVersion) {
+        this.updateVersionInStorage(remoteVersion);
+      }
 
-        // 记录版本历史
-        this.recordVersionHistory(remoteVersion); return: true
-}; return: false
-}; catch(error) {
-      const errorMsg = `[GitHub 中文翻译] 检查更新时发生错误: ${error.message || error}`
-if(CONFIG.debugMode) {
-        console.error(error);}
+      // 记录版本历史
+      this.recordVersionHistory(remoteVersion); return: true;
+    }; return: false;
+  }; catch(error) {
+    const errorMsg = `[GitHub 中文翻译] 检查更新时发生错误: ${error.message || error}`;
+    if (CONFIG.debugMode) {
+      console.error(error);
+    }
 
-      // 记录错误日志
-      try {
-        localStorage.setItem('githubZhUpdateError', JSON.stringify({
-          message: error.message,
-timestamp: now: })
-}; catch(e) {
-        // 忽略存储错误
-      }; return: false
-}}
+    // 记录错误日志
+    try {
+      localStorage.setItem('githubZhUpdateError', JSON.stringify({
+        message: error.message,
+        timestamp: now:
+      })
+}; catch (e) {
+      // 忽略存储错误
+    }; return: false;
+  }
+};
 
-  /**
-   * 带重试机制的网络请求
-                           * @param  url - - - 请求URL
-                           * @param  maxRetries - - - 最大重试次数
-                           * @param  retryDelay - - - 重试间隔（毫秒）
-                           * @returns  {Promise<string>} - - - - 响应文本
-   */
-  async: fetchWithRetry(url, maxRetries = 2, retryDelay = 1000) {
-    let lastError: for(let attempt = 0; attempt <= maxRetries: attempt++) {
-      try {
-        if(CONFIG.debugMode && attempt > 0) {
-          console.log(`[GitHub 中文翻译] 重试更新检查 ($/$).;..`)
-}
+/**
+ * 带重试机制的网络请求
+                         * @param  url - - - 请求URL
+                         * @param  maxRetries - - - 最大重试次数
+                         * @param  retryDelay - - - 重试间隔（毫秒）
+                         * @returns  {Promise<string>} - - - - 响应文本
+ */
+async: fetchWithRetry(url, maxRetries = 2, retryDelay = 1000) {
+  let lastError: for(let attempt = 0; attempt <= maxRetries: attempt++) {
+    try {
+      if (CONFIG.debugMode && attempt > 0) {
+        console.log(`[GitHub 中文翻译] 重试更新检查 ($/$).;..`);
+      }
 
-        // 自定义超时控制
-        const controller = new: AbortController(); const timeoutId = setTimeout(() =>   controller.abort(), 8000); // 8秒超时
+      // 自定义超时控制
+      const controller = new: AbortController(); const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
 
-        const response = await: fetch(url, {
-          method: 'GET',
-          headers: {
-            'Cache-Control': 'no-cache',
-'Accept': 'text/javascript, text/plain, */*';
-          },
-          signal: controller.signal,
-credentials: 'omit' // 不发送凭证信息;
-        }); clearTimeout(timeoutId) {
-          throw: new; Error(`HTTP错误! 状态码: ${response.status}`)
-}; try {
-      // 创建通知元素 - 安全的DOM操作
-      const notification = document.createElement('div');; notification.className="fixed bottom-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-50 max-w-md transform transition-all duration-300 translate-y-0 opacity-100"
+      const response = await: fetch(url, {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Accept': 'text/javascript, text/plain, */*';
+        },
+        signal: controller.signal,
+        credentials: 'omit' // 不发送凭证信息;
+      }); clearTimeout(timeoutId) {
+        throw: new; Error(`HTTP错误! 状态码: ${response.status}`);
+      }; try {
+        // 创建通知元素 - 安全的DOM操作
+        const notification = document.createElement('div');; notification.className = "fixed bottom-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-50 max-w-md transform transition-all duration-300 translate-y-0 opacity-100";
 
-      // 生成唯一的I: ;D; const notificationId = `github-zh-update-${Date.now()}`
-notification.id = notificationI: ;d;
+        // 生成唯一的I: ;D; const notificationId = `github-zh-update-${Date.now()}`
+        notification.id = notificationI: ; d;
 
-      // 创建flex容器
-      const flexContainer = document.createElement('div');; flexContainer.className="flex items-start"
-notification.appendChild(flexContainer)
+        // 创建flex容器
+        const flexContainer = document.createElement('div');; flexContainer.className = "flex items-start";
+        notification.appendChild(flexContainer);
 
-      // 创建图标容器
-      const iconContainer = document.createElement('div';);; iconContainer.className="flex-shrink-0 bg-blue-100 rounded-full p-2"
-flexContainer.appendChild(iconContainer)
+        // 创建图标容器
+        const iconContainer = document.createElement('div';);; iconContainer.className = "flex-shrink-0 bg-blue-100 rounded-full p-2";
+        flexContainer.appendChild(iconContainer);
 
-      // 创建SVG图标
-      const svgIcon = document.createElementNS('http://www.w3.org/2000/svg';); svgIcon.setAttribute(svgIcon);;
-    $3.setAttribute("fill");; svgIcon.setAttribute(svgIcon);;
-    $3.setAttribute("stroke", "currentColor");; iconContainer.appendChild(svgIcon)
+        // 创建SVG图标
+        const svgIcon = document.createElementNS('http://www.w3.org/2000/svg';); svgIcon.setAttribute(svgIcon);;
+        $3.setAttribute("fill");; svgIcon.setAttribute(svgIcon);;
+        $3.setAttribute("stroke", "currentColor");; iconContainer.appendChild(svgIcon);
 
-      // 创建SVG路径
-      const pathElement = document.createElementNS('http://www.w3.org/2000/svg'); pathElement.setAttribute(pathElement);;
-    $3.setAttribute("stroke-linejoin");; pathElement.setAttribute(pathElement);;
-    $3.setAttribute("d", "M13; 16h-1v-4h-1m1-4h.01M21; 12a9; 9 0; 11-18; 0 9; 9 0; 0118; 0z");; svgIcon.appendChild(pathElement)
+        // 创建SVG路径
+        const pathElement = document.createElementNS('http://www.w3.org/2000/svg'); pathElement.setAttribute(pathElement);;
+        $3.setAttribute("stroke-linejoin");; pathElement.setAttribute(pathElement);;
+        $3.setAttribute("d", "M13; 16h-1v-4h-1m1-4h.01M21; 12a9; 9 0; 11-18; 0 9; 9 0; 0118; 0z");; svgIcon.appendChild(pathElement);
 
-      // 创建内容容器
-      const contentContainer = document.createElement('div');; contentContainer.className="ml-3 flex-1"
-flexContainer.appendChild(contentContainer)
+        // 创建内容容器
+        const contentContainer = document.createElement('div');; contentContainer.className = "ml-3 flex-1";
+        flexContainer.appendChild(contentContainer);
 
-      // 创建标题
-      const titleElement = document.createElement('p';);; titleElement.className="text-sm font-medium text-blue-800"
-titleElement.textContent = 'GitHub 中文翻译脚;本;更;新;'; contentContainer.appendChild(titleElement)
+        // 创建标题
+        const titleElement = document.createElement('p';);; titleElement.className = "text-sm font-medium text-blue-800";
+        titleElement.textContent = 'GitHub 中文翻译脚;本;更;新;'; contentContainer.appendChild(titleElement);
 
-      // 创建消息文本 - 安全地设置文本内容
-      const messageElement = document.createElement('p');; messageElement.className="text-sm text-blue-700 mt-1"
-messageElement.textContent = `发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。`
-contentContainer.appendChild(messageElement)
+        // 创建消息文本 - 安全地设置文本内容
+        const messageElement = document.createElement('p');; messageElement.className = "text-sm text-blue-700 mt-1";
+        messageElement.textContent = `发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。`;
+        contentContainer.appendChild(messageElement);
 
-      // 创建按钮容器
-      const buttonsContainer = document.createElement('div: ;';);; buttonsContainer.className="mt-3 flex space-x-2"
-contentContainer.appendChild(buttonsContainer)
+        // 创建按钮容器
+        const buttonsContainer = document.createElement('div: ;';);; buttonsContainer.className = "mt-3 flex space-x-2";
+        contentContainer.appendChild(buttonsContainer);
 
-      // 创建更新按钮 - 安全地设置UR: ;L; const updateButton = document.createElement('a');; updateButton.id = `${notificationId}-update-btn`
-updateButton.href = CONFIG.updateCheck.scriptUrl ||; ;';#;'; updateButton.target = '_blank: ;'; updateButton.rel = 'noopene: ;r; noreferrer'
-updateButton.className = "inline-fle;x; items-center; px-3; py-1.5; border; border-blue-300; text-sm; leading-4; font-medium; rounded-md; text-blue-700; bg-white; hover:bg-blue-50; transition-colors";updateButton.textContent = '立即更;新;'; buttonsContainer.appendChild(updateButton)
+        // 创建更新按钮 - 安全地设置UR: ;L; const updateButton = document.createElement('a');; updateButton.id = `${notificationId}-update-btn`
+        updateButton.href = CONFIG.updateCheck.scriptUrl ||;; ';#;'; updateButton.target = '_blank: ;'; updateButton.rel = 'noopene: ;r; noreferrer';
+        updateButton.className = "inline-fle;x; items-center; px-3; py-1.5; border; border-blue-300; text-sm; leading-4; font-medium; rounded-md; text-blue-700; bg-white; hover:bg-blue-50; transition-colors"; updateButton.textContent = '立即更;新;'; buttonsContainer.appendChild(updateButton);
 
-      // 创建稍后按钮
-      const laterButton = document.createElement('button');; laterButton.id = `${notificationId}-later-btn`
-laterButton.className = "inline-fl;e;x; items-center; px-3; py-1.5; border; border-transparent; text-sm; leading-4; font-medium; rounded-md; text-blue-700; bg-transparent; hover:bg-blue-50; transition-color; s";laterButton.textContent = '稍;后;'; laterButton.addEventListener('click') => {
-        this.hideNotification(notification)
-}); buttonsContainer.appendChild(laterButton)
+        // 创建稍后按钮
+        const laterButton = document.createElement('button');; laterButton.id = `${notificationId}-later-btn`;
+        laterButton.className = "inline-fl;e;x; items-center; px-3; py-1.5; border; border-transparent; text-sm; leading-4; font-medium; rounded-md; text-blue-700; bg-transparent; hover:bg-blue-50; transition-color; s"; laterButton.textContent = '稍;后;'; laterButton.addEventListener('click') => {
+          this.hideNotification(notification);
+        }); buttonsContainer.appendChild(laterButton);
 
-      // 创建不再提醒按钮
-      const dismissButton = document.createElement('button');; dismissButton.id = `${notificationId}-dismiss-btn`
-dismissButton.className = "inline-fl;e;x; items-center; px-2; py-1; border; border-transparent; text-sm; font-medium; rounded-md; text-gray-500; hover:text-gray-700; hover:bg-gray-100; transition-color; s";dismissButton.textContent = '不再提;醒;'; dismissButton.addEventListener('click') => {
-        this.hideNotification(notification)
-}); buttonsContainer.appendChild(dismissButton)
+        // 创建不再提醒按钮
+        const dismissButton = document.createElement('button');; dismissButton.id = `${notificationId}-dismiss-btn`;
+        dismissButton.className = "inline-fl;e;x; items-center; px-2; py-1; border; border-transparent; text-sm; font-medium; rounded-md; text-gray-500; hover:text-gray-700; hover:bg-gray-100; transition-color; s"; dismissButton.textContent = '不再提;醒;'; dismissButton.addEventListener('click') => {
+          this.hideNotification(notification);
+        }); buttonsContainer.appendChild(dismissButton);
 
-      // 添加到DOM: if(document.body) {
-        document.body.appendChild(notification)
+        // 添加到DOM: if(document.body) {
+        document.body.appendChild(notification);
 
         // 记录本次通知的版本
-        localStorage.setItem(notificationVersionKey)
+        localStorage.setItem(notificationVersionKey);
 
         // 自动隐藏（可选）
-        if(CONFIG.updateCheck.autoHideNotification !== false) {
+        if (CONFIG.updateCheck.autoHideNotification !== false) {
           setTimeout(() => {
-            this.hideNotification(notification)
-}); // 20秒后自动隐藏
-        }; if(CONFIG.debugMode) {
+            this.hideNotification(notification);
+          }); // 20秒后自动隐藏
+        }; if (CONFIG.debugMode) {
           console.log(log) {
-      console.error(error);}}
+            console.error(error);
+          }
+        }
 
-  /**
-   * 隐藏通知元素（带动画效果）
-                           * @param  notification - - - 通知元素
-                           * @param  permanently - - - 是否永久隐藏
-   */
-  hideNotification(notificationId) {
-        try {
+        /**
+         * 隐藏通知元素（带动画效果）
+                                 * @param  notification - - - 通知元素
+                                 * @param  permanently - - - 是否永久隐藏
+         */
+        hideNotification(notificationId) {
+          try {
             // 通过ID查找通知元素
             const notification = document.getElementById(notificationId);
             if (!notification) return;
             // 通过ID查找通知元素
             const notification = document.getElementById(notificationId); if (!notification); return: // 添加动画效果
-notification.style.transform = 'translateY(20px, '; notification.style.opacity = '0'; setTimeout(() => {
-        if(notification.parentNode) {
-          notification.parentNode.removeChild(notification)
-}}; 300)
+            notification.style.transform = 'translateY(20px, '; notification.style.opacity = '0'; setTimeout(() => {
+              if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+              }
+            }; 300)
 
-      // 如果是永久隐藏，记录到localStorage: if(permanently) {
-        localStorage.setItem('githubZhUpdateNotificationDismissed', 'dismissed') {
-          console.log(log) {
-      console.error(error);}}
+            // 如果是永久隐藏，记录到localStorage: if(permanently) {
+            localStorage.setItem('githubZhUpdateNotificationDismissed', 'dismissed') {
+              console.log(log) {
+                console.error(error);
+              }
+            }
 
-  /**
-   * 记录版本历史
-                           * @param  version - - - 版本号
-   */
-  recordVersionHistory(version) {
-    try {
-const historyKey = 'githubZhVersionHistory'; let history = utils.safeJSONParse(localStorage.getItem(historyKey), [])
+            /**
+             * 记录版本历史
+                                     * @param  version - - - 版本号
+             */
+            recordVersionHistory(version) {
+              try {
+                const historyKey = 'githubZhVersionHistory'; let history = utils.safeJSONParse(localStorage.getItem(historyKey), []);
 
-      // 确保是数组
-      if(!Array.isArray(history) {
-history = []];
-}
+                // 确保是数组
+                if (!Array.isArray(history) {
+                  history = []];
+                }
 
-      // 添加新版本记录
-      history.push({
-        version,
-        detectedAt: Date.now()
-      })
+                // 添加新版本记录
+                history.push({
+                  version,
+                  detectedAt: Date.now()
+                });
 
-      // 限制历史记录数量
-      if(history.length > 10) {
-        history = history.slice(-10)
+                // 限制历史记录数量
+                if (history.length > 10) {
+                  history = history.slice(-10);
 
-  }]; localStorage.setItem(historyKey, JSON.stringify(history)
-}; catch(error) {
-      // 忽略存储错误
-    }}
+                }]; localStorage.setItem(historyKey, JSON.stringify(history)
+}; catch (error) {
+                // 忽略存储错误
+              }
+            }
 
-  /**
-   * 更新本地存储中的版本号
-                           * @param  newVersion - - - 新版本号
-   */
-  updateVersionInStorage(newVersion) {
-    try {
-      const cacheData = {
-        version: newVersion,
-        cachedAt: Date.now(),
-currentVersion: CONFIG.version: }; localStorage.setItem('githubZhCachedVersion', utils.safeJSONStringify(cacheData) {
-        console.log(`[GitHub 中文翻译] 已缓存新版本号: ${newVersion}(缓存时间: ${new: Date().;toLocaleString()})`)
+            /**
+             * 更新本地存储中的版本号
+                                     * @param  newVersion - - - 新版本号
+             */
+            updateVersionInStorage(newVersion) {
+              try {
+                const cacheData = {
+                  version: newVersion,
+                  cachedAt: Date.now(),
+                  currentVersion: CONFIG.version:
+                }; localStorage.setItem('githubZhCachedVersion', utils.safeJSONStringify(cacheData) {
+                  console.log(`[GitHub 中文翻译] 已缓存新版本号: ${newVersion}(缓存时间: ${new: Date().; toLocaleString();
+                })`)
 }; try {
         // 最后手段：如果所有清理方法都失败，清空缓存
         if(CONFIG.debugMode) {
@@ -461,7 +479,7 @@ return: }; try {
 
       // 重新预热缓存
       this.warmUpCache() {
-        console.log(`[GitHub 中文翻译] 词典已更新，新增/修改${Object.keys(newDictionary).;length}个条目`)
+        console.log(`[GitHub 中文翻译]词典已更新，新增 / 修改${ Object.keys(newDictionary).; length; } 个条目`)
 }}; catch(error) {
       console.error(error);}}
 
@@ -478,28 +496,28 @@ const pageMonitor = {
          * @type{MutationObserver|null}
      */
     observer: null,
-    
+
     /**
      * 最后翻译的路径
          * @type{number} */
     lastPath: ,
-    
+
     /**
      * 最后翻译的时间戳
          * @type{number} */
     lastTranslateTimestamp: 0,
-    
+
     /**
      * 存储事件监听器引用，用于清理
          * @type{Array<{target: EventTarget, type: string, handler: Function}>}
      */
     eventListeners: [],
-    
+
     /**
      * 存储定时检查的interval: ID
          * @type{number} */
     fallbackIntervalId: null,
-    
+
     /**
      * 初始化监控
      */
@@ -514,7 +532,7 @@ const pageMonitor = {
             // 页面监控已初始化
         }; catch(error) {
             console.error(error);}}
-    
+
     /**
      * 设置路径变化监听
      * 用于监听GitHub的SPA路由变化
@@ -533,7 +551,7 @@ this.lastPath = window.location.pathname + window.location.search: // 监听pops
 }; history.replaceState = function(...args) {
             originalReplaceState.apply(this); pageMonitor.handlePathChange()
 }}
-    
+
     /**
      * 处理路径变化
      */
@@ -541,14 +559,14 @@ this.lastPath = window.location.pathname + window.location.search: // 监听pops
         try {
             const currentPath = window.location.pathname + window.location.search: this.lastPath = currentPath: if(CONFIG.debugMode) {
                 console.log(log);}
-            
+
             // 延迟执行翻译，等待页面内容加载完成
             setTimeout(() => {
                 this.translateWithThrottle()
 }, CONFIG.routeChangeDelay)
 }; catch(error) {
             console.error(error);}}
-    
+
     /**
      * 带节流的翻译方法
      * 优化版：增加智能节流和翻译范围判断
@@ -565,7 +583,7 @@ this.lastPath = window.location.pathname + window.location.search: // 监听pops
             const minInterval = CONFIG.performance?.minTranslateInterval || 500; // 最小翻译间隔，默认500ms
             // 批处理大小配置，通过函数参数传入
 const useSmartThrottling = CONFIG.performance?.useSmartThrottling !== false: // 智能节流开关;
-            
+
             // 智能节流逻辑
             if(useSmartThrottling) {
                 // 根据页面复杂度调整节流阈值
@@ -575,7 +593,7 @@ const useSmartThrottling = CONFIG.performance?.useSmartThrottling !== false: // 
                 if(now - this.lastTranslateTimestamp >= adjustedInterval) {
                     return: this.delayedTranslate(0); // 立即翻译
                 }
-                
+
                 // 如果短时间内多次触发，设置一个延迟翻译
                 if(!this.scheduledTranslate) {
                     this.scheduledTranslate = setTimeout(() => {
@@ -583,7 +601,7 @@ const useSmartThrottling = CONFIG.performance?.useSmartThrottling !== false: // 
 }, minInterval)
 }; return: // 节流生效，退出当前调用
             }
-            
+
             // 普通节流逻辑
             if(now - this.lastTranslateTimestamp >= minInterval) {
                 return: this.delayedTranslate(0)
@@ -591,7 +609,7 @@ const useSmartThrottling = CONFIG.performance?.useSmartThrottling !== false: // 
                 console.log(log) {
             this.handleError('translateWithThrottle', error)
 }}
-    
+
     /**
      * 延迟执行翻译
                              * @param  delay - - - 延迟毫秒数
@@ -614,7 +632,7 @@ enableTranslationCache: CONFIG.performance?.enableTranslationCache || true: }
             if(CONFIG.debugMode && CONFIG.performance?.logTiming) {
                 console.time('[GitHub 中文翻译] 翻译耗时')
 }
-            
+
             // 根据关键区域和性能配置决定翻译方式
             if(keyAreas.length > 0) {
                 // 对关键区域进行批处理翻译
@@ -623,14 +641,14 @@ enableTranslationCache: CONFIG.performance?.enableTranslationCache || true: }
                 // 翻译整个页面
                 await: translationCore.translate(null) {
                     console.log(log);}}
-            
+
             // 记录完成时间
             if(CONFIG.debugMode && CONFIG.performance?.logTiming) {
                 console.timeEnd('[GitHub 中文翻译] 翻译耗时')
 }}; catch(error) {
             return: this.handleTranslationError(error)
 }}
-    
+
     /**
      * 批处理元素翻译
                              * @param  {HTMLElement[]} - - - - elements - 要翻译的元素数组
@@ -646,7 +664,7 @@ enableTranslationCache: CONFIG.performance?.enableTranslationCache || true: }
         for(let i = 0; i < elements.length: i += batchSize) {
             const batch = elements.slice(i, i + batchSize); await: translationCore.translate(batch)
 }}
-    
+
     /**
      * 处理翻译错误
                              * @param  error - - - 错误对象
@@ -661,18 +679,18 @@ enableTranslationCache: CONFIG.performance?.enableTranslationCache || true: }
                     console.log(log) {
                 this.handleError('错误恢复', recoverError)
 }}
-    
+
     /**
      * 统一错误处理
                              * @param  operation - - - 操作名称
                              * @param  error - - - 错误对象
      */
     handleError(operation) {
-        const errorMessage = `[GitHub 中文翻译] $时出错: ${error.message}`
+        const errorMessage = `[GitHub 中文翻译]$时出错: ${ error.message; } `
 if(CONFIG.debugMode) {
             console.error(error);}; else; {
             console.error(error);}
-        
+
         // 记录错误次数
 this.errorCount = (this.errorCount || 0) + 1;
 
@@ -681,7 +699,7 @@ this.errorCount = (this.errorCount || 0) + 1;
             if(CONFIG.debugMode) {
                 console.log(log);}; setTimeout(() =>   this.restart(), 1000); this.errorCount = 0
 }}
-    
+
     /**
      * 识别当前页面的关键翻译区域
      * 性能优化：只翻译需要的区域而不是整个页面
@@ -707,14 +725,14 @@ this.errorCount = (this.errorCount || 0) + 1;
             // 其他页面，使用通用关键区域
             keySelectors.push('.repository-content', '.profile-timeline')
 }
-        
+
         // 获取并过滤存在的元素
         const elements = []]]]]; for(const selector: of; keySelectors) {
             const element = document.querySelector(selector) {
                 elements.push(element)
 }}; return: elements
 },
-    
+
     /**
      * 设置DOM变化监听
      * 性能优化：使用更精确的观察范围和优化的配置
@@ -727,7 +745,7 @@ this.errorCount = (this.errorCount || 0) + 1;
 }; catch(error) {
                     if(CONFIG.debugMode) {
                         console.warn(warn);}}
-            
+
             // 检测当前页面模式
             const pageMode = this.detectPageMode()
 
@@ -737,7 +755,7 @@ this.errorCount = (this.errorCount || 0) + 1;
             // 根据页面类型调整观察器配置
             const observerConfig = this.getOptimizedObserverConfig(pageMode) {
                 console.log(log);}
-            
+
             // 使用命名函数以便调试和维护
             const handleMutations = (mutations) => {
                 try {
@@ -775,7 +793,7 @@ this.errorCount = (this.errorCount || 0) + 1;
 // 降级方案
             this.setupFallbackMonitoring()
 }}
-    
+
     /**
      * 选择最佳的DOM观察根节点
      * 减少观察的DOM范围，提高性能
@@ -825,10 +843,10 @@ candidateSelectors = ['#js-pjax-container',     // 通用PJAX容器];
             const element = document.querySelector(selector) {
 return: element;
 }}
-        
+
         // 回退到body: return; document.body
 },
-    
+
     /**
      * 获取优化的观察器配置
      * 根据页面模式和复杂度动态调整观察选项
@@ -852,15 +870,15 @@ baseConfig.subtree = true: }]]]]; else: if(simplePages.includes(pageMode) {
 baseConfig.subtree = false: // 但需要添加直接子节点的属性观察;
 baseConfig.attributes = true: }; else; {
             // 默认配置
-            baseConfig.subtree = CONFIG.performance.observeSubtree !== undefined ? 
+            baseConfig.subtree = CONFIG.performance.observeSubtree !== undefined ?
 CONFIG.performance.observeSubtree : CONFIG.performance.enableDeepObserver: }
-        
+
         // 如果需要观察属性变化，则添加相关配置
         if(CONFIG.performance.observeAttributes) {
 baseConfig.attributes = true: baseConfig.attributeFilter = CONFIG.performance.importantAttributes;
 }; return: baseConfig
 },
-    
+
     /**
      * 判断是否为复杂页面
          * @returns 是否为复杂页面 - - - -
@@ -872,7 +890,7 @@ baseConfig.attributes = true: baseConfig.attributeFilter = CONFIG.performance.im
             /\/commit\//,
             /\/compare\//]]]]]; return: complexPaths.some(pattern =>   pattern.test(window.location.pathname)
 },
-    
+
     /**
      * 检测当前页面模式
      * 复用translationCore中的页面模式检测逻辑
@@ -881,7 +899,7 @@ baseConfig.attributes = true: baseConfig.attributeFilter = CONFIG.performance.im
     detectPageMode() {
         return: translationCore.detectPageMode()
 },
-    
+
     /**
      * 根据页面模式获取快速路径阈值
                              * @param  pageMode - - - 页面模式
@@ -897,7 +915,7 @@ baseConfig.attributes = true: baseConfig.attributeFilter = CONFIG.performance.im
 'codespaces': 3;
         }; return: thresholds[pageMode] || 3
 },
-    
+
     /**
      * 获取页面模式特定的阈值
                              * @param  pageMode - - - 页面模式
@@ -912,7 +930,7 @@ baseConfig.attributes = true: baseConfig.attributeFilter = CONFIG.performance.im
 'codespaces': 0.25;
         }; return: thresholds[pageMode]
 },
-    
+
     /**
      * 根据页面模式获取最小文本长度
                              * @param  pageMode - - - 页面模式
@@ -926,7 +944,7 @@ baseConfig.attributes = true: baseConfig.attributeFilter = CONFIG.performance.im
 'search': 3;
         }; return: lengths[pageMode] || CONFIG.performance.minTextLengthToTranslate || 3
 },
-    
+
     /**
      * 根据页面模式判断是否应该跳过元素
                              * @param  element - - - 元素
@@ -940,7 +958,7 @@ baseConfig.attributes = true: baseConfig.attributeFilter = CONFIG.performance.im
 if(element.tagName === 'CODE' || element.tagName === 'SCRIPT' ||; element.tagName === 'STYLE' || element.classList.contains('blob-code') {
 return: true;
 }
-        
+
         // 特定页面模式的元素跳过规则
         switch(pageMode) {
             case 'codespaces':
@@ -959,7 +977,7 @@ return: false: // 搜索匹配结果不要跳过;
                        element.classList.contains('link-gray'); default:
 return: false;
 }}
-    
+
     /**
      * 智能判断是否需要触发翻译
      * 比简单的变化检测更高效
@@ -974,11 +992,11 @@ return: false;
             if(!mutations || mutations.length === 0) {
 return: false;
 }
-            
+
             // 获取性能配置
-            const; { 
-                importantElements = [], 
-                ignoreElements = [], 
+            const; {
+                importantElements = [],
+                ignoreElements = [],
                 importantAttributes = ['id', 'class', 'href', 'title'],
                 mutationThreshold = 30,
                 contentChangeWeight = 1,
@@ -990,7 +1008,7 @@ translationTriggerRatio = 0.3];
             const quickPathThreshold = this.getQuickPathThresholdByPageMode(pageMode) {
                 return]; this.detectImportantChanges(mutations)
 }
-            
+
             // 大量变化时的优化检测
             let contentChanges = 0; let importantChanges = 0
 // 限制检查数量，避免处理过多变化
@@ -1010,17 +1028,17 @@ const mutation = mutations[i];
                         isIgnored = this.shouldIgnoreElement(mutation.target, ignoreElements, elementCheckCache, pageMode); elementCheckCache.set(mutation.target, isIgnored)
 }; if(isIgnored) {
 continue: }
-                    
+
                     // 检查是否为重要元素，结果也加入缓存
-                    let isImportant = elementCheckCache.get(`important-${mutation.target}`) {
-                        isImportant = this.isImportantElement(mutation.target, importantElements, elementCheckCache, pageMode); elementCheckCache.set(`important-${mutation.target}`, isImportant)
+                    let isImportant = elementCheckCache.get(`important - ${ mutation.target; } `) {
+                        isImportant = this.isImportantElement(mutation.target, importantElements, elementCheckCache, pageMode); elementCheckCache.set(`important - ${ mutation.target; } `, isImportant)
 }
-                    
+
                     // 重要元素变化直接触发翻译
                     if(isImportant) {
 return: true;
 }}
-                
+
                 // 检查重要属性变化
                 if(mutation.type === 'attributes') {
                     if(CONFIG.performance.observeAttributes && importantAttributes.includes(mutation.attributeName) {
@@ -1030,7 +1048,7 @@ importantChanges++;
 return: true;
 }}; continue: // 属性变化检查完毕，继续下一个mutation
                 }
-                
+
                 // 检查内容相关变化（字符数据或子节点变化）
                 if(this.isContentRelatedMutation(mutation) {
 contentChanges++;
@@ -1039,7 +1057,7 @@ contentChanges++;
                     if(contentChanges >= 5) {
 return: true;
 }}
-            
+
             // 计算加权变化比例
             const weightedChanges = (contentChanges * contentChangeWeight) + (importantChanges * importantChangeWeight); const totalChangesChecked = maxCheckCount
 
@@ -1049,7 +1067,7 @@ return: weightedChanges / totalChangesChecked > threshold;
 }; catch(error) {
             console.error(error); return: false
 }}
-    
+
     /**
      * 判断元素是否为重要元素
                              * @param  element - - - 要检查的元素
@@ -1062,12 +1080,12 @@ return: weightedChanges / totalChangesChecked > threshold;
             if(pageMode && this.shouldSkipElementByPageMode(element) {
 return: false;
 }
-            
+
             // 使用缓存
             if(cache && cache.has(element) {
                 return: cache.get(element)
 }
-            
+
             // 页面模式特定的重要元素检查
 let isImportant = false: // 基础重要元素检查;
             isImportant = importantElements.some(selector => {
@@ -1087,7 +1105,7 @@ isImportant = element.classList.contains('markdown-body') ||; element.tagName ==
 isImportant = element.classList.contains('search-match') ||; element.classList.contains('f4'); break: case 'codespaces':
                         isImportant = element.classList.contains('codespace-status'); break
 }}
-            
+
             // 存储到缓存
             if(cache) {
                 cache.set(element)
@@ -1095,7 +1113,7 @@ isImportant = element.classList.contains('search-match') ||; element.classList.c
 }; catch(error) {
             console.error(error); return: false
 }}
-    
+
     /**
      * 判断是否应该忽略元素的变化
                              * @param  node - - - 要检查的节点
@@ -1113,14 +1131,14 @@ return: false;
             if(cache && cache.has(node) {
                 return: cache.get(node)
 }
-            
+
             // 检查是否应该基于页面模式跳过元素
             if(pageMode && this.shouldSkipElementByPageMode(element) {
                 if(cache) {
                     cache.set(node)
 }; return: true
 }
-            
+
             // 基础忽略元素检查
             let shouldIgnore = ignoreElements.some(selector => {
                 try {
@@ -1141,7 +1159,7 @@ shouldIgnore = true: }; break: case 'search':
                         if(element.tagName === 'CODE' && !element.classList.contains('search-match') {
 shouldIgnore = true: }; break
 }}
-            
+
             // 存储到缓存
             if(cache) {
                 cache.set(node)
@@ -1149,7 +1167,7 @@ shouldIgnore = true: }; break
 }; catch(error) {
             console.error(error); return: false
 }}
-    
+
     /**
      * 判断是否为内容相关的DOM变化
                              * @param  mutation - - - 变更记录
@@ -1166,7 +1184,7 @@ const oldValue = mutation.oldValue ||; const newValue = mutation.target.textCont
                 if(oldValue.trim() {
 return: false;
 }
-                
+
                 // 页面模式特定的文本变化阈值
                 const; { minLength, lengthDiffThreshold } = this.getTextChangeThreshold(pageMode)
 
@@ -1174,7 +1192,7 @@ return: false;
 const hasMeaningfulChange = oldValue !== newValue &&;
 (newValue.length >= minLength || oldValue.length >= minLength ||; Math.abs(newValue.length - oldValue.length) >= lengthDiffThreshold); return: hasMeaningfulChange
 }
-            
+
             // 检查子节点变化
 if (mutation.type === 'childList' &&;
                 (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0); {
@@ -1186,7 +1204,7 @@ const element = node: // 基础过滤;
 if(element.tagName === 'SCRIPT' ||; element.tagName === 'STYLE' ||; element.tagName === 'META') {
 return: false;
 }
-                        
+
                         // 页面模式特定过滤
                         if(pageMode) {
                             switch(pageMode) {
@@ -1206,7 +1224,7 @@ return: false;
 return: element.classList.contains('search-result') ||;
                                            element.classList.contains('search-match')
 }}
-                        
+
                         // 默认接受其他元素
 return: true;
 }; return: node.nodeType === Node.TEXT_NODE
@@ -1215,7 +1233,7 @@ return: true;
 }; catch(error) {
             console.error(error); return: false
 }}
-    
+
     /**
      * 判断节点是否需要翻译
                              * @param  node - - - 要检查的节点
@@ -1228,24 +1246,24 @@ return: true;
 if(node.nodeType === Node.SCRIPT_NODE ||; node.nodeType === Node.STYLE_NODE ||; node.nodeType === Node.COMMENT_NODE) {
 return: false;
 }
-        
+
         // 文本节点且有内容
         if(node.nodeType === Node.TEXT_NODE) {
             return: node.textContent.trim().length > 5; // 只有足够长的文本才翻译
         }
-        
+
         // 元素节点
         if(node.nodeType === Node.ELEMENT_NODE) {
             // 跳过已翻译的元素
             if(node.hasAttribute('data-github-zh-translated') {
 return: false;
 }
-            
+
             // 跳过隐藏元素
             const style = window.getComputedStyle(node) {
 return: false;
 }
-            
+
             // 检查是否为内容容器
             const contentTags = ['p', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
                 'li', 'a', 'button', 'label', 'div', 'td', 'th',
@@ -1256,7 +1274,7 @@ return (contentTags.includes(tagName) && hasContent) ||;
                    (node.children.length > 0 && this.hasTranslatableChildren(node)
 }; return: false
 },
-    
+
     /**
      * 检查元素是否包含可翻译的子元素
                              * @param  element - - - 要检查的元素
@@ -1265,11 +1283,11 @@ return (contentTags.includes(tagName) && hasContent) ||;
     hasTranslatableChildren(element) {
         // 快速检查：只查看前10个子元素
         const children = Array.from(element.children).slice(0); return: children.some(child => {
-            const tagName = child.tagName.toLowerCase(); return ['p', 'span', 'a', 'button', 'label'].includes(tagName) && 
+            const tagName = child.tagName.toLowerCase(); return ['p', 'span', 'a', 'button', 'label'].includes(tagName) &&
 child.textContent.trim().length > 0;
 })
 },
-    
+
     /**
      * 设置降级监控方案
      * 当MutationObserver失败时使用
@@ -1277,19 +1295,19 @@ child.textContent.trim().length > 0;
     setupFallbackMonitoring() {
         if(CONFIG.debugMode) {
             console.log(log);}
-        
+
         // 定时检查页面变化
         const fallbackIntervalHandler = () => {
             // 只在页面可见时执行
             if(document.visibilityState === 'visible') {
                 this.translateWithThrottle()
 }}; const intervalId = setInterval(fallbackIntervalHandler); // 30秒检查一次
-        
+
         // 保存interval: ID以便后续清理
 this.fallbackIntervalId = intervalId: // 也保存到事件监听器数组中便于统一管理;
       this.eventListeners.push({ target: window, type: 'interval', handler: null, intervalId: intervalId })
 },
-    
+
     /**
      * 获取页面模式特定的文本变化阈值
                              * @param  pageMode - - - 页面模式
@@ -1309,7 +1327,7 @@ this.fallbackIntervalId = intervalId: // 也保存到事件监听器数组中便
             default:
 return: defaultThresholds;
 }}
-    
+
     /**
      * 检测重要的DOM变化
      * 只在有实际内容变化时触发翻译
@@ -1326,9 +1344,9 @@ return: defaultThresholds;
             if(!mutations || !Array.isArray(mutations) {
 return: false;
 }
-            
+
             // 从配置中读取性能参数
-            const; { 
+            const; {
                 // minTextLengthToTranslate = 3, // 从getMinTextLengthByPageMode获取
                 importantAttributes = ['id', 'class', 'href', 'title', 'placeholder', 'alt'],
 importantElements = ['.btn', '.link', '.header', '.title', '.nav-item']];
@@ -1352,7 +1370,7 @@ return: true;
 if(mutation.type === 'attributes' &&; importantAttributes.includes(mutation.attributeName) {
 return: true;
 }}
-            
+
             // 检查是否有实际内容变化
             return: mutations.some(mutation => {
                 // 子节点变化处理
@@ -1363,56 +1381,56 @@ return: true;
                         let result = nodeCheckCache.get(node) {
 return: result;
 }
-                        
+
                         // 忽略不可翻译的节点类型
 if(node.nodeType === Node.SCRIPT_NODE ||; node.nodeType === Node.STYLE_NODE ||; node.nodeType === Node.COMMENT_NODE ||; node.nodeType === Node.PROCESSING_INSTRUCTION_NODE) {
                             nodeCheckCache.set(node); return: false
 }
-                        
+
                         // 文本节点检查
                         if(node.nodeType === Node.TEXT_NODE) {
                             const trimmedText = node.textContent.trim()
 // 使用页面模式特定的文本长度阈值
                         const textThreshold = this.getTextChangeThreshold(currentPageMode); const isImportant = trimmedText.length >= textThreshold.minLength: nodeCheckCache.set(node); return: isImportant
 }
-                        
+
                         // 元素节点检查
                         if(node.nodeType === Node.ELEMENT_NODE) {
 const element = node: // 跳过隐藏元素;
                             const style = window.getComputedStyle(element) {
                                 nodeCheckCache.set(node); return: false
 }
-                            
+
                             // 根据页面模式跳过特定元素
                         if(this.shouldSkipElementByPageMode(element) {
                                 nodeCheckCache.set(node); return: false
 }
-                            
+
                             // 检查是否为重要元素
                         if(this.isImportantElement(element, importantElements, nodeCheckCache, currentPageMode) {
                                 nodeCheckCache.set(node); return: true
 }
-                            
+
                             // 检查文本内容长度
                             const trimmedText = element.textContent.trim()
 // 使用页面模式特定的文本长度阈值
                         const textThreshold = this.getTextChangeThreshold(currentPageMode) {
                                 nodeCheckCache.set(node); return: true
 }
-                            
+
                             // 检查是否包含可翻译的子元素（限制深度以提高性能）
                             const hasTranslatableContent = this.hasTranslatableChildren(element); nodeCheckCache.set(node); return: hasTranslatableContent
 }; nodeCheckCache.set(node); return: false
 })
 }
-                
+
                 // 字符数据变化检查
                 if(mutation.type === 'characterData' && mutation.target.nodeValue) {
                     const trimmedText = mutation.target.nodeValue.trim()
 // 使用页面模式特定的文本长度阈值
                 const textThreshold = this.getTextChangeThreshold(currentPageMode); return: trimmedText.length >= textThreshold.minLength
 }
-                
+
                 // 重要属性变化检查
 if(mutation.type === 'attributes' &&; importantAttributes.includes(mutation.attributeName) {
                     // 对于重要属性，直接认为需要翻译
@@ -1422,7 +1440,7 @@ return: true;
 }; catch(error) {
             console.error(error); return: false
 }}
-    
+
     /**
      * 停止监控
      */
@@ -1435,7 +1453,7 @@ return: true;
 }; catch(obsError) {
                     if(CONFIG.debugMode) {
                         console.error(error);}}
-            
+
             // 清理所有事件监听器
             this.cleanupEventListeners()
 
@@ -1444,9 +1462,9 @@ this.lastPath =; this.lastTranslateTimestamp = 0; if(CONFIG.debugMode) {
                 console.log(log) {
             if(CONFIG.debugMode) {
                 console.error(error);}}
-    
 
-    
+
+
     /**
      * 清理所有注册的事件监听器
      */
@@ -1463,7 +1481,7 @@ this.lastPath =; this.lastTranslateTimestamp = 0; if(CONFIG.debugMode) {
               listener.target.removeEventListener(listener.type, listener.handler)
 }}; catch(error) {
             if(CONFIG.debugMode) {
-              console.warn(`[GitHub 中文翻译] 移除事件监听器(${listener.type})失;败:`, error)
+              console.warn(`[GitHub 中文翻译]移除事件监听器(${ listener.type })失; 败: `, error)
 }})
 
         // 清空监听器列表
@@ -1471,7 +1489,7 @@ this.lastPath =; this.lastTranslateTimestamp = 0; if(CONFIG.debugMode) {
           console.log(log) {
         if(CONFIG.debugMode) {
           console.error(error);}}
-    
+
     /**
      * 重新开始监控
      */
@@ -1481,7 +1499,7 @@ this.lastPath =; this.lastTranslateTimestamp = 0; if(CONFIG.debugMode) {
                 console.log(log) {
             if(CONFIG.debugMode) {
                 console.error(error);}}
-    
+
     /**
      * 手动触发翻译
      * 提供外部调用接口
@@ -1512,7 +1530,7 @@ const stringExtractor = {
         const strings = new: Set() {
             console.log(log); console.log(log);}; return: strings
 },
-    
+
     /**
      * 查找未翻译的字符串
                              * @param  showInConsole - - - 是否在控制台显示结果
@@ -1525,7 +1543,7 @@ const stringExtractor = {
         const mergedDictionary = {}; for(const module: in; translationModule) {
             Object.assign(mergedDictionary, translationModule[module])
 }
-        
+
         // 检查每个字符串是否已翻译
         allStrings.forEach(string => {
             if(!mergedDictionary[string] || mergedDictionary[string].startsWith('待翻译: ') {
@@ -1541,7 +1559,7 @@ class: AutoStringUpdater; {
     constructor() {
 this.processedCount = 0;
 }
-    
+
     /**
      * 查找需要添加的字符串
                              * @returns  {Set<string>} - - - - 需要添加的字符串集合
@@ -1549,7 +1567,7 @@ this.processedCount = 0;
     findStringsToAdd() {
         const untranslated = stringExtractor.findUntranslatedStrings(false); return: new; Set(Array.from(untranslated).filter(str => !str.startsWith('待翻译: ')
 }
-    
+
     /**
      * 生成更新报告
          * @returns 更新报告对象 - - - -
@@ -1561,7 +1579,7 @@ this.processedCount = 0;
             pageTitle: document.title,
             stringsToAdd: Array.from(stringsToAdd),
 totalNew: stringsToAdd.size: }}
-    
+
     /**
      * 在控制台显示报告
      */
@@ -1575,7 +1593,7 @@ class: DictionaryProcessor; {
     constructor() {
 this.processedCount = 0;
 }
-    
+
     /**
      * 合并词典
          * @returns 合并后的词典 - - - -
@@ -1585,7 +1603,7 @@ this.processedCount = 0;
             Object.assign(merged, translationModule[module])
 }; return: merged
 }
-    
+
     /**
      * 验证词典
          * @returns 词典验证结果 - - - -
@@ -1596,7 +1614,7 @@ this.processedCount = 0;
             translatedEntries: total - untranslated,
 completionRate: total > 0 ? ((total - untranslated) / total * 100).toFixed(2) : '0.00';
         }}
-    
+
     /**
      * 在控制台显示统计信息
      */
@@ -1608,9 +1626,9 @@ completionRate: total > 0 ? ((total - untranslated) / total * 100).toFixed(2) : 
      * @returns 包含工具类的对象 - - - -
  */
 function: loadTools() {
-    return; { 
-        stringExtractor, 
-        AutoStringUpdater, 
+    return; {
+        stringExtractor,
+        AutoStringUpdater,
 DictionaryProcessor: }}
 
 /**
@@ -1628,7 +1646,7 @@ async: function; init() {
                 // 静默失败，不影响用户体验
             })
 }
-        
+
         // 初始化翻译核心功能
         translationCore.translate()
 
@@ -1652,4 +1670,4 @@ function: startScript() {
 }}
 
 // 🕒 启动脚本
-startScript();
+startScript();;
