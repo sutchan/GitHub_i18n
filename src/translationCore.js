@@ -5,6 +5,7 @@
 import { CONFIG } from './config.js';
 import { mergeAllDictionaries } from './dictionaries/index.js';
 import { utils } from './utils.js';
+import virtualDomManager from './virtualDom.js';
 
 /**
  * 翻译核心对象
@@ -17,10 +18,28 @@ export const translationCore = {
   dictionary: {},
 
   /**
+   * 翻译缓存项结构
+   * @typedef {Object} CacheItem
+   * @property {string} value - 缓存的值
+   * @property {number} timestamp - 最后访问时间戳
+   * @property {number} accessCount - 访问次数
+   */
+
+  /**
    * 翻译缓存，用于存储已翻译过的文本
-   * @type {Map<string, string>}
+   * @type {Map<string, CacheItem>}
    */
   translationCache: new Map(),
+
+  /**
+   * 缓存统计信息
+   */
+  cacheStats: {
+    hits: 0,
+    misses: 0,
+    evictions: 0,
+    size: 0
+  },
 
   /**
    * 性能监控数据
@@ -30,7 +49,9 @@ export const translationCore = {
     elementsProcessed: 0,
     textsTranslated: 0,
     cacheHits: 0,
-    cacheMisses: 0
+    cacheMisses: 0,
+    cacheEvictions: 0,
+    cacheCleanups: 0
   },
 
   /**
@@ -307,6 +328,8 @@ export const translationCore = {
    * @returns {Promise<void>} 处理完成的Promise
    */
   processElementsInBatches(elements) {
+    // 使用虚拟DOM优化：只处理需要更新的元素
+    elements = virtualDomManager.processElements(elements);
     const modeConfig = this.getCurrentPageModeConfig();
     const batchSize = modeConfig.batchSize || CONFIG.performance.batchSize || 50; // 每批处理的元素数量
     const delay = CONFIG.performance.batchDelay || 0; // 批处理之间的延迟
@@ -800,14 +823,19 @@ export const translationCore = {
   },
 
   /**
-   * 翻译单个元素
-   * 性能优化：使用更高效的DOM遍历和翻译策略
-   * @param {HTMLElement} element - 要翻译的元素
-   * @returns {boolean} 是否成功翻译了元素
-   */
-  translateElement(element) {
+ * 翻译单个元素
+ * 性能优化：使用更高效的DOM遍历和翻译策略
+ * @param {HTMLElement} element - 要翻译的元素
+ * @returns {boolean} 是否成功翻译了元素
+ */
+translateElement(element) {
     // 快速检查：避免无效元素
     if (!element || !(element instanceof HTMLElement)) {
+      return false;
+    }
+    
+    // 使用虚拟DOM检查是否需要翻译
+    if (!virtualDomManager.shouldTranslate(element)) {
       return false;
     }
 
@@ -934,7 +962,7 @@ export const translationCore = {
 
     // 标记为已翻译
     if (hasTranslation) {
-      element.setAttribute('data-github-zh-translated', 'true');
+      virtualDomManager.markElementAsTranslated(element);
     } else {
       // 标记为已检查但未翻译，避免重复检查
       element.setAttribute('data-github-zh-translated', 'checked');
@@ -964,9 +992,11 @@ export const translationCore = {
     }
 
     // 检查缓存 - 使用Map的O(1)查找
-    if (CONFIG.performance.enableTranslationCache && this.translationCache.has(normalizedText)) {
-      this.performanceData.cacheHits++;
-      return this.translationCache.get(normalizedText);
+    if (CONFIG.performance.enableTranslationCache) {
+      const cachedResult = this.getFromCache(normalizedText);
+      if (cachedResult !== null) {
+        return cachedResult;
+      }
     }
 
     // 记录缓存未命中
@@ -1014,14 +1044,9 @@ export const translationCore = {
     // 更新缓存 - 优化：根据文本长度选择是否缓存
     if (CONFIG.performance.enableTranslationCache &&
       normalizedText.length <= CONFIG.performance.maxCachedTextLength) {
-      // 智能缓存管理
-      if (this.translationCache.size >= CONFIG.performance.maxDictSize) {
-        this.cleanCache();
-      }
-
       // 只缓存翻译结果不为null的文本
       if (result !== null) {
-        this.translationCache.set(normalizedText, result);
+        this.setToCache(normalizedText, result);
       }
     }
 
@@ -1127,8 +1152,136 @@ export const translationCore = {
   },
 
   /**
+   * 实现LRU缓存策略的辅助方法：获取缓存项
+   * @param {string} key - 缓存键
+   * @returns {string|null} 缓存的值，如果不存在返回null
+   */
+  getFromCache(key) {
+    const cacheItem = this.translationCache.get(key);
+    
+    if (cacheItem && cacheItem.value) {
+      // 更新访问时间和访问次数
+      cacheItem.timestamp = Date.now();
+      cacheItem.accessCount = (cacheItem.accessCount || 0) + 1;
+      
+      // 更新缓存统计
+      this.cacheStats.hits++;
+      this.performanceData.cacheHits++;
+      
+      return cacheItem.value;
+    }
+    
+    // 缓存未命中
+    this.cacheStats.misses++;
+    this.performanceData.cacheMisses++;
+    return null;
+  },
+
+  /**
+   * 实现LRU缓存策略的辅助方法：设置缓存项
+   * @param {string} key - 缓存键
+   * @param {string} value - 缓存值
+   */
+  setToCache(key, value) {
+    // 检查缓存大小是否超过限制
+    this.checkCacheSizeLimit();
+    
+    // 创建或更新缓存项
+    this.translationCache.set(key, {
+      value,
+      timestamp: Date.now(),
+      accessCount: 1
+    });
+    
+    // 更新缓存大小统计
+    this.cacheStats.size = this.translationCache.size;
+  },
+
+  /**
+   * 检查并维护缓存大小限制
+   * 实现真正的LRU（最近最少使用）缓存淘汰策略
+   */
+  checkCacheSizeLimit() {
+    const maxSize = CONFIG.performance.maxDictSize || 1000;
+    
+    if (this.translationCache.size >= maxSize) {
+      // 需要执行LRU清理
+      this.performLRUCacheEviction(maxSize);
+    }
+  },
+
+  /**
+   * 执行LRU缓存淘汰
+   * @param {number} maxSize - 最大缓存大小
+   */
+  performLRUCacheEviction(maxSize) {
+    try {
+      // 目标大小设为最大值的80%，为新条目预留空间
+      const targetSize = Math.floor(maxSize * 0.8);
+      
+      // 获取缓存条目并按LRU策略排序
+      const cacheEntries = Array.from(this.translationCache.entries());
+      
+      // LRU排序策略：
+      // 1. 优先保留最近访问的条目（时间戳降序）
+      // 2. 对于相同时间戳，保留访问次数多的条目
+      cacheEntries.sort(([, itemA], [, itemB]) => {
+        // 主要按时间戳排序（最近访问的优先）
+        if (itemB.timestamp !== itemA.timestamp) {
+          return itemB.timestamp - itemA.timestamp;
+        }
+        // 次要按访问次数排序（访问次数多的优先）
+        return (itemB.accessCount || 0) - (itemA.accessCount || 0);
+      });
+      
+      // 保留最重要的条目
+      const entriesToKeep = cacheEntries.slice(0, targetSize);
+      const evictedCount = cacheEntries.length - entriesToKeep.length;
+      
+      // 重建缓存
+      this.translationCache.clear();
+      entriesToKeep.forEach(([key, item]) => {
+        this.translationCache.set(key, item);
+      });
+      
+      // 更新统计信息
+      this.cacheStats.evictions += evictedCount;
+      this.cacheStats.size = this.translationCache.size;
+      this.performanceData.cacheEvictions += evictedCount;
+      
+      if (CONFIG.debugMode) {
+        console.log(`[GitHub 中文翻译] LRU缓存淘汰完成，移除了${evictedCount}项，当前缓存大小：${this.translationCache.size}`);
+      }
+    } catch (error) {
+      if (CONFIG.debugMode) {
+        console.error('[GitHub 中文翻译] LRU缓存淘汰失败:', error);
+      }
+      
+      // 回退策略：如果LRU失败，清空部分缓存
+      try {
+        const evictCount = Math.max(50, Math.floor(this.translationCache.size * 0.2));
+        const oldestEntries = Array.from(this.translationCache.entries())
+          .sort(([, itemA], [, itemB]) => itemA.timestamp - itemB.timestamp)
+          .slice(0, evictCount);
+          
+        oldestEntries.forEach(([key]) => {
+          this.translationCache.delete(key);
+        });
+        
+        this.cacheStats.evictions += evictCount;
+        this.cacheStats.size = this.translationCache.size;
+        this.performanceData.cacheEvictions += evictCount;
+      } catch (fallbackError) {
+        if (CONFIG.debugMode) {
+          console.error('[GitHub 中文翻译] 缓存回退策略失败:', fallbackError);
+        }
+      }
+    }
+  },
+
+  /**
    * 清理翻译缓存
-   * 性能优化：智能缓存清理策略
+   * 使用LRU策略进行智能缓存管理
    */
   cleanCache() {
     try {
@@ -1140,63 +1293,15 @@ export const translationCore = {
         return;
       }
 
-      const currentSize = this.translationCache.size;
-      const maxSize = CONFIG.performance.maxDictSize || 1000;
-
-      // 检查是否需要清理
-      if (currentSize <= maxSize) {
-        // 缓存尚未达到需要清理的程度
-        return;
-      }
-
-      // 目标大小设为最大值的75%，为新条目预留空间
-      const targetSize = Math.floor(maxSize * 0.75);
-
-      // 获取缓存条目并进行智能排序
-      const cacheEntries = Array.from(this.translationCache.entries());
-
-      // 1. 先移除null值的缓存项
-      const nonNullEntries = cacheEntries.filter(([, value]) => {
-        return value !== null && typeof value === 'string';
-      });
-
-      // 2. 智能排序策略：
-      //    - 短键优先（更可能重复出现）
-      //    - 非空值优先
-      //    - 忽略过长的键（不太可能重复使用）
-      nonNullEntries.sort(([keyA, valueA], [keyB, valueB]) => {
-        // 优先保留较短的键
-        if (keyA.length !== keyB.length) {
-          return keyA.length - keyB.length;
-        }
-
-        // 其次考虑翻译后的长度（较长的翻译可能更有价值）
-        const valueALength = valueA ? valueA.length : 0;
-        const valueBLength = valueB ? valueB.length : 0;
-        return valueBLength - valueALength;
-      });
-
-      // 3. 保留最重要的条目
-      const entriesToKeep = nonNullEntries.slice(0, targetSize);
-
-      // 4. 重建缓存
-      const oldSize = this.translationCache.size;
-      this.translationCache.clear();
-
-      // 5. 添加需要保留的条目
-      entriesToKeep.forEach(([key, value]) => {
-        if (value !== null && typeof value === 'string') {
-          this.translationCache.set(key, value);
-        }
-      });
-
-      if (CONFIG.debugMode) {
-        const removedCount = oldSize - this.translationCache.size;
-        console.log(`[GitHub 中文翻译] 缓存已清理，从${oldSize}项减少到${this.translationCache.size}项，移除了${removedCount}项`);
-      }
-
+      // 执行LRU缓存淘汰
+      this.checkCacheSizeLimit();
+      
       // 更新性能数据
-      this.performanceData.cacheCleaned = (this.performanceData.cacheCleaned || 0) + 1;
+      this.performanceData.cacheCleanups = (this.performanceData.cacheCleanups || 0) + 1;
+      
+      if (CONFIG.debugMode) {
+        console.log(`[GitHub 中文翻译] 缓存清理完成，当前大小：${this.translationCache.size}，总命中：${this.cacheStats.hits}，总未命中：${this.cacheStats.misses}`);
+      }
 
     } catch (error) {
       // 如果清理过程出错，使用更安全的回退策略
@@ -1205,33 +1310,36 @@ export const translationCore = {
       }
 
       try {
-        // 更安全的回退策略：删除30%的条目，优先删除较长的键
-        const entriesToRemove = Math.max(10, Math.floor(this.translationCache.size * 0.3));
-
-        // 转换为数组并按键长度降序排序（优先删除长键）
-        const cacheEntries = Array.from(this.translationCache.entries());
-        cacheEntries.sort(([keyA], [keyB]) => keyB.length - keyA.length);
-
-        // 删除前N个最长的键
-        for (let i = 0; i < entriesToRemove && i < cacheEntries.length; i++) {
-          this.translationCache.delete(cacheEntries[i][0]);
-        }
-
-      } catch (fallbackError) {
-        // 最后手段：如果所有清理方法都失败，直接清空缓存
+        // 最后手段：如果所有清理方法都失败，清空缓存
         if (CONFIG.debugMode) {
-          console.error('[GitHub 中文翻译] 回退策略也失败，清空整个缓存:', fallbackError);
+          console.log('[GitHub 中文翻译] 执行缓存重置作为最后手段');
         }
         this.translationCache.clear();
+        this.cacheStats.size = 0;
+        
+      } catch (fallbackError) {
+        if (CONFIG.debugMode) {
+          console.error('[GitHub 中文翻译] 缓存重置失败:', fallbackError);
+        }
       }
     }
   },
 
   /**
-   * 清除翻译缓存
-   */
-  clearCache() {
+ * 清除翻译缓存
+ */
+clearCache() {
+    // 清除虚拟DOM缓存
+    virtualDomManager.clear();
     this.translationCache.clear();
+    
+    // 重置缓存统计
+    this.cacheStats = {
+      hits: 0,
+      misses: 0,
+      evictions: 0,
+      size: 0
+    };
 
     // 重置已翻译标记
     const translatedElements = document.querySelectorAll('[data-github-zh-translated]');
@@ -1261,7 +1369,7 @@ export const translationCore = {
 
       commonKeys.forEach(key => {
         const value = this.dictionary[key];
-        this.translationCache.set(key, value);
+        this.setToCache(key, value);
       });
 
       if (CONFIG.debugMode) {

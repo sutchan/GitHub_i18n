@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GitHub 中文翻译配置文件
  * 包含脚本所有可配置项
  */
@@ -81,7 +81,10 @@ export const CONFIG = {
     "mutationThreshold": 30, // 单次突变数量阈值
     "contentChangeWeight": 1, // 内容变化权重
     "importantChangeWeight": 2, // 重要变化权重
-    "translationTriggerRatio": 0.3 // 触发翻译的变化比例
+    "translationTriggerRatio": 0.3, // 触发翻译的变化比例
+    "enableVirtualDom": true, // 是否启用虚拟DOM优化
+    "virtualDomCleanupInterval": 60000, // 虚拟DOM清理间隔（毫秒）
+    "virtualDomNodeTimeout": 3600000 // 虚拟DOM节点超时时间（毫秒）
   },
   "selectors": {
     "primary": [

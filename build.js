@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.136
+ * @version 1.8.144
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -127,10 +127,28 @@ class BuildManager {
       // 遍历所有文件并更新版本号
       filesToUpdate.forEach(file => {
         if (fs.existsSync(file.path)) {
-          let content = fs.readFileSync(file.path, 'utf8');
-          content = content.replace(file.regex, file.replacement);
-          fs.writeFileSync(file.path, content, 'utf8');
-          console.log(`✅ 已更新 ${file.name} 版本号为: ${this.currentVersion}`);
+          try {
+            let content = fs.readFileSync(file.path, 'utf8');
+            content = content.replace(file.regex, file.replacement);
+
+            // 特殊处理build.js - 当脚本正在运行时，它可能无法写入自己
+            if (file.name === 'build.js') {
+              // 尝试写入，但如果失败则跳过（脚本正在运行）
+              try {
+                fs.writeFileSync(file.path, content, 'utf8');
+                console.log(`✅ 已更新 ${file.name} 版本号为: ${this.currentVersion}`);
+              } catch (e) {
+                console.log(`⚠️  跳过更新 ${file.name}（脚本正在运行）`);
+                // 继续执行，不抛出错误
+              }
+            } else {
+              fs.writeFileSync(file.path, content, 'utf8');
+              console.log(`✅ 已更新 ${file.name} 版本号为: ${this.currentVersion}`);
+            }
+          } catch (e) {
+            console.log(`⚠️  更新 ${file.name} 失败: ${e.message}`);
+            // 继续执行其他文件的更新
+          }
         }
       });
 
@@ -532,7 +550,13 @@ class BuildManager {
       return `console.error("${firstArg}", ${后续Strings.join(', ')})`;
     });
 
-    // 2. 修复DOM操作函数中的多余逗号
+    // 2. 修复DOM操作函数中的多余逗号和括号问题
+    // 移除函数调用中的多余括号
+    fileContent = fileContent.replace(/removeChild\(\s*\(\s*([^()]+?)\s*\)\s*\)/g, 'removeChild($1)');
+    fileContent = fileContent.replace(/appendChild\(\s*\(\s*([^()]+?)\s*\)\s*\)/g, 'appendChild($1)');
+    fileContent = fileContent.replace(/insertBefore\(\s*\(\s*([^()]+?)\s*\)\s*\)/g, 'insertBefore($1)');
+
+    // 移除函数调用中的多余逗号
     fileContent = fileContent.replace(/appendChild\(\s*([^)]+?)\s*,\s*\)/g, 'appendChild($1)');
     fileContent = fileContent.replace(/removeChild\(\s*([^)]+?)\s*,\s*\)/g, 'removeChild($1)');
     fileContent = fileContent.replace(/insertBefore\(\s*([^)]+?)\s*,\s*\)/g, 'insertBefore($1)');
@@ -542,23 +566,104 @@ class BuildManager {
     fileContent = fileContent.replace(/removeChild\(\s*\)/g, 'removeChild(null)');
     fileContent = fileContent.replace(/insertBefore\(\s*\)/g, 'insertBefore(null, null)');
 
-    // 4. 修复console调用问题
+    // 4. 额外修复removeChild的特殊语法问题
+    fileContent = fileContent.replace(/removeChild\(\s*([^),]+)\s*,\s*\)/g, 'removeChild($1)');
+    fileContent = fileContent.replace(/removeChild\(\s*([^)]+?)\s*\)\s*\)/g, 'removeChild($1)');
+
+    // 5. 修复console调用问题
     fileContent = fileContent.replace(/console\.(log|error|warn)\(\s*\)/g, 'console.$1()');
     fileContent = fileContent.replace(/console\.(log|error|warn)\([^)]+\)[^;\n}]/g, '$&;');
 
-    // 5. 修复函数调用中的多余括号
+    // 6. 专门修复console.error语法错误（第2128行问题）
+    fileContent = fileContent.replace(/console\.error\((['"][^'"]*['"]\)[\s\S]*?)(?=\)|;|$)/g, (match) => {
+      // 提取第一个参数
+      const firstArg = match.match(/(['"][^'"]*['"])/)[1];
+      // 提取后面的参数（如果有）
+      const restArgs = match.slice(match.indexOf(')') + 1).trim();
+      // 如果后面有内容且不是分号，作为参数处理
+      if (restArgs && restArgs !== ';') {
+        return `console.error(${firstArg}, ${restArgs})`;
+      }
+      return `console.error(${firstArg})`;
+    });
+
+    // 7. 修复try-catch块中的大括号不匹配问题
+    // 修复catch块后缺少大括号的问题
+    fileContent = fileContent.replace(/catch\(([^)]+)\)\s*\{[\s\S]*?\}\s*;/g, (match) => {
+      const catchMatch = match.match(/catch\(([^)]+)\)\s*\{([\s\S]*?)\}\s*;/);
+      if (catchMatch) {
+        return `catch(${catchMatch[1]}) {${catchMatch[2]}}`;
+      }
+      return match;
+    });
+
+    // 修复try-catch-finally结构中的语法错误
+    fileContent = fileContent.replace(/catch\(([^)]+)\)\s*\{[\s\S]*?\}\s*;\s*try/g, (match) => {
+      const catchMatch = match.match(/catch\(([^)]+)\)\s*\{([\s\S]*?)\}\s*;/);
+      if (catchMatch) {
+        return `catch(${catchMatch[1]}) {${catchMatch[2]}}\ntry`;
+      }
+      return match;
+    });
+
+    // 8. 修复console.error调用后的多余逗号和缺少分号问题
+    fileContent = fileContent.replace(/console\.(error|warn|log)\([^)]+\)\s*,\s*(\n|\}|\))/g, 'console.$1($1)$2');
+    fileContent = fileContent.replace(/console\.(error|warn|log)\([^)]+\)\s*(\n|\}|\})/g, 'console.$1($1);$2');
+
+    // 9. 专门修复try-catch块的语法错误
+    // 修复错误的 }; try { 语法
+    fileContent = fileContent.replace(/\};\s*try\s*{/g, '} catch(error) {\n        // 错误处理\n    }\ntry {');
+
+    // 修复catch块前的多余分号
+    fileContent = fileContent.replace(/\};\s*catch\s*/g, '}\ncatch ');
+
+    // 修复console.log/error后的缺少分号和大括号不匹配问题
+    fileContent = fileContent.replace(/console\.(log|error)\([^)]+\)\s*\}/g, 'console.$1($1);\n        }');
+    fileContent = fileContent.replace(/console\.(log|error)\([^)]+\)\s*;/g, 'console.$1($1);');
+
+    // 10. 修复if语句和前面代码连在一起的问题
+    fileContent = fileContent.replace(/\}\s*\);\s*if\s*\(/g, '}\n    });\n    if (');
+
+    // 11. 修复console.log后面错误的大括号
+    fileContent = fileContent.replace(/console\.log\([^)]+\)\s*{\s*console\.error/g, 'console.log($1);\n        console.error');
+
+    // 12. 修复函数调用后的多余括号
+    fileContent = fileContent.replace(/\(\);\)/g, '();');
+
+    // 13. 修复嵌套的多余大括号
+    fileContent = fileContent.replace(/\}\s*\}\s*,/g, '}}');
+    fileContent = fileContent.replace(/\}\s*\}\s*\)/g, '}})');
+
+    // 14. 修复数组末尾的多余逗号
+    fileContent = fileContent.replace(/,\s*\]/g, ']');
+
+    // 9. 修复console调用中的括号不匹配问题
+    fileContent = fileContent.replace(/console\.(log|error|warn)\(\s*([^()]+?)\s*\)\s*\)/g, 'console.$1($2)');
+
+    // 10. 修复数组定义末尾的多余逗号
+    fileContent = fileContent.replace(/,\s*\]/g, ']');
+    fileContent = fileContent.replace(/,\s*\}\s*\]/g, '}]');
+    fileContent = fileContent.replace(/,\s*(\]|\}\s*\])/g, '$1');
+
+    // 11. 增强数组末尾逗号的检测和修复
+    // 匹配数组定义中最后一个元素后的逗号
+    fileContent = fileContent.replace(/([^\s,]+)\s*,\s*(\])/g, '$1$2');
+    // 匹配对象数组中的末尾逗号
+    fileContent = fileContent.replace(/(\}\s*),\s*(\])/g, '$1$2');
+
+    // 12. 修复函数调用中的多余括号
     fileContent = fileContent.replace(/(\w+)\(\s*\(\s*([^()]+?)\s*\)\s*\)/g, '$1($2)');
 
-    // 6. 修复连续的右括号问题
+    // 13. 修复连续的右括号问题
     fileContent = fileContent.replace(/(\{[^}]*\})\s*\}\s*\}\s*\}/g, '$1');
     fileContent = fileContent.replace(/\}\s*\}\s*\}\s*\}/g, '}}');
     fileContent = fileContent.replace(/\}\s*\}\s*\}/g, '}}');
 
-    // 7. 修复空数组和空对象
+    // 14. 修复空数组和空对象
     fileContent = fileContent.replace(/\[\s*\]/g, '[]');
     fileContent = fileContent.replace(/\{\s*\}/g, '{}');
 
-    // 8. 修复DOM操作后缺少分号的问题
+    // 15. 修复DOM操作后缺少分号的问题
     fileContent = fileContent.replace(/(appendChild|removeChild|insertBefore)\([^)]*\)(?!\s*[;\n}])/g, '$&;');
 
     // 9. 修复括号内多余的空格和逗号 - 超级增强版

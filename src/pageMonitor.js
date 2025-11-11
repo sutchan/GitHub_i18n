@@ -5,6 +5,7 @@
 import { CONFIG } from './config.js';
 import { translationCore } from './translationCore.js';
 import { utils } from './utils.js';
+import virtualDomManager from './virtualDom.js';
 
 /**
  * 页面监控对象
@@ -27,6 +28,18 @@ export const pageMonitor = {
      * @type {number}
      */
     lastTranslateTimestamp: 0,
+    
+    /**
+     * 存储事件监听器引用，用于清理
+     * @type {Array<{target: EventTarget, type: string, handler: Function}>}
+     */
+    eventListeners: [],
+    
+    /**
+     * 存储定时检查的interval ID
+     * @type {number}
+     */
+    fallbackIntervalId: null,
     
     /**
      * 初始化监控
@@ -54,12 +67,15 @@ export const pageMonitor = {
         this.lastPath = window.location.pathname + window.location.search;
         
         // 监听popstate事件
-        window.addEventListener('popstate', utils.debounce(() => {
+        const popstateHandler = utils.debounce(() => {
             const currentPath = window.location.pathname + window.location.search;
             if (currentPath !== this.lastPath) {
                 this.handlePathChange();
             }
-        }, CONFIG.routeChangeDelay));
+        }, CONFIG.routeChangeDelay);
+        
+        window.addEventListener('popstate', popstateHandler);
+        this.eventListeners.push({ target: window, type: 'popstate', handler: popstateHandler });
         
         // 监听pushState和replaceState方法
         const originalPushState = history.pushState;
@@ -305,6 +321,18 @@ export const pageMonitor = {
      */
     setupDomObserver() {
         try {
+            // 先断开之前可能存在的observer
+            if (this.observer) {
+                try {
+                    this.observer.disconnect();
+                    this.observer = null;
+                } catch (error) {
+                    if (CONFIG.debugMode) {
+                        console.warn('[GitHub 中文翻译] 断开现有observer失败:', error);
+                    }
+                }
+            }
+            
             // 检测当前页面模式
             const pageMode = this.detectPageMode();
             
@@ -336,14 +364,37 @@ export const pageMonitor = {
             
             // 开始观察最优根节点
             if (rootNode) {
-                this.observer.observe(rootNode, observerConfig);
-                if (CONFIG.debugMode) {
-                    console.log('[GitHub 中文翻译] DOM观察器已启动，观察范围:', rootNode.tagName + (rootNode.id ? '#' + rootNode.id : ''));
+                try {
+                    this.observer.observe(rootNode, observerConfig);
+                    if (CONFIG.debugMode) {
+                        console.log('[GitHub 中文翻译] DOM观察器已启动，观察范围:', rootNode.tagName + (rootNode.id ? '#' + rootNode.id : ''));
+                    }
+                } catch (error) {
+                    if (CONFIG.debugMode) {
+                        console.error('[GitHub 中文翻译] 启动DOM观察者失败:', error);
+                    }
+                    // 降级方案
+                    this.setupFallbackMonitoring();
                 }
             } else {
                 console.error('[GitHub 中文翻译] 无法找到合适的观察节点，回退到body');
-                // 尝试延迟启动
-                setTimeout(() => this.setupDomObserver(), 500);
+                // 如果body还不存在，等待DOMContentLoaded
+                const domLoadedHandler = () => {
+                    try {
+                        this.setupDomObserver(); // 重新尝试设置DOM观察器
+                    } catch (error) {
+                        if (CONFIG.debugMode) {
+                            console.error('[GitHub 中文翻译] DOMContentLoaded后启动观察者失败:', error);
+                        }
+                    }
+                    // 移除一次性监听器
+                    document.removeEventListener('DOMContentLoaded', domLoadedHandler);
+                    // 从事件监听器数组中移除
+                    this.eventListeners = this.eventListeners.filter(l => !(l.target === document && l.type === 'DOMContentLoaded'));
+                };
+                
+                document.addEventListener('DOMContentLoaded', domLoadedHandler);
+                this.eventListeners.push({ target: document, type: 'DOMContentLoaded', handler: domLoadedHandler });
             }
         } catch (error) {
             console.error('[GitHub 中文翻译] 设置DOM观察器失败:', error);
@@ -1009,12 +1060,19 @@ export const pageMonitor = {
         }
         
         // 定时检查页面变化
-        setInterval(() => {
+        const fallbackIntervalHandler = () => {
             // 只在页面可见时执行
             if (document.visibilityState === 'visible') {
                 this.translateWithThrottle();
             }
-        }, 30000); // 30秒检查一次
+        };
+        
+        const intervalId = setInterval(fallbackIntervalHandler, 30000); // 30秒检查一次
+        
+        // 保存interval ID以便后续清理
+      this.fallbackIntervalId = intervalId;
+      // 也保存到事件监听器数组中便于统一管理
+      this.eventListeners.push({ target: window, type: 'interval', handler: null, intervalId: intervalId });
     },
     
     /**
@@ -1192,21 +1250,71 @@ export const pageMonitor = {
      */
     stop() {
         try {
+            // 断开MutationObserver连接
             if (this.observer) {
-                this.observer.disconnect();
-                this.observer = null;
-                
-                // DOM观察器已断开连接
+                try {
+                    this.observer.disconnect();
+                    this.observer = null;
+                } catch (obsError) {
+                    if (CONFIG.debugMode) {
+                        console.error('[GitHub 中文翻译] 断开MutationObserver失败:', obsError);
+                    }
+                }
             }
+            
+            // 清理所有事件监听器
+            this.cleanupEventListeners();
             
             // 重置状态
             this.lastPath = '';
             this.lastTranslateTimestamp = 0;
             
-            // 页面监控已停止
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 页面监控已停止并清理');
+            }
         } catch (error) {
-            console.error('[GitHub 中文翻译] 停止监控时出错:', error);
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 停止监控时出错:', error);
+            }
         }
+    },
+    
+
+    
+    /**
+     * 清理所有注册的事件监听器
+     */
+    cleanupEventListeners() {
+      try {
+        // 清理所有事件监听器
+        this.eventListeners.forEach(listener => {
+          try {
+            if (listener.intervalId) {
+              // 清理定时器
+              clearInterval(listener.intervalId);
+            } else if (listener.target && listener.type && listener.handler) {
+              // 清理DOM事件监听器
+              listener.target.removeEventListener(listener.type, listener.handler);
+            }
+          } catch (error) {
+            if (CONFIG.debugMode) {
+              console.warn(`[GitHub 中文翻译] 移除事件监听器(${listener.type})失败:`, error);
+            }
+          }
+        });
+        
+        // 清空监听器列表
+        this.eventListeners = [];
+        this.fallbackIntervalId = null;
+        
+        if (CONFIG.debugMode) {
+          console.log('[GitHub 中文翻译] 事件监听器已清理');
+        }
+      } catch (error) {
+        if (CONFIG.debugMode) {
+          console.error('[GitHub 中文翻译] 清理事件监听器失败:', error);
+        }
+      }
     },
     
     /**
@@ -1216,8 +1324,14 @@ export const pageMonitor = {
         try {
             this.stop();
             this.init();
+            
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 页面监控已重启');
+            }
         } catch (error) {
-            console.error('[GitHub 中文翻译] 重新开始监控失败:', error);
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 重新开始监控失败:', error);
+            }
         }
     },
     
@@ -1226,6 +1340,13 @@ export const pageMonitor = {
      * 提供外部调用接口
      */
     triggerTranslation() {
+        // 性能优化：如果启用了虚拟DOM，先检查是否有需要翻译的元素
+        if (CONFIG.performance.enableVirtualDom) {
+            // 如果页面没有明显变化，可以跳过翻译
+            if (this.lastMutationTime && Date.now() - this.lastMutationTime < 500) {
+                return;
+            }
+        }
         this.translateWithThrottle();
     }
 };
