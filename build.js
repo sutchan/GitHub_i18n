@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.146
+ * @version 1.8.150
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -697,7 +697,23 @@ class BuildManager {
 
     // 新增：修复多余的分号
     fileContent = fileContent.replace(/;\s*;/g, ';');
-    fileContent = fileContent.replace(/;;;/g, ';');
+    fileContent = fileContent.replace(/;;;\s*;/g, ';');
+
+    // 专门修复数组赋值后的多余分号问题（如: changes: ['当前版本'];）
+    // 移除数组后的分号，不添加回去
+    fileContent = fileContent.replace(/:\s*\[([^\]]*)\]\s*;/g, ': [$1]');
+    fileContent = fileContent.replace(/:\s*\[([^\]]*)\]\s*;;/g, ': [$1]');
+
+    // 修复版本历史中缺少缩进且多了分号的问题（如'changes: ['当前版本'];'）
+    fileContent = fileContent.replace(/^\s*changes:\s*\[([^\]]*)\]\s*;/gm, '    changes: [$1]');
+
+    // 更精确地修复VERSION_HISTORY中的格式问题 - 直接匹配整个对象结构
+    fileContent = fileContent.replace(/const\s+VERSION_HISTORY\s*=\s*\[\s*\{\s*version:\s*'([^']*)'\s*,\s*date:\s*'([^']*)'\s*,\s*changes:\s*\[([^\]]*)\]\s*;\s*\}\s*\]/g,
+      'const VERSION_HISTORY = [{\n    version: \'$1\',\n    date: \'$2\',\n    changes: [$3]\n  }]');
+
+    // 专门修复第54行附近的格式问题
+    fileContent = fileContent.replace(/(const\s+VERSION_HISTORY\s*=\s*\[\s*\{\s*version:\s*'[^']*'\s*,\s*date:\s*'[^']*'\s*,)([\s\S]*?)(changes:\s*\[([^\]]*)\]\s*;\s*\}\s*\])/g,
+      '$1\n    $3\n  }]');
     fileContent = fileContent.replace(/;;/g, ';');
     fileContent = fileContent.replace(/;\s*\)/g, ')');
     fileContent = fileContent.replace(/;\s*{/g, ' {');
