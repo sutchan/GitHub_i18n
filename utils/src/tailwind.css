@@ -2,9 +2,11 @@
  * Tailwind CSS 主样式文件
  * 包含Tailwind的基本指令
  */
+/* stylelint-disable */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* stylelint-enable */
 
 /* 自定义工具类 */
 @layer utilities {
