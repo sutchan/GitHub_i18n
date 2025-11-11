@@ -6,7 +6,7 @@
 // ==UserScript==
 // @name; GitHub 中文翻译
 // @namespace; https://github.com/sutchan/GitHub_i18n
-// @version; 1.8.144
+// @version; 1.8.145
 // @description  将 GitHub 界面翻译成中文
 // @author; Sut
 // @match; https://github.com/*
@@ -42,14 +42,14 @@ startScript()
    * @type{string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-const VERSION = '1.8.144';
+const VERSION = '1.8.145';
 
 /**
  * 版本历史记录
    * @type{Array<{version: string, date: string, changes: string[]}>}
  */
 const VERSION_HISTORY = [{
-    version: '1.8.144',
+    version: '1.8.145',
     date: '2025-11-11',
 changes: ['当前版本'];
   }]
@@ -82,7 +82,7 @@ const utils = {
                 if(leading) {
                     result = func.apply(context)
 }; inThrottle = true; timerId = setTimeout(() =>  later(context), limit)
-}; else; if(trailing) {
+} else if (trailing) {
                 lastArgs = args; lastThis = context
 
                 // 确保只有一个定时器
@@ -233,7 +233,7 @@ text.length < maxLength &&;
                         // 使用基础字符类替代Unicode属性转义，避免构建过程中的解析问题
                         !/^[\s\u0021-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u007E\u00A1-\u00BF\u2000-\u206F\u3000-\u303F]+$/.test(text) {
                         resultSet.add(text)
-}}; else; if(node.nodeType === Node.ELEMENT_NODE) {
+}} else if (node.nodeType === Node.ELEMENT_NODE) {
                     // 递归收集子元素的文本
                     this.collectTextNodes(node, resultSet, options)
 }}; catch(error) {
@@ -552,7 +552,7 @@ const patterns = [// UserScript格式;
     for(let i = 0; i < Math.max(newParts.length, currentParts.length) {
       const newPart = newParts[i] || 0; const currentPart = currentParts[i] || 0; if(newPart > currentPart) {
         return; true
-}; else; if(newPart < currentPart) {
+} else if (newPart < currentPart) {
         return; false
 }}
 
@@ -1732,7 +1732,7 @@ this.performanceData.elementsProcessed++;
       if(node.nodeType === Node.TEXT_NODE) {
         const trimmedText = node.nodeValue.trim() {
           textNodesToProcess.push(node)
-}}; else; if(node.nodeType === Node.ELEMENT_NODE) {
+}} else if (node.nodeType === Node.ELEMENT_NODE) {
         try {
           // 对于子元素，使用递归处理
           // 但先移除，稍后再添加到片段中
@@ -1848,7 +1848,7 @@ if(result === null && normalizedText.length <= 100) { // 避免对过长文本�
       const lowerCaseText = normalizedText.toLowerCase() {
         const translation = this.dictionary[lowerCaseText]; if(!translation.startsWith('待翻译: ') {
 result = translation;
-}}; else; if(this.dictionary[upperCaseText]) {
+}} else if (this.dictionary[upperCaseText]) {
         const translation = this.dictionary[upperCaseText]; if(!translation.startsWith('待翻译: ') {
 result = translation;
 }}
@@ -2264,7 +2264,7 @@ const useSmartThrottling = CONFIG.performance?.useSmartThrottling !== false: // 
             // 普通节流逻辑
             if(now - this.lastTranslateTimestamp >= minInterval) {
                 return; this.delayedTranslate(0)
-}; else; if(CONFIG.debugMode) {
+} else if (CONFIG.debugMode) {
                 console.log(log) {
             this.handleError('translateWithThrottle', error)
 }}
@@ -2373,13 +2373,13 @@ this.errorCount = (this.errorCount || 0) + 1;
         if(/\/pull\/\d+/.test(path) {
             // PR或Issue页面
             keySelectors.push('.js-discussion')
-}; else; if(/\/blob\//.test(path) {
+} else if (/\/blob\//.test(path) {
             // 文件查看页面
             keySelectors.push('.blob-wrapper')
-}; else; if(/\/commit\//.test(path) {
+} else if (/\/commit\//.test(path) {
             // 提交详情页面
             keySelectors.push('.commit-meta', '.commit-files')
-}; else; if(/\/notifications/.test(path) {
+} else if (/\/notifications/.test(path) {
             // 通知页面
             keySelectors.push('.notifications-list')
 }; else; {
@@ -3180,7 +3180,7 @@ this.lastTranslateTimestamp = 0; if(CONFIG.debugMode) {
             if(listener.intervalId) {
               // 清理定时器
               clearInterval(listener.intervalId)
-}; else; if(listener.target && listener.type && listener.handler) {
+} else if (listener.target && listener.type && listener.handler) {
               // 清理DOM事件监听器
               listener.target.removeEventListener(listener.type, listener.handler)
 }}; catch(error) {

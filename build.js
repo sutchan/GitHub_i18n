@@ -1,6 +1,6 @@
 /**
  * GitHub 中文翻译 - 构建脚本
- * @version 1.8.144
+ * @version 1.8.145
  * @description 自动化构建、版本管理和清理工具
  * @author Sut (https://github.com/sutchan)
  */
@@ -1558,6 +1558,20 @@ class BuildManager {
     ];
 
     domStatementFixes.forEach(({ pattern, replacement }) => {
+      const originalCount = (fileContent.match(pattern) || []).length;
+      if (originalCount > 0) {
+        fileContent = fileContent.replace(pattern, replacement);
+        hasChanges = true;
+        changesCount += originalCount;
+      }
+    });
+
+    // 修复}; else; if(...) { 语法错误
+    const elseIfFixes = [
+      { pattern: /\}\s*;\s*else\s*;\s*if\s*\(/gs, replacement: '} else if (' }
+    ];
+
+    elseIfFixes.forEach(({ pattern, replacement }) => {
       const originalCount = (fileContent.match(pattern) || []).length;
       if (originalCount > 0) {
         fileContent = fileContent.replace(pattern, replacement);
