@@ -53,7 +53,7 @@ VERSION_HISTORY = [
   {
     version: '1.8.158',
     date: new Date().toLocaleDateString('zh-CN'),
-    changes: ['当前版本'];
+    changes: ['当前版本']
   },
   {
     version: '1.8.0',

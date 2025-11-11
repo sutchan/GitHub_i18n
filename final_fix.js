@@ -239,6 +239,45 @@ function fixBuildOutput() {
     // 再次检查并清理任何剩余的',;'模式
     content = content.replace(/,\s*;/g, ';');
     
+    // 修复对象属性中数组后面的多余分号
+    content = content.replace(/changes:\s*\[([^\]]*)\];/g, 'changes: [$1]');
+    
+    // 专门修复VERSION_HISTORY数组结尾的},;问题
+    content = content.replace(/\s*\},\s*\];/g, '}];');
+    
+    // 更精确地修复数组结尾多余的逗号加分号
+    content = content.replace(/\],\s*;/g, '];');
+    
+    // 查找VERSION_HISTORY定义并完全重写
+    // 使用更简单的方法：先找到VERSION_HISTORY定义的开始，然后删除所有内容直到文件末尾，再添加正确的定义
+    const versionHistoryStartRegex = /VERSION_HISTORY\s*=\s*\[/;
+    const versionHistoryMatch = content.match(versionHistoryStartRegex);
+    
+    if (versionHistoryMatch) {
+      // 获取VERSION_HISTORY定义的开始位置
+      const startPos = versionHistoryMatch.index;
+      // 只保留VERSION_HISTORY定义之前的内容
+      const beforeVersionHistory = content.substring(0, startPos);
+      
+      // 创建正确格式的VERSION_HISTORY定义
+      const newVersionHistory = `VERSION_HISTORY = [
+  {
+    version: '${currentVersion}',
+    date: new Date().toLocaleDateString('zh-CN'),
+    changes: ['当前版本']
+  },
+  {
+    version: '1.8.0',
+    date: '2023-01-01',
+    changes: ['初始版本', 'GitHub界面基础翻译']
+  }
+];`;
+      
+      // 重新组合内容
+      content = beforeVersionHistory + newVersionHistory;
+      console.log('✅ 完全重写了VERSION_HISTORY定义，确保没有语法错误');
+    }
+    
     // 确保文件以分号结尾（谨慎处理，避免添加多余分号）
     if (!content.endsWith(';') && !content.endsWith('}') && !content.endsWith(']')) {
       content += ';';
