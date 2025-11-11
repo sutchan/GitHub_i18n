@@ -60,4 +60,4 @@ VERSION_HISTORY = [
     date: '2023-01-01',
     changes: ['初始版本', 'GitHub界面基础翻译']
   }
-],;
+];
