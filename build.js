@@ -648,8 +648,8 @@ const utils = {
     // 4. 修复函数调用末尾多余的大括号和格式问题
     const functionCallFixes = [
       {
-        pattern: /if \(!response\.ok\) \{\s*throw new Error\(`HTTP错误! 状态码: \${ response\.status; } `\)\s*\}\s*\}/g,
-        replacement: "if (!response.ok) {\n                    throw new Error(`HTTP错误! 状态码: ${ response.status; } `)\n                }"
+        pattern: /if \(!response\.ok\) \{\s*throw new Error\(`HTTP错误! 状态码: \${ response\.status } `\)\s*\}\s*\}/g,
+        replacement: "if (!response.ok) {\n                    throw new Error(`HTTP错误! 状态码: ${ response.status } `)\n                }"
       },
       {
         pattern: /if \(attempt === maxRetries\) \{\s*throw error\s*\}\s*\}/g,
@@ -1593,9 +1593,9 @@ const utils = {
 
     // 10. 修复按钮ID中的模板字符串问题
     const btnIdFixes = [
-      { pattern: /id = `notificationId - update - btn`/, replacement: "id = `\${ notificationId; } -update - btn`" },
-      { pattern: /id = `notificationId - later - btn`/, replacement: "id = `\${ notificationId; } -later - btn`" },
-      { pattern: /id = `notificationId - dismiss - btn`/, replacement: "id = `\${ notificationId; } -dismiss - btn`" }
+      { pattern: /id = `notificationId - update - btn`/, replacement: "id = `\${ notificationId } -update - btn`" },
+      { pattern: /id = `notificationId - later - btn`/, replacement: "id = `\${ notificationId } -later - btn`" },
+      { pattern: /id = `notificationId - dismiss - btn`/, replacement: "id = `\${ notificationId } -dismiss - btn`" }
     ];
 
     btnIdFixes.forEach(({ pattern, replacement }) => {

@@ -50,7 +50,7 @@ const VERSION = '1.8.159';
  */
 const VERSION_HISTORY = [{
     version: '1.8.159',
-    date: '2025-11-11',
+    date: '2025-11-12',
 changes: ['当前版本'];
   }
 ]]];
