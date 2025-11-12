@@ -240,12 +240,18 @@ async function addPage(page) {
 async function updatePage(pageId, updates) {
   try {
     const pagesData = await loadPages();
-    const pageIndex = pagesData.pages.findIndex(p => p.id === pageId);
+
+    // 查找页面索引 - 只处理旧格式页面
+    const pageIndex = pagesData.pages.findIndex(p => {
+      // 跳过新格式页面 (有url字段的)
+      if (p.url) return false;
+      return p.id === pageId;
+    });
 
     if (pageIndex === -1) {
       return {
         success: false,
-        message: `页面ID '${pageId}' 不存在`
+        message: `页面ID '${pageId}' 不存在或不支持更新`
       };
     }
 
@@ -263,7 +269,11 @@ async function updatePage(pageId, updates) {
 
     // 如果更新了ID，检查新ID是否已存在
     if (updates.id && updates.id !== pageId &&
-      pagesData.pages.some(p => p.id === updates.id && p.id !== pageId)) {
+      pagesData.pages.some(p => {
+        // 只检查旧格式页面的ID冲突
+        if (p.url) return false;
+        return p.id === updates.id && p.id !== pageId;
+      })) {
       return {
         success: false,
         message: `页面ID '${updates.id}' 已存在`

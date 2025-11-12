@@ -3,6 +3,18 @@
 // 作者: SutChan
 // 版本: 1.8.16
 
+// 添加字符串哈希函数，用于生成唯一ID
+String.prototype.hashCode = function() {
+  let hash = 0;
+  if (this.length === 0) return hash;
+  for (let i = 0; i < this.length; i++) {
+    const char = this.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // 转换为32位整数
+  }
+  return Math.abs(hash);
+};
+
 /**
  * 页面管理器UI类
  */
@@ -61,7 +73,36 @@ class PageManagerUI {
    */
   async loadPages() {
     try {
-      // 使用PageManager模块加载页面数据
+      // 尝试从API加载新格式的页面配置
+      try {
+        const response = await fetch('api/pages.json');
+        if (response.ok) {
+          const apiPagesData = await response.json();
+          
+          // 检查是否为数组格式（新格式）
+          if (Array.isArray(apiPagesData)) {
+            // 合并本地存储的旧格式页面和API的新格式页面
+            const pagesData = await window.PageManager.loadPages();
+            const localPages = pagesData.pages || [];
+            
+            // 过滤掉可能重复的页面
+            const uniqueApiPages = apiPagesData.filter(apiPage => {
+              // 检查是否已经在本地存储中有相同的URL
+              return !localPages.some(localPage => localPage.url === apiPage.url);
+            });
+            
+            // 合并页面列表
+            this.pages = [...localPages, ...uniqueApiPages];
+            this.renderPageTable();
+            this.updateStatistics();
+            return;
+          }
+        }
+      } catch (apiError) {
+        console.warn('加载API页面配置失败，使用本地存储:', apiError);
+      }
+      
+      // 如果API加载失败或不是新格式，则使用PageManager加载本地存储的页面
       const pagesData = await window.PageManager.loadPages();
       this.pages = pagesData.pages || [];
       this.renderPageTable();
@@ -272,14 +313,31 @@ class PageManagerUI {
   /**
    * 编辑指定ID的页面
    */
-  editPage(pageId) {
-    const page = this.pages.find(p => p.id === pageId);
-    if (!page) return;
+  async editPage(pageId) {
+    // 查找页面 - 同时考虑新旧格式
+    const page = this.pages.find(p => {
+      if (p.url) {
+        return `page_${p.url.hashCode()}` === pageId;
+      }
+      return p.id === pageId;
+    });
+    
+    if (!page) {
+      this.showNotification('错误', '未找到页面', 'error');
+      return;
+    }
+    
+    // 检查是否为新格式页面
+    if (page.url) {
+      // 新格式页面不允许编辑
+      this.showNotification('提示', '新格式页面不支持编辑', 'info');
+      return;
+    }
     
     // 填充表单
     document.getElementById('pageId').value = page.id;
     document.getElementById('pageName').value = page.name;
-    document.getElementById('pagePattern').value = page.pattern || page.url || '';
+    document.getElementById('pagePattern').value = page.pattern || '';
     document.getElementById('pageSelectors').value = (page.selectors || ['body']).join(', ');
     document.getElementById('pagePriority').value = page.priority || 0;
     document.getElementById('pageEnabled').checked = page.enabled !== false;
@@ -302,17 +360,33 @@ class PageManagerUI {
   /**
    * 删除指定ID的页面
    */
-  deletePage(pageId) {
-    const page = this.pages.find(p => p.id === pageId);
-    if (!page) return;
+  async deletePage(pageId) {
+    // 找出要删除的页面对象
+    const pageToDelete = this.pages.find(page => {
+      // 检查是否为新格式页面
+      if (page.url) {
+        return `page_${page.url.hashCode()}` === pageId;
+      }
+      return page.id === pageId;
+    });
     
-    if (confirm(`确定要删除页面 "${page.name}" 吗？`)) {
-      this.pages = this.pages.filter(p => p.id !== pageId);
-      this.savePagesToServer();
+    if (!pageToDelete) return;
+    
+    if (confirm(`确定要删除页面 "${pageToDelete.name}" 吗？`)) {
+      // 过滤掉要删除的页面
+      this.pages = this.pages.filter(page => {
+        if (page.url) {
+          return `page_${page.url.hashCode()}` !== pageId;
+        }
+        return page.id !== pageId;
+      });
+      
+      // 保存到本地存储
+      await this.savePagesToServer();
       this.currentPageId = null;
       this.renderPageTable();
       this.updateStatistics();
-      this.showNotification('成功', '页面已成功删除', 'success');
+      this.showNotification('成功', '页面删除成功', 'success');
     }
   }
 
