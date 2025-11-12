@@ -56,43 +56,65 @@ ${details.stack}`;
 function validatePage(page) {
   const errors = [];
 
-  // 检查必需字段
-  if (!page.id || typeof page.id !== 'string' || page.id.trim() === '') {
-    errors.push('页面ID不能为空');
+  // 支持两种格式：
+  // 1. 旧格式：id, name, pattern, selectors
+  // 2. 新格式：url, selector, module
+
+  // 检查是否是新格式 (url, selector, module)
+  const isNewFormat = page.url && (page.selector || page.selectors);
+
+  if (isNewFormat) {
+    // 新格式验证
+    if (typeof page.url !== 'string' || page.url.trim() === '') {
+      errors.push('页面URL不能为空');
+    }
+
+    if (!page.selector && (!Array.isArray(page.selectors) || page.selectors.length === 0)) {
+      errors.push('页面选择器不能为空');
+    }
+
+    if (page.module && typeof page.module !== 'string') {
+      errors.push('模块名称必须是字符串');
+    }
+  } else {
+    // 旧格式验证
+    if (!page.id || typeof page.id !== 'string' || page.id.trim() === '') {
+      errors.push('页面ID不能为空');
+    }
+
+    if (!page.name || typeof page.name !== 'string' || page.name.trim() === '') {
+      errors.push('页面名称不能为空');
+    }
+
+    if (!page.pattern || typeof page.pattern !== 'string' || page.pattern.trim() === '') {
+      errors.push('页面模式不能为空');
+    }
+
+    if (!Array.isArray(page.selectors) || page.selectors.length === 0) {
+      errors.push('页面选择器必须是非空数组');
+    }
+
+    // 检查正则表达式是否有效
+    try {
+      new RegExp(page.pattern);
+    } catch (e) {
+      errors.push(`无效的正则表达式: ${page.pattern}`);
+    }
   }
 
-  if (!page.name || typeof page.name !== 'string' || page.name.trim() === '') {
-    errors.push('页面名称不能为空');
-  }
-
-  if (!page.pattern || typeof page.pattern !== 'string' || page.pattern.trim() === '') {
-    errors.push('页面模式不能为空');
-  }
-
-  if (!Array.isArray(page.selectors) || page.selectors.length === 0) {
-    errors.push('页面选择器必须是非空数组');
-  }
-
-  // 检查正则表达式是否有效
-  try {
-    new RegExp(page.pattern);
-  } catch (e) {
-    errors.push(`无效的正则表达式: ${page.pattern}`);
-  }
-
-  // 检查优先级
+  // 两种格式都需要的字段验证
   if (page.priority !== undefined && (typeof page.priority !== 'number' || isNaN(page.priority))) {
     errors.push('优先级必须是数字');
   }
 
-  // 检查启用状态
   if (page.enabled !== undefined && typeof page.enabled !== 'boolean') {
     errors.push('启用状态必须是布尔值');
   }
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
+    isNewFormat // 返回是否为新格式，便于其他函数处理
   };
 }
 

@@ -90,6 +90,7 @@ const DEFAULT_CONFIG = {
   ignoreWords: ['GitHub', 'API', 'URL', 'HTTP', 'HTTPS'], // 忽略的单词列表
   ignorePatterns: [], // 忽略的正则表达式模式列表
   includePatterns: [], // 必须包含的正则表达式模式列表
+  skipAuthenticatedPages: true, // 是否跳过需要认证的页面
   requestHeaders: {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
@@ -100,6 +101,14 @@ const DEFAULT_CONFIG = {
 // 配置对象，将在初始化时从文件加载
 let CONFIG = { ...DEFAULT_CONFIG };
 let GITHUB_PAGES = [];
+
+// 过滤掉需要用户认证的URL模式
+const AUTHENTICATED_URL_PATTERNS = [
+  /\/created_by\//i,
+  /\/assigned\//i,
+  /\/mentioned\//i,
+  /\/review-requested\//i
+];
 
 // 统计数据
 let STATS = {
@@ -152,30 +161,55 @@ async function loadConfig() {
     // 加载GitHub页面配置
     const pagesFilePath = path.resolve(__dirname, 'api', 'pages.json');
     const pagesData = await fs.readFile(pagesFilePath, 'utf8');
-    GITHUB_PAGES = JSON.parse(pagesData);
+    const parsedPages = JSON.parse(pagesData);
+
+    // 支持两种格式：数组格式和对象格式
+    if (Array.isArray(parsedPages)) {
+      // 直接使用数组格式的页面配置
+      GITHUB_PAGES = [...parsedPages];
+      log('info', `已加载 ${GITHUB_PAGES.length} 个GitHub页面配置（数组格式）`);
+    } else if (parsedPages.pages && Array.isArray(parsedPages.pages)) {
+      // 兼容旧的对象格式配置
+      parsedPages.pages.forEach(page => {
+        if (page.enabled !== false) {
+          // 为了简单起见，使用示例URL
+          const testUrl = `https://github.com${page.pattern || ''}`;
+          GITHUB_PAGES.push({
+            url: page.url || testUrl,
+            selector: page.selectors ? page.selectors.join(', ') : (page.selector || 'body'),
+            module: page.id || page.module || 'global'
+          });
+        }
+      });
+      log('info', `已加载 ${GITHUB_PAGES.length} 个GitHub页面配置（对象格式）`);
+    } else {
+      throw new Error('pages.json 格式错误，应为数组或包含pages数组的对象');
+    }
 
     // 验证页面配置
-    if (GITHUB_PAGES && Array.isArray(GITHUB_PAGES)) {
-      log('info', `已加载 ${GITHUB_PAGES.length} 个GitHub页面配置`);
+    if (!Array.isArray(GITHUB_PAGES) || GITHUB_PAGES.length === 0) {
+      throw new Error('没有有效的页面配置');
+    }
 
-      // 过滤掉可能需要认证的特定用户URL
+    // 根据配置过滤需要认证的URL
+    if (CONFIG.skipAuthenticatedPages !== false) {
+      const beforeCount = GITHUB_PAGES.length;
       GITHUB_PAGES = GITHUB_PAGES.filter(page => {
-        const isUserSpecific = page.url.includes('/created_by/') ||
-          page.url.includes('/assigned/') ||
-          page.url.includes('/mentioned/') ||
+        // 检查是否匹配需要认证的URL模式
+        const needsAuth = AUTHENTICATED_URL_PATTERNS.some(pattern => pattern.test(page.url)) ||
           page.url.includes('/following/');
-
-        if (isUserSpecific) {
+          
+        if (needsAuth) {
           log('debug', `跳过可能需要认证的特定用户页面: ${page.url}`);
           return false;
         }
         return true;
       });
-
       log('info', `过滤后剩余 ${GITHUB_PAGES.length} 个可访问的GitHub页面配置`);
-    } else {
-      throw new Error('pages.json 格式错误，应为数组');
+      log('info', `过滤掉了 ${beforeCount - GITHUB_PAGES.length} 个需要认证的页面`);
     }
+
+    log('info', `配置加载完成，最终页面数量: ${GITHUB_PAGES.length}`);
   } catch (error) {
     log('error', '加载配置文件失败:', error);
     log('info', '使用默认配置');

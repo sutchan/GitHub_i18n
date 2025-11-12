@@ -111,36 +111,60 @@ class PageManagerUI {
     tbody.innerHTML = '';
     
     this.pages.forEach(page => {
+      // 确定是否为新格式 (url, selector, module)
+      const isNewFormat = page.url && (page.selector || page.selectors);
+      
+      // 为新格式页面生成唯一ID用于DOM操作
+      const pageId = isNewFormat ? `page_${page.url.hashCode()}` : page.id;
+      
       const row = document.createElement('tr');
-      row.className = page.enabled ? 'bg-white hover:bg-gray-50' : 'bg-gray-100 hover:bg-gray-200';
-      row.dataset.pageId = page.id;
+      row.className = page.enabled !== false ? 'bg-white hover:bg-gray-50' : 'bg-gray-100 hover:bg-gray-200';
+      row.dataset.pageId = pageId;
       
       // 点击行时选中页面
       row.addEventListener('click', (e) => {
         if (!e.target.closest('input[type="checkbox"]')) {
-          this.selectPage(page.id);
+          this.selectPage(pageId);
         }
       });
+      
+      // 获取选择器显示内容
+      const selectorDisplay = isNewFormat ? 
+        (page.selector || page.selectors?.join(', ') || 'body') : 
+        (page.selectors?.join(', ') || 'body');
+      
+      // 获取页面名称显示内容
+      const nameDisplay = isNewFormat ? 
+        (page.name || page.url.split('/').filter(Boolean).pop() || '未命名页面') : 
+        page.name;
+      
+      // 获取URL/模式显示内容
+      const urlDisplay = isNewFormat ? page.url : page.pattern;
+      
+      // 获取模块信息
+      const moduleInfo = page.module ? ` (${page.module})` : '';
       
       // 构建表格行内容
       row.innerHTML = `
         <td class="border px-4 py-2">
-          <input type="checkbox" class="page-checkbox" value="${page.id}">
+          <input type="checkbox" class="page-checkbox" value="${pageId}">
         </td>
-        <td class="border px-4 py-2">${page.id}</td>
-        <td class="border px-4 py-2">${page.name}</td>
+        <td class="border px-4 py-2">${pageId}</td>
+        <td class="border px-4 py-2">${nameDisplay}${moduleInfo}</td>
         <td class="border px-4 py-2 max-w-xs overflow-hidden text-ellipsis">
-          <span title="${page.pattern || page.url}">${page.pattern || page.url}</span>
+          <span title="${urlDisplay}">${urlDisplay}</span>
         </td>
-        <td class="border px-4 py-2">${page.selectors?.join(', ') || 'body'}</td>
+        <td class="border px-4 py-2">${selectorDisplay}</td>
         <td class="border px-4 py-2">${page.priority || 0}</td>
         <td class="border px-4 py-2">
-          <span class="inline-block px-2 py-1 text-xs rounded-full ${page.enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-            ${page.enabled ? '启用' : '禁用'}
+          <span class="inline-block px-2 py-1 text-xs rounded-full ${page.enabled !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+            ${page.enabled !== false ? '启用' : '禁用'}
           </span>
         </td>
         <td class="border px-4 py-2">
-          <button class="edit-btn px-2 py-1 text-blue-600 hover:text-blue-800">编辑</button>
+          <button class="edit-btn px-2 py-1 text-blue-600 hover:text-blue-800" ${isNewFormat ? 'disabled title="不支持编辑新格式页面"' : ''}>
+            ${isNewFormat ? '查看' : '编辑'}
+          </button>
           <button class="delete-btn px-2 py-1 text-red-600 hover:text-red-800">删除</button>
         </td>
       `;
@@ -148,20 +172,22 @@ class PageManagerUI {
       // 绑定行内按钮事件
       row.querySelector('.edit-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.editPage(page.id);
+        if (!isNewFormat) {
+          this.editPage(pageId);
+        }
       });
       
       row.querySelector('.delete-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.deletePage(page.id);
+        this.deletePage(pageId);
       });
       
       row.querySelector('.page-checkbox')?.addEventListener('change', (e) => {
         e.stopPropagation();
         if (e.target.checked) {
-          this.selectPage(page.id);
+          this.selectPage(pageId);
         } else {
-          this.deselectPage(page.id);
+          this.deselectPage(pageId);
         }
       });
       
