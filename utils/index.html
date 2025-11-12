@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GitHub 中文翻译 - 自动字符串更新工具</title>
+  <!-- 页面管理样式 -->
+  <link rel="stylesheet" href="page_manager.css">
   <style>
     /* 基础样式 - 优化版 */
     :root {
@@ -780,6 +782,7 @@
         <div class="tab active" data-tab="logs">日志输出</div>
         <div class="tab" data-tab="results">提取结果</div>
         <div class="tab" data-tab="advanced">高级设置</div>
+        <div class="tab" data-tab="pageManager">页面管理</div>
       </div>
 
       <div id="logs-content" class="tab-content active">
@@ -873,6 +876,67 @@
 
         <button id="apply-settings-btn" class="btn">应用设置</button>
       </div>
+
+      <div id="pageManager-content" class="tab-content">
+        <div id="pageManagerContainer" class="page-manager-container">
+          <!-- 工具栏 -->
+          <div class="page-manager-toolbar">
+            <button id="addPageBtn" class="btn">添加页面</button>
+            <button id="loadPagesBtn" class="btn">加载页面</button>
+            <button id="savePagesBtn" class="btn">保存页面</button>
+            <button id="collectStringsBtn" class="btn">采集字符串</button>
+          </div>
+
+          <!-- 进度条 -->
+          <div class="progress-container">
+            <div id="pageManagerProgress" class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+            <span id="progressText" class="progress-text">0%</span>
+          </div>
+
+          <!-- 页面表格 -->
+          <div class="table-container">
+            <table id="pagesTable">
+              <thead>
+                <tr>
+                  <th>页面名称</th>
+                  <th>CSS选择器</th>
+                  <th>启用</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="pagesTableBody">
+                <!-- 页面数据将通过JavaScript动态加载 -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 页面表单 -->
+          <div class="form-container" id="pageFormContainer" style="display: none;">
+            <h3 id="formTitle">添加新页面</h3>
+            <input type="hidden" id="pageId" value="">
+            <div class="form-group">
+              <label for="pageName">页面名称:</label>
+              <input type="text" id="pageName" placeholder="输入页面名称">
+            </div>
+            <div class="form-group">
+              <label for="cssSelector">CSS选择器:</label>
+              <textarea id="cssSelector" placeholder="输入CSS选择器，多个选择器用逗号分隔"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="pageEnabled">
+                <span>启用此页面</span>
+              </label>
+            </div>
+            <div class="form-actions">
+              <button id="cancelPageBtn" class="btn btn-secondary">取消</button>
+              <button id="savePageBtn" class="btn">保存</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -880,6 +944,10 @@
     <div>GitHub 中文翻译项目</div>
     <div class="version-info">版本 1.0.0</div>
   </footer>
+
+  <!-- 页面管理相关脚本 -->
+  <script src="page_manager.js"></script>
+  <script src="page_manager_ui.js"></script>
 
   <script>
     // 应用状态管理
@@ -1639,6 +1707,11 @@
       // 初始化事件监听
       initEventListeners();
 
+      // 初始化页面管理器
+      if (typeof PageManagerUI !== 'undefined') {
+        PageManagerUI.init();
+      }
+
       // 更新UI状态
       updateUIState();
 
@@ -1658,6 +1731,105 @@
     // 页面加载完成后初始化
     document.addEventListener('DOMContentLoaded', initialize);
   </script>
+
+  <!-- 页面管理相关脚本 -->
+  <script src="page_manager.js"></script>
+  <script src="string_collector.js"></script>
+  <script src="page_manager_ui.js"></script>
+
+  <!-- 页面管理部分的HTML结构 -->
+  <div id="pageManagerContainer" style="display: none;">
+    <div class="page-manager">
+      <!-- 工具栏 -->
+      <div class="toolbar">
+        <button id="addPageBtn" class="btn btn-primary">添加页面</button>
+        <button id="editPageBtn" class="btn btn-secondary" disabled>编辑页面</button>
+        <button id="deleteSelectedBtn" class="btn btn-danger" disabled>删除选中</button>
+        <button id="toggleEnabledBtn" class="btn btn-secondary" disabled>启用/禁用</button>
+        <button id="collectStringsBtn" class="btn btn-primary">采集字符串</button>
+        <div id="pageStatistics">
+          <div class="stat-item total">总数: <span id="totalPages">0</span></div>
+          <div class="stat-item enabled">启用: <span id="enabledPages">0</span></div>
+          <div class="stat-item disabled">禁用: <span id="disabledPages">0</span></div>
+          <div class="stat-item selected">选中: <span id="selectedPages">0</span></div>
+        </div>
+      </div>
+
+      <!-- 进度条 -->
+      <div id="collectionProgress">
+        <div class="progress-container">
+          <div class="progress-bar" style="width: 0%"></div>
+          <div class="progress-text">准备中...</div>
+        </div>
+      </div>
+
+      <!-- 页面表格 -->
+      <div id="tableWrapper">
+        <table id="pageTable">
+          <thead>
+            <tr>
+              <th style="width: 40px;"><input type="checkbox" id="selectAllCheckbox" class="page-checkbox"></th>
+              <th>页面名称</th>
+              <th>URL 模式</th>
+              <th>选择器</th>
+              <th>优先级</th>
+              <th>状态</th>
+              <th style="width: 100px;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="pageTableBody">
+            <!-- 页面数据将通过 JavaScript 动态生成 -->
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 40px; color: #6a737d;">
+                加载页面配置中...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 页面表单 -->
+      <div id="pageForm">
+        <h3 id="pageFormTitle">添加页面</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pageId">页面 ID</label>
+            <input type="text" id="pageId" placeholder="唯一标识符">
+          </div>
+          <div class="form-group">
+            <label for="pageName">页面名称</label>
+            <input type="text" id="pageName" placeholder="页面显示名称">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pagePattern">URL 模式</label>
+            <input type="text" id="pagePattern" placeholder="URL 匹配模式，支持正则表达式">
+          </div>
+          <div class="form-group">
+            <label for="pagePriority">优先级</label>
+            <input type="number" id="pagePriority" min="1" max="10" value="5" placeholder="1-10">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pageSelectors">CSS 选择器</label>
+            <textarea id="pageSelectors" placeholder="CSS 选择器，多个选择器用逗号分隔" rows="4"></textarea>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-checkbox">
+            <input type="checkbox" id="pageEnabled" checked>
+            <label for="pageEnabled">启用此页面</label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button id="cancelFormBtn" class="btn btn-secondary">取消</button>
+          <button id="savePageBtn" class="btn btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
