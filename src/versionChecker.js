@@ -2,8 +2,8 @@
  * 版本更新检查模块
  * 负责检查和处理脚本更新
  */
-const { CONFIG } = require('./config.js');
-const { utils } = require('./utils.js');
+import { CONFIG } from './config.js';
+import { utils } from './utils.js';
 
 /**
  * 版本检查器对象
@@ -453,4 +453,4 @@ const versionChecker = {
   }
 };
 
-module.exports = { versionChecker };
+export { versionChecker };
