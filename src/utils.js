@@ -100,7 +100,8 @@ export const utils = {
      * @returns {string} 转义后的字符串
      */
     escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // 转义所有正则表达式特殊字符，包括/字符
+        return string.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
     },
     
     /**
@@ -115,6 +116,62 @@ export const utils = {
         } catch (error) {
             console.warn('[GitHub 中文翻译] JSON解析失败:', error);
             return defaultValue;
+        }
+    },
+
+    /**
+     * 检查正则表达式是否存在潜在的ReDoS风险
+     * @param {string|RegExp} pattern - 正则表达式模式
+     * @returns {boolean} - 是否安全
+     */
+    isSafeRegex(pattern) {
+        if (typeof pattern === 'string') {
+            pattern = new RegExp(pattern);
+        }
+
+        const source = pattern.source;
+        let depth = 0;
+        let hasNestedRepetition = false;
+        
+        // 检查是否存在嵌套的重复量词（ReDoS的主要来源）
+        for (let i = 0; i < source.length; i++) {
+            const char = source[i];
+            
+            if (char === '(' && source[i - 1] !== '\\') {
+                depth++;
+            } else if (char === ')' && source[i - 1] !== '\\') {
+                depth--;
+            } else if (depth > 0 && /[*+?]/.test(char) && source[i - 1] !== '\\') {
+                // 在分组内发现重复量词
+                hasNestedRepetition = true;
+                break;
+            }
+        }
+        
+        // 检查是否存在长时间运行的可能性
+        const longPatternWarning = source.length > 100; // 过长的正则表达式
+        const hasMultipleRepetitions = (source.match(/[*+?]/g) || []).length > 5; // 过多的重复量词
+        
+        return !hasNestedRepetition && !longPatternWarning && !hasMultipleRepetitions;
+    },
+
+    /**
+     * 安全地创建正则表达式，防止ReDoS攻击
+     * @param {string} pattern - 正则表达式模式
+     * @param {string} flags - 正则表达式标志
+     * @returns {RegExp|null} - 安全的正则表达式或null
+     */
+    safeRegExp(pattern, flags = '') {
+        try {
+            const regex = new RegExp(pattern, flags);
+            if (this.isSafeRegex(regex)) {
+                return regex;
+            }
+            console.warn('[GitHub 中文翻译] 检测到可能存在ReDoS风险的正则表达式:', pattern);
+            return null;
+        } catch (error) {
+            console.warn('[GitHub 中文翻译] 创建正则表达式失败:', error);
+            return null;
         }
     },
     

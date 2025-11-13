@@ -2,10 +2,13 @@
  * GitHub 中文翻译主入口文件
  * 整合所有模块并初始化脚本
  */
+
+// 导入核心模块
 import { CONFIG } from './config.js';
 import { versionChecker } from './versionChecker.js';
 import { translationCore } from './translationCore.js';
 import { pageMonitor } from './pageMonitor.js';
+import { configUI } from './configUI.js';
 
 /**
  * 初始化脚本
@@ -24,6 +27,9 @@ async function init() {
         
         // 初始化页面监控
         pageMonitor.init();
+        
+        // 初始化配置界面
+        configUI.init();
     } catch (error) {
         console.error('[GitHub 中文翻译] 脚本初始化失败:', error);
     }
@@ -46,6 +52,12 @@ function startScript() {
 
 // 导出函数供其他模块使用
 export { init, startScript };
+
+// 将核心模块暴露到全局作用域，便于调试和配置界面使用
+if (typeof window !== 'undefined') {
+    window.translationCore = translationCore;
+    window.configUI = configUI;
+}
 
 // 🕒 启动脚本
 startScript();

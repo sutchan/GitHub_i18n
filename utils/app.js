@@ -1232,10 +1232,8 @@ async function saveConfig() {
     const debugOutputFile = document.getElementById('debugOutputFile').value;
     const exactMatchOnly = document.getElementById('exactMatchOnly').checked;
     const ignoreWords = document.getElementById('ignoreWords').value.split(',').map(word => word.trim()).filter(word => word.length > 0);
-    const ignorePatterns = document.getElementById('ignorePatterns').value.split('
-').map(pattern => pattern.trim()).filter(pattern => pattern.length > 0);
-    const includePatterns = document.getElementById('includePatterns').value.split('
-').map(pattern => pattern.trim()).filter(pattern => pattern.length > 0);;
+    const ignorePatterns = document.getElementById('ignorePatterns').value.split('\n').map(pattern => pattern.trim()).filter(pattern => pattern.length > 0);
+    const includePatterns = document.getElementById('includePatterns').value.split('\n').map(pattern => pattern.trim()).filter(pattern => pattern.length > 0);
 
     // 用户脚本设置
     const enableExternalTranslation = document.getElementById('scriptExternalTranslation').checked;
@@ -1457,10 +1455,8 @@ async function loadConfig() {
 
       // 更新忽略词、模式和用户脚本设置
       document.getElementById('ignoreWords').value = (config.ignoreWords || []).join(', ');
-      document.getElementById('ignorePatterns').value = (config.ignorePatterns || []).join('
-');
-      document.getElementById('includePatterns').value = (config.includePatterns || []).join('
-');
+      document.getElementById('ignorePatterns').value = (config.ignorePatterns || []).join('\n');
+      document.getElementById('includePatterns').value = (config.includePatterns || []).join('\n');
       document.getElementById('scriptExternalTranslation').checked = config.enableExternalTranslation || false;
       document.getElementById('scriptMinTranslationLength').value = config.externalTranslationMinLength || 5;
       document.getElementById('scriptMaxTranslationLength').value = config.externalTranslationMaxLength || 500;
@@ -1541,10 +1537,8 @@ async function loadConfig() {
         document.getElementById('debugOutputFile').value = mergedConfig.debugOutputFile;
         document.getElementById('exactMatchOnly').checked = mergedConfig.exactMatchOnly;
         document.getElementById('ignoreWords').value = (mergedConfig.ignoreWords || defaults.ignoreWords).join(', ');
-        document.getElementById('ignorePatterns').value = (mergedConfig.ignorePatterns || defaults.ignorePatterns).join('
-');
-        document.getElementById('includePatterns').value = (mergedConfig.includePatterns || defaults.includePatterns).join('
-');
+        document.getElementById('ignorePatterns').value = (mergedConfig.ignorePatterns || defaults.ignorePatterns).join('\n');
+        document.getElementById('includePatterns').value = (mergedConfig.includePatterns || defaults.includePatterns).join('\n');
 
         // 填充用户脚本设置
         document.getElementById('scriptExternalTranslation').checked = mergedConfig.enableExternalTranslation;

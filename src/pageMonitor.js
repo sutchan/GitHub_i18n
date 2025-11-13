@@ -288,19 +288,40 @@ export const pageMonitor = {
         // 根据页面类型选择关键区域
         if (/\/pull\/\d+/.test(path) || /\/issues\/\d+/.test(path)) {
             // PR或Issue页面
-            keySelectors.push('.js-discussion');
+            keySelectors.push('.js-discussion', '.issue-details', '.js-issue-title', '.js-issue-labels');
         } else if (/\/blob\//.test(path)) {
             // 文件查看页面
-            keySelectors.push('.blob-wrapper');
+            keySelectors.push('.blob-wrapper', '.file-header', '.file-info');
         } else if (/\/commit\//.test(path)) {
             // 提交详情页面
-            keySelectors.push('.commit-meta', '.commit-files');
+            keySelectors.push('.commit-meta', '.commit-files', '.commit-body', '.commit-desc');
         } else if (/\/notifications/.test(path)) {
             // 通知页面
-            keySelectors.push('.notifications-list');
+            keySelectors.push('.notifications-list', '.notification-shelf');
+        } else if (/\/actions/.test(path)) {
+            // Actions页面
+            keySelectors.push('.workflow-run-list', '.workflow-jobs', '.workflow-run-header');
+        } else if (/\/settings/.test(path)) {
+            // 设置页面
+            keySelectors.push('.settings-content', '.js-settings-content');
+        } else if (/\/projects/.test(path)) {
+            // Projects页面
+            keySelectors.push('.project-layout', '.project-columns');
+        } else if (/\/wiki/.test(path)) {
+            // Wiki页面
+            keySelectors.push('.wiki-wrapper', '.markdown-body');
+        } else if (/\/search/.test(path)) {
+            // 搜索结果页面
+            keySelectors.push('.codesearch-results', '.search-title');
+        } else if (/\/orgs\//.test(path) || /\/users\//.test(path)) {
+            // 组织或用户页面
+            keySelectors.push('.org-profile, .profile-timeline', '.user-profile-sticky-header', '.user-profile-main');
+        } else if (/\/repos\/\w+\/\w+/.test(path)) {
+            // 仓库主页面
+            keySelectors.push('.repository-content', '.repository-meta-content', '.readme');
         } else {
             // 其他页面，使用通用关键区域
-            keySelectors.push('.repository-content', '.profile-timeline');
+            keySelectors.push('.repository-content', '.profile-timeline', '.application-main', 'main');
         }
         
         // 获取并过滤存在的元素
@@ -309,6 +330,21 @@ export const pageMonitor = {
             const element = document.querySelector(selector);
             if (element) {
                 elements.push(element);
+            }
+        }
+        
+        // 如果没有找到关键区域，尝试使用更通用的选择器
+        if (elements.length === 0) {
+            const genericSelectors = [
+                '#js-pjax-container', '.application-main', 'main', 'body'
+            ];
+            
+            for (const selector of genericSelectors) {
+                const element = document.querySelector(selector);
+                if (element) {
+                    elements.push(element);
+                    break;
+                }
             }
         }
         
@@ -429,6 +465,7 @@ export const pageMonitor = {
             case 'pullRequests':
                 candidateSelectors = [
                     '.js-discussion',       // 讨论区容器
+                    '.issue-details',       // 问题详情容器
                     '#js-issue-title',      // 问题标题
                     '#js-pjax-container',   // 通用PJAX容器
                     'main',                 // 主内容
@@ -448,6 +485,7 @@ export const pageMonitor = {
             case 'notifications':
                 candidateSelectors = [
                     '.notifications-list',    // 通知列表
+                    '.notification-shelf',    // 通知顶栏
                     '#js-pjax-container',     // 通用PJAX容器
                     'main',                   // 主内容
                     'body'                    // 降级方案
@@ -467,6 +505,69 @@ export const pageMonitor = {
             case 'actions':
                 candidateSelectors = [
                     '.workflow-run-list',     // 工作流运行列表
+                    '.workflow-jobs',         // 工作流任务列表
+                    '.workflow-run-header',   // 工作流运行头部
+                    '#js-pjax-container',     // 通用PJAX容器
+                    'main',                   // 主内容
+                    'body'                    // 降级方案
+                ];
+                break;
+            
+            case 'projects':
+                candidateSelectors = [
+                    '.project-layout',        // 项目布局容器
+                    '.project-columns',       // 项目列容器
+                    '#js-pjax-container',     // 通用PJAX容器
+                    'main',                   // 主内容
+                    'body'                    // 降级方案
+                ];
+                break;
+            
+            case 'packages':
+                candidateSelectors = [
+                    '.packages-list',         // 包列表容器
+                    '.package-details',       // 包详情容器
+                    '#js-pjax-container',     // 通用PJAX容器
+                    'main',                   // 主内容
+                    'body'                    // 降级方案
+                ];
+                break;
+            
+            case 'security':
+                candidateSelectors = [
+                    '.security-overview',     // 安全概览容器
+                    '.vulnerability-list',    // 漏洞列表
+                    '#js-pjax-container',     // 通用PJAX容器
+                    'main',                   // 主内容
+                    'body'                    // 降级方案
+                ];
+                break;
+            
+            case 'insights':
+                candidateSelectors = [
+                    '.insights-container',    // 洞察容器
+                    '#js-pjax-container',     // 通用PJAX容器
+                    'main',                   // 主内容
+                    'body'                    // 降级方案
+                ];
+                break;
+            
+            case 'settings':
+                candidateSelectors = [
+                    '.settings-content',      // 设置内容
+                    '.js-settings-content',   // JS设置内容
+                    '#js-pjax-container',     // 通用PJAX容器
+                    'main',                   // 主内容
+                    'body'                    // 降级方案
+                ];
+                break;
+            
+            case 'profile':
+            case 'organizations':
+                candidateSelectors = [
+                    '.profile-timeline',      // 个人资料时间线
+                    '.org-profile',           // 组织资料
+                    '.user-profile-main',     // 用户资料主内容
                     '#js-pjax-container',     // 通用PJAX容器
                     'main',                   // 主内容
                     'body'                    // 降级方案
@@ -502,12 +603,17 @@ export const pageMonitor = {
      */
     getOptimizedObserverConfig(pageMode) {
         // 如果没有提供页面模式，则自动检测
-        // 使用传入的页面模式或自动检测
+        pageMode = pageMode || this.detectPageMode();
+        
         // 基础配置
         const baseConfig = {
-            childList: true,  // 监听子节点变化
-            characterData: true
+            childList: true  // 始终监听子节点变化
         };
+        
+        // 根据配置决定是否监听字符数据变化
+        if (!CONFIG.performance.ignoreCharacterDataMutations) {
+            baseConfig.characterData = true;
+        }
         
         // 根据页面模式调整subtree观察选项
         const complexPages = ['wiki', 'issues', 'pullRequests', 'markdown'];
@@ -515,20 +621,17 @@ export const pageMonitor = {
         
         // 复杂页面可能需要更深入的观察，但要平衡性能
         if (complexPages.includes(pageMode)) {
-            baseConfig.subtree = true;
+            baseConfig.subtree = CONFIG.performance.observeSubtree;
         } else if (simplePages.includes(pageMode)) {
             // 简单页面可以减少观察深度，提高性能
             baseConfig.subtree = false;
-            // 但需要添加直接子节点的属性观察
-            baseConfig.attributes = true;
         } else {
             // 默认配置
-            baseConfig.subtree = CONFIG.performance.observeSubtree !== undefined ? 
-                CONFIG.performance.observeSubtree : CONFIG.performance.enableDeepObserver;
+            baseConfig.subtree = CONFIG.performance.observeSubtree;
         }
         
-        // 如果需要观察属性变化，则添加相关配置
-        if (CONFIG.performance.observeAttributes) {
+        // 根据配置决定是否观察属性变化
+        if (CONFIG.performance.observeAttributes && !CONFIG.performance.ignoreAttributeMutations) {
             baseConfig.attributes = true;
             baseConfig.attributeFilter = CONFIG.performance.importantAttributes;
         }
@@ -676,7 +779,11 @@ export const pageMonitor = {
                 mutationThreshold = 30,
                 contentChangeWeight = 1,
                 importantChangeWeight = 2,
-                translationTriggerRatio = 0.3
+                translationTriggerRatio = 0.3,
+                maxMutationProcessing = 50,
+                minContentChangesToTrigger = 3,
+                ignoreCharacterDataMutations = false,
+                ignoreAttributeMutations = false
             } = CONFIG.performance;
             
             // 快速路径：少量变化直接检查，阈值根据页面模式调整
@@ -689,7 +796,7 @@ export const pageMonitor = {
             let contentChanges = 0;
             let importantChanges = 0;
             // 限制检查数量，避免处理过多变化
-            const maxCheckCount = Math.min(mutations.length, mutationThreshold); 
+            const maxCheckCount = Math.min(mutations.length, Math.max(mutationThreshold, maxMutationProcessing)); 
             
             // 缓存重要元素和忽略元素的匹配结果，避免重复计算
             const elementCheckCache = new WeakMap();
@@ -697,6 +804,14 @@ export const pageMonitor = {
             // 分批处理变化，每批检查一定数量
             for (let i = 0; i < maxCheckCount; i++) {
                 const mutation = mutations[i];
+                
+                // 根据配置忽略特定类型的变化
+                if (ignoreCharacterDataMutations && mutation.type === 'characterData') {
+                    continue;
+                }
+                if (ignoreAttributeMutations && mutation.type === 'attributes') {
+                    continue;
+                }
                 
                 // 跳过空目标或已缓存为忽略的元素
                 if (mutation.target) {
@@ -741,10 +856,15 @@ export const pageMonitor = {
                     contentChanges++;
                     
                     // 内容变化达到阈值直接触发
-                    if (contentChanges >= 5) {
+                    if (contentChanges >= Math.max(5, minContentChangesToTrigger)) {
                         return true;
                     }
                 }
+            }
+            
+            // 检查内容变化是否达到最小触发阈值
+            if (contentChanges < minContentChangesToTrigger) {
+                return false;
             }
             
             // 计算加权变化比例

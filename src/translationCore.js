@@ -6,6 +6,107 @@ import { CONFIG } from './config.js';
 import { mergeAllDictionaries } from './dictionaries/index.js';
 import { utils } from './utils.js';
 import virtualDomManager from './virtualDom.js';
+import { ErrorHandler } from './errorHandler.js';
+
+/**
+ * Trie树数据结构，用于高效的字符串匹配
+ * 优化部分匹配算法的性能
+ */
+class TrieNode {
+    constructor() {
+        this.children = new Map();
+        this.isEndOfWord = false;
+        this.value = null;
+        this.length = 0;
+    }
+}
+
+class Trie {
+    constructor() {
+        this.root = new TrieNode();
+        this.size = 0;
+    }
+
+    /**
+     * 向Trie树中插入一个单词及其翻译
+     * @param {string} word - 要插入的单词
+     * @param {string} value - 翻译结果
+     */
+    insert(word, value) {
+        if (!word || typeof word !== 'string' || word.length === 0) {
+            return;
+        }
+
+        let node = this.root;
+        for (const char of word) {
+            if (!node.children.has(char)) {
+                node.children.set(char, new TrieNode());
+            }
+            node = node.children.get(char);
+        }
+        node.isEndOfWord = true;
+        node.value = value;
+        node.length = word.length;
+        this.size++;
+    }
+
+    /**
+     * 在Trie树中查找所有匹配的单词
+     * @param {string} text - 要查找的文本
+     * @returns {Array} 匹配结果数组
+     */
+    findAllMatches(text) {
+        if (!text || typeof text !== 'string' || text.length === 0) {
+            return [];
+        }
+
+        const matches = [];
+        const textLen = text.length;
+
+        for (let i = 0; i < textLen; i++) {
+            let node = this.root;
+            let currentWord = '';
+
+            for (let j = i; j < textLen; j++) {
+                const char = text[j];
+                if (!node.children.has(char)) {
+                    break;
+                }
+
+                node = node.children.get(char);
+                currentWord += char;
+
+                if (node.isEndOfWord) {
+                    matches.push({
+                        key: currentWord,
+                        value: node.value,
+                        start: i,
+                        end: j,
+                        length: node.length
+                    });
+                }
+            }
+        }
+
+        return matches;
+    }
+
+    /**
+     * 清空Trie树
+     */
+    clear() {
+        this.root = new TrieNode();
+        this.size = 0;
+    }
+
+    /**
+     * 获取Trie树的大小
+     * @returns {number} Trie树中的单词数量
+     */
+    getSize() {
+        return this.size;
+    }
+}
 
 /**
  * 翻译核心对象
@@ -30,6 +131,31 @@ export const translationCore = {
    * @type {Map<string, CacheItem>}
    */
   translationCache: new Map(),
+
+  /**
+   * DOM元素缓存，用于存储元素的翻译状态
+   * 使用WeakMap可以避免内存泄漏
+   * @type {WeakMap<Element, boolean>}
+   */
+  elementCache: new WeakMap(),
+
+  /**
+   * 词典哈希表，用于快速查找
+   * @type {Map<string, string>}
+   */
+  dictionaryHash: new Map(),
+
+  /**
+   * Trie树数据结构，用于高效的部分匹配
+   * @type {Trie}
+   */
+  dictionaryTrie: new Trie(),
+
+  /**
+   * 正则表达式缓存，避免重复创建
+   * @type {Map}
+   */
+  regexCache: new Map(),
 
   /**
    * 缓存统计信息
@@ -114,15 +240,46 @@ export const translationCore = {
    * 初始化词典
    */
   initDictionary() {
-    if (CONFIG.debugMode) {
-      console.time('[GitHub 中文翻译] 词典初始化');
-    }
+    try {
+      if (CONFIG.debugMode) {
+        console.time('[GitHub 中文翻译] 词典初始化');
+      }
 
-    this.dictionary = mergeAllDictionaries();
+      this.dictionary = mergeAllDictionaries();
+      
+      // 初始化词典哈希表和Trie树，提高查找效率
+      this.dictionaryHash.clear();
+      this.dictionaryTrie.clear();
+      this.regexCache.clear();
+      
+      Object.keys(this.dictionary).forEach(key => {
+        // 只添加非待翻译的有效条目
+        if (!this.dictionary[key].startsWith('待翻译: ')) {
+          this.dictionaryHash.set(key, this.dictionary[key]);
+          // 同时添加小写和大写版本，优化大小写不敏感匹配
+          if (key.length <= 100) {
+            this.dictionaryHash.set(key.toLowerCase(), this.dictionary[key]);
+            this.dictionaryHash.set(key.toUpperCase(), this.dictionary[key]);
+          }
+          
+          // 添加到Trie树中，用于高效的部分匹配
+          this.dictionaryTrie.insert(key);
+        }
+      });
 
-    if (CONFIG.debugMode) {
-      console.timeEnd('[GitHub 中文翻译] 词典初始化');
-      console.log(`[GitHub 中文翻译] 词典条目数量: ${Object.keys(this.dictionary).length}`);
+      if (CONFIG.debugMode) {
+        console.timeEnd('[GitHub 中文翻译] 词典初始化');
+        console.log(`[GitHub 中文翻译] 词典条目数量: ${Object.keys(this.dictionary).length}`);
+        console.log(`[GitHub 中文翻译] 哈希表条目数量: ${this.dictionaryHash.size}`);
+        console.log(`[GitHub 中文翻译] Trie树条目数量: ${this.dictionaryTrie.getSize()}`);
+      }
+    } catch (error) {
+      ErrorHandler.handleError('词典初始化', error, ErrorHandler.ERROR_TYPES.DICTIONARY);
+      // 提供一个空的默认词典作为回退
+      this.dictionary = {};
+      this.dictionaryHash.clear();
+      this.dictionaryTrie.clear();
+      this.regexCache.clear();
     }
   },
 
@@ -229,69 +386,55 @@ export const translationCore = {
         // 批量处理元素，避免长时间运行导致UI阻塞
         this.processElementsInBatches(elements)
           .then(() => {
+            // 记录翻译结束时间
+            this.performanceData.translateEndTime = Date.now();
             // 记录性能数据
             this.logPerformanceData();
             resolve();
           })
           .catch((batchError) => {
-            if (CONFIG.debugMode) {
-              console.error('[GitHub 中文翻译] 批处理过程中出错:', batchError);
-            }
-
-            // 错误恢复机制：尝试继续执行基本翻译
-            try {
-              if (CONFIG.debugMode) {
-                console.log('[GitHub 中文翻译] 尝试错误恢复，执行最小化翻译');
-              }
-              this.translateCriticalElementsOnly()
-                .then(() => {
-                  this.logPerformanceData();
-                  resolve(); // 即使有错误，也尽量完成基本翻译
-                })
-                .catch((recoverError) => {
-                  if (CONFIG.debugMode) {
-                    console.error('[GitHub 中文翻译] 错误恢复失败:', recoverError);
-                  }
-                  this.logPerformanceData();
-                  reject(recoverError);
-                });
-            } catch (recoverError) {
-              if (CONFIG.debugMode) {
-                console.error('[GitHub 中文翻译] 错误恢复失败:', recoverError);
-              }
-              this.logPerformanceData();
-              reject(recoverError);
-            }
+            // 使用ErrorHandler处理批处理错误
+            ErrorHandler.handleError('批处理过程', batchError, ErrorHandler.ERROR_TYPES.TRANSLATION, {
+              retryable: true,
+              recoveryFn: () => {
+                // 错误恢复机制：尝试继续执行基本翻译
+                this.translateCriticalElementsOnly()
+                  .then(() => {
+                    // 记录翻译结束时间
+                    this.performanceData.translateEndTime = Date.now();
+                    this.logPerformanceData();
+                    resolve(); // 即使有错误，也尽量完成基本翻译
+                  })
+                  .catch((recoverError) => {
+                    ErrorHandler.handleError('错误恢复', recoverError, ErrorHandler.ERROR_TYPES.TRANSLATION);
+                    // 记录翻译结束时间
+                    this.performanceData.translateEndTime = Date.now();
+                    this.logPerformanceData();
+                    reject(recoverError);
+                  });
+              },
+              maxRetries: 2
+            });
           });
       } catch (error) {
-        if (CONFIG.debugMode) {
-          console.error('[GitHub 中文翻译] 翻译过程中出错:', error);
-        }
-
-        // 错误恢复机制：尝试继续执行基本翻译
-        try {
-          if (CONFIG.debugMode) {
-            console.log('[GitHub 中文翻译] 尝试错误恢复，执行最小化翻译');
-          }
-          this.translateCriticalElementsOnly()
-            .then(() => {
-              this.logPerformanceData();
-              resolve(); // 即使有错误，也尽量完成基本翻译
-            })
-            .catch((recoverError) => {
-              if (CONFIG.debugMode) {
-                console.error('[GitHub 中文翻译] 错误恢复失败:', recoverError);
-              }
-              this.logPerformanceData();
-              reject(recoverError);
-            });
-        } catch (recoverError) {
-          if (CONFIG.debugMode) {
-            console.error('[GitHub 中文翻译] 错误恢复失败:', recoverError);
-          }
-          this.logPerformanceData();
-          reject(recoverError);
-        }
+        // 使用ErrorHandler处理翻译过程中的错误
+        ErrorHandler.handleError('翻译过程', error, ErrorHandler.ERROR_TYPES.TRANSLATION, {
+          retryable: true,
+          recoveryFn: () => {
+            // 错误恢复机制：尝试继续执行基本翻译
+            this.translateCriticalElementsOnly()
+              .then(() => {
+                this.logPerformanceData();
+                resolve(); // 即使有错误，也尽量完成基本翻译
+              })
+              .catch((recoverError) => {
+                ErrorHandler.handleError('错误恢复', recoverError, ErrorHandler.ERROR_TYPES.TRANSLATION);
+                this.logPerformanceData();
+                reject(recoverError);
+              });
+          },
+          maxRetries: 2
+        });
       }
     });
   },
@@ -299,13 +442,28 @@ export const translationCore = {
   /**
    * 重置性能统计数据
    */
+  /**
+   * 重置性能数据
+   */
   resetPerformanceData() {
     this.performanceData = {
       translateStartTime: 0,
+      translateEndTime: 0,
       elementsProcessed: 0,
       textsTranslated: 0,
       cacheHits: 0,
-      cacheMisses: 0
+      cacheMisses: 0,
+      cacheEvictions: 0,
+      cacheCleanups: 0,
+      domOperations: 0,
+      domOperationTime: 0,
+      networkRequests: 0,
+      networkRequestTime: 0,
+      dictionaryLookups: 0,
+      partialMatches: 0,
+      batchProcessings: 0,
+      errorCount: 0,
+      totalMemory: 0
     };
   },
 
@@ -315,10 +473,100 @@ export const translationCore = {
   logPerformanceData() {
     if (CONFIG.debugMode && CONFIG.performance.logTiming) {
       const duration = Date.now() - this.performanceData.translateStartTime;
-      console.log(`[GitHub 中文翻译] 翻译完成 - 耗时: ${duration}ms, 处理元素: ${this.performanceData.elementsProcessed}, ` +
-        `翻译文本: ${this.performanceData.textsTranslated}, 缓存命中: ${this.performanceData.cacheHits}, ` +
-        `缓存未命中: ${this.performanceData.cacheMisses}`);
+      console.log(`[GitHub 中文翻译] 性能数据 - 总耗时: ${duration}ms`);
+      console.log(`  元素处理: ${this.performanceData.elementsProcessed}`);
+      console.log(`  文本翻译: ${this.performanceData.textsTranslated}`);
+      console.log(`  缓存命中: ${this.performanceData.cacheHits}`);
+      console.log(`  缓存未命中: ${this.performanceData.cacheMisses}`);
+      console.log(`  缓存驱逐: ${this.performanceData.cacheEvictions}`);
+      console.log(`  缓存清理: ${this.performanceData.cacheCleanups}`);
+      console.log(`  DOM操作: ${this.performanceData.domOperations} (${this.performanceData.domOperationTime}ms)`);
+      console.log(`  网络请求: ${this.performanceData.networkRequests} (${this.performanceData.networkRequestTime}ms)`);
+      console.log(`  字典查询: ${this.performanceData.dictionaryLookups}`);
+      console.log(`  部分匹配: ${this.performanceData.partialMatches}`);
+      console.log(`  批处理次数: ${this.performanceData.batchProcessings}`);
+      console.log(`  错误次数: ${this.performanceData.errorCount}`);
     }
+  },
+
+  /**
+   * 记录单个性能事件
+   * @param {string} eventType - 事件类型
+   * @param {object} data - 事件数据
+   */
+  recordPerformanceEvent(eventType, data = {}) {
+    switch (eventType) {
+      case 'dom-operation':
+        this.performanceData.domOperations++;
+        this.performanceData.domOperationTime += data.duration || 0;
+        break;
+      case 'network-request':
+        this.performanceData.networkRequests++;
+        this.performanceData.networkRequestTime += data.duration || 0;
+        break;
+      case 'dictionary-lookup':
+        this.performanceData.dictionaryLookups++;
+        break;
+      case 'partial-match':
+        this.performanceData.partialMatches++;
+        break;
+      case 'batch-processing':
+        this.performanceData.batchProcessings++;
+        break;
+      case 'error':
+        this.performanceData.errorCount++;
+        break;
+      default:
+        break;
+    }
+  },
+
+  /**
+   * 获取当前性能统计数据
+   * @returns {object} - 性能统计数据
+   */
+  getPerformanceStats() {
+    const stats = { ...this.performanceData };
+    if (stats.translateStartTime > 0) {
+      stats.totalDuration = stats.translateEndTime > 0 
+        ? stats.translateEndTime - stats.translateStartTime 
+        : Date.now() - stats.translateStartTime;
+    } else {
+      stats.totalDuration = 0;
+    }
+    
+    // 计算缓存命中率
+    const totalCacheRequests = stats.cacheHits + stats.cacheMisses;
+    stats.cacheHitRate = totalCacheRequests > 0 
+      ? (stats.cacheHits / totalCacheRequests * 100).toFixed(2) + '%' 
+      : '0%';
+    
+    // 计算平均DOM操作时间
+    stats.avgDomOperationTime = stats.domOperations > 0 
+      ? (stats.domOperationTime / stats.domOperations).toFixed(2) + 'ms' 
+      : '0ms';
+    
+    // 计算平均网络请求时间
+    stats.avgNetworkRequestTime = stats.networkRequests > 0 
+      ? (stats.networkRequestTime / stats.networkRequests).toFixed(2) + 'ms' 
+      : '0ms';
+    
+    return stats;
+  },
+
+  /**
+   * 导出性能数据
+   * @returns {string} - JSON格式的性能数据
+   */
+  exportPerformanceData() {
+    const data = {
+      timestamp: new Date().toISOString(),
+      pageMode: this.currentPageMode,
+      stats: this.getPerformanceStats(),
+      userAgent: navigator.userAgent,
+      browserLanguage: navigator.language
+    };
+    return JSON.stringify(data, null, 2);
   },
 
   /**
@@ -348,9 +596,7 @@ export const translationCore = {
         try {
           this.translateElement(element);
         } catch (error) {
-          if (CONFIG.debugMode) {
-            console.error('[GitHub 中文翻译] 翻译元素时出错:', error, element);
-          }
+          ErrorHandler.handleError('翻译元素', error, ErrorHandler.ERROR_TYPES.DOM_OPERATION);
         }
       });
       return Promise.resolve();
@@ -368,9 +614,7 @@ export const translationCore = {
             try {
               this.translateElement(element);
             } catch (error) {
-              if (CONFIG.debugMode) {
-                console.error('[GitHub 中文翻译] 翻译元素时出错:', error, element);
-              }
+              ErrorHandler.handleError('翻译元素', error, ErrorHandler.ERROR_TYPES.DOM_OPERATION);
             }
           });
 
@@ -393,9 +637,7 @@ export const translationCore = {
             resolve();
           }
         } catch (error) {
-          if (CONFIG.debugMode) {
-            console.error('[GitHub 中文翻译] 批处理时出错:', error);
-          }
+          ErrorHandler.handleError('批处理过程', error, ErrorHandler.ERROR_TYPES.TRANSLATION);
           resolve(); // 即使出错也要完成Promise
         }
       };
@@ -439,9 +681,7 @@ export const translationCore = {
             }
           }
         } catch (err) {
-          if (CONFIG.debugMode) {
-            console.warn(`[GitHub 中文翻译] 查询选择器失败: ${selector}`, err);
-          }
+          ErrorHandler.handleError('查询选择器', err, ErrorHandler.ERROR_TYPES.DOM_OPERATION);
           // 继续处理其他选择器
         }
       });
@@ -462,9 +702,7 @@ export const translationCore = {
           processedElements++;
         } catch (err) {
           failedElements++;
-          if (CONFIG.debugMode) {
-            console.warn('[GitHub 中文翻译] 关键元素翻译失败:', err, element);
-          }
+          ErrorHandler.handleError('关键元素翻译', err, ErrorHandler.ERROR_TYPES.DOM_OPERATION);
         }
       });
 
@@ -839,8 +1077,15 @@ translateElement(element) {
       return false;
     }
 
+    // 性能优化：检查元素缓存，避免重复翻译
+    if (this.elementCache.has(element)) {
+      return false;
+    }
+    
     // 性能优化：检查是否已翻译，避免重复翻译
     if (element.hasAttribute('data-github-zh-translated')) {
+      // 将已标记的元素添加到缓存
+      this.elementCache.set(element, true);
       return false;
     }
 
@@ -967,6 +1212,9 @@ translateElement(element) {
       // 标记为已检查但未翻译，避免重复检查
       element.setAttribute('data-github-zh-translated', 'checked');
     }
+    
+    // 将元素添加到缓存，避免重复翻译
+    this.elementCache.set(element, true);
 
     return hasTranslation;
   },
@@ -1005,31 +1253,15 @@ translateElement(element) {
     // 尝试不同的规范化形式进行匹配
     let result = null;
 
-    // 1. 尝试精确匹配（已经规范化的文本）
-    if (this.dictionary[normalizedText]) {
-      const translation = this.dictionary[normalizedText];
-      // 避免返回标记为待翻译的文本
-      if (!translation.startsWith('待翻译: ')) {
-        result = translation;
-      }
-    }
+    // 1. 尝试使用哈希表进行快速查找（已经规范化的文本）
+    result = this.dictionaryHash.get(normalizedText);
 
-    // 2. 尝试不区分大小写的匹配（仅当文本长度小于某个阈值）
-    if (result === null && normalizedText.length <= 100) { // 避免对过长文本进行大小写转换
+    // 2. 如果哈希表没有匹配，且文本长度适合，尝试大小写转换（作为回退）
+    if (result === undefined && normalizedText.length <= 100) {
       const lowerCaseText = normalizedText.toLowerCase();
       const upperCaseText = normalizedText.toUpperCase();
-
-      if (this.dictionary[lowerCaseText]) {
-        const translation = this.dictionary[lowerCaseText];
-        if (!translation.startsWith('待翻译: ')) {
-          result = translation;
-        }
-      } else if (this.dictionary[upperCaseText]) {
-        const translation = this.dictionary[upperCaseText];
-        if (!translation.startsWith('待翻译: ')) {
-          result = translation;
-        }
-      }
+      
+      result = this.dictionaryHash.get(lowerCaseText) || this.dictionaryHash.get(upperCaseText);
     }
 
     // 3. 如果启用了部分匹配且尚未找到结果
@@ -1055,7 +1287,7 @@ translateElement(element) {
 
   /**
    * 执行部分翻译匹配
-   * 优化版：使用智能匹配算法和优先级排序
+   * 优化版：使用Trie树进行高效匹配，减少不必要的字典遍历
    * @param {string} text - 要翻译的文本
    * @returns {string|null} - 翻译后的文本
    */
@@ -1074,44 +1306,77 @@ translateElement(element) {
     // 优化：仅考虑长度合适的字典键，避免不必要的匹配
     const minKeyLength = Math.min(4, Math.floor(textLen / 2)); // 最小键长度至少为4或文本长度的一半
 
-    // 筛选可能匹配的键
-    for (const [key, value] of Object.entries(this.dictionary)) {
-      // 快速检查
-      if (key.length < minKeyLength ||
-        key.length > textLen ||
-        value.startsWith('待翻译: ') ||
-        // 避免对纯数字或特殊字符的匹配
-        /^[0-9.,\s()[\]{}/*^$#@!~`|:;"'?>+-]+$/i.test(key)) {
+    // 使用Trie树查找所有可能的匹配项，避免遍历整个字典
+    const potentialKeys = this.dictionaryTrie.findAllMatches(text, minKeyLength);
+
+    // 处理找到的潜在匹配项
+    for (const key of potentialKeys) {
+      if (!this.dictionary.hasOwnProperty(key) || 
+          this.dictionary[key].startsWith('待翻译: ')) {
         continue;
       }
 
-      // 使用更高效的匹配算法
-      // 先检查是否包含，再使用正则确认是完整单词
-      if (text.includes(key)) {
-        // 尝试将key视为一个完整的单词进行匹配
-        // 使用单词边界的正则表达式
-        const wordRegex = new RegExp('\\b' + utils.escapeRegExp(key) + '\\b', 'gi');
-        const wordMatches = text.match(wordRegex);
+      const value = this.dictionary[key];
+      
+      // 避免对纯数字或特殊字符的匹配
+      if (/^[0-9.,\s()[\]{}/*^$#@!~`|:;"'?>+-]+$/i.test(key)) {
+        continue;
+      }
 
-        if (wordMatches && wordMatches.length > 0) {
-          // 记录匹配项，按匹配长度排序
-          matches.push({
-            key,
-            value,
-            length: key.length,
-            matches: wordMatches.length,
-            regex: wordRegex
-          });
+      // 尝试将key视为一个完整的单词进行匹配
+      // 使用单词边界的正则表达式
+      const wordRegexKey = `word_${key}`;
+      let wordRegex;
+      
+      // 检查正则表达式缓存
+      if (this.regexCache.has(wordRegexKey)) {
+        wordRegex = this.regexCache.get(wordRegexKey);
+      } else {
+        // 使用安全的正则表达式创建方法防止ReDoS攻击
+        wordRegex = utils.safeRegExp('\\b' + utils.escapeRegExp(key) + '\\b', 'gi');
+        if (wordRegex) {
+          this.regexCache.set(wordRegexKey, wordRegex);
         } else {
-          // 如果不是完整单词，也记录匹配项
-          matches.push({
-            key,
-            value,
-            length: key.length,
-            matches: 1,
-            regex: new RegExp(utils.escapeRegExp(key), 'g')
-          });
+          continue; // 如果正则表达式不安全，跳过此键
         }
+      }
+      
+      const wordMatches = text.match(wordRegex);
+
+      if (wordMatches && wordMatches.length > 0) {
+        // 记录匹配项，按匹配长度排序
+        matches.push({
+          key,
+          value,
+          length: key.length,
+          matches: wordMatches.length,
+          regex: wordRegex
+        });
+      } else {
+        // 如果不是完整单词，也记录匹配项
+        const nonWordRegexKey = `nonword_${key}`;
+        let nonWordRegex;
+        
+        // 检查正则表达式缓存
+        if (this.regexCache.has(nonWordRegexKey)) {
+          nonWordRegex = this.regexCache.get(nonWordRegexKey);
+        } else {
+          // 使用安全的正则表达式创建方法防止ReDoS攻击
+          nonWordRegex = utils.safeRegExp(utils.escapeRegExp(key), 'g');
+          if (nonWordRegex) {
+            this.regexCache.set(nonWordRegexKey, nonWordRegex);
+          } else {
+            continue; // 如果正则表达式不安全，跳过此键
+          }
+        }
+        
+        matches.push({
+          key,
+          value,
+          length: key.length,
+          matches: 1,
+          regex: nonWordRegex
+        });
       }
     }
 
@@ -1332,6 +1597,9 @@ clearCache() {
     // 清除虚拟DOM缓存
     virtualDomManager.clear();
     this.translationCache.clear();
+    
+    // 清除元素缓存
+    this.elementCache = new WeakMap();
     
     // 重置缓存统计
     this.cacheStats = {

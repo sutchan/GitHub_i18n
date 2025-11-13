@@ -17,7 +17,7 @@ const { JSDOM } = require('jsdom');
 const https = require('https');
 
 // 导入共享工具函数
-const { updateStatsAfterRun, validateConfig, processPagesInBatches, sleep, formatNumber } = require('./utils');
+const { updateStatsAfterRun, validateConfig, processPagesInBatches, sleep, formatNumber, escapeRegExp } = require('./utils');
 const { saveExtractedStringsToDictionary } = require('./dictionary_processor');
 
 
@@ -651,8 +651,7 @@ function isStringUsedInScript(scriptContent, text) {
 
   try {
     // 对文本进行转义，使其可以在正则表达式中使用
-    // 改进的转义逻辑，确保所有正则表达式特殊字符都被正确转义
-    const escapedText = text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+    const escapedText = escapeRegExp(text);
 
     // 匹配字符串作为完整标识符、属性名、参数值等
     // 这包括：函数调用参数、赋值、字符串拼接等场景
@@ -759,7 +758,7 @@ async function updateTranslationDictionary(scriptContent, newStrings) {
       let moduleRegex = moduleRegexCache.get(module);
       if (!moduleRegex) {
         // 转义模块名中的特殊字符
-        const escapedModule = module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const escapedModule = escapeRegExp(module);
         moduleRegex = new RegExp(`(const ${escapedModule} = {[\\s\\S]*?})`);
         moduleRegexCache.set(module, moduleRegex);
       }
