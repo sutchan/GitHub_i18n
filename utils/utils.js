@@ -8,7 +8,7 @@
  * @param {string} string - 要转义的字符串
  * @returns {string} 转义后的字符串
  */
-export function escapeRegExp(string) {
+function escapeRegExp(string) {
     // 转义所有正则表达式特殊字符，包括/字符
     return string.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 }
@@ -18,7 +18,7 @@ export function escapeRegExp(string) {
  * @param {number} num - 要格式化的数字
  * @returns {string} 格式化后的数字字符串
  */
-export function formatNumber(num) {
+function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
@@ -27,7 +27,7 @@ export function formatNumber(num) {
  * @param {number} ms - 延迟时间（毫秒）
  * @returns {Promise<void>}
  */
-export function sleep(ms) {
+function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -38,7 +38,7 @@ export function sleep(ms) {
  * @param {number} batchSize - 批次大小
  * @returns {Promise<Array>} 处理结果
  */
-export async function processPagesInBatches(items, processFn, batchSize = 5) {
+async function processPagesInBatches(items, processFn, batchSize = 5) {
     const results = [];
     for (let i = 0; i < items.length; i += batchSize) {
         const batch = items.slice(i, i + batchSize);
@@ -57,7 +57,7 @@ export async function processPagesInBatches(items, processFn, batchSize = 5) {
  * @param {Object} config - 配置对象
  * @returns {Object} 验证结果
  */
-export function validateConfig(config) {
+function validateConfig(config) {
     const errors = [];
     
     // 验证必要的配置项
@@ -89,7 +89,7 @@ export function validateConfig(config) {
  * @param {Object} stats - 统计信息对象
  * @returns {void}
  */
-export function updateStatsAfterRun(stats) {
+function updateStatsAfterRun(stats) {
     // 这里可以添加统计信息的更新逻辑
     console.log('运行完成，更新统计信息:', stats);
 }

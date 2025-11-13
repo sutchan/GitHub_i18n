@@ -38,7 +38,7 @@ startScript()
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-const VERSION = '1.8.164'
+const VERSION = '1.8.165'
 
 /**
  * 版本历史记录
@@ -46,7 +46,7 @@ const VERSION = '1.8.164'
  */
 const VERSION_HISTORY = [
   {
-    version: '1.8.164',
+    version: '1.8.165',
     date: '2025-11-13',
     changes: ['当前版本']
   }
@@ -592,9 +592,6 @@ const CONFIG = {
  * 版本更新检查模块
  * 负责检查和处理脚本更新
  */
-const = require('./config.js')
-const = require('./utils.js')
-
 /**
  * 版本检查器对象
  */
@@ -1041,8 +1038,6 @@ localStorage.removeItem('githubZhLastNotifiedVersion')
 }
         }
 }
-
-module.exports = 
 
 /**
  * 翻译词典合并模块
@@ -5267,9 +5262,6 @@ const CONFIG = {
  * 版本更新检查模块
  * 负责检查和处理脚本更新
  */
-const = require('./config.js')
-const = require('./utils.js')
-
 /**
  * 版本检查器对象
  */
@@ -5716,8 +5708,6 @@ localStorage.removeItem('githubZhLastNotifiedVersion')
 }
         }
 }
-
-module.exports = 
 
 /**
  * 翻译词典合并模块
