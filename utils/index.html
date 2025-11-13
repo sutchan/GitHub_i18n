@@ -945,10 +945,6 @@
     <div class="version-info">版本 1.0.0</div>
   </footer>
 
-  <!-- 页面管理相关脚本 -->
-  <script src="page_manager.js"></script>
-  <script src="page_manager_ui.js"></script>
-
   <script>
     // 应用状态管理
     const appState = {
@@ -1708,8 +1704,8 @@
       initEventListeners();
 
       // 初始化页面管理器
-      if (typeof PageManagerUI !== 'undefined') {
-        PageManagerUI.init();
+      if (typeof initPageManager !== 'undefined') {
+        initPageManager();
       }
 
       // 更新UI状态
@@ -1734,7 +1730,6 @@
 
   <!-- 页面管理相关脚本 -->
   <script src="page_manager.js"></script>
-  <script src="string_collector.js"></script>
   <script src="page_manager_ui.js"></script>
 
   <!-- 页面管理部分的HTML结构 -->
