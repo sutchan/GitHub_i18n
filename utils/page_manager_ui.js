@@ -591,17 +591,20 @@ class PageManagerUI {
    */
   updateStatistics() {
     const totalCount = this.pages.length;
-    const enabledCount = this.pages.filter(p => p.enabled).length;
+    const enabledCount = this.pages.filter(p => p.enabled !== false).length;
     const disabledCount = totalCount - enabledCount;
     
-    const statsElement = document.getElementById('pageStatistics');
-    if (statsElement) {
-      statsElement.innerHTML = `
-        <span class="stat-item">总计: ${totalCount}</span>
-        <span class="stat-item enabled">启用: ${enabledCount}</span>
-        <span class="stat-item disabled">禁用: ${disabledCount}</span>
-      `;
-    }
+    // 更新单个统计元素的内容，而不是替换整个结构
+    document.getElementById('totalPages')?.textContent = totalCount;
+    document.getElementById('enabledPages')?.textContent = enabledCount;
+    document.getElementById('disabledPages')?.textContent = disabledCount;
+    
+    // 更新选中页面计数
+    const selectedCount = this.pages.filter(p => {
+      const pageId = p.url ? `page_${p.url.hashCode()}` : p.id;
+      return pageId === this.currentPageId;
+    }).length;
+    document.getElementById('selectedPages')?.textContent = selectedCount;
   }
 
   /**

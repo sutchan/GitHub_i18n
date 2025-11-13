@@ -878,64 +878,7 @@
       </div>
 
       <div id="pageManager-content" class="tab-content">
-        <div id="pageManagerContainer" class="page-manager-container">
-          <!-- 工具栏 -->
-          <div class="page-manager-toolbar">
-            <button id="addPageBtn" class="btn">添加页面</button>
-            <button id="loadPagesBtn" class="btn">加载页面</button>
-            <button id="savePagesBtn" class="btn">保存页面</button>
-            <button id="collectStringsBtn" class="btn">采集字符串</button>
-          </div>
-
-          <!-- 进度条 -->
-          <div class="progress-container">
-            <div id="pageManagerProgress" class="progress-bar">
-              <div class="progress-fill"></div>
-            </div>
-            <span id="progressText" class="progress-text">0%</span>
-          </div>
-
-          <!-- 页面表格 -->
-          <div class="table-container">
-            <table id="pagesTable">
-              <thead>
-                <tr>
-                  <th>页面名称</th>
-                  <th>CSS选择器</th>
-                  <th>启用</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody id="pagesTableBody">
-                <!-- 页面数据将通过JavaScript动态加载 -->
-              </tbody>
-            </table>
-          </div>
-
-          <!-- 页面表单 -->
-          <div class="form-container" id="pageFormContainer" style="display: none;">
-            <h3 id="formTitle">添加新页面</h3>
-            <input type="hidden" id="pageId" value="">
-            <div class="form-group">
-              <label for="pageName">页面名称:</label>
-              <input type="text" id="pageName" placeholder="输入页面名称">
-            </div>
-            <div class="form-group">
-              <label for="cssSelector">CSS选择器:</label>
-              <textarea id="cssSelector" placeholder="输入CSS选择器，多个选择器用逗号分隔"></textarea>
-            </div>
-            <div class="form-group">
-              <label class="checkbox-label">
-                <input type="checkbox" id="pageEnabled">
-                <span>启用此页面</span>
-              </label>
-            </div>
-            <div class="form-actions">
-              <button id="cancelPageBtn" class="btn btn-secondary">取消</button>
-              <button id="savePageBtn" class="btn">保存</button>
-            </div>
-          </div>
-        </div>
+        <!-- 页面管理部分的HTML结构将从文档底部移动到这里 -->
       </div>
     </div>
   </div>
@@ -1739,8 +1682,8 @@
       <div class="toolbar">
         <button id="addPageBtn" class="btn btn-primary">添加页面</button>
         <button id="editPageBtn" class="btn btn-secondary" disabled>编辑页面</button>
-        <button id="deleteSelectedBtn" class="btn btn-danger" disabled>删除选中</button>
-        <button id="toggleEnabledBtn" class="btn btn-secondary" disabled>启用/禁用</button>
+        <button id="deletePageBtn" class="btn btn-danger" disabled>删除选中</button>
+        <button id="toggleStatusBtn" class="btn btn-secondary" disabled>启用/禁用</button>
         <button id="collectStringsBtn" class="btn btn-primary">采集字符串</button>
         <div id="pageStatistics">
           <div class="stat-item total">总数: <span id="totalPages">0</span></div>
