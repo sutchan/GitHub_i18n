@@ -20,7 +20,7 @@
     "userscript"
   ],
   "author": "Sut (https://github.com/sutchan)",
-  "license": "MIT",
+  "license": "GPL-2.0-only",
   "repository": {
     "type": "git",
     "url": "https://github.com/sutchan/GitHub_i18n.git"
