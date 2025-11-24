@@ -1,6 +1,10 @@
 /**
  * GitHub 中文翻译主入口文件
- * 整合所有模块并初始化脚本
+ * @file main.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 整合所有模块并初始化脚本
  */
 
 // 导入核心模块

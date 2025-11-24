@@ -10,7 +10,17 @@
     "build:patch": "node build.js --patch",
     "clean": "node build.js --no-upgrade --no-copy",
     "validate": "node -e \"const BuildManager = require('./build.js'); const bm = new BuildManager(); console.log(bm.validateBuild());\"",
-    "test": "npx jest"
+    "test": "npx jest",
+    "test:watch": "npx jest --watch",
+    "test:coverage": "npx jest --coverage",
+    "coverage:report": "node -e \"const { generateCoverageReport } = require('./utils/coverageTool.js'); generateCoverageReport();\"",
+    "benchmark": "node -e \"const { runTranslationBenchmark } = require('./utils/performanceBenchmark.js'); runTranslationBenchmark();\"",
+    "lint": "npx eslint src/**/*.js test/**/*.js utils/**/*.js build/**/*.js",
+    "lint:fix": "npx eslint src/**/*.js test/**/*.js utils/**/*.js build/**/*.js --fix",
+    "docs:generate": "npx jsdoc -c jsdoc.conf.json",
+    "security:audit": "npm audit --audit-level=moderate",
+    "precommit": "npm run lint && npm run test",
+    "prepush": "npm run build && npm run validate"
   },
   "keywords": [
     "github",
@@ -34,7 +44,8 @@
     "babel-jest": "^29.7.0",
     "eslint": "^7.32.0",
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0"
+    "jest-environment-jsdom": "^29.7.0",
+    "jsdoc": "^4.0.2"
   },
   "dependencies": {
     "eventsource": "^4.0.0"

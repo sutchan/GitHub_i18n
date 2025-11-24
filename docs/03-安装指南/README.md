@@ -86,8 +86,9 @@
 2. **安装 GitHub i18n 脚本**
 
    访问以下链接安装：
-   - [Greasy Fork](https://greasyfork.org/zh-CN/scripts/424985-github-%E4%B8%AD%E6%96%87%E7%BF%BB%E8%AF%91) - 推荐安装渠道
+   - [Greasy Fork](https://greasyfork.org/zh-CN/scripts/448954-github-%E4%B8%AD%E6%96%87%E7%BF%BB%E8%AF%91) - 推荐安装渠道
    - [GitHub 发布页](https://github.com/sutchan/GitHub_i18n/releases) - 最新版本
+   - [直接安装链接](https://raw.githubusercontent.com/sutchan/GitHub_i18n/main/dist/GitHub_zh-CN.user.js)
 
 3. **验证安装**
 
@@ -100,6 +101,7 @@
 1. 访问 [Greasy Fork 上的项目页面](https://greasyfork.org/zh-CN/scripts/448954-github-%E4%B8%AD%E6%96%87%E7%BF%BB%E8%AF%91)
 2. 点击 "安装此脚本" 按钮
 3. 在弹出的用户脚本管理器界面中确认安装
+4. 安装完成后自动跳转到 GitHub 页面以验证安装效果
 
 ### 通过 GitHub 直接安装
 
@@ -155,6 +157,8 @@
    - 访问 [GitHub Marketplace](https://github.com/marketplace)
    - 访问 [GitHub Actions](https://github.com/features/actions)
    - 访问 [GitHub Settings](https://github.com/settings/profile)
+   - 访问 [GitHub Codespaces](https://github.com/codespaces)
+   - 访问 [GitHub Copilot](https://github.com/features/copilot)
    - 确认这些特殊页面也能得到适当翻译
 
 ### 验证结果记录
@@ -310,6 +314,8 @@ GitHub i18n 脚本支持自动更新和手动更新两种方式：
 - 确保您的浏览器版本符合要求
 - 尝试切换到推荐的用户脚本管理器（如 Tampermonkey）
 - 检查浏览器扩展是否与脚本冲突
+- 对于 Edge 浏览器，确保使用基于 Chromium 的最新版本
+- 对于 Safari，注意权限设置可能需要额外配置
 
 ### 翻译准确性问题
 
@@ -319,8 +325,8 @@ GitHub i18n 脚本支持自动更新和手动更新两种方式：
 
 ## 版本信息
 
-- **当前版本**: 1.8.99
-- **发布日期**: 2024-06-02
+- **当前版本**: 2.1.0
+- **发布日期**: 2024-06-18
 - **文档状态**: 活跃维护中
 
 ---

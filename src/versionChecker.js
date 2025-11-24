@@ -1,6 +1,10 @@
 /**
  * 版本更新检查模块
- * 负责检查和处理脚本更新
+ * @file versionChecker.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 负责检查和处理脚本更新
  */
 import { CONFIG } from './config.js';
 import { utils } from './utils.js';

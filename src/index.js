@@ -1,4 +1,11 @@
-/** GitHub 中文翻译入口文件 */
+/**
+ * GitHub 中文翻译入口文件
+ * @file index.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 将 GitHub 界面翻译成中文
+ */
 
 // ==UserScript==
 // @name         GitHub 中文翻译

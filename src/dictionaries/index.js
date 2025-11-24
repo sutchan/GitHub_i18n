@@ -1,6 +1,10 @@
 /**
  * 翻译词典合并模块
- * 整合所有页面的翻译词典
+ * @file index.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 整合所有页面的翻译词典
  */
 import { codespacesDictionary } from './codespaces.js';
 import { exploreDictionary } from './explore.js';

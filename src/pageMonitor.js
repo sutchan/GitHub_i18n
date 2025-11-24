@@ -1,6 +1,10 @@
 /**
  * 页面监控模块
- * 负责监听GitHub页面的变化，检测DOM更新并触发翻译
+ * @file pageMonitor.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 负责监听GitHub页面的变化，检测DOM更新并触发翻译
  */
 import { CONFIG } from './config.js';
 import { translationCore } from './translationCore.js';

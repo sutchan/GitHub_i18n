@@ -1,6 +1,10 @@
 /**
  * 翻译核心模块
- * 负责页面内容的实际翻译工作
+ * @file translationCore.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 负责页面内容的实际翻译工作
  */
 import { CONFIG } from './config.js';
 import { mergeAllDictionaries } from './dictionaries/index.js';

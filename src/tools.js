@@ -1,6 +1,10 @@
 /**
  * 开发工具模块
- * 包含字符串提取、自动更新和词典处理等开发工具
+ * @file tools.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含字符串提取、自动更新和词典处理等开发工具
  */
 // 删除未使用的CONFIG导入
 import { utils } from './utils.js';

@@ -1,6 +1,10 @@
 /**
  * 工具函数模块
- * 包含各种通用的辅助函数
+ * @file utils.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含各种通用的辅助函数
  */
 
 /**

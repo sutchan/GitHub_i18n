@@ -1,5 +1,10 @@
 /**
  * Explore 页面翻译词典
+ * @file explore.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含 GitHub Explore 页面的翻译词典
  */
 
 export const exploreDictionary = {

@@ -1,6 +1,10 @@
 /**
  * 通用翻译词典
- * 包含所有页面共用的翻译字符串
+ * @file common.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含所有页面共用的翻译字符串
  */
 
 export const commonDictionary = {

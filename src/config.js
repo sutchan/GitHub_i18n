@@ -1,6 +1,10 @@
 /**
  * GitHub 中文翻译配置文件
- * 包含脚本所有可配置项
+ * @file config.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含脚本所有可配置项
  */
 
 // 导入版本常量（从单一版本源）
