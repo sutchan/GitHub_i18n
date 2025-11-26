@@ -231,6 +231,15 @@
       gap: 0.5rem;
     }
 
+    .btn-info {
+      background-color: #3b82f6;
+      --btn-hover-bg: #2563eb;
+    }
+
+    .btn-info:hover:not(:disabled) {
+      background-color: var(--btn-hover-bg, var(--primary-hover));
+    }
+
     .btn:hover:not(:disabled) {
       background-color: var(--primary-hover);
       box-shadow: var(--shadow-md);
@@ -887,6 +896,7 @@
               <button id="editPageBtn" class="btn btn-secondary" disabled>编辑页面</button>
               <button id="deletePageBtn" class="btn btn-danger" disabled>删除选中</button>
               <button id="toggleStatusBtn" class="btn btn-secondary" disabled>启用/禁用</button>
+              <button id="importPagesBtn" class="btn btn-info">导入页面</button>
               <button id="collectStringsBtn" class="btn btn-primary">采集字符串</button>
               <div id="pageStatistics">
                 <div class="stat-item total">总数: <span id="totalPages">0</span></div>

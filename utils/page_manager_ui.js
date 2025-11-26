@@ -19,9 +19,17 @@ String.prototype.hashCode = function() {
  * 页面管理器UI类
  */
 class PageManagerUI {
-  constructor() {
+  constructor(options = {}) {
+    // 原有属性
     this.pages = [];
     this.currentPageId = null;
+    
+    // 新增配置选项
+    this.container = options.container || document.body;
+    this.apiEndpoint = options.apiEndpoint || '/api/github-i18n';
+    this.pageManager = options.pageManager || window.PageManager;
+    
+    // 初始化UI
     this.init();
   }
 
@@ -66,6 +74,270 @@ class PageManagerUI {
     
     // 全选复选框事件
     document.getElementById('selectAllPages')?.addEventListener('change', (e) => this.toggleSelectAll(e.target.checked));
+    
+    // 导入按钮事件
+    document.getElementById('importPagesBtn')?.addEventListener('click', () => this.showImportModal());
+    
+    // 导入文件选择事件
+    document.getElementById('importFileInput')?.addEventListener('change', (e) => this.handleFileSelection(e.target.files));
+    
+    // 导入确认按钮事件
+    document.getElementById('confirmImportBtn')?.addEventListener('click', () => this.performImport());
+    
+    // 关闭导入模态框按钮事件
+    document.getElementById('closeImportModalBtn')?.addEventListener('click', () => this.hideImportModal());
+  }
+  
+  /**
+   * 显示导入模态框
+   */
+  showImportModal() {
+    // 创建导入模态框HTML（如果不存在）
+    let importModal = document.getElementById('importPagesModal');
+    if (!importModal) {
+      importModal = this.createImportModal();
+      document.body.appendChild(importModal);
+    }
+    
+    // 重置文件输入
+    document.getElementById('importFileInput').value = '';
+    document.getElementById('importResult').textContent = '';
+    document.getElementById('confirmImportBtn').disabled = true;
+    
+    // 显示模态框
+    importModal.classList.remove('hidden');
+    importModal.classList.add('visible');
+  }
+  
+  /**
+   * 隐藏导入模态框
+   */
+  hideImportModal() {
+    const importModal = document.getElementById('importPagesModal');
+    if (importModal) {
+      importModal.classList.remove('visible');
+      importModal.classList.add('hidden');
+    }
+  }
+  
+  /**
+   * 创建导入模态框HTML
+   */
+  createImportModal() {
+    const modal = document.createElement('div');
+    modal.id = 'importPagesModal';
+    modal.className = 'modal hidden';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>导入页面配置</h3>
+          <button id="closeImportModalBtn" class="close-btn">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="importFileInput">选择JSON文件:</label>
+            <input type="file" id="importFileInput" accept=".json" />
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="mergeImportData" checked />
+              合并到现有页面（取消勾选将替换所有页面）
+            </label>
+          </div>
+          <div id="importResult" class="import-result"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelImportBtn" class="btn btn-secondary">取消</button>
+          <button id="confirmImportBtn" class="btn btn-primary" disabled>导入</button>
+        </div>
+      </div>
+    `;
+    
+    // 添加样式
+    const style = document.createElement('style');
+    style.textContent = `
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+      }
+      .modal.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      .modal.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+      .modal-content {
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .close-btn:hover {
+        color: #333;
+      }
+      .modal-body {
+        padding: 20px;
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+      .import-result {
+        min-height: 20px;
+        margin-top: 16px;
+        font-size: 14px;
+        color: #666;
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 16px 20px;
+        border-top: 1px solid #e0e0e0;
+        gap: 12px;
+      }
+      .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+      }
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .btn-primary {
+        background-color: #0078d4;
+        color: white;
+      }
+      .btn-primary:hover:not(:disabled) {
+        background-color: #005a9e;
+      }
+      .btn-secondary {
+        background-color: #f0f0f0;
+        color: #333;
+      }
+      .btn-secondary:hover {
+        background-color: #e0e0e0;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // 绑定取消按钮事件
+    modal.querySelector('#cancelImportBtn').addEventListener('click', () => this.hideImportModal());
+    
+    return modal;
+  }
+  
+  /**
+   * 处理文件选择
+   */
+  handleFileSelection(files) {
+    if (files && files.length > 0) {
+      document.getElementById('confirmImportBtn').disabled = false;
+      document.getElementById('importResult').textContent = `已选择文件: ${files[0].name}`;
+      this.selectedFile = files[0];
+    }
+  }
+  
+  /**
+   * 执行导入操作
+   */
+  async performImport() {
+    if (!this.selectedFile) {
+      return;
+    }
+    
+    const importResultEl = document.getElementById('importResult');
+    const mergeData = document.getElementById('mergeImportData').checked;
+    
+    try {
+      // 读取文件内容
+      const fileContent = await this.readFileAsText(this.selectedFile);
+      const importData = JSON.parse(fileContent);
+      
+      // 显示导入进度
+      importResultEl.textContent = '正在导入...';
+      importResultEl.style.color = '#666';
+      
+      // 调用导入函数
+      const result = await window.PageManager.importPages(importData, { merge: mergeData });
+      
+      // 显示导入结果
+      if (result.success) {
+        importResultEl.textContent = result.message;
+        importResultEl.style.color = '#28a745';
+        
+        // 重新加载页面列表
+        await this.loadPages();
+        
+        // 2秒后自动关闭模态框
+        setTimeout(() => {
+          this.hideImportModal();
+        }, 2000);
+      } else {
+        importResultEl.textContent = result.message;
+        importResultEl.style.color = '#dc3545';
+      }
+    } catch (error) {
+      importResultEl.textContent = `导入失败: ${error.message}`;
+      importResultEl.style.color = '#dc3545';
+    }
+  }
+  
+  /**
+   * 读取文件内容为文本
+   */
+  readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsText(file);
+    });
   }
 
   /**

@@ -395,6 +395,125 @@ async function searchPages(query) {
   );
 }
 
+/**
+ * 导入页面配置数据
+ * @param {Array|Object} importData - 导入的页面数据，可以是数组或包含pages数组的对象
+ * @param {Object} options - 导入选项
+ * @param {boolean} options.merge - 是否合并现有数据 (true) 或替换 (false)
+ * @returns {Promise<Object>} 导入结果 { success: boolean, message: string, importedCount: number, skippedCount: number }
+ */
+async function importPages(importData, options = { merge: true }) {
+  try {
+    // 验证并规范化导入数据格式
+    let pagesToImport;
+    if (Array.isArray(importData)) {
+      pagesToImport = importData;
+    } else if (importData && importData.pages && Array.isArray(importData.pages)) {
+      pagesToImport = importData.pages;
+    } else {
+      return {
+        success: false,
+        message: '导入数据格式不正确，必须是页面数组或包含pages数组的对象',
+        importedCount: 0,
+        skippedCount: 0
+      };
+    }
+
+    // 获取现有页面数据
+    let pagesData = await loadPages();
+    let existingPages = options.merge ? [...pagesData.pages] : [];
+    let importedCount = 0;
+    let skippedCount = 0;
+
+    // 创建用于检测重复的映射
+    const existingPageIds = new Set();
+    const existingUrls = new Set();
+    
+    existingPages.forEach(page => {
+      if (page.id) existingPageIds.add(page.id);
+      if (page.url) existingUrls.add(page.url);
+    });
+
+    // 导入页面数据
+    for (const page of pagesToImport) {
+      // 验证页面数据
+      const validation = validatePage(page);
+      if (!validation.isValid) {
+        log('warn', `跳过无效页面: ${validation.errors.join(', ')}`, page);
+        skippedCount++;
+        continue;
+      }
+
+      // 检查是否重复
+      let isDuplicate = false;
+      
+      if (page.id && existingPageIds.has(page.id)) {
+        isDuplicate = true;
+      } else if (page.url && existingUrls.has(page.url)) {
+        isDuplicate = true;
+      }
+
+      if (isDuplicate) {
+        if (options.merge) {
+          // 找到并更新现有页面
+          const existingIndex = existingPages.findIndex(p => 
+            p.id === page.id || p.url === page.url
+          );
+          
+          if (existingIndex !== -1) {
+            // 合并页面数据，保留现有页面的某些属性
+            const existingPage = existingPages[existingIndex];
+            const updatedPage = {
+              ...existingPage,
+              ...page,
+              // 保留原始的enabled状态（除非明确提供）
+              enabled: page.enabled !== undefined ? page.enabled : existingPage.enabled
+            };
+            existingPages[existingIndex] = updatedPage;
+            log('info', `更新现有页面: ${page.id || page.url}`);
+          }
+        } else {
+          // 替换模式下，跳过重复页面
+          skippedCount++;
+          continue;
+        }
+      } else {
+        // 添加新页面
+        const newPage = {
+          ...page,
+          priority: page.priority ?? 100,
+          enabled: page.enabled ?? true
+        };
+        
+        existingPages.push(newPage);
+        existingPageIds.add(newPage.id);
+        existingUrls.add(newPage.url);
+        importedCount++;
+        log('info', `导入新页面: ${newPage.id || newPage.url}`);
+      }
+    }
+
+    // 保存更新后的页面数据
+    pagesData.pages = existingPages;
+    await savePages(pagesData);
+
+    return {
+      success: true,
+      message: `成功导入 ${importedCount} 个页面，更新 ${skippedCount} 个页面`,
+      importedCount,
+      updatedCount: skippedCount
+    };
+  } catch (error) {
+    log('error', '导入页面配置失败', error);
+    return {
+      success: false,
+      message: `导入失败: ${error.message}`,
+      importedCount: 0,
+      skippedCount: 0
+    };
+  }
+}
+
 // 在浏览器环境中导出
 if (typeof window !== 'undefined') {
   window.PageManager = {
@@ -410,7 +529,8 @@ if (typeof window !== 'undefined') {
     getPagesByModule,
     searchPages,
     validatePage,
-    log
+    log,
+    importPages
   };
 } else {
   // 为可能的Node.js环境提供一个基本导出
@@ -427,7 +547,8 @@ if (typeof window !== 'undefined') {
     getPagesByModule,
     searchPages,
     validatePage,
-    log
+    log,
+    importPages
   };
 
   try {
