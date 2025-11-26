@@ -20,3 +20,6 @@ github_string_fetcher.js
 # /test
 
 /test
+/docs/_backup
+/docs/_templates
+/docs/_fragments

@@ -46,19 +46,156 @@ export const pageMonitor = {
     fallbackIntervalId: null,
     
     /**
+     * 页面卸载标记
+     * @type {boolean}
+     */
+    isPageUnloading: false,
+    
+    /**
+     * 节点检查缓存，用于性能优化
+     * @type {Map<Node, boolean>}
+     */
+    nodeCheckCache: new Map(),
+    
+    /**
+     * 缓存清理间隔（毫秒）
+     * @type {number}
+     */
+    cacheCleanupInterval: 30000, // 30秒清理一次
+    
+    /**
+     * 上次缓存清理时间
+     * @type {number}
+     */
+    lastCacheCleanupTime: Date.now(),
+    
+    /**
+     * 缓存清理定时器ID
+     * @type {number}
+     */
+    cacheCleanupTimerId: null,
+    
+    /**
      * 初始化监控
      */
     init() {
         try {
+            // 设置页面卸载监听，确保资源清理
+            this.setupPageUnloadHandler();
+            
             // 设置路径变化监听
             this.setupPathListener();
             
             // 设置DOM变化监听
             this.setupDomObserver();
             
+            // 启动缓存清理定时器
+            this.startCacheCleanupTimer();
+            
             // 页面监控已初始化
         } catch (error) {
             console.error('[GitHub 中文翻译] 页面监控初始化失败:', error);
+        }
+    },
+    
+    /**
+     * 设置页面卸载处理器
+     */
+    setupPageUnloadHandler() {
+        // 监听页面卸载事件
+        const unloadHandler = () => {
+            this.isPageUnloading = true;
+            this.cleanup();
+        };
+        
+        // 监听多种卸载事件以确保兼容性
+        window.addEventListener('beforeunload', unloadHandler);
+        window.addEventListener('unload', unloadHandler);
+        window.addEventListener('pagehide', unloadHandler);
+        
+        // 存储监听器引用以便清理
+        this.eventListeners.push(
+            { target: window, type: 'beforeunload', handler: unloadHandler },
+            { target: window, type: 'unload', handler: unloadHandler },
+            { target: window, type: 'pagehide', handler: unloadHandler }
+        );
+    },
+    
+    /**
+     * 启动缓存清理定时器
+     */
+    startCacheCleanupTimer() {
+        // 清理现有定时器
+        this.stopCacheCleanupTimer();
+        
+        // 设置新的定时器
+        this.cacheCleanupTimerId = setInterval(() => {
+            if (!this.isPageUnloading) {
+                this.cleanupNodeCheckCache();
+            }
+        }, this.cacheCleanupInterval);
+    },
+    
+    /**
+     * 停止缓存清理定时器
+     */
+    stopCacheCleanupTimer() {
+        if (this.cacheCleanupTimerId) {
+            clearInterval(this.cacheCleanupTimerId);
+            this.cacheCleanupTimerId = null;
+        }
+    },
+    
+    /**
+     * 清理节点检查缓存
+     */
+    cleanupNodeCheckCache() {
+        try {
+            // 如果缓存大小超过限制，清理最旧的条目
+            const maxCacheSize = 1000;
+            if (this.nodeCheckCache.size > maxCacheSize) {
+                // 删除最旧的条目，保留最新的70%
+                const entriesToRemove = Math.floor(this.nodeCheckCache.size * 0.3);
+                const keysToRemove = Array.from(this.nodeCheckCache.keys()).slice(0, entriesToRemove);
+                
+                keysToRemove.forEach(key => {
+                    this.nodeCheckCache.delete(key);
+                });
+                
+                if (CONFIG.debugMode) {
+                    console.log(`[GitHub 中文翻译] 清理了${keysToRemove.length}个节点检查缓存条目`);
+                }
+            }
+            
+            this.lastCacheCleanupTime = Date.now();
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 清理节点检查缓存失败:', error);
+            }
+        }
+    },
+    
+    /**
+     * 完全清理所有资源
+     */
+    cleanup() {
+        try {
+            // 停止监控
+            this.stop();
+            
+            // 清理节点检查缓存
+            this.nodeCheckCache.clear();
+            
+            // 停止缓存清理定时器
+            this.stopCacheCleanupTimer();
+            
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 页面监控资源已完全清理');
+            }
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 清理页面监控资源失败:', error);
+            }
         }
     },
     
@@ -1389,6 +1526,12 @@ export const pageMonitor = {
             // 清理所有事件监听器
             this.cleanupEventListeners();
             
+            // 停止缓存清理定时器
+            this.stopCacheCleanupTimer();
+            
+            // 清理所有缓存，防止内存泄漏
+            this.clearAllCaches();
+            
             // 重置状态
             this.lastPath = '';
             this.lastTranslateTimestamp = 0;
@@ -1399,6 +1542,46 @@ export const pageMonitor = {
         } catch (error) {
             if (CONFIG.debugMode) {
                 console.error('[GitHub 中文翻译] 停止监控时出错:', error);
+            }
+        }
+    },
+    
+    /**
+     * 清理所有缓存
+     */
+    clearAllCaches() {
+        try {
+            // 清理节点检查缓存
+            if (this.nodeCheckCache) {
+                this.nodeCheckCache = new WeakMap();
+            }
+            
+            // 清理元素缓存
+            if (this.elementCache) {
+                this.elementCache = new WeakMap();
+            }
+            
+            // 清理页面模式缓存
+            if (this.pageModeCache) {
+                this.pageModeCache.clear();
+            }
+            
+            // 清理文本变化阈值缓存
+            if (this.textThresholdCache) {
+                this.textThresholdCache.clear();
+            }
+            
+            // 清理重要元素缓存
+            if (this.importantElementsCache) {
+                this.importantElementsCache.clear();
+            }
+            
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 所有缓存已清理');
+            }
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 清理缓存时出错:', error);
             }
         }
     },

@@ -121,37 +121,102 @@ class PageManagerUI {
   }
   
   /**
-   * 创建导入模态框HTML
+   * 创建导入模态框
    */
   createImportModal() {
     const modal = document.createElement('div');
     modal.id = 'importPagesModal';
     modal.className = 'modal hidden';
-    modal.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>导入页面配置</h3>
-          <button id="closeImportModalBtn" class="close-btn">×</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="importFileInput">选择JSON文件:</label>
-            <input type="file" id="importFileInput" accept=".json" />
-          </div>
-          <div class="form-group">
-            <label>
-              <input type="checkbox" id="mergeImportData" checked />
-              合并到现有页面（取消勾选将替换所有页面）
-            </label>
-          </div>
-          <div id="importResult" class="import-result"></div>
-        </div>
-        <div class="modal-footer">
-          <button id="cancelImportBtn" class="btn btn-secondary">取消</button>
-          <button id="confirmImportBtn" class="btn btn-primary" disabled>导入</button>
-        </div>
-      </div>
-    `;
+    
+    // 使用安全的DOM操作方法创建模态框内容
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+    
+    // 创建模态框头部
+    const modalHeader = document.createElement('div');
+    modalHeader.className = 'modal-header';
+    
+    const headerTitle = document.createElement('h3');
+    headerTitle.textContent = '导入页面配置';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.id = 'closeImportModalBtn';
+    closeBtn.className = 'close-btn';
+    closeBtn.textContent = '×';
+    
+    modalHeader.appendChild(headerTitle);
+    modalHeader.appendChild(closeBtn);
+    
+    // 创建模态框主体
+    const modalBody = document.createElement('div');
+    modalBody.className = 'modal-body';
+    
+    // 文件选择表单组
+    const fileFormGroup = document.createElement('div');
+    fileFormGroup.className = 'form-group';
+    
+    const fileLabel = document.createElement('label');
+    fileLabel.setAttribute('for', 'importFileInput');
+    fileLabel.textContent = '选择JSON文件:';
+    
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'importFileInput';
+    fileInput.accept = '.json';
+    
+    fileFormGroup.appendChild(fileLabel);
+    fileFormGroup.appendChild(fileInput);
+    
+    // 合并选项表单组
+    const mergeFormGroup = document.createElement('div');
+    mergeFormGroup.className = 'form-group';
+    
+    const mergeLabel = document.createElement('label');
+    
+    const mergeCheckbox = document.createElement('input');
+    mergeCheckbox.type = 'checkbox';
+    mergeCheckbox.id = 'mergeImportData';
+    mergeCheckbox.checked = true;
+    
+    const mergeText = document.createTextNode('合并到现有页面（取消勾选将替换所有页面）');
+    
+    mergeLabel.appendChild(mergeCheckbox);
+    mergeLabel.appendChild(mergeText);
+    
+    mergeFormGroup.appendChild(mergeLabel);
+    
+    // 导入结果区域
+    const importResult = document.createElement('div');
+    importResult.id = 'importResult';
+    importResult.className = 'import-result';
+    
+    modalBody.appendChild(fileFormGroup);
+    modalBody.appendChild(mergeFormGroup);
+    modalBody.appendChild(importResult);
+    
+    // 创建模态框底部
+    const modalFooter = document.createElement('div');
+    modalFooter.className = 'modal-footer';
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.id = 'cancelImportBtn';
+    cancelBtn.className = 'btn btn-secondary';
+    cancelBtn.textContent = '取消';
+    
+    const confirmBtn = document.createElement('button');
+    confirmBtn.id = 'confirmImportBtn';
+    confirmBtn.className = 'btn btn-primary';
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = '导入';
+    
+    modalFooter.appendChild(cancelBtn);
+    modalFooter.appendChild(confirmBtn);
+    
+    // 组装模态框
+    modalContent.appendChild(modalHeader);
+    modalContent.appendChild(modalBody);
+    modalContent.appendChild(modalFooter);
+    modal.appendChild(modalContent);
     
     // 添加样式
     const style = document.createElement('style');
@@ -421,7 +486,10 @@ class PageManagerUI {
     const tbody = document.getElementById('pageTableBody');
     if (!tbody) return;
     
-    tbody.innerHTML = '';
+    // 清空表格内容
+    while (tbody.firstChild) {
+      tbody.removeChild(tbody.firstChild);
+    }
     
     this.pages.forEach(page => {
       // 确定是否为新格式 (url, selector, module)
@@ -457,45 +525,99 @@ class PageManagerUI {
       // 获取模块信息
       const moduleInfo = page.module ? ` (${page.module})` : '';
       
-      // 构建表格行内容
-      row.innerHTML = `
-        <td class="border px-4 py-2">
-          <input type="checkbox" class="page-checkbox" value="${pageId}">
-        </td>
-        <td class="border px-4 py-2">${pageId}</td>
-        <td class="border px-4 py-2">${nameDisplay}${moduleInfo}</td>
-        <td class="border px-4 py-2 max-w-xs overflow-hidden text-ellipsis">
-          <span title="${urlDisplay}">${urlDisplay}</span>
-        </td>
-        <td class="border px-4 py-2">${selectorDisplay}</td>
-        <td class="border px-4 py-2">${page.priority || 0}</td>
-        <td class="border px-4 py-2">
-          <span class="inline-block px-2 py-1 text-xs rounded-full ${page.enabled !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-            ${page.enabled !== false ? '启用' : '禁用'}
-          </span>
-        </td>
-        <td class="border px-4 py-2">
-          <button class="edit-btn px-2 py-1 text-blue-600 hover:text-blue-800" ${isNewFormat ? 'disabled title="不支持编辑新格式页面"' : ''}>
-            ${isNewFormat ? '查看' : '编辑'}
-          </button>
-          <button class="delete-btn px-2 py-1 text-red-600 hover:text-red-800">删除</button>
-        </td>
-      `;
+      // 创建表格单元格
+      const createCell = (content, className = '') => {
+        const cell = document.createElement('td');
+        cell.className = `border px-4 py-2 ${className}`;
+        if (typeof content === 'string') {
+          cell.textContent = content;
+        } else {
+          cell.appendChild(content);
+        }
+        return cell;
+      };
+      
+      // 复选框单元格
+      const checkboxCell = createCell('');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'page-checkbox';
+      checkbox.value = pageId;
+      checkboxCell.appendChild(checkbox);
+      
+      // ID单元格
+      const idCell = createCell(pageId);
+      
+      // 名称单元格
+      const nameCell = createCell(nameDisplay + moduleInfo);
+      
+      // URL单元格（带省略效果）
+      const urlCell = document.createElement('td');
+      urlCell.className = 'border px-4 py-2 max-w-xs overflow-hidden text-ellipsis';
+      const urlSpan = document.createElement('span');
+      urlSpan.title = urlDisplay;
+      urlSpan.textContent = urlDisplay;
+      urlCell.appendChild(urlSpan);
+      
+      // 选择器单元格
+      const selectorCell = createCell(selectorDisplay);
+      
+      // 优先级单元格
+      const priorityCell = createCell(page.priority || 0);
+      
+      // 状态单元格
+      const statusCell = document.createElement('td');
+      statusCell.className = 'border px-4 py-2';
+      const statusSpan = document.createElement('span');
+      statusSpan.className = `inline-block px-2 py-1 text-xs rounded-full ${
+        page.enabled !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+      }`;
+      statusSpan.textContent = page.enabled !== false ? '启用' : '禁用';
+      statusCell.appendChild(statusSpan);
+      
+      // 操作单元格
+      const actionCell = document.createElement('td');
+      actionCell.className = 'border px-4 py-2';
+      
+      const editBtn = document.createElement('button');
+      editBtn.className = 'edit-btn px-2 py-1 text-blue-600 hover:text-blue-800';
+      editBtn.textContent = isNewFormat ? '查看' : '编辑';
+      if (isNewFormat) {
+        editBtn.disabled = true;
+        editBtn.title = '不支持编辑新格式页面';
+      }
+      
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn px-2 py-1 text-red-600 hover:text-red-800';
+      deleteBtn.textContent = '删除';
+      
+      actionCell.appendChild(editBtn);
+      actionCell.appendChild(deleteBtn);
+      
+      // 添加所有单元格到行
+      row.appendChild(checkboxCell);
+      row.appendChild(idCell);
+      row.appendChild(nameCell);
+      row.appendChild(urlCell);
+      row.appendChild(selectorCell);
+      row.appendChild(priorityCell);
+      row.appendChild(statusCell);
+      row.appendChild(actionCell);
       
       // 绑定行内按钮事件
-      row.querySelector('.edit-btn')?.addEventListener('click', (e) => {
+      editBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (!isNewFormat) {
           this.editPage(pageId);
         }
       });
       
-      row.querySelector('.delete-btn')?.addEventListener('click', (e) => {
+      deleteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         this.deletePage(pageId);
       });
       
-      row.querySelector('.page-checkbox')?.addEventListener('change', (e) => {
+      checkbox.addEventListener('change', (e) => {
         e.stopPropagation();
         if (e.target.checked) {
           this.selectPage(pageId);
@@ -887,22 +1009,40 @@ class PageManagerUI {
     const notification = document.createElement('div');
     notification.className = `notification ${type} show`;
     
-    notification.innerHTML = `
-      <div class="notification-content">
-        <div class="notification-title">${title}</div>
-        <div class="notification-message">${message}</div>
-      </div>
-      <button class="notification-close">×</button>
-    `;
+    // 创建通知内容
+    const notificationContent = document.createElement('div');
+    notificationContent.className = 'notification-content';
+    
+    const notificationTitle = document.createElement('div');
+    notificationTitle.className = 'notification-title';
+    notificationTitle.textContent = title;
+    
+    const notificationMessage = document.createElement('div');
+    notificationMessage.className = 'notification-message';
+    notificationMessage.textContent = message;
+    
+    notificationContent.appendChild(notificationTitle);
+    notificationContent.appendChild(notificationMessage);
+    
+    // 创建关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.className = 'notification-close';
+    closeButton.textContent = '×';
+    
+    // 组装通知元素
+    notification.appendChild(notificationContent);
+    notification.appendChild(closeButton);
     
     // 添加到文档
     document.body.appendChild(notification);
     
     // 添加关闭事件
-    notification.querySelector('.notification-close').addEventListener('click', () => {
+    closeButton.addEventListener('click', () => {
       notification.classList.remove('show');
       setTimeout(() => {
-        document.body.removeChild(notification);
+        if (document.body.contains(notification)) {
+          document.body.removeChild(notification);
+        }
       }, 300);
     });
     

@@ -57,6 +57,76 @@ function log(level, message, details = null) {
 }
 
 /**
+ * 安全地解析模块内容为对象，替代eval()以符合CSP要求
+ * @param {string} moduleContent - 模块内容字符串
+ * @returns {Object} 解析后的对象
+ */
+function safeParseModuleContent(moduleContent) {
+  try {
+    // 确保内容是一个有效的对象字面量
+    const trimmedContent = moduleContent.trim();
+    
+    // 验证内容以 { 开始和以 } 结束
+    if (!trimmedContent.startsWith('{') || !trimmedContent.endsWith('}')) {
+      throw new Error('模块内容格式不正确，不是有效的对象字面量');
+    }
+    
+    // 使用JSON.parse替代eval，但需要先处理非标准JSON格式
+    // 将单引号替换为双引号，并处理JavaScript对象字面量中的其他格式差异
+    let jsonCompatibleContent = trimmedContent
+      // 替换单引号为双引号
+      .replace(/'/g, '"')
+      // 移除对象字面量中的尾随逗号（JSON不允许）
+      .replace(/,\s*}/g, '}')
+      .replace(/,\s*]/g, ']')
+      // 处理属性名（确保所有属性名都有引号）
+      .replace(/(\w+)\s*:/g, '"$1":')
+      // 处理字符串值中的转义字符
+      .replace(/\\n/g, '\\n')
+      .replace(/\\r/g, '\\r')
+      .replace(/\\t/g, '\\t')
+      // 处理多行字符串（将它们连接成单行）
+      .replace(/"\s*\+\s*"/g, '')
+      // 处理字符串中的换行符
+      .replace(/[\r\n]+/g, ' ');
+    
+    // 尝试解析处理后的内容
+    return JSON.parse(jsonCompatibleContent);
+  } catch (error) {
+    log('warn', '使用JSON.parse解析失败，尝试使用更安全的解析方法', error.message);
+    
+    try {
+      // 作为后备方案，使用更安全的解析方法
+      // 1. 尝试使用简单的正则表达式解析键值对
+      const result = {};
+      // 匹配键值对的正则表达式，支持单引号和双引号
+      const keyValueRegex = /(['"])([^'"]+)\1\s*:\s*(['"])([^'"]*)\3/g;
+      let match;
+      
+      while ((match = keyValueRegex.exec(trimmedContent)) !== null) {
+        const key = match[2];
+        const value = match[4];
+        result[key] = value;
+      }
+      
+      // 如果找到了键值对，返回结果
+      if (Object.keys(result).length > 0) {
+        log('info', `使用正则表达式解析成功，提取了 ${Object.keys(result).length} 个键值对`);
+        return result;
+      }
+      
+      // 2. 如果正则表达式解析失败，尝试使用更宽松的解析方法
+      // 注意：这是一个最后的后备方案，可能不适用于所有情况
+      // 在生产环境中，应该确保模块内容是有效的JSON格式
+      throw new Error('无法使用安全方法解析模块内容，请确保模块内容是有效的JSON格式');
+    } catch (fallbackError) {
+      log('error', '无法安全解析模块内容', fallbackError);
+      throw new Error(`解析模块内容失败: ${fallbackError.message}`);
+    }
+  }
+}
+
+/**
  * 从GitHub_zh-CN.user.js中提取翻译词典
  * @returns {Promise<Object>} 提取的词典对象
  */
@@ -84,8 +154,8 @@ async function extractDictionaryFromUserScript() {
         const moduleName = moduleMatch[1];
         const moduleContent = moduleMatch[0].replace(`${moduleName}: `, '');
 
-        // 解析模块内容为对象
-        const moduleDict = eval(`(${moduleContent})`);
+        // 使用安全的方法解析模块内容为对象，替代eval()
+        const moduleDict = safeParseModuleContent(moduleContent);
         dictionary[moduleName] = moduleDict;
 
         log('debug', `已提取模块 ${moduleName}，包含 ${Object.keys(moduleDict).length} 个字符串`);

@@ -198,11 +198,32 @@ class VirtualDomManager {
     this.nodes = new Map();
     this.nodeCache = new Map(); // 快速查找缓存
     this.lastCleanupTime = Date.now();
-    this.cleanupInterval = 60000; // 1分钟清理一次
+    this.cleanupInterval = 30000; // 30秒清理一次，提高清理频率
+    this.maxNodes = 5000; // 最大节点数限制
+    this.cleanupTimer = null;
+    this.isPageUnloading = false;
+    
+    // 设置页面卸载处理
+    this.setupPageUnloadHandler();
     
     // 自动清理定时器
-    this.cleanupTimer = null;
     this.startAutoCleanup();
+  }
+  
+  /**
+   * 设置页面卸载处理器
+   */
+  setupPageUnloadHandler() {
+    // 监听页面卸载事件
+    const unloadHandler = () => {
+      this.isPageUnloading = true;
+      this.cleanup();
+    };
+    
+    // 监听多种卸载事件以确保兼容性
+    window.addEventListener('beforeunload', unloadHandler);
+    window.addEventListener('unload', unloadHandler);
+    window.addEventListener('pagehide', unloadHandler);
   }
   
   /**
@@ -212,11 +233,41 @@ class VirtualDomManager {
    */
   getOrCreateNode(element) {
     try {
+      // 检查页面是否正在卸载
+      if (this.isPageUnloading) {
+        return null;
+      }
+      
       // 先尝试从缓存查找
       if (element.dataset && element.dataset.virtualDomId) {
         const cachedNode = this.nodeCache.get(element.dataset.virtualDomId);
         if (cachedNode && cachedNode.element === element) {
           return cachedNode;
+        }
+      }
+      
+      // 检查节点数量限制
+      if (this.nodes.size >= this.maxNodes) {
+        // 强制清理一次
+        this.cleanup(true);
+        
+        // 如果清理后仍然超过限制，删除最旧的节点
+        if (this.nodes.size >= this.maxNodes) {
+          const nodesToRemove = Math.floor(this.maxNodes * 0.2); // 删除20%的节点
+          const entries = Array.from(this.nodes.entries());
+          
+          // 按最后更新时间排序，删除最旧的
+          entries.sort((a, b) => a[1].lastUpdated - b[1].lastUpdated);
+          
+          for (let i = 0; i < nodesToRemove; i++) {
+            const [id] = entries[i];
+            this.nodes.delete(id);
+            this.nodeCache.delete(id);
+          }
+          
+          if (CONFIG.debugMode) {
+            console.log(`[GitHub 中文翻译] 强制清理了${nodesToRemove}个虚拟节点`);
+          }
         }
       }
       
@@ -329,6 +380,12 @@ class VirtualDomManager {
   startAutoCleanup() {
     this.stopAutoCleanup();
     this.cleanupTimer = setInterval(() => {
+      // 如果页面正在卸载，停止清理
+      if (this.isPageUnloading) {
+        this.stopAutoCleanup();
+        return;
+      }
+      
       this.cleanup();
     }, this.cleanupInterval);
   }
@@ -345,39 +402,64 @@ class VirtualDomManager {
   
   /**
    * 清理无效的虚拟节点
+   * @param {boolean} force - 是否强制清理所有节点
    */
-  cleanup() {
+  cleanup(force = false) {
     try {
       const now = Date.now();
+      
+      // 如果不是强制清理且距离上次清理时间不足，则跳过
+      if (!force && now - this.lastCleanupTime < this.cleanupInterval) {
+        return;
+      }
+      
+      this.lastCleanupTime = now;
+      let removedCount = 0;
+      
+      // 如果页面正在卸载或强制清理，删除所有节点
+      if (force || this.isPageUnloading) {
+        removedCount = this.nodes.size;
+        this.nodes.clear();
+        this.nodeCache.clear();
+        
+        if (CONFIG.debugMode) {
+          console.log(`[GitHub 中文翻译] 强制清理了${removedCount}个虚拟节点`);
+        }
+        return;
+      }
+      
+      // 正常清理：删除DOM中不存在的节点或长时间未更新的节点
       const nodesToRemove = [];
       
-      // 检查每个节点
       for (const [id, node] of this.nodes) {
-        // 检查元素是否仍然存在于DOM中
+        // 检查节点是否仍在DOM中
         if (!document.contains(node.element)) {
           nodesToRemove.push(id);
-        } else if (now - node.lastUpdated > 3600000) { // 1小时未更新
-          // 对于长时间未更新的节点，重新检查
-          if (!node.element || !document.contains(node.element)) {
-            nodesToRemove.push(id);
-          }
+          continue;
+        }
+        
+        // 检查节点是否长时间未更新
+        const timeSinceUpdate = now - node.lastUpdated;
+        const maxAge = 60 * 60 * 1000; // 1小时
+        
+        if (timeSinceUpdate > maxAge) {
+          nodesToRemove.push(id);
         }
       }
       
-      // 删除无效节点
-      nodesToRemove.forEach(id => {
+      // 删除需要清理的节点
+      for (const id of nodesToRemove) {
         this.nodes.delete(id);
         this.nodeCache.delete(id);
-      });
+        removedCount++;
+      }
       
-      this.lastCleanupTime = now;
-      
-      if (CONFIG.debugMode && nodesToRemove.length > 0) {
-        console.log(`[GitHub 中文翻译] 清理了${nodesToRemove.length}个无效的虚拟节点`);
+      if (CONFIG.debugMode && removedCount > 0) {
+        console.log(`[GitHub 中文翻译] 清理了${removedCount}个无效虚拟节点，当前节点数：${this.nodes.size}`);
       }
     } catch (error) {
       if (CONFIG.debugMode) {
-        console.error('[GitHub 中文翻译] 清理虚拟DOM失败:', error);
+        console.error('[GitHub 中文翻译] 清理虚拟节点失败:', error);
       }
     }
   }

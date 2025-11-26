@@ -469,7 +469,7 @@ async function toggleTool() {
   const toggleBtn = document.getElementById('toggleBtn');
 
   // 根据按钮文本判断当前状态
-  if (toggleBtn.innerHTML.includes('开始')) {
+  if (toggleBtn.textContent.includes('开始')) {
     await runTool();
   } else {
     await stopTool();
@@ -494,7 +494,14 @@ async function runTool() {
 
     // 更新按钮状态：显示停止状态
     const toggleBtn = document.getElementById('toggleBtn');
-    toggleBtn.innerHTML = '<i class="fa fa-stop mr-2"></i>停止抓取';
+    // 清空按钮内容并添加图标和文本
+    while (toggleBtn.firstChild) {
+      toggleBtn.removeChild(toggleBtn.firstChild);
+    }
+    const stopIcon = document.createElement('i');
+    stopIcon.className = 'fa fa-stop mr-2';
+    toggleBtn.appendChild(stopIcon);
+    toggleBtn.appendChild(document.createTextNode('停止抓取'));
     toggleBtn.classList.remove('bg-primary', 'hover:bg-primary/90');
     toggleBtn.classList.add('bg-danger', 'hover:bg-danger/90');
 
@@ -511,7 +518,14 @@ async function runTool() {
     // 确保UI状态正确
     updateStatus('stopped');
     const toggleBtn = document.getElementById('toggleBtn');
-    toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+    // 清空按钮内容并添加图标和文本
+    while (toggleBtn.firstChild) {
+      toggleBtn.removeChild(toggleBtn.firstChild);
+    }
+    const playIcon = document.createElement('i');
+    playIcon.className = 'fa fa-play mr-2';
+    toggleBtn.appendChild(playIcon);
+    toggleBtn.appendChild(document.createTextNode('开始抓取字符串'));
     toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
     toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
   }
@@ -566,7 +580,14 @@ function startEventSource() {
       setTimeout(() => {
         updateStatus('running');
         const toggleBtn = document.getElementById('toggleBtn');
-        toggleBtn.innerHTML = '<i class="fa fa-stop mr-2"></i>停止抓取';
+        // 清空按钮内容并添加图标和文本
+        while (toggleBtn.firstChild) {
+          toggleBtn.removeChild(toggleBtn.firstChild);
+        }
+        const stopIcon = document.createElement('i');
+        stopIcon.className = 'fa fa-stop mr-2';
+        toggleBtn.appendChild(stopIcon);
+        toggleBtn.appendChild(document.createTextNode('停止抓取'));
         toggleBtn.classList.remove('bg-primary', 'hover:bg-primary/90');
         toggleBtn.classList.add('bg-danger', 'hover:bg-danger/90');
 
@@ -588,7 +609,18 @@ function startEventSource() {
       setTimeout(() => {
         updateStatus('running');
         const toggleBtn = document.getElementById('toggleBtn');
-        toggleBtn.innerHTML = '<i class="fa fa-stop mr-2"></i>停止抓取';
+        // 使用安全的DOM操作替代innerHTML
+        while (toggleBtn.firstChild) {
+          toggleBtn.removeChild(toggleBtn.firstChild);
+        }
+        
+        const icon = document.createElement('i');
+        icon.className = 'fa fa-stop mr-2';
+        toggleBtn.appendChild(icon);
+        
+        const textNode = document.createTextNode('停止抓取');
+        toggleBtn.appendChild(textNode);
+        
         toggleBtn.classList.remove('bg-primary', 'hover:bg-primary/90');
         toggleBtn.classList.add('bg-danger', 'hover:bg-danger/90');
 
@@ -607,7 +639,14 @@ function startEventSource() {
         eventSource = null; // 确保设置为null
         updateStatus('stopped');
         const toggleBtn = document.getElementById('toggleBtn');
-        toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+        // 清空按钮内容并添加图标和文本
+        while (toggleBtn.firstChild) {
+          toggleBtn.removeChild(toggleBtn.firstChild);
+        }
+        const playIcon = document.createElement('i');
+        playIcon.className = 'fa fa-play mr-2';
+        toggleBtn.appendChild(playIcon);
+        toggleBtn.appendChild(document.createTextNode('开始抓取字符串'));
         toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
         toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
       }
@@ -620,7 +659,18 @@ function startEventSource() {
 
       // 再次确认按钮状态
       const toggleBtn = document.getElementById('toggleBtn');
-      toggleBtn.innerHTML = '<i class="fa fa-stop mr-2"></i>停止抓取';
+      // 使用安全的DOM操作替代innerHTML
+      while (toggleBtn.firstChild) {
+        toggleBtn.removeChild(toggleBtn.firstChild);
+      }
+      
+      const icon = document.createElement('i');
+      icon.className = 'fa fa-stop mr-2';
+      toggleBtn.appendChild(icon);
+      
+      const textNode = document.createTextNode('停止抓取');
+      toggleBtn.appendChild(textNode);
+      
       toggleBtn.classList.remove('bg-primary', 'hover:bg-primary/90');
       toggleBtn.classList.add('bg-danger', 'hover:bg-danger/90');
     };
@@ -668,7 +718,14 @@ function startEventSource() {
 
             // 更新按钮状态：显示开始状态
             const toggleBtn = document.getElementById('toggleBtn');
-            toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+            // 清空按钮内容并添加图标和文本
+            while (toggleBtn.firstChild) {
+              toggleBtn.removeChild(toggleBtn.firstChild);
+            }
+            const playIcon = document.createElement('i');
+            playIcon.className = 'fa fa-play mr-2';
+            toggleBtn.appendChild(playIcon);
+            toggleBtn.appendChild(document.createTextNode('开始抓取字符串'));
             toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
             toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
 
@@ -684,7 +741,14 @@ function startEventSource() {
         // 出错时确保按钮状态正确
         updateStatus('stopped');
         const toggleBtn = document.getElementById('toggleBtn');
-        toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+        // 清空按钮内容并添加图标和文本
+        while (toggleBtn.firstChild) {
+          toggleBtn.removeChild(toggleBtn.firstChild);
+        }
+        const playIcon = document.createElement('i');
+        playIcon.className = 'fa fa-play mr-2';
+        toggleBtn.appendChild(playIcon);
+        toggleBtn.appendChild(document.createTextNode('开始抓取字符串'));
         toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
         toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
       }
@@ -704,7 +768,14 @@ function startEventSource() {
 
       // 更新按钮状态：显示开始状态
       const toggleBtn = document.getElementById('toggleBtn');
-      toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+      // 清空按钮内容并添加图标和文本
+      while (toggleBtn.firstChild) {
+        toggleBtn.removeChild(toggleBtn.firstChild);
+      }
+      const playIcon = document.createElement('i');
+      playIcon.className = 'fa fa-play mr-2';
+      toggleBtn.appendChild(playIcon);
+      toggleBtn.appendChild(document.createTextNode('开始抓取字符串'));
       toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
       toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
 
@@ -718,7 +789,14 @@ function startEventSource() {
     addLog(`创建SSE连接失败: ${e}`, 'error');
     updateStatus('stopped');
     const toggleBtn = document.getElementById('toggleBtn');
-    toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+    // 清空按钮内容并添加图标和文本
+    while (toggleBtn.firstChild) {
+      toggleBtn.removeChild(toggleBtn.firstChild);
+    }
+    const playIcon = document.createElement('i');
+    playIcon.className = 'fa fa-play mr-2';
+    toggleBtn.appendChild(playIcon);
+    toggleBtn.appendChild(document.createTextNode('开始抓取字符串'));
     toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
     toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
     eventSource = null;
@@ -795,7 +873,14 @@ function simulateServerProgress() {
 
         updateStatus('stopped');
         const toggleBtn = document.getElementById('toggleBtn');
-        toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+        // 清空按钮内容并添加图标和文本
+        while (toggleBtn.firstChild) {
+          toggleBtn.removeChild(toggleBtn.firstChild);
+        }
+        const playIcon = document.createElement('i');
+        playIcon.className = 'fa fa-play mr-2';
+        toggleBtn.appendChild(playIcon);
+        toggleBtn.appendChild(document.createTextNode('开始抓取字符串'));
         toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
         toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
       }, 500);
@@ -828,7 +913,14 @@ async function stopTool() {
         addLog('工具已停止', 'info');
         updateStatus('stopped');
         const toggleBtn = document.getElementById('toggleBtn');
-        toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+        // 清空按钮内容并添加图标和文本
+        while (toggleBtn.firstChild) {
+          toggleBtn.removeChild(toggleBtn.firstChild);
+        }
+        const playIcon = document.createElement('i');
+        playIcon.className = 'fa fa-play mr-2';
+        toggleBtn.appendChild(playIcon);
+        toggleBtn.appendChild(document.createTextNode('开始抓取字符串'));
         toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
         toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
       }, 500);
@@ -873,7 +965,14 @@ async function stopTool() {
 
     // 更新按钮状态：显示开始状态
     const toggleBtn = document.getElementById('toggleBtn');
-    toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+    // 清空按钮内容并添加图标和文本
+    while (toggleBtn.firstChild) {
+      toggleBtn.removeChild(toggleBtn.firstChild);
+    }
+    const playIcon = document.createElement('i');
+    playIcon.className = 'fa fa-play mr-2';
+    toggleBtn.appendChild(playIcon);
+    toggleBtn.appendChild(document.createTextNode('开始抓取字符串'));
     toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
     toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
 
@@ -974,7 +1073,10 @@ function addLog(message, type = 'normal') {
 
   // 移除初始提示
   if (logContainer.children.length === 1 && logContainer.firstChild.textContent.includes('日志将显示在这里...')) {
-    logContainer.innerHTML = '';
+    // 使用安全的DOM操作替代innerHTML
+    while (logContainer.firstChild) {
+      logContainer.removeChild(logContainer.firstChild);
+    }
   }
 
   // 限制日志条目数量，防止DOM过大
@@ -1027,7 +1129,10 @@ function restoreLogsFromLocalStorage() {
 
     if (logs.length > 0) {
       const logContainer = document.getElementById('logContainer');
-      logContainer.innerHTML = ''; // 清空初始提示
+      // 使用安全的DOM操作替代innerHTML清空初始提示
+      while (logContainer.firstChild) {
+        logContainer.removeChild(logContainer.firstChild);
+      }
 
       logs.forEach(log => {
         const logEntry = document.createElement('div');
@@ -1066,7 +1171,16 @@ function restoreLogsFromLocalStorage() {
 // 清空日志
 function clearLog() {
   const logContainer = document.getElementById('logContainer');
-  logContainer.innerHTML = '<div class="text-gray-500">日志将显示在这里...</div>';
+  // 使用安全的DOM操作替代innerHTML
+  while (logContainer.firstChild) {
+    logContainer.removeChild(logContainer.firstChild);
+  }
+  
+  // 添加初始提示
+  const initialLog = document.createElement('div');
+  initialLog.className = 'text-gray-500';
+  initialLog.textContent = '日志将显示在这里...';
+  logContainer.appendChild(initialLog);
 
   // 同时清空localStorage中的日志
   try {
@@ -1613,7 +1727,10 @@ function renderPagesTable(pages) {
   const tableBody = document.getElementById('pagesTableBody');
   if (!tableBody) return;
 
-  tableBody.innerHTML = '';
+  // 使用安全的DOM操作替代innerHTML
+  while (tableBody.firstChild) {
+    tableBody.removeChild(tableBody.firstChild);
+  }
 
   pages.forEach((page, index) => {
     const newRow = document.createElement('tr');
@@ -1622,34 +1739,77 @@ function renderPagesTable(pages) {
     newRow.setAttribute('data-selector', escapeHTML(page.selector));
     newRow.setAttribute('data-module', escapeHTML(page.module));
     newRow.className = 'hover:bg-gray-50 transition-colors';
-    newRow.innerHTML = `
-                    <td class="px-4 py-4 whitespace-nowrap">
-                        <input type="checkbox" class="page-checkbox rounded border-gray-300 text-primary focus:ring-primary/50">
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-900">
-                        <div class="flex items-center">
-                            <div class="max-w-md overflow-hidden text-ellipsis whitespace-nowrap relative" title="${escapeHTML(page.url)}">
-                                ${escapeHTML(page.url)}
-                            </div>
-                            <button class="ml-2 text-gray-400 hover:text-primary copy-url transition-colors" data-url="${escapeHTML(page.url)}" aria-label="复制URL">
-                                <i class="fa fa-copy"></i>
-                            </button>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.selector)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(page.module)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button class="text-primary hover:text-primary/80 mr-3 edit-page transition-colors" aria-label="编辑">
-                            <i class="fa fa-pencil"></i>
-                        </button>
-                        <button class="text-danger hover:text-danger/80 delete-page transition-colors" aria-label="删除">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                        <button class="text-secondary hover:text-secondary/80 ml-3 test-page transition-colors" aria-label="测试" data-url="${escapeHTML(page.url)}">
-                            <i class="fa fa-external-link"></i>
-                        </button>
-                    </td>
-                `;
+    
+    // 创建表格单元格
+    const checkboxCell = document.createElement('td');
+    checkboxCell.className = 'px-4 py-4 whitespace-nowrap';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'page-checkbox rounded border-gray-300 text-primary focus:ring-primary/50';
+    checkboxCell.appendChild(checkbox);
+    
+    const urlCell = document.createElement('td');
+    urlCell.className = 'px-6 py-4 text-sm text-gray-900';
+    const urlContainer = document.createElement('div');
+    urlContainer.className = 'flex items-center';
+    const urlText = document.createElement('div');
+    urlText.className = 'max-w-md overflow-hidden text-ellipsis whitespace-nowrap relative';
+    urlText.title = page.url;
+    urlText.textContent = page.url;
+    const copyButton = document.createElement('button');
+    copyButton.className = 'ml-2 text-gray-400 hover:text-primary copy-url transition-colors';
+    copyButton.setAttribute('data-url', page.url);
+    copyButton.setAttribute('aria-label', '复制URL');
+    // 使用安全的DOM操作替代innerHTML
+    const copyIcon = document.createElement('i');
+    copyIcon.className = 'fa fa-copy';
+    copyButton.appendChild(copyIcon);
+    urlContainer.appendChild(urlText);
+    urlContainer.appendChild(copyButton);
+    urlCell.appendChild(urlContainer);
+    
+    const selectorCell = document.createElement('td');
+    selectorCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500';
+    selectorCell.textContent = page.selector;
+    
+    const moduleCell = document.createElement('td');
+    moduleCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500';
+    moduleCell.textContent = page.module;
+    
+    const actionsCell = document.createElement('td');
+    actionsCell.className = 'px-6 py-4 whitespace-nowrap text-right text-sm font-medium';
+    const editButton = document.createElement('button');
+    editButton.className = 'text-primary hover:text-primary/80 mr-3 edit-page transition-colors';
+    editButton.setAttribute('aria-label', '编辑');
+    // 使用安全的DOM操作替代innerHTML
+    const editIcon = document.createElement('i');
+    editIcon.className = 'fa fa-pencil';
+    editButton.appendChild(editIcon);
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'text-danger hover:text-danger/80 delete-page transition-colors';
+    deleteButton.setAttribute('aria-label', '删除');
+    // 使用安全的DOM操作替代innerHTML
+    const deleteIcon = document.createElement('i');
+    deleteIcon.className = 'fa fa-trash';
+    deleteButton.appendChild(deleteIcon);
+    const testButton = document.createElement('button');
+    testButton.className = 'text-secondary hover:text-secondary/80 ml-3 test-page transition-colors';
+    testButton.setAttribute('aria-label', '测试');
+    testButton.setAttribute('data-url', page.url);
+    // 使用安全的DOM操作替代innerHTML
+    const testIcon = document.createElement('i');
+    testIcon.className = 'fa fa-external-link';
+    testButton.appendChild(testIcon);
+    actionsCell.appendChild(editButton);
+    actionsCell.appendChild(deleteButton);
+    actionsCell.appendChild(testButton);
+    
+    newRow.appendChild(checkboxCell);
+    newRow.appendChild(urlCell);
+    newRow.appendChild(selectorCell);
+    newRow.appendChild(moduleCell);
+    newRow.appendChild(actionsCell);
+    
     tableBody.appendChild(newRow);
 
     // 绑定事件
@@ -1731,7 +1891,10 @@ async function loadPagesConfig() {
         }
 
         const tableBody = document.getElementById('pagesTableBody');
-        tableBody.innerHTML = '';
+        // 使用安全的DOM操作替代innerHTML
+        while (tableBody.firstChild) {
+          tableBody.removeChild(tableBody.firstChild);
+        }
 
         // 检查响应格式并提取pages数组
         let pages;
@@ -1809,9 +1972,11 @@ async function loadPagesConfig() {
 
 // HTML转义函数，防止XSS攻击
 function escapeHTML(text) {
+  // 使用安全的DOM操作替代innerHTML
   const div = document.createElement('div');
   div.textContent = text;
-  return div.innerHTML;
+  // 使用textContent获取转义后的内容，避免innerHTML
+  return div.textContent;
 }
 
 // 加载统计数据
@@ -2329,29 +2494,58 @@ function viewBackup() {
 function showBackupPathDialog(path) {
   const dialog = document.createElement('div');
   dialog.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/50';
-  dialog.innerHTML = `
-        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <h3 class="text-xl font-semibold mb-4">备份目录路径</h3>
-            <div class="flex mb-4">
-                <input type="text" value="${escapeHTML(path)}" readonly
-                       class="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-secondary"
-                       id="backupPathInput">
-                <button id="copyBackupPathBtn"
-                        class="bg-secondary text-white px-4 py-2 rounded-r-md hover:bg-secondary/80 transition-colors">
-                    复制
-                </button>
-            </div>
-            <p class="text-sm text-gray-500 mb-4">
-                由于浏览器安全限制，无法直接打开文件系统。请手动导航到上述目录查看备份文件。
-            </p>
-            <div class="flex justify-end">
-                <button id="closeBackupDialogBtn"
-                        class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors">
-                    关闭
-                </button>
-            </div>
-        </div>
-    `;
+  
+  // 使用安全的DOM操作替代innerHTML
+  const dialogContent = document.createElement('div');
+  dialogContent.className = 'bg-white rounded-lg shadow-xl p-6 w-full max-w-md';
+  
+  // 标题
+  const title = document.createElement('h3');
+  title.className = 'text-xl font-semibold mb-4';
+  title.textContent = '备份目录路径';
+  dialogContent.appendChild(title);
+  
+  // 输入框容器
+  const inputContainer = document.createElement('div');
+  inputContainer.className = 'flex mb-4';
+  
+  // 输入框
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = escapeHTML(path);
+  input.readOnly = true;
+  input.className = 'flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-secondary';
+  input.id = 'backupPathInput';
+  inputContainer.appendChild(input);
+  
+  // 复制按钮
+  const copyBtn = document.createElement('button');
+  copyBtn.id = 'copyBackupPathBtn';
+  copyBtn.className = 'bg-secondary text-white px-4 py-2 rounded-r-md hover:bg-secondary/80 transition-colors';
+  copyBtn.textContent = '复制';
+  inputContainer.appendChild(copyBtn);
+  
+  dialogContent.appendChild(inputContainer);
+  
+  // 提示文本
+  const helpText = document.createElement('p');
+  helpText.className = 'text-sm text-gray-500 mb-4';
+  helpText.textContent = '由于浏览器安全限制，无法直接打开文件系统。请手动导航到上述目录查看备份文件。';
+  dialogContent.appendChild(helpText);
+  
+  // 按钮容器
+  const buttonContainer = document.createElement('div');
+  buttonContainer.className = 'flex justify-end';
+  
+  // 关闭按钮
+  const closeBtn = document.createElement('button');
+  closeBtn.id = 'closeBackupDialogBtn';
+  closeBtn.className = 'bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors';
+  closeBtn.textContent = '关闭';
+  buttonContainer.appendChild(closeBtn);
+  
+  dialogContent.appendChild(buttonContainer);
+  dialog.appendChild(dialogContent);
 
   document.body.appendChild(dialog);
 
@@ -2469,7 +2663,18 @@ async function resetToolStatus() {
       // 确保按钮状态正确
       const toggleBtn = document.getElementById('toggleBtn');
       if (toggleBtn) {
-        toggleBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始抓取字符串';
+        // 使用安全的DOM操作替代innerHTML
+        while (toggleBtn.firstChild) {
+          toggleBtn.removeChild(toggleBtn.firstChild);
+        }
+        
+        const icon = document.createElement('i');
+        icon.className = 'fa fa-play mr-2';
+        toggleBtn.appendChild(icon);
+        
+        const textNode = document.createTextNode('开始抓取字符串');
+        toggleBtn.appendChild(textNode);
+        
         toggleBtn.classList.remove('bg-danger', 'hover:bg-danger/90');
         toggleBtn.classList.add('bg-primary', 'hover:bg-primary/90');
       }
@@ -2597,25 +2802,32 @@ function showSearchSuggestions(searchTerm) {
   const searchSuggestions = document.getElementById('searchSuggestions');
   if (searchSuggestions) {
     // 清空之前的建议
-    searchSuggestions.innerHTML = '';
+    while (searchSuggestions.firstChild) {
+      searchSuggestions.removeChild(searchSuggestions.firstChild);
+    }
 
     if (matchedUrls.length > 0) {
       // 创建建议项
       matchedUrls.forEach(url => {
         const suggestionItem = document.createElement('div');
         suggestionItem.className = 'suggestion-item';
-        suggestionItem.textContent = url;
-
+        
         // 高亮匹配的文本
         const lowerUrl = url.toLowerCase();
         const searchIndex = lowerUrl.indexOf(searchTerm);
         if (searchIndex !== -1) {
-          const highlightedText = url.substring(0, searchIndex) +
-            '<span class="text-secondary font-medium">' +
-            url.substring(searchIndex, searchIndex + searchTerm.length) +
-            '</span>' +
-            url.substring(searchIndex + searchTerm.length);
-          suggestionItem.innerHTML = highlightedText;
+          // 使用安全的DOM操作替代innerHTML
+          suggestionItem.textContent = url.substring(0, searchIndex);
+          
+          const highlightSpan = document.createElement('span');
+          highlightSpan.className = 'text-secondary font-medium';
+          highlightSpan.textContent = url.substring(searchIndex, searchIndex + searchTerm.length);
+          suggestionItem.appendChild(highlightSpan);
+          
+          const afterText = document.createTextNode(url.substring(searchIndex + searchTerm.length));
+          suggestionItem.appendChild(afterText);
+        } else {
+          suggestionItem.textContent = url;
         }
 
         // 添加点击事件
@@ -3037,7 +3249,10 @@ function sortPagesTable(column) {
   // 添加排序指示器
   const indicator = document.createElement('span');
   indicator.className = 'sort-indicator ml-1';
-  indicator.innerHTML = isAscending ? '<i class="fa fa-sort-asc"></i>' : '<i class="fa fa-sort-desc"></i>';
+  // 使用安全的DOM操作替代innerHTML
+  const icon = document.createElement('i');
+  icon.className = isAscending ? 'fa fa-sort-asc' : 'fa fa-sort-desc';
+  indicator.appendChild(icon);
   header.appendChild(indicator);
 
   // 根据列名排序

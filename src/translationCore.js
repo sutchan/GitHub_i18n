@@ -191,6 +191,18 @@ export const translationCore = {
   currentPageMode: null,
 
   /**
+   * 页面卸载状态标记
+   * @type {boolean}
+   */
+  isPageUnloading: false,
+
+  /**
+   * 缓存清理定时器ID
+   * @type {number|null}
+   */
+  cacheCleanupTimer: null,
+
+  /**
    * 页面模式配置，定义不同页面模式的特定翻译策略
    */
   pageModeConfig: {
@@ -241,8 +253,98 @@ export const translationCore = {
   },
 
   /**
-   * 初始化词典
+   * 初始化翻译核心
    */
+  init() {
+    try {
+      // 初始化词典
+      this.initDictionary();
+      
+      // 设置页面卸载处理
+      this.setupPageUnloadHandler();
+      
+      // 启动缓存清理定时器
+      this.startCacheCleanupTimer();
+      
+      // 预热缓存
+      this.warmUpCache();
+      
+      if (CONFIG.debugMode) {
+        console.log('[GitHub 中文翻译] 翻译核心初始化完成');
+      }
+    } catch (error) {
+      ErrorHandler.handleError('翻译核心初始化', error, ErrorHandler.ERROR_TYPES.INITIALIZATION);
+    }
+  },
+
+  /**
+   * 设置页面卸载处理器
+   */
+  setupPageUnloadHandler() {
+    // 监听页面卸载事件
+    const unloadHandler = () => {
+      this.isPageUnloading = true;
+      this.cleanup();
+    };
+    
+    // 监听多种卸载事件以确保兼容性
+    window.addEventListener('beforeunload', unloadHandler);
+    window.addEventListener('unload', unloadHandler);
+    window.addEventListener('pagehide', unloadHandler);
+  },
+
+  /**
+   * 启动缓存清理定时器
+   */
+  startCacheCleanupTimer() {
+    // 清除现有定时器
+    this.stopCacheCleanupTimer();
+    
+    // 设置新的定时器，每2分钟清理一次缓存
+    this.cacheCleanupTimer = setInterval(() => {
+      // 如果页面正在卸载，停止清理
+      if (this.isPageUnloading) {
+        this.stopCacheCleanupTimer();
+        return;
+      }
+      
+      this.cleanCache();
+    }, 120000); // 2分钟
+  },
+
+  /**
+   * 停止缓存清理定时器
+   */
+  stopCacheCleanupTimer() {
+    if (this.cacheCleanupTimer) {
+      clearInterval(this.cacheCleanupTimer);
+      this.cacheCleanupTimer = null;
+    }
+  },
+
+  /**
+   * 清理资源
+   */
+  cleanup() {
+    try {
+      // 停止缓存清理定时器
+      this.stopCacheCleanupTimer();
+      
+      // 清理所有缓存
+      this.clearCache();
+      
+      // 清理正则表达式缓存
+      this.regexCache.clear();
+      
+      if (CONFIG.debugMode) {
+        console.log('[GitHub 中文翻译] 翻译核心资源清理完成');
+      }
+    } catch (error) {
+      if (CONFIG.debugMode) {
+        console.error('[GitHub 中文翻译] 翻译核心资源清理失败:', error);
+      }
+    }
+  },
   initDictionary() {
     try {
       if (CONFIG.debugMode) {
@@ -1452,6 +1554,11 @@ translateElement(element) {
    * @param {string} value - 缓存值
    */
   setToCache(key, value) {
+    // 检查页面是否正在卸载
+    if (this.isPageUnloading) {
+      return;
+    }
+    
     // 检查缓存大小是否超过限制
     this.checkCacheSizeLimit();
     
@@ -1595,32 +1702,92 @@ translateElement(element) {
   },
 
   /**
- * 清除翻译缓存
- */
-clearCache() {
-    // 清除虚拟DOM缓存
-    virtualDomManager.clear();
-    this.translationCache.clear();
-    
-    // 清除元素缓存
-    this.elementCache = new WeakMap();
-    
-    // 重置缓存统计
-    this.cacheStats = {
-      hits: 0,
-      misses: 0,
-      evictions: 0,
-      size: 0
-    };
+   * 清除翻译缓存
+   * 彻底清理所有缓存和内存引用，防止内存泄漏
+   */
+  clearCache() {
+    try {
+      // 清除虚拟DOM缓存
+      if (virtualDomManager && typeof virtualDomManager.clear === 'function') {
+        virtualDomManager.clear();
+      }
+      
+      // 清除翻译缓存
+      if (this.translationCache) {
+        this.translationCache.clear();
+      }
+      
+      // 清除元素缓存
+      if (this.elementCache) {
+        this.elementCache = new WeakMap();
+      }
+      
+      // 清除节点检查缓存
+      if (this.nodeCheckCache) {
+        this.nodeCheckCache = new WeakMap();
+      }
+      
+      // 清除页面模式缓存
+      if (this.pageModeCache) {
+        this.pageModeCache.clear();
+      }
+      
+      // 清除文本变化阈值缓存
+      if (this.textThresholdCache) {
+        this.textThresholdCache.clear();
+      }
+      
+      // 清除重要元素缓存
+      if (this.importantElementsCache) {
+        this.importantElementsCache.clear();
+      }
+      
+      // 重置缓存统计
+      this.cacheStats = {
+        hits: 0,
+        misses: 0,
+        evictions: 0,
+        size: 0
+      };
+      
+      // 重置性能数据
+      this.resetPerformanceData();
 
-    // 重置已翻译标记
-    const translatedElements = document.querySelectorAll('[data-github-zh-translated]');
-    translatedElements.forEach(element => {
-      element.removeAttribute('data-github-zh-translated');
-    });
+      // 重置已翻译标记
+      try {
+        const translatedElements = document.querySelectorAll('[data-github-zh-translated]');
+        translatedElements.forEach(element => {
+          element.removeAttribute('data-github-zh-translated');
+        });
+      } catch (domError) {
+        if (CONFIG.debugMode) {
+          console.warn('[GitHub 中文翻译] 清除翻译标记时出错:', domError);
+        }
+      }
 
-    if (CONFIG.debugMode) {
-      console.log('[GitHub 中文翻译] 翻译缓存已清除，已移除所有翻译标记');
+      // 清理其他可能的缓存引用
+      this.lastProcessedElements = [];
+      this.batchProcessQueue = [];
+      this.pendingTranslations = new Set();
+
+      if (CONFIG.debugMode) {
+        console.log('[GitHub 中文翻译] 翻译缓存已彻底清除，所有内存引用已清理');
+      }
+    } catch (error) {
+      if (CONFIG.debugMode) {
+        console.error('[GitHub 中文翻译] 清除缓存时出错:', error);
+      }
+      
+      // 出错时尝试基本清理
+      try {
+        if (this.translationCache) this.translationCache.clear();
+        if (this.elementCache) this.elementCache = new WeakMap();
+        this.cacheStats = { hits: 0, misses: 0, evictions: 0, size: 0 };
+      } catch (fallbackError) {
+        if (CONFIG.debugMode) {
+          console.error('[GitHub 中文翻译] 基本缓存清理也失败:', fallbackError);
+        }
+      }
     }
   },
 

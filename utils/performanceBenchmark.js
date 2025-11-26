@@ -381,7 +381,7 @@ function createTranslationBenchmark() {
             const elements = [];
             for (let i = 0; i < 100; i++) {
                 elements.push({
-                    innerHTML: '',
+                    // 使用安全的DOM操作替代innerHTML
                     textContent: '',
                     setAttribute: function(key, value) { this[key] = value; },
                     addEventListener: function() {},

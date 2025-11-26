@@ -1145,9 +1145,18 @@
       elements.stopBtn.disabled = !appState.isExtracting;
       elements.exportBtn.disabled = appState.stats.totalStrings === 0;
 
-      // 添加加载指示器
+      // 添加加载指示器 - 使用安全的DOM操作替代innerHTML
       if (appState.isExtracting) {
-        elements.startBtn.innerHTML = '<span class="loading"></span> 提取中...';
+        // 清空按钮内容
+        while (elements.startBtn.firstChild) {
+          elements.startBtn.removeChild(elements.startBtn.firstChild);
+        }
+        
+        // 创建加载指示器
+        const loadingSpan = document.createElement('span');
+        loadingSpan.className = 'loading';
+        elements.startBtn.appendChild(loadingSpan);
+        elements.startBtn.appendChild(document.createTextNode(' 提取中...'));
       } else {
         elements.startBtn.textContent = '开始提取';
       }
@@ -1306,7 +1315,10 @@
 
     // 清空字符串表格
     function clearStringsTable() {
-      elements.stringsTableBody.innerHTML = '';
+      // 使用安全的DOM操作替代innerHTML
+      while (elements.stringsTableBody.firstChild) {
+        elements.stringsTableBody.removeChild(elements.stringsTableBody.firstChild);
+      }
     }
 
     // 更新统计数据 - 增强版带动画
@@ -1392,7 +1404,10 @@
       clearStringsTable();
 
       // 清空日志 - 添加保留初始信息
-      elements.logArea.innerHTML = '';
+      // 使用安全的DOM操作替代innerHTML
+      while (elements.logArea.firstChild) {
+        elements.logArea.removeChild(elements.logArea.firstChild);
+      }
       log('配置已重置', 'success');
 
       // 更新UI状态
@@ -1525,7 +1540,14 @@
 
       // 模拟导出进度
       elements.exportBtn.disabled = true;
-      elements.exportBtn.innerHTML = '<span class="loading"></span> 导出中...';
+      // 使用安全的DOM操作替代innerHTML
+      while (elements.exportBtn.firstChild) {
+        elements.exportBtn.removeChild(elements.exportBtn.firstChild);
+      }
+      const loadingSpan = document.createElement('span');
+      loadingSpan.className = 'loading';
+      elements.exportBtn.appendChild(loadingSpan);
+      elements.exportBtn.appendChild(document.createTextNode(' 导出中...'));
 
       // 模拟进度更新
       let progress = 0;
