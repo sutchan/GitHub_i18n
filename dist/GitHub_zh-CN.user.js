@@ -1,9 +1,16 @@
-/** GitHub 中文翻译入口文件 */
+/**
+ * GitHub 中文翻译入口文件
+ * @file index.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 将 GitHub 界面翻译成中文
+ */
 
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.8.172
+// @version      1.8.175
 // @description  将 GitHub 界面翻译成中文
 // @author       Sut
 // @match        https://github.com/*
@@ -30,6 +37,14 @@
 // 启动脚本
 startScript()
 
+/**
+ * 版本信息模块
+ * @file version.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 统一管理GitHub自动化字符串更新工具的版本信息
+ */
 // 作者: Sut
 // 此文件用于统一管理GitHub自动化字符串更新工具的版本信息
 
@@ -38,7 +53,7 @@ startScript()
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-const VERSION = '1.8.172'
+const VERSION = '1.8.175'
 
 /**
  * 版本历史记录
@@ -46,15 +61,19 @@ const VERSION = '1.8.172'
  */
 const VERSION_HISTORY = [
   {
-    version: '1.8.172',
-    date: '2025-11-13',
+    version: '1.8.175',
+    date: '2025-11-26',
     changes: ['当前版本']
   }
 ]
 
 /**
  * 工具函数模块
- * 包含各种通用的辅助函数
+ * @file utils.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含各种通用的辅助函数
  */
 
 /**
@@ -101,7 +120,14 @@ const utils = {
     // 简单的字符串转义
     escapeRegExp: function(string) {
         // 使用数组定义特殊字符，避免转义问题
-        const specialChars = ['.', '+', '*', '?', '^', ') {
+        const specialChars = ['.', '+', '*', '?', '^', ' func - 要节流的函数
+     * @param {number} limit - 限制时间（毫秒）
+     * @param {Object} options - 配置选项
+     * @param {boolean} options.leading - 是否在开始时执行（默认true）
+     * @param {boolean} options.trailing - 是否在结束后执行（默认true）
+     * @returns {Function} 节流后的函数
+     */
+    throttle(func, limit, options = {}) {
         const { leading = true, trailing = true } = options
 let inThrottle, lastArgs, lastThis, result, timerId
 
@@ -139,11 +165,11 @@ timerId = setTimeout(() => later(lastThis, lastArgs), limit)
     /**
      * 防抖函数，延迟执行函数直到停止触发一段时间
      * 支持返回Promise
-     * @param func - 要防抖的函数
-     * @param delay - 延迟时间（毫秒）
-     * @param options - 配置选项
-     * @param options.leading - 是否在开始时执行一次（默认false）
-     * @returns 防抖后的函数
+     * @param {Function} func - 要防抖的函数
+     * @param {number} delay - 延迟时间（毫秒）
+     * @param {Object} options - 配置选项
+     * @param {boolean} options.leading - 是否在开始时执行一次（默认false）
+     * @returns {Function} 防抖后的函数
      */
     debounce(func, delay, options = {}) {
         const { leading = false } = options
@@ -171,7 +197,7 @@ timeout = setTimeout(() => later(context, args), delay)
     
     /**
      * 延迟函数，返回Promise的setTimeout
-     * @param ms - 延迟时间（毫秒）
+     * @param {number} ms - 延迟时间（毫秒）
      * @returns {Promise<void>}
      */
     delay(ms) {
@@ -180,8 +206,8 @@ timeout = setTimeout(() => later(context, args), delay)
 
     /**
      * 转义正则表达式中的特殊字符
-     * @param string - 要转义的字符串
-     * @returns 转义后的字符串
+     * @param {string} string - 要转义的字符串
+     * @returns {string} 转义后的字符串
      */
     escapeRegExp(string) {
         // 转义所有正则表达式特殊字符，包括/字符
@@ -190,7 +216,7 @@ timeout = setTimeout(() => later(context, args), delay)
     
     /**
      * 安全地解析JSON字符串
-     * @param jsonString - JSON字符串
+     * @param {string} jsonString - JSON字符串
      * @param {*} defaultValue - 解析失败时的默认值
      * @returns {*} 解析结果或默认值
      */
@@ -206,7 +232,7 @@ return defaultValue
     /**
      * 检查正则表达式是否存在潜在的ReDoS风险
      * @param {string|RegExp} pattern - 正则表达式模式
-     * @returns - 是否安全
+     * @returns {boolean} - 是否安全
      */
     isSafeRegex(pattern) {
         if (typeof pattern === 'string') {
@@ -241,8 +267,8 @@ break
 
     /**
      * 安全地创建正则表达式，防止ReDoS攻击
-     * @param pattern - 正则表达式模式
-     * @param flags - 正则表达式标志
+     * @param {string} pattern - 正则表达式模式
+     * @param {string} flags - 正则表达式标志
      * @returns {RegExp|null} - 安全的正则表达式或null
      */
     safeRegExp(pattern, flags = '') {
@@ -262,8 +288,8 @@ return null
     /**
      * 安全地序列化对象为JSON字符串
      * @param {*} obj - 要序列化的对象
-     * @param defaultValue - 序列化失败时的默认值
-     * @returns JSON字符串或默认值
+     * @param {string} defaultValue - 序列化失败时的默认值
+     * @returns {string} JSON字符串或默认值
      */
     safeJSONStringify(obj, defaultValue = '{}') {
         try {
@@ -276,7 +302,7 @@ return defaultValue
     
     /**
      * 获取当前页面路径
-     * @returns 当前页面的路径
+     * @returns {string} 当前页面的路径
      */
     getCurrentPath() {
         return window.location.pathname
@@ -284,7 +310,7 @@ return defaultValue
     
     /**
      * 获取完整的当前页面URL（包含查询参数）
-     * @returns 完整的URL
+     * @returns {string} 完整的URL
      */
     getCurrentUrl() {
         return window.location.href
@@ -292,8 +318,8 @@ return defaultValue
     
     /**
      * 判断当前页面是否匹配某个路径模式
-     * @param pattern - 路径模式
-     * @returns 是否匹配
+     * @param {RegExp} pattern - 路径模式
+     * @returns {boolean} 是否匹配
      */
     isCurrentPathMatch(pattern) {
         return pattern.test(this.getCurrentPath())
@@ -301,19 +327,19 @@ return defaultValue
     
     /**
      * 从URL获取查询参数
-     * @param name - 参数名
-     * @param url - URL字符串，默认使用当前页面URL
+     * @param {string} name - 参数名
+     * @param {string} url - URL字符串，默认使用当前页面URL
      * @returns {string|null} 参数值或null
      */
     getQueryParam(name, url = window.location.href) {
-        const match = RegExp(`[?&]$=([^&]*)`).exec(url)
+        const match = RegExp(`[?&]${name}=([^&]*)`).exec(url)
 return match && decodeURIComponent(match[1].replace(/\+/g, ' '))
 },
     
     /**
      * 获取URL中的所有查询参数
-     * @param url - URL字符串，默认使用当前页面URL
-     * @returns 查询参数对象
+     * @param {string} url - URL字符串，默认使用当前页面URL
+     * @returns {Object} 查询参数对象
      */
     getAllQueryParams(url = window.location.href) {
         const params = {}
@@ -326,10 +352,10 @@ for (const [key, value] of searchParams) {
     
     /**
      * 收集DOM树中的所有文本节点内容
-     * @param element - 要收集文本的起始元素
+     * @param {HTMLElement} element - 要收集文本的起始元素
      * @param {Set<string>} resultSet - 用于存储结果的Set集合
-     * @param options - 配置选项
-     * @param options.maxLength - 最大文本长度（默认200）
+     * @param {Object} options - 配置选项
+     * @param {number} options.maxLength - 最大文本长度（默认200）
      * @param {string[]} options.skipTags - 跳过的标签名数组
      */
     collectTextNodes(element, resultSet, options = {}) {
@@ -377,7 +403,7 @@ for (const node of childNodes) {
     
     /**
      * 安全地访问对象属性，避免嵌套属性访问出错
-     * @param obj - 目标对象
+     * @param {Object} obj - 目标对象
      * @param {string|string[]} path - 属性路径，如'a.b.c'或['a','b','c']
      * @param {*} defaultValue - 获取失败时的默认值
      * @returns {*} 属性值或默认值
@@ -427,9 +453,9 @@ return obj
     
     /**
      * 安全地执行函数，捕获可能的异常
-     * @param fn - 要执行的函数
+     * @param {Function} fn - 要执行的函数
      * @param {*} defaultValue - 执行失败时的默认返回值
-     * @param context - 函数执行上下文
+     * @param {Object} context - 函数执行上下文
      * @param {...*} args - 函数参数
      * @returns {*} 函数返回值或默认值
      */
@@ -448,7 +474,11 @@ return defaultValue
 
 /**
  * GitHub 中文翻译配置文件
- * 包含脚本所有可配置项
+ * @file config.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含脚本所有可配置项
  */
 
 // 导入版本常量（从单一版本源）
@@ -457,7 +487,7 @@ const greasemonkeyInfo = typeof window !== 'undefined' ? window.GM_info ?? {} : 
 
 /**
  * 从用户脚本头部注释中提取版本号
- * @returns 版本号
+ * @returns {string} 版本号
  */
 function getVersionFromComment() {
   try {
@@ -590,7 +620,11 @@ const CONFIG = {
 
 /**
  * 版本更新检查模块
- * 负责检查和处理脚本更新
+ * @file versionChecker.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 负责检查和处理脚本更新
  */
 /**
  * 版本检查器对象
@@ -637,7 +671,7 @@ const intervalMs = (CONFIG.updateCheck.intervalHours || 24) * 60 * 60 * 1000
 }
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 当前版本: ${CONFIG.version}, 远程版本: $`)
+        console.log(`[GitHub 中文翻译] 当前版本: ${CONFIG.version}, 远程版本: ${remoteVersion}`)
 }
 
       // 比较版本号
@@ -679,9 +713,9 @@ if (CONFIG.debugMode) {
 
   /**
    * 带重试机制的网络请求
-   * @param url - 请求URL
-   * @param maxRetries - 最大重试次数
-   * @param retryDelay - 重试间隔（毫秒）
+   * @param {string} url - 请求URL
+   * @param {number} maxRetries - 最大重试次数
+   * @param {number} retryDelay - 重试间隔（毫秒）
    * @returns {Promise<string>} 响应文本
    */
   async fetchWithRetry(url, maxRetries = 2, retryDelay = 1000) {
@@ -690,7 +724,7 @@ if (CONFIG.debugMode) {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         if (CONFIG.debugMode && attempt > 0) {
-          console.log(`[GitHub 中文翻译] 重试更新检查 ($/$)...`)
+          console.log(`[GitHub 中文翻译] 重试更新检查 (${attempt}/${maxRetries})...`)
 }
 
         // 自定义超时控制
@@ -733,7 +767,7 @@ const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
   /**
    * 从脚本内容中提取版本号
    * 支持多种版本号格式
-   * @param content - 脚本内容
+   * @param {string} content - 脚本内容
    * @returns {string|null} 提取的版本号或null
    */
   extractVersion(content) {
@@ -760,9 +794,9 @@ if (match && match[1]) {
 
   /**
    * 比较版本号，判断是否有新版本
-   * @param newVersion - 新版本号
-   * @param currentVersion - 当前版本号
-   * @returns 是否有新版本
+   * @param {string} newVersion - 新版本号
+   * @param {string} currentVersion - 当前版本号
+   * @returns {boolean} 是否有新版本
    */
   isNewerVersion(newVersion, currentVersion) {
     // 将版本号转换为数组进行比较
@@ -788,7 +822,7 @@ const currentPart = currentParts[i] || 0
   /**
    * 显示更新通知
    * 使用安全的DOM操作而不是innerHTML
-   * @param newVersion - 新版本号
+   * @param {string} newVersion - 新版本号
    */
   showUpdateNotification(newVersion) {
     const notificationKey = 'githubZhUpdateNotificationDismissed'
@@ -801,7 +835,7 @@ const notificationVersionKey = 'githubZhLastNotifiedVersion'
     if (localStorage.getItem(notificationKey) === 'dismissed' ||
       lastNotifiedVersion === newVersion) {
       if (CONFIG.debugMode && lastNotifiedVersion === newVersion) {
-        console.log(`[GitHub 中文翻译] 已经通知过版本 ${newVersion}的更新`)
+        console.log(`[GitHub 中文翻译] 已经通知过版本 ${newVersion} 的更新`)
 }
       return
 }
@@ -865,7 +899,7 @@ contentContainer.appendChild(buttonsContainer)
 
       // 创建更新按钮 - 安全地设置URL
       const updateButton = document.createElement('a')
-updateButton.id = `$-update-btn`
+updateButton.id = `${notificationId}-update-btn`
 updateButton.href = CONFIG.updateCheck.scriptUrl || '#'
 updateButton.target = '_blank'
 updateButton.rel = 'noopener noreferrer'
@@ -875,7 +909,7 @@ buttonsContainer.appendChild(updateButton)
 
       // 创建稍后按钮
       const laterButton = document.createElement('button')
-laterButton.id = `$-later-btn`
+laterButton.id = `${notificationId}-later-btn`
 laterButton.className = 'inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors'
 laterButton.textContent = '稍后'
 laterButton.addEventListener('click', () => {
@@ -885,7 +919,7 @@ buttonsContainer.appendChild(laterButton)
 
       // 创建不再提醒按钮
       const dismissButton = document.createElement('button')
-dismissButton.id = `$-dismiss-btn`
+dismissButton.id = `${notificationId}-dismiss-btn`
 dismissButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors'
 dismissButton.textContent = '不再提醒'
 dismissButton.addEventListener('click', () => {
@@ -908,7 +942,7 @@ buttonsContainer.appendChild(dismissButton)
         }
 
         if (CONFIG.debugMode) {
-          console.log(`[GitHub 中文翻译] 显示更新通知: 版本 ${newVersion}`)
+          console.log(`[GitHub 中文翻译] 显示更新通知: 版本 ${newVersion}{newVersion}`)
 }
         }
     } catch (error) {
@@ -918,8 +952,8 @@ buttonsContainer.appendChild(dismissButton)
 
   /**
    * 隐藏通知元素（带动画效果）
-   * @param notification - 通知元素
-   * @param permanently - 是否永久隐藏
+   * @param {HTMLElement} notification - 通知元素
+   * @param {boolean} permanently - 是否永久隐藏
    */
   hideNotification(notification, permanently = false) {
     try {
@@ -947,7 +981,7 @@ if (CONFIG.debugMode) {
 
   /**
    * 记录版本历史
-   * @param version - 版本号
+   * @param {string} version - 版本号
    */
   recordVersionHistory(version) {
     try {
@@ -978,7 +1012,7 @@ let history = utils.safeJSONParse(localStorage.getItem(historyKey), [])
 
   /**
    * 更新本地存储中的版本号
-   * @param newVersion - 新版本号
+   * @param {string} newVersion - 新版本号
    */
   updateVersionInStorage(newVersion) {
     try {
@@ -991,7 +1025,7 @@ let history = utils.safeJSONParse(localStorage.getItem(historyKey), [])
       localStorage.setItem('githubZhCachedVersion', utils.safeJSONStringify(cacheData))
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 已缓存新版本号: ${newVersion}(缓存时间: ${new Date().toLocaleString()})`)
+        console.log(`[GitHub 中文翻译] 已缓存新版本号: ${newVersion} (缓存时间: ${new Date().toLocaleString()})`)
 }
 
       return true
@@ -1041,7 +1075,11 @@ localStorage.removeItem('githubZhLastNotifiedVersion')
 
 /**
  * 翻译词典合并模块
- * 整合所有页面的翻译词典
+ * @file index.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 整合所有页面的翻译词典
  */
 /**
  * 翻译词典对象，包含所有需要翻译的字符串
@@ -1055,7 +1093,7 @@ const translationModule = {
 
 /**
  * 合并所有词典为一个完整的词典对象
- * @returns 合并后的词典
+ * @returns {Object} 合并后的词典
  */
 function mergeAllDictionaries() {
     const merged = {}
@@ -1067,7 +1105,11 @@ for (const module in translationModule) {
 
 /**
  * 通用翻译词典
- * 包含所有页面共用的翻译字符串
+ * @file common.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含所有页面共用的翻译字符串
  */
 const commonDictionary = {
   "common": {
@@ -1083,6 +1125,11 @@ const commonDictionary = {
 
 /**
  * Codespaces 页面翻译词典
+ * @file codespaces.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含 GitHub Codespaces 页面的翻译词典
  */
 const codespacesDictionary = {
     "Skip to content": "待翻译: Skip to content",
@@ -1109,6 +1156,11 @@ const codespacesDictionary = {
 
 /**
  * Explore 页面翻译词典
+ * @file explore.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含 GitHub Explore 页面的翻译词典
  */
 const exploreDictionary = {
   "Navigation Menu": "导航菜单",
@@ -1370,7 +1422,11 @@ Appearance settings": "登录
 
 /**
  * 翻译核心模块
- * 负责页面内容的实际翻译工作
+ * @file translationCore.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 负责页面内容的实际翻译工作
  */
 /**
  * Trie树数据结构，用于高效的字符串匹配
@@ -1393,8 +1449,8 @@ this.size = 0
 
     /**
      * 向Trie树中插入一个单词及其翻译
-     * @param word - 要插入的单词
-     * @param value - 翻译结果
+     * @param {string} word - 要插入的单词
+     * @param {string} value - 翻译结果
      */
     insert(word, value) {
         if (!word || typeof word !== 'string' || word.length === 0) {
@@ -1416,8 +1472,8 @@ this.size++
 
     /**
      * 在Trie树中查找所有匹配的单词
-     * @param text - 要查找的文本
-     * @returns 匹配结果数组
+     * @param {string} text - 要查找的文本
+     * @returns {Array} 匹配结果数组
      */
     findAllMatches(text) {
         if (!text || typeof text !== 'string' || text.length === 0) {
@@ -1465,7 +1521,7 @@ this.size = 0
 
     /**
      * 获取Trie树的大小
-     * @returns Trie树中的单词数量
+     * @returns {number} Trie树中的单词数量
      */
     getSize() {
         return this.size
@@ -1478,15 +1534,16 @@ this.size = 0
 const translationCore = {
   /**
    * 合并后的完整词典
-   * @type */
+   * @type {Object}
+   */
   dictionary: {},
 
   /**
    * 翻译缓存项结构
-   * @typedef CacheItem
-   * @property value - 缓存的值
-   * @property timestamp - 最后访问时间戳
-   * @property accessCount - 访问次数
+   * @typedef {Object} CacheItem
+   * @property {string} value - 缓存的值
+   * @property {number} timestamp - 最后访问时间戳
+   * @property {number} accessCount - 访问次数
    */
 
   /**
@@ -1510,12 +1567,14 @@ const translationCore = {
 
   /**
    * Trie树数据结构，用于高效的部分匹配
-   * @type */
+   * @type {Trie}
+   */
   dictionaryTrie: new Trie(),
 
   /**
    * 正则表达式缓存，避免重复创建
-   * @type */
+   * @type {Map}
+   */
   regexCache: new Map(),
 
   /**
@@ -1543,8 +1602,21 @@ const translationCore = {
 
   /**
    * 当前页面模式
-   * @type */
+   * @type {string}
+   */
   currentPageMode: null,
+
+  /**
+   * 页面卸载状态标记
+   * @type {boolean}
+   */
+  isPageUnloading: false,
+
+  /**
+   * 缓存清理定时器ID
+   * @type {number|null}
+   */
+  cacheCleanupTimer: null,
 
   /**
    * 页面模式配置，定义不同页面模式的特定翻译策略
@@ -1597,8 +1669,98 @@ const translationCore = {
         },
 
   /**
-   * 初始化词典
+   * 初始化翻译核心
    */
+  init() {
+    try {
+      // 初始化词典
+      this.initDictionary()
+
+      // 设置页面卸载处理
+      this.setupPageUnloadHandler()
+
+      // 启动缓存清理定时器
+      this.startCacheCleanupTimer()
+
+      // 预热缓存
+      this.warmUpCache()
+
+      if (CONFIG.debugMode) {
+        console.log('[GitHub 中文翻译] 翻译核心初始化完成')
+}
+        } catch (error) {
+      ErrorHandler.handleError('翻译核心初始化', error, ErrorHandler.ERROR_TYPES.INITIALIZATION)
+}
+        },
+
+  /**
+   * 设置页面卸载处理器
+   */
+  setupPageUnloadHandler() {
+    // 监听页面卸载事件
+    const unloadHandler = () => {
+      this.isPageUnloading = true
+this.cleanup()
+}
+
+    // 监听多种卸载事件以确保兼容性
+    window.addEventListener('beforeunload', unloadHandler)
+window.addEventListener('unload', unloadHandler)
+window.addEventListener('pagehide', unloadHandler)
+},
+
+  /**
+   * 启动缓存清理定时器
+   */
+  startCacheCleanupTimer() {
+    // 清除现有定时器
+    this.stopCacheCleanupTimer()
+
+    // 设置新的定时器，每2分钟清理一次缓存
+    this.cacheCleanupTimer = setInterval(() => {
+      // 如果页面正在卸载，停止清理
+      if (this.isPageUnloading) {
+        this.stopCacheCleanupTimer()
+return
+}
+      
+      this.cleanCache()
+}, 120000); // 2分钟
+  },
+
+  /**
+   * 停止缓存清理定时器
+   */
+  stopCacheCleanupTimer() {
+    if (this.cacheCleanupTimer) {
+      clearInterval(this.cacheCleanupTimer)
+this.cacheCleanupTimer = null
+}
+        },
+
+  /**
+   * 清理资源
+   */
+  cleanup() {
+    try {
+      // 停止缓存清理定时器
+      this.stopCacheCleanupTimer()
+
+      // 清理所有缓存
+      this.clearCache()
+
+      // 清理正则表达式缓存
+      this.regexCache.clear()
+
+      if (CONFIG.debugMode) {
+        console.log('[GitHub 中文翻译] 翻译核心资源清理完成')
+}
+        } catch (error) {
+      if (CONFIG.debugMode) {
+        console.error('[GitHub 中文翻译] 翻译核心资源清理失败:', error)
+}
+        }
+  },
   initDictionary() {
     try {
       if (CONFIG.debugMode) {
@@ -1645,7 +1807,7 @@ this.regexCache.clear()
 
   /**
    * 检测当前页面模式
-   * @returns 当前页面模式
+   * @returns {string} 当前页面模式
    */
   detectPageMode() {
     try {
@@ -1684,7 +1846,7 @@ return 'default'
 
   /**
    * 获取当前页面模式的配置
-   * @returns 页面模式配置
+   * @returns {Object} 页面模式配置
    */
   getCurrentPageModeConfig() {
     const mode = this.currentPageMode || this.detectPageMode()
@@ -1708,7 +1870,7 @@ return this.pageModeConfig[mode] || this.pageModeConfig.default
 const modeConfig = this.getCurrentPageModeConfig()
 
     if (CONFIG.debugMode) {
-      console.log(`[GitHub 中文翻译] 当前页面模式: $`, modeConfig)
+      console.log(`[GitHub 中文翻译] 当前页面模式: ${pageMode}`, modeConfig)
 }
 
     // 重置性能统计数据
@@ -1833,7 +1995,7 @@ reject(recoverError)
   logPerformanceData() {
     if (CONFIG.debugMode && CONFIG.performance.logTiming) {
       const duration = Date.now() - this.performanceData.translateStartTime
-console.log(`[GitHub 中文翻译] 性能数据 - 总耗时: $ms`)
+console.log(`[GitHub 中文翻译] 性能数据 - 总耗时: ${duration}ms`)
 console.log(`  元素处理: ${this.performanceData.elementsProcessed}`)
 console.log(`  文本翻译: ${this.performanceData.textsTranslated}`)
 console.log(`  缓存命中: ${this.performanceData.cacheHits}`)
@@ -1851,8 +2013,8 @@ console.log(`  错误次数: ${this.performanceData.errorCount}`)
 
   /**
    * 记录单个性能事件
-   * @param eventType - 事件类型
-   * @param data - 事件数据
+   * @param {string} eventType - 事件类型
+   * @param {object} data - 事件数据
    */
   recordPerformanceEvent(eventType, data = {}) {
     switch (eventType) {
@@ -1883,7 +2045,7 @@ default:
 
   /**
    * 获取当前性能统计数据
-   * @returns - 性能统计数据
+   * @returns {object} - 性能统计数据
    */
   getPerformanceStats() {
     const stats = { ...this.performanceData }
@@ -1916,7 +2078,7 @@ stats.cacheHitRate = totalCacheRequests > 0
 
   /**
    * 导出性能数据
-   * @returns - JSON格式的性能数据
+   * @returns {string} - JSON格式的性能数据
    */
   exportPerformanceData() {
     const data = {
@@ -1981,7 +2143,7 @@ const batch = validElements.slice(startIndex, endIndex)
           // 性能日志记录
           if (CONFIG.performance.logTiming && (endIndex % (batchSize * 5) === 0 || endIndex === validElements.length)) {
             const progress = Math.round((endIndex / validElements.length) * 100)
-console.log(`[GitHub 中文翻译] 翻译进度: $%, 已处理: $/${validElements.length} 元素`)
+console.log(`[GitHub 中文翻译] 翻译进度: ${progress}%, 已处理: ${endIndex}/${validElements.length} 元素`)
 }
 
           if (endIndex < validElements.length) {
@@ -2037,7 +2199,7 @@ if (elements && elements.length > 0) {
         })
 
             if (CONFIG.debugMode) {
-              console.log(`[GitHub 中文翻译] 找到关键元素: $, 数量: ${elements.length}`)
+              console.log(`[GitHub 中文翻译] 找到关键元素: ${selector}, 数量: ${elements.length}`)
 }
         }
         } catch (err) {
@@ -2068,7 +2230,7 @@ ErrorHandler.handleError('关键元素翻译', err, ErrorHandler.ERROR_TYPES.DOM
 
       // 记录统计信息
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: $, 失败: $`)
+        console.log(`[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: ${processedElements}, 失败: ${failedElements}`)
 }
 
       resolve()
@@ -2098,7 +2260,7 @@ Array.from(allElements).forEach(element => {
 }
         })
 if (CONFIG.debugMode && CONFIG.performance.logTiming) {
-          console.log(`[GitHub 中文翻译] 合并查询选择器: $, 结果数量: ${allElements.length}`)
+          console.log(`[GitHub 中文翻译] 合并查询选择器: ${combinedSelector}, 结果数量: ${allElements.length}`)
 }
         return Array.from(uniqueElements)
 } catch (error) {
@@ -2121,7 +2283,7 @@ Array.from(matchedElements).forEach(element => {
         })
 } catch (error) {
         if (CONFIG.debugMode) {
-          console.warn(`[GitHub 中文翻译] 选择器 "$" 解析失败:`, error)
+          console.warn(`[GitHub 中文翻译] 选择器 "${selector}" 解析失败:`, error)
 }
         }
     })
@@ -2133,8 +2295,8 @@ Array.from(matchedElements).forEach(element => {
   /**
    * 判断元素是否应该被翻译
    * 优化版：增加更多过滤条件和快速路径
-   * @param element - 要检查的元素
-   * @returns 是否应该翻译
+   * @param {HTMLElement} element - 要检查的元素
+   * @returns {boolean} 是否应该翻译
    */
   shouldTranslateElement(element) {
     // 快速路径：无效元素检查
@@ -2423,8 +2585,8 @@ if (textContent.length === 0) {
   /**
  * 翻译单个元素
  * 性能优化：使用更高效的DOM遍历和翻译策略
- * @param element - 要翻译的元素
- * @returns 是否成功翻译了元素
+ * @param {HTMLElement} element - 要翻译的元素
+ * @returns {boolean} 是否成功翻译了元素
  */
 translateElement(element) {
     // 快速检查：避免无效元素
@@ -2582,7 +2744,7 @@ this.performanceData.textsTranslated++
   /**
    * 获取文本的翻译结果
    * 优化版：改进缓存策略、添加更智能的文本处理
-   * @param text - 原始文本
+   * @param {string} text - 原始文本
    * @returns {string|null} 翻译后的文本，如果没有找到翻译则返回null
    */
   getTranslatedText(text) {
@@ -2648,7 +2810,7 @@ const enablePartialMatch = modeConfig.enablePartialMatch !== undefined ?
   /**
    * 执行部分翻译匹配
    * 优化版：使用Trie树进行高效匹配，减少不必要的字典遍历
-   * @param text - 要翻译的文本
+   * @param {string} text - 要翻译的文本
    * @returns {string|null} - 翻译后的文本
    */
   performPartialTranslation(text) {
@@ -2685,7 +2847,7 @@ const enablePartialMatch = modeConfig.enablePartialMatch !== undefined ?
 
       // 尝试将key视为一个完整的单词进行匹配
       // 使用单词边界的正则表达式
-      const wordRegexKey = `word_$`
+      const wordRegexKey = `word_${key}`
 let wordRegex
 
       // 检查正则表达式缓存
@@ -2714,7 +2876,7 @@ if (wordRegex) {
         })
 } else {
         // 如果不是完整单词，也记录匹配项
-        const nonWordRegexKey = `nonword_$`
+        const nonWordRegexKey = `nonword_${key}`
 let nonWordRegex
 
         // 检查正则表达式缓存
@@ -2778,7 +2940,7 @@ hasReplaced = true
 
   /**
    * 实现LRU缓存策略的辅助方法：获取缓存项
-   * @param key - 缓存键
+   * @param {string} key - 缓存键
    * @returns {string|null} 缓存的值，如果不存在返回null
    */
   getFromCache(key) {
@@ -2804,10 +2966,15 @@ return null
 
   /**
    * 实现LRU缓存策略的辅助方法：设置缓存项
-   * @param key - 缓存键
-   * @param value - 缓存值
+   * @param {string} key - 缓存键
+   * @param {string} value - 缓存值
    */
   setToCache(key, value) {
+    // 检查页面是否正在卸载
+    if (this.isPageUnloading) {
+      return
+}
+    
     // 检查缓存大小是否超过限制
     this.checkCacheSizeLimit()
 
@@ -2837,7 +3004,7 @@ return null
 
   /**
    * 执行LRU缓存淘汰
-   * @param maxSize - 最大缓存大小
+   * @param {number} maxSize - 最大缓存大小
    */
   performLRUCacheEviction(maxSize) {
     try {
@@ -2875,7 +3042,7 @@ this.cacheStats.size = this.translationCache.size
 this.performanceData.cacheEvictions += evictedCount
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] LRU缓存淘汰完成，移除了$项，当前缓存大小：${this.translationCache.size}`)
+        console.log(`[GitHub 中文翻译] LRU缓存淘汰完成，移除了${evictedCount}项，当前缓存大小：${this.translationCache.size}`)
 }
         } catch (error) {
       if (CONFIG.debugMode) {
@@ -2950,33 +3117,93 @@ this.cacheStats.size = 0
         },
 
   /**
- * 清除翻译缓存
- */
-clearCache() {
-    // 清除虚拟DOM缓存
-    virtualDomManager.clear()
-this.translationCache.clear()
-
-    // 清除元素缓存
-    this.elementCache = new WeakMap()
-
-    // 重置缓存统计
-    this.cacheStats = {
-      hits: 0,
-      misses: 0,
-      evictions: 0,
-      size: 0
-    }
-
-    // 重置已翻译标记
-    const translatedElements = document.querySelectorAll('[data-github-zh-translated]')
-translatedElements.forEach(element => {
-      element.removeAttribute('data-github-zh-translated')
-})
-
-    if (CONFIG.debugMode) {
-      console.log('[GitHub 中文翻译] 翻译缓存已清除，已移除所有翻译标记')
+   * 清除翻译缓存
+   * 彻底清理所有缓存和内存引用，防止内存泄漏
+   */
+  clearCache() {
+    try {
+      // 清除虚拟DOM缓存
+      if (virtualDomManager && typeof virtualDomManager.clear === 'function') {
+        virtualDomManager.clear()
 }
+      
+      // 清除翻译缓存
+      if (this.translationCache) {
+        this.translationCache.clear()
+}
+      
+      // 清除元素缓存
+      if (this.elementCache) {
+        this.elementCache = new WeakMap()
+}
+      
+      // 清除节点检查缓存
+      if (this.nodeCheckCache) {
+        this.nodeCheckCache = new WeakMap()
+}
+      
+      // 清除页面模式缓存
+      if (this.pageModeCache) {
+        this.pageModeCache.clear()
+}
+      
+      // 清除文本变化阈值缓存
+      if (this.textThresholdCache) {
+        this.textThresholdCache.clear()
+}
+      
+      // 清除重要元素缓存
+      if (this.importantElementsCache) {
+        this.importantElementsCache.clear()
+}
+      
+      // 重置缓存统计
+      this.cacheStats = {
+        hits: 0,
+        misses: 0,
+        evictions: 0,
+        size: 0
+      }
+
+      // 重置性能数据
+      this.resetPerformanceData()
+
+      // 重置已翻译标记
+      try {
+        const translatedElements = document.querySelectorAll('[data-github-zh-translated]')
+translatedElements.forEach(element => {
+          element.removeAttribute('data-github-zh-translated')
+})
+} catch (domError) {
+        if (CONFIG.debugMode) {
+          console.warn('[GitHub 中文翻译] 清除翻译标记时出错:', domError)
+}
+        }
+
+      // 清理其他可能的缓存引用
+      this.lastProcessedElements = []
+this.batchProcessQueue = []
+this.pendingTranslations = new Set()
+
+      if (CONFIG.debugMode) {
+        console.log('[GitHub 中文翻译] 翻译缓存已彻底清除，所有内存引用已清理')
+}
+        } catch (error) {
+      if (CONFIG.debugMode) {
+        console.error('[GitHub 中文翻译] 清除缓存时出错:', error)
+}
+      
+      // 出错时尝试基本清理
+      try {
+        if (this.translationCache) this.translationCache.clear()
+if (this.elementCache) this.elementCache = new WeakMap()
+this.cacheStats = { hits: 0, misses: 0, evictions: 0, size: 0 }
+        } catch (fallbackError) {
+        if (CONFIG.debugMode) {
+          console.error('[GitHub 中文翻译] 基本缓存清理也失败:', fallbackError)
+}
+        }
+    }
         },
 
   /**
@@ -3010,7 +3237,7 @@ this.setToCache(key, value)
   /**
    * 更新词典
    * 支持动态更新词典内容
-   * @param newDictionary - 新的词典条目
+   * @param {Object} newDictionary - 新的词典条目
    */
   updateDictionary(newDictionary) {
     try {
@@ -3034,7 +3261,11 @@ this.setToCache(key, value)
 
 /**
  * 页面监控模块
- * 负责监听GitHub页面的变化，检测DOM更新并触发翻译
+ * @file pageMonitor.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 负责监听GitHub页面的变化，检测DOM更新并触发翻译
  */
 /**
  * 页面监控对象
@@ -3048,12 +3279,14 @@ const pageMonitor = {
     
     /**
      * 最后翻译的路径
-     * @type */
+     * @type {string}
+     */
     lastPath: '',
     
     /**
      * 最后翻译的时间戳
-     * @type */
+     * @type {number}
+     */
     lastTranslateTimestamp: 0,
     
     /**
@@ -3064,25 +3297,163 @@ const pageMonitor = {
     
     /**
      * 存储定时检查的interval ID
-     * @type */
+     * @type {number}
+     */
     fallbackIntervalId: null,
+    
+    /**
+     * 页面卸载标记
+     * @type {boolean}
+     */
+    isPageUnloading: false,
+    
+    /**
+     * 节点检查缓存，用于性能优化
+     * @type {Map<Node, boolean>}
+     */
+    nodeCheckCache: new Map(),
+    
+    /**
+     * 缓存清理间隔（毫秒）
+     * @type {number}
+     */
+    cacheCleanupInterval: 30000, // 30秒清理一次
+    
+    /**
+     * 上次缓存清理时间
+     * @type {number}
+     */
+    lastCacheCleanupTime: Date.now(),
+    
+    /**
+     * 缓存清理定时器ID
+     * @type {number}
+     */
+    cacheCleanupTimerId: null,
     
     /**
      * 初始化监控
      */
     init() {
         try {
+            // 设置页面卸载监听，确保资源清理
+            this.setupPageUnloadHandler()
+
             // 设置路径变化监听
             this.setupPathListener()
 
             // 设置DOM变化监听
             this.setupDomObserver()
 
+            // 启动缓存清理定时器
+            this.startCacheCleanupTimer()
+
             // 页面监控已初始化
         } catch (error) {
             console.error('[GitHub 中文翻译] 页面监控初始化失败:', error)
 }
         },
+    
+    /**
+     * 设置页面卸载处理器
+     */
+    setupPageUnloadHandler() {
+        // 监听页面卸载事件
+        const unloadHandler = () => {
+            this.isPageUnloading = true
+this.cleanup()
+}
+
+        // 监听多种卸载事件以确保兼容性
+        window.addEventListener('beforeunload', unloadHandler)
+window.addEventListener('unload', unloadHandler)
+window.addEventListener('pagehide', unloadHandler)
+
+        // 存储监听器引用以便清理
+        this.eventListeners.push(
+            { target: window, type: 'beforeunload', handler: unloadHandler },
+            { target: window, type: 'unload', handler: unloadHandler },
+            { target: window, type: 'pagehide', handler: unloadHandler }
+        )
+},
+    
+    /**
+     * 启动缓存清理定时器
+     */
+    startCacheCleanupTimer() {
+        // 清理现有定时器
+        this.stopCacheCleanupTimer()
+
+        // 设置新的定时器
+        this.cacheCleanupTimerId = setInterval(() => {
+            if (!this.isPageUnloading) {
+                this.cleanupNodeCheckCache()
+}
+        }, this.cacheCleanupInterval)
+},
+    
+    /**
+     * 停止缓存清理定时器
+     */
+    stopCacheCleanupTimer() {
+        if (this.cacheCleanupTimerId) {
+            clearInterval(this.cacheCleanupTimerId)
+this.cacheCleanupTimerId = null
+}
+        },
+    
+    /**
+     * 清理节点检查缓存
+     */
+    cleanupNodeCheckCache() {
+        try {
+            // 如果缓存大小超过限制，清理最旧的条目
+            const maxCacheSize = 1000
+if (this.nodeCheckCache.size > maxCacheSize) {
+                // 删除最旧的条目，保留最新的70%
+                const entriesToRemove = Math.floor(this.nodeCheckCache.size * 0.3)
+const keysToRemove = Array.from(this.nodeCheckCache.keys()).slice(0, entriesToRemove)
+
+                keysToRemove.forEach(key => {
+                    this.nodeCheckCache.delete(key)
+})
+
+                if (CONFIG.debugMode) {
+                    console.log(`[GitHub 中文翻译] 清理了${keysToRemove.length}个节点检查缓存条目`)
+}
+        }
+            
+            this.lastCacheCleanupTime = Date.now()
+} catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 清理节点检查缓存失败:', error)
+}
+        }
+    },
+    
+    /**
+     * 完全清理所有资源
+     */
+    cleanup() {
+        try {
+            // 停止监控
+            this.stop()
+
+            // 清理节点检查缓存
+            this.nodeCheckCache.clear()
+
+            // 停止缓存清理定时器
+            this.stopCacheCleanupTimer()
+
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 页面监控资源已完全清理')
+}
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 清理页面监控资源失败:', error)
+}
+        }
+    },
     
     /**
      * 设置路径变化监听
@@ -3127,7 +3498,7 @@ pageMonitor.handlePathChange()
 this.lastPath = currentPath
 
             if (CONFIG.debugMode) {
-                console.log(`[GitHub 中文翻译] 页面路径变化: $`)
+                console.log(`[GitHub 中文翻译] 页面路径变化: ${currentPath}`)
 }
             
             // 延迟执行翻译，等待页面内容加载完成
@@ -3191,7 +3562,7 @@ this.delayedTranslate(0)
     
     /**
      * 延迟执行翻译
-     * @param delay - 延迟毫秒数
+     * @param {number} delay - 延迟毫秒数
      */
     async delayedTranslate() {
         try {
@@ -3240,7 +3611,7 @@ if (CONFIG.debugMode) {
     /**
      * 批处理元素翻译
      * @param {HTMLElement[]} elements - 要翻译的元素数组
-     * @param batchSize - 每批处理的元素数量
+     * @param {number} batchSize - 每批处理的元素数量
      */
     async processElementsInBatches(elements, batchSize) {
         const performanceConfig = {
@@ -3258,7 +3629,7 @@ await translationCore.translate(batch, performanceConfig)
     
     /**
      * 处理翻译错误
-     * @param error - 错误对象
+     * @param {Error} error - 错误对象
      */
     async handleTranslationError(error) {
         this.handleError('翻译过程', error)
@@ -3278,11 +3649,11 @@ if (CONFIG.debugMode) {
     
     /**
      * 统一错误处理
-     * @param operation - 操作名称
-     * @param error - 错误对象
+     * @param {string} operation - 操作名称
+     * @param {Error} error - 错误对象
      */
     handleError(operation, error) {
-        const errorMessage = `[GitHub 中文翻译] $时出错: ${error.message}`
+        const errorMessage = `[GitHub 中文翻译] ${operation}时出错: ${error.message}`
 if (CONFIG.debugMode) {
             console.error(errorMessage, error)
 } else {
@@ -3468,8 +3839,8 @@ this.eventListeners.push({ target: document, type: 'DOMContentLoaded', handler: 
     /**
      * 选择最佳的DOM观察根节点
      * 减少观察的DOM范围，提高性能
-     * @param pageMode - 页面模式
-     * @returns 最佳观察根节点
+     * @param {string} pageMode - 页面模式
+     * @returns {HTMLElement} 最佳观察根节点
      */
     selectOptimalRootNode(pageMode) {
         // 如果没有提供页面模式，则自动检测
@@ -3624,8 +3995,8 @@ if (element && element.textContent.trim().length > 0) {
     /**
      * 获取优化的观察器配置
      * 根据页面模式和复杂度动态调整观察选项
-     * @param pageMode - 页面模式
-     * @returns 优化的MutationObserver配置
+     * @param {string} pageMode - 页面模式
+     * @returns {Object} 优化的MutationObserver配置
      */
     getOptimizedObserverConfig(pageMode) {
         // 如果没有提供页面模式，则自动检测
@@ -3667,7 +4038,7 @@ baseConfig.attributeFilter = CONFIG.performance.importantAttributes
     
     /**
      * 判断是否为复杂页面
-     * @returns 是否为复杂页面
+     * @returns {boolean} 是否为复杂页面
      */
     isComplexPage() {
         const complexPaths = [
@@ -3684,7 +4055,7 @@ baseConfig.attributeFilter = CONFIG.performance.importantAttributes
     /**
      * 检测当前页面模式
      * 复用translationCore中的页面模式检测逻辑
-     * @returns 当前页面模式
+     * @returns {string} 当前页面模式
      */
     detectPageMode() {
         return translationCore.detectPageMode()
@@ -3692,8 +4063,8 @@ baseConfig.attributeFilter = CONFIG.performance.importantAttributes
     
     /**
      * 根据页面模式获取快速路径阈值
-     * @param pageMode - 页面模式
-     * @returns 快速路径阈值
+     * @param {string} pageMode - 页面模式
+     * @returns {number} 快速路径阈值
      */
     getQuickPathThresholdByPageMode(pageMode) {
         const thresholds = {
@@ -3709,8 +4080,8 @@ return thresholds[pageMode] || 3
     
     /**
      * 获取页面模式特定的阈值
-     * @param pageMode - 页面模式
-     * @returns 页面模式特定的阈值
+     * @param {string} pageMode - 页面模式
+     * @returns {number} 页面模式特定的阈值
      */
     getModeSpecificThreshold(pageMode) {
         const thresholds = {
@@ -3725,8 +4096,8 @@ return thresholds[pageMode]
     
     /**
      * 根据页面模式获取最小文本长度
-     * @param pageMode - 页面模式
-     * @returns 最小文本长度
+     * @param {string} pageMode - 页面模式
+     * @returns {number} 最小文本长度
      */
     getMinTextLengthByPageMode(pageMode) {
         const lengths = {
@@ -3740,9 +4111,9 @@ return lengths[pageMode] || CONFIG.performance.minTextLengthToTranslate || 3
     
     /**
      * 根据页面模式判断是否应该跳过元素
-     * @param element - 元素
-     * @param pageMode - 页面模式
-     * @returns 是否应该跳过
+     * @param {HTMLElement} element - 元素
+     * @param {string} pageMode - 页面模式
+     * @returns {boolean} 是否应该跳过
      */
     shouldSkipElementByPageMode(element, pageMode) {
         if (!element || !pageMode) return false
@@ -3785,8 +4156,8 @@ default:
      * 智能判断是否需要触发翻译
      * 比简单的变化检测更高效
      * @param {MutationRecord[]} mutations - 变更记录数组
-     * @param pageMode - 当前页面模式
-     * @returns 是否需要触发翻译
+     * @param {string} pageMode - 当前页面模式
+     * @returns {boolean} 是否需要触发翻译
      */
     shouldTriggerTranslation(mutations, pageMode) {
         // 如果没有提供页面模式，则自动检测
@@ -3910,9 +4281,9 @@ return false
     
     /**
      * 判断元素是否为重要元素
-     * @param element - 要检查的元素
+     * @param {HTMLElement} element - 要检查的元素
      * @param {string[]} importantElements - 重要元素选择器数组
-     * @returns 是否为重要元素
+     * @returns {boolean} 是否为重要元素
      */
     isImportantElement(element, importantElements, cache, pageMode) {
         try {
@@ -3975,9 +4346,9 @@ return false
     
     /**
      * 判断是否应该忽略元素的变化
-     * @param node - 要检查的节点
+     * @param {Node} node - 要检查的节点
      * @param {string[]} ignoreElements - 忽略元素选择器数组
-     * @returns 是否应该忽略
+     * @returns {boolean} 是否应该忽略
      */
     shouldIgnoreElement(node, ignoreElements, cache, pageMode) {
         try {
@@ -4047,8 +4418,8 @@ return false
     
     /**
      * 判断是否为内容相关的DOM变化
-     * @param mutation - 变更记录
-     * @returns 是否为内容相关变化
+     * @param {MutationRecord} mutation - 变更记录
+     * @returns {boolean} 是否为内容相关变化
      */
     isContentRelatedMutation(mutation, pageMode) {
         try {
@@ -4132,9 +4503,9 @@ return false
     
     /**
      * 判断节点是否需要翻译
-     * @param node - 要检查的节点
-     * @param pageMode - 当前页面模式
-     * @returns 是否需要翻译
+     * @param {Node} node - 要检查的节点
+     * @param {string} pageMode - 当前页面模式
+     * @returns {boolean} 是否需要翻译
      */
     isTranslatableNode(node) {
         // 不再需要页面模式参数，简化函数逻辑
@@ -4183,8 +4554,8 @@ const hasContent = node.textContent.trim().length > 0
     
     /**
      * 检查元素是否包含可翻译的子元素
-     * @param element - 要检查的元素
-     * @returns 是否包含可翻译的子元素
+     * @param {HTMLElement} element - 要检查的元素
+     * @returns {boolean} 是否包含可翻译的子元素
      */
     hasTranslatableChildren(element) {
         // 快速检查：只查看前10个子元素
@@ -4223,8 +4594,8 @@ return ['p', 'span', 'a', 'button', 'label'].includes(tagName) &&
     
     /**
      * 获取页面模式特定的文本变化阈值
-     * @param pageMode - 页面模式
-     * @returns 阈值配置
+     * @param {string} pageMode - 页面模式
+     * @returns {Object} 阈值配置
      */
     getTextChangeThreshold(pageMode) {
         const defaultThresholds = { minLength: 5, lengthDiffThreshold: 3 }
@@ -4250,8 +4621,8 @@ return ['p', 'span', 'a', 'button', 'label'].includes(tagName) &&
      * 检测重要的DOM变化
      * 只在有实际内容变化时触发翻译
      * @param {MutationRecord[]} mutations - 变更记录数组
-     * @param pageMode - 页面模式
-     * @returns 是否有需要触发翻译的重要变化
+     * @param {string} pageMode - 页面模式
+     * @returns {boolean} 是否有需要触发翻译的重要变化
      */
     detectImportantChanges(mutations, pageMode) {
         try {
@@ -4411,6 +4782,12 @@ this.observer = null
             // 清理所有事件监听器
             this.cleanupEventListeners()
 
+            // 停止缓存清理定时器
+            this.stopCacheCleanupTimer()
+
+            // 清理所有缓存，防止内存泄漏
+            this.clearAllCaches()
+
             // 重置状态
             this.lastPath = ''
 this.lastTranslateTimestamp = 0
@@ -4421,6 +4798,46 @@ this.lastTranslateTimestamp = 0
         } catch (error) {
             if (CONFIG.debugMode) {
                 console.error('[GitHub 中文翻译] 停止监控时出错:', error)
+}
+        }
+    },
+    
+    /**
+     * 清理所有缓存
+     */
+    clearAllCaches() {
+        try {
+            // 清理节点检查缓存
+            if (this.nodeCheckCache) {
+                this.nodeCheckCache = new WeakMap()
+}
+            
+            // 清理元素缓存
+            if (this.elementCache) {
+                this.elementCache = new WeakMap()
+}
+            
+            // 清理页面模式缓存
+            if (this.pageModeCache) {
+                this.pageModeCache.clear()
+}
+            
+            // 清理文本变化阈值缓存
+            if (this.textThresholdCache) {
+                this.textThresholdCache.clear()
+}
+            
+            // 清理重要元素缓存
+            if (this.importantElementsCache) {
+                this.importantElementsCache.clear()
+}
+            
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 所有缓存已清理')
+}
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 清理缓存时出错:', error)
 }
         }
     },
@@ -4499,7 +4916,11 @@ this.init()
 
 /**
  * 开发工具模块
- * 包含字符串提取、自动更新和词典处理等开发工具
+ * @file tools.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含字符串提取、自动更新和词典处理等开发工具
  */
 // 删除未使用的CONFIG导入
 /**
@@ -4508,7 +4929,7 @@ this.init()
 const stringExtractor = {
     /**
      * 收集页面上的字符串
-     * @param showInConsole - 是否在控制台显示结果
+     * @param {boolean} showInConsole - 是否在控制台显示结果
      * @returns {Set<string>} 收集到的字符串集合
      */
     collectStrings(showInConsole = true) {
@@ -4525,7 +4946,7 @@ console.log('收集到的字符串:', strings)
     
     /**
      * 查找未翻译的字符串
-     * @param showInConsole - 是否在控制台显示结果
+     * @param {boolean} showInConsole - 是否在控制台显示结果
      * @returns {Set<string>} 未翻译的字符串集合
      */
     findUntranslatedStrings(showInConsole = true) {
@@ -4573,7 +4994,7 @@ return new Set(Array.from(untranslated).filter(str => !str.startsWith('待翻译
     
     /**
      * 生成更新报告
-     * @returns 更新报告对象
+     * @returns {Object} 更新报告对象
      */
     generateUpdateReport() {
         const stringsToAdd = this.findStringsToAdd()
@@ -4607,7 +5028,7 @@ class DictionaryProcessor {
     
     /**
      * 合并词典
-     * @returns 合并后的词典
+     * @returns {Object} 合并后的词典
      */
     mergeDictionaries() {
         const merged = {}
@@ -4619,7 +5040,7 @@ for (const module in translationModule) {
     
     /**
      * 验证词典
-     * @returns 词典验证结果
+     * @returns {Object} 词典验证结果
      */
     validateDictionary() {
         const dictionary = this.mergeDictionaries()
@@ -4646,7 +5067,7 @@ console.log(`📈 完成率: ${stats.completionRate}%`)
 
 /**
  * 加载工具类
- * @returns 包含工具类的对象
+ * @returns {Object} 包含工具类的对象
  */
 function loadTools() {
     return { 
@@ -4658,10 +5079,45 @@ function loadTools() {
 
 /**
  * GitHub 中文翻译主入口文件
- * 整合所有模块并初始化脚本
+ * @file main.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 整合所有模块并初始化脚本
  */
 
 // 导入核心模块
+/**
+ * 清理资源
+ * 在页面卸载时调用，防止内存泄漏
+ */
+function cleanup() {
+    try {
+        // 停止页面监控
+        if (pageMonitor && typeof pageMonitor.stop === 'function') {
+            pageMonitor.stop()
+}
+        
+        // 清理翻译缓存
+        if (translationCore && typeof translationCore.clearCache === 'function') {
+            translationCore.clearCache()
+}
+        
+        // 清理配置界面
+        if (configUI && typeof configUI.cleanup === 'function') {
+            configUI.cleanup()
+}
+        
+        if (CONFIG.debugMode) {
+            console.log('[GitHub 中文翻译] 资源清理完成')
+}
+        } catch (error) {
+        if (CONFIG.debugMode) {
+            console.error('[GitHub 中文翻译] 资源清理失败:', error)
+}
+        }
+}
+
 /**
  * 初始化脚本
  */
@@ -4675,13 +5131,28 @@ async function init() {
 }
         
         // 初始化翻译核心功能
-        translationCore.translate()
+        translationCore.init()
+translationCore.translate()
 
         // 初始化页面监控
         pageMonitor.init()
 
         // 初始化配置界面
         configUI.init()
+
+        // 添加页面卸载事件监听器
+        window.addEventListener('beforeunload', cleanup)
+window.addEventListener('unload', cleanup)
+
+        // 添加页面隐藏事件监听器（当用户切换标签页时）
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                // 页面隐藏时可以清理一些缓存
+                if (translationCore && typeof translationCore.cleanCache === 'function') {
+                    translationCore.cleanCache()
+}
+        }
+        })
 } catch (error) {
         console.error('[GitHub 中文翻译] 脚本初始化失败:', error)
 }
@@ -4771,7 +5242,14 @@ startScript();, '{', '}', '(', ')', '[', ']', '|', '\'];
         }
         return params;
     }
-        };) {
+        }; func - 要节流的函数
+     * @param {number} limit - 限制时间（毫秒）
+     * @param {Object} options - 配置选项
+     * @param {boolean} options.leading - 是否在开始时执行（默认true）
+     * @param {boolean} options.trailing - 是否在结束后执行（默认true）
+     * @returns {Function} 节流后的函数
+     */
+    throttle(func, limit, options = {}) {
         const { leading = true, trailing = true } = options
 let inThrottle, lastArgs, lastThis, result, timerId
 
@@ -4809,11 +5287,11 @@ timerId = setTimeout(() => later(lastThis, lastArgs), limit)
     /**
      * 防抖函数，延迟执行函数直到停止触发一段时间
      * 支持返回Promise
-     * @param func - 要防抖的函数
-     * @param delay - 延迟时间（毫秒）
-     * @param options - 配置选项
-     * @param options.leading - 是否在开始时执行一次（默认false）
-     * @returns 防抖后的函数
+     * @param {Function} func - 要防抖的函数
+     * @param {number} delay - 延迟时间（毫秒）
+     * @param {Object} options - 配置选项
+     * @param {boolean} options.leading - 是否在开始时执行一次（默认false）
+     * @returns {Function} 防抖后的函数
      */
     debounce(func, delay, options = {}) {
         const { leading = false } = options
@@ -4841,7 +5319,7 @@ timeout = setTimeout(() => later(context, args), delay)
     
     /**
      * 延迟函数，返回Promise的setTimeout
-     * @param ms - 延迟时间（毫秒）
+     * @param {number} ms - 延迟时间（毫秒）
      * @returns {Promise<void>}
      */
     delay(ms) {
@@ -4850,8 +5328,8 @@ timeout = setTimeout(() => later(context, args), delay)
 
     /**
      * 转义正则表达式中的特殊字符
-     * @param string - 要转义的字符串
-     * @returns 转义后的字符串
+     * @param {string} string - 要转义的字符串
+     * @returns {string} 转义后的字符串
      */
     escapeRegExp(string) {
         // 转义所有正则表达式特殊字符，包括/字符
@@ -4860,7 +5338,7 @@ timeout = setTimeout(() => later(context, args), delay)
     
     /**
      * 安全地解析JSON字符串
-     * @param jsonString - JSON字符串
+     * @param {string} jsonString - JSON字符串
      * @param {*} defaultValue - 解析失败时的默认值
      * @returns {*} 解析结果或默认值
      */
@@ -4876,7 +5354,7 @@ return defaultValue
     /**
      * 检查正则表达式是否存在潜在的ReDoS风险
      * @param {string|RegExp} pattern - 正则表达式模式
-     * @returns - 是否安全
+     * @returns {boolean} - 是否安全
      */
     isSafeRegex(pattern) {
         if (typeof pattern === 'string') {
@@ -4911,8 +5389,8 @@ break
 
     /**
      * 安全地创建正则表达式，防止ReDoS攻击
-     * @param pattern - 正则表达式模式
-     * @param flags - 正则表达式标志
+     * @param {string} pattern - 正则表达式模式
+     * @param {string} flags - 正则表达式标志
      * @returns {RegExp|null} - 安全的正则表达式或null
      */
     safeRegExp(pattern, flags = '') {
@@ -4932,8 +5410,8 @@ return null
     /**
      * 安全地序列化对象为JSON字符串
      * @param {*} obj - 要序列化的对象
-     * @param defaultValue - 序列化失败时的默认值
-     * @returns JSON字符串或默认值
+     * @param {string} defaultValue - 序列化失败时的默认值
+     * @returns {string} JSON字符串或默认值
      */
     safeJSONStringify(obj, defaultValue = '{}') {
         try {
@@ -4946,7 +5424,7 @@ return defaultValue
     
     /**
      * 获取当前页面路径
-     * @returns 当前页面的路径
+     * @returns {string} 当前页面的路径
      */
     getCurrentPath() {
         return window.location.pathname
@@ -4954,7 +5432,7 @@ return defaultValue
     
     /**
      * 获取完整的当前页面URL（包含查询参数）
-     * @returns 完整的URL
+     * @returns {string} 完整的URL
      */
     getCurrentUrl() {
         return window.location.href
@@ -4962,8 +5440,8 @@ return defaultValue
     
     /**
      * 判断当前页面是否匹配某个路径模式
-     * @param pattern - 路径模式
-     * @returns 是否匹配
+     * @param {RegExp} pattern - 路径模式
+     * @returns {boolean} 是否匹配
      */
     isCurrentPathMatch(pattern) {
         return pattern.test(this.getCurrentPath())
@@ -4971,19 +5449,19 @@ return defaultValue
     
     /**
      * 从URL获取查询参数
-     * @param name - 参数名
-     * @param url - URL字符串，默认使用当前页面URL
+     * @param {string} name - 参数名
+     * @param {string} url - URL字符串，默认使用当前页面URL
      * @returns {string|null} 参数值或null
      */
     getQueryParam(name, url = window.location.href) {
-        const match = RegExp(`[?&]$=([^&]*)`).exec(url)
+        const match = RegExp(`[?&]${name}=([^&]*)`).exec(url)
 return match && decodeURIComponent(match[1].replace(/\+/g, ' '))
 },
     
     /**
      * 获取URL中的所有查询参数
-     * @param url - URL字符串，默认使用当前页面URL
-     * @returns 查询参数对象
+     * @param {string} url - URL字符串，默认使用当前页面URL
+     * @returns {Object} 查询参数对象
      */
     getAllQueryParams(url = window.location.href) {
         const params = {}
@@ -4996,10 +5474,10 @@ for (const [key, value] of searchParams) {
     
     /**
      * 收集DOM树中的所有文本节点内容
-     * @param element - 要收集文本的起始元素
+     * @param {HTMLElement} element - 要收集文本的起始元素
      * @param {Set<string>} resultSet - 用于存储结果的Set集合
-     * @param options - 配置选项
-     * @param options.maxLength - 最大文本长度（默认200）
+     * @param {Object} options - 配置选项
+     * @param {number} options.maxLength - 最大文本长度（默认200）
      * @param {string[]} options.skipTags - 跳过的标签名数组
      */
     collectTextNodes(element, resultSet, options = {}) {
@@ -5047,7 +5525,7 @@ for (const node of childNodes) {
     
     /**
      * 安全地访问对象属性，避免嵌套属性访问出错
-     * @param obj - 目标对象
+     * @param {Object} obj - 目标对象
      * @param {string|string[]} path - 属性路径，如'a.b.c'或['a','b','c']
      * @param {*} defaultValue - 获取失败时的默认值
      * @returns {*} 属性值或默认值
@@ -5097,9 +5575,9 @@ return obj
     
     /**
      * 安全地执行函数，捕获可能的异常
-     * @param fn - 要执行的函数
+     * @param {Function} fn - 要执行的函数
      * @param {*} defaultValue - 执行失败时的默认返回值
-     * @param context - 函数执行上下文
+     * @param {Object} context - 函数执行上下文
      * @param {...*} args - 函数参数
      * @returns {*} 函数返回值或默认值
      */
@@ -5118,7 +5596,11 @@ return defaultValue
 
 /**
  * GitHub 中文翻译配置文件
- * 包含脚本所有可配置项
+ * @file config.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含脚本所有可配置项
  */
 
 // 导入版本常量（从单一版本源）
@@ -5127,7 +5609,7 @@ const greasemonkeyInfo = typeof window !== 'undefined' ? window.GM_info ?? {} : 
 
 /**
  * 从用户脚本头部注释中提取版本号
- * @returns 版本号
+ * @returns {string} 版本号
  */
 function getVersionFromComment() {
   try {
@@ -5260,7 +5742,11 @@ const CONFIG = {
 
 /**
  * 版本更新检查模块
- * 负责检查和处理脚本更新
+ * @file versionChecker.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 负责检查和处理脚本更新
  */
 /**
  * 版本检查器对象
@@ -5307,7 +5793,7 @@ const intervalMs = (CONFIG.updateCheck.intervalHours || 24) * 60 * 60 * 1000
 }
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 当前版本: ${CONFIG.version}, 远程版本: $`)
+        console.log(`[GitHub 中文翻译] 当前版本: ${CONFIG.version}, 远程版本: ${remoteVersion}`)
 }
 
       // 比较版本号
@@ -5349,9 +5835,9 @@ if (CONFIG.debugMode) {
 
   /**
    * 带重试机制的网络请求
-   * @param url - 请求URL
-   * @param maxRetries - 最大重试次数
-   * @param retryDelay - 重试间隔（毫秒）
+   * @param {string} url - 请求URL
+   * @param {number} maxRetries - 最大重试次数
+   * @param {number} retryDelay - 重试间隔（毫秒）
    * @returns {Promise<string>} 响应文本
    */
   async fetchWithRetry(url, maxRetries = 2, retryDelay = 1000) {
@@ -5360,7 +5846,7 @@ if (CONFIG.debugMode) {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         if (CONFIG.debugMode && attempt > 0) {
-          console.log(`[GitHub 中文翻译] 重试更新检查 ($/$)...`)
+          console.log(`[GitHub 中文翻译] 重试更新检查 (${attempt}/${maxRetries})...`)
 }
 
         // 自定义超时控制
@@ -5403,7 +5889,7 @@ const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
   /**
    * 从脚本内容中提取版本号
    * 支持多种版本号格式
-   * @param content - 脚本内容
+   * @param {string} content - 脚本内容
    * @returns {string|null} 提取的版本号或null
    */
   extractVersion(content) {
@@ -5430,9 +5916,9 @@ if (match && match[1]) {
 
   /**
    * 比较版本号，判断是否有新版本
-   * @param newVersion - 新版本号
-   * @param currentVersion - 当前版本号
-   * @returns 是否有新版本
+   * @param {string} newVersion - 新版本号
+   * @param {string} currentVersion - 当前版本号
+   * @returns {boolean} 是否有新版本
    */
   isNewerVersion(newVersion, currentVersion) {
     // 将版本号转换为数组进行比较
@@ -5458,7 +5944,7 @@ const currentPart = currentParts[i] || 0
   /**
    * 显示更新通知
    * 使用安全的DOM操作而不是innerHTML
-   * @param newVersion - 新版本号
+   * @param {string} newVersion - 新版本号
    */
   showUpdateNotification(newVersion) {
     const notificationKey = 'githubZhUpdateNotificationDismissed'
@@ -5471,7 +5957,7 @@ const notificationVersionKey = 'githubZhLastNotifiedVersion'
     if (localStorage.getItem(notificationKey) === 'dismissed' ||
       lastNotifiedVersion === newVersion) {
       if (CONFIG.debugMode && lastNotifiedVersion === newVersion) {
-        console.log(`[GitHub 中文翻译] 已经通知过版本 $的更新`)
+        console.log(`[GitHub 中文翻译] 已经通知过版本 ${newVersion} 的更新`)
 }
       return
 }
@@ -5525,7 +6011,7 @@ contentContainer.appendChild(titleElement)
       // 创建消息文本 - 安全地设置文本内容
       const messageElement = document.createElement('p')
 messageElement.className = 'text-sm text-blue-700 mt-1'
-messageElement.textContent = `发现新版本 $，建议更新以获得更好的翻译体验。`
+messageElement.textContent = `发现新版本 ${newVersion}，建议更新以获得更好的翻译体验。`
 contentContainer.appendChild(messageElement)
 
       // 创建按钮容器
@@ -5535,7 +6021,7 @@ contentContainer.appendChild(buttonsContainer)
 
       // 创建更新按钮 - 安全地设置URL
       const updateButton = document.createElement('a')
-updateButton.id = `$-update-btn`
+updateButton.id = `${notificationId}-update-btn`
 updateButton.href = CONFIG.updateCheck.scriptUrl || '#'
 updateButton.target = '_blank'
 updateButton.rel = 'noopener noreferrer'
@@ -5545,7 +6031,7 @@ buttonsContainer.appendChild(updateButton)
 
       // 创建稍后按钮
       const laterButton = document.createElement('button')
-laterButton.id = `$-later-btn`
+laterButton.id = `${notificationId}-later-btn`
 laterButton.className = 'inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors'
 laterButton.textContent = '稍后'
 laterButton.addEventListener('click', () => {
@@ -5555,7 +6041,7 @@ buttonsContainer.appendChild(laterButton)
 
       // 创建不再提醒按钮
       const dismissButton = document.createElement('button')
-dismissButton.id = `$-dismiss-btn`
+dismissButton.id = `${notificationId}-dismiss-btn`
 dismissButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors'
 dismissButton.textContent = '不再提醒'
 dismissButton.addEventListener('click', () => {
@@ -5578,7 +6064,7 @@ buttonsContainer.appendChild(dismissButton)
         }
 
         if (CONFIG.debugMode) {
-          console.log(`[GitHub 中文翻译] 显示更新通知: 版本 $`)
+          console.log(`[GitHub 中文翻译] 显示更新通知: 版本 ${newVersion}`)
 }
         }
     } catch (error) {
@@ -5588,8 +6074,8 @@ buttonsContainer.appendChild(dismissButton)
 
   /**
    * 隐藏通知元素（带动画效果）
-   * @param notification - 通知元素
-   * @param permanently - 是否永久隐藏
+   * @param {HTMLElement} notification - 通知元素
+   * @param {boolean} permanently - 是否永久隐藏
    */
   hideNotification(notification, permanently = false) {
     try {
@@ -5617,7 +6103,7 @@ if (CONFIG.debugMode) {
 
   /**
    * 记录版本历史
-   * @param version - 版本号
+   * @param {string} version - 版本号
    */
   recordVersionHistory(version) {
     try {
@@ -5648,7 +6134,7 @@ let history = utils.safeJSONParse(localStorage.getItem(historyKey), [])
 
   /**
    * 更新本地存储中的版本号
-   * @param newVersion - 新版本号
+   * @param {string} newVersion - 新版本号
    */
   updateVersionInStorage(newVersion) {
     try {
@@ -5661,7 +6147,7 @@ let history = utils.safeJSONParse(localStorage.getItem(historyKey), [])
       localStorage.setItem('githubZhCachedVersion', utils.safeJSONStringify(cacheData))
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 已缓存新版本号: $(缓存时间: ${new Date().toLocaleString()})`)
+        console.log(`[GitHub 中文翻译] 已缓存新版本号: ${newVersion} (缓存时间: ${new Date().toLocaleString()})`)
 }
 
       return true
@@ -5711,7 +6197,11 @@ localStorage.removeItem('githubZhLastNotifiedVersion')
 
 /**
  * 翻译词典合并模块
- * 整合所有页面的翻译词典
+ * @file index.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 整合所有页面的翻译词典
  */
 /**
  * 翻译词典对象，包含所有需要翻译的字符串
@@ -5725,7 +6215,7 @@ const translationModule = {
 
 /**
  * 合并所有词典为一个完整的词典对象
- * @returns 合并后的词典
+ * @returns {Object} 合并后的词典
  */
 function mergeAllDictionaries() {
     const merged = {}
@@ -5737,7 +6227,11 @@ for (const module in translationModule) {
 
 /**
  * 通用翻译词典
- * 包含所有页面共用的翻译字符串
+ * @file common.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含所有页面共用的翻译字符串
  */
 const commonDictionary = {
   "common": {
@@ -5753,6 +6247,11 @@ const commonDictionary = {
 
 /**
  * Codespaces 页面翻译词典
+ * @file codespaces.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含 GitHub Codespaces 页面的翻译词典
  */
 const codespacesDictionary = {
     "Skip to content": "待翻译: Skip to content",
@@ -5779,6 +6278,11 @@ const codespacesDictionary = {
 
 /**
  * Explore 页面翻译词典
+ * @file explore.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含 GitHub Explore 页面的翻译词典
  */
 const exploreDictionary = {
   "Navigation Menu": "导航菜单",
@@ -6040,7 +6544,11 @@ Appearance settings": "登录
 
 /**
  * 翻译核心模块
- * 负责页面内容的实际翻译工作
+ * @file translationCore.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 负责页面内容的实际翻译工作
  */
 /**
  * Trie树数据结构，用于高效的字符串匹配
@@ -6063,8 +6571,8 @@ this.size = 0
 
     /**
      * 向Trie树中插入一个单词及其翻译
-     * @param word - 要插入的单词
-     * @param value - 翻译结果
+     * @param {string} word - 要插入的单词
+     * @param {string} value - 翻译结果
      */
     insert(word, value) {
         if (!word || typeof word !== 'string' || word.length === 0) {
@@ -6086,8 +6594,8 @@ this.size++
 
     /**
      * 在Trie树中查找所有匹配的单词
-     * @param text - 要查找的文本
-     * @returns 匹配结果数组
+     * @param {string} text - 要查找的文本
+     * @returns {Array} 匹配结果数组
      */
     findAllMatches(text) {
         if (!text || typeof text !== 'string' || text.length === 0) {
@@ -6135,7 +6643,7 @@ this.size = 0
 
     /**
      * 获取Trie树的大小
-     * @returns Trie树中的单词数量
+     * @returns {number} Trie树中的单词数量
      */
     getSize() {
         return this.size
@@ -6148,15 +6656,16 @@ this.size = 0
 const translationCore = {
   /**
    * 合并后的完整词典
-   * @type */
+   * @type {Object}
+   */
   dictionary: {},
 
   /**
    * 翻译缓存项结构
-   * @typedef CacheItem
-   * @property value - 缓存的值
-   * @property timestamp - 最后访问时间戳
-   * @property accessCount - 访问次数
+   * @typedef {Object} CacheItem
+   * @property {string} value - 缓存的值
+   * @property {number} timestamp - 最后访问时间戳
+   * @property {number} accessCount - 访问次数
    */
 
   /**
@@ -6180,12 +6689,14 @@ const translationCore = {
 
   /**
    * Trie树数据结构，用于高效的部分匹配
-   * @type */
+   * @type {Trie}
+   */
   dictionaryTrie: new Trie(),
 
   /**
    * 正则表达式缓存，避免重复创建
-   * @type */
+   * @type {Map}
+   */
   regexCache: new Map(),
 
   /**
@@ -6213,8 +6724,21 @@ const translationCore = {
 
   /**
    * 当前页面模式
-   * @type */
+   * @type {string}
+   */
   currentPageMode: null,
+
+  /**
+   * 页面卸载状态标记
+   * @type {boolean}
+   */
+  isPageUnloading: false,
+
+  /**
+   * 缓存清理定时器ID
+   * @type {number|null}
+   */
+  cacheCleanupTimer: null,
 
   /**
    * 页面模式配置，定义不同页面模式的特定翻译策略
@@ -6267,8 +6791,98 @@ const translationCore = {
         },
 
   /**
-   * 初始化词典
+   * 初始化翻译核心
    */
+  init() {
+    try {
+      // 初始化词典
+      this.initDictionary()
+
+      // 设置页面卸载处理
+      this.setupPageUnloadHandler()
+
+      // 启动缓存清理定时器
+      this.startCacheCleanupTimer()
+
+      // 预热缓存
+      this.warmUpCache()
+
+      if (CONFIG.debugMode) {
+        console.log('[GitHub 中文翻译] 翻译核心初始化完成')
+}
+        } catch (error) {
+      ErrorHandler.handleError('翻译核心初始化', error, ErrorHandler.ERROR_TYPES.INITIALIZATION)
+}
+        },
+
+  /**
+   * 设置页面卸载处理器
+   */
+  setupPageUnloadHandler() {
+    // 监听页面卸载事件
+    const unloadHandler = () => {
+      this.isPageUnloading = true
+this.cleanup()
+}
+
+    // 监听多种卸载事件以确保兼容性
+    window.addEventListener('beforeunload', unloadHandler)
+window.addEventListener('unload', unloadHandler)
+window.addEventListener('pagehide', unloadHandler)
+},
+
+  /**
+   * 启动缓存清理定时器
+   */
+  startCacheCleanupTimer() {
+    // 清除现有定时器
+    this.stopCacheCleanupTimer()
+
+    // 设置新的定时器，每2分钟清理一次缓存
+    this.cacheCleanupTimer = setInterval(() => {
+      // 如果页面正在卸载，停止清理
+      if (this.isPageUnloading) {
+        this.stopCacheCleanupTimer()
+return
+}
+      
+      this.cleanCache()
+}, 120000); // 2分钟
+  },
+
+  /**
+   * 停止缓存清理定时器
+   */
+  stopCacheCleanupTimer() {
+    if (this.cacheCleanupTimer) {
+      clearInterval(this.cacheCleanupTimer)
+this.cacheCleanupTimer = null
+}
+        },
+
+  /**
+   * 清理资源
+   */
+  cleanup() {
+    try {
+      // 停止缓存清理定时器
+      this.stopCacheCleanupTimer()
+
+      // 清理所有缓存
+      this.clearCache()
+
+      // 清理正则表达式缓存
+      this.regexCache.clear()
+
+      if (CONFIG.debugMode) {
+        console.log('[GitHub 中文翻译] 翻译核心资源清理完成')
+}
+        } catch (error) {
+      if (CONFIG.debugMode) {
+        console.error('[GitHub 中文翻译] 翻译核心资源清理失败:', error)
+}
+        }
+  },
   initDictionary() {
     try {
       if (CONFIG.debugMode) {
@@ -6315,7 +6929,7 @@ this.regexCache.clear()
 
   /**
    * 检测当前页面模式
-   * @returns 当前页面模式
+   * @returns {string} 当前页面模式
    */
   detectPageMode() {
     try {
@@ -6354,7 +6968,7 @@ return 'default'
 
   /**
    * 获取当前页面模式的配置
-   * @returns 页面模式配置
+   * @returns {Object} 页面模式配置
    */
   getCurrentPageModeConfig() {
     const mode = this.currentPageMode || this.detectPageMode()
@@ -6378,7 +6992,7 @@ return this.pageModeConfig[mode] || this.pageModeConfig.default
 const modeConfig = this.getCurrentPageModeConfig()
 
     if (CONFIG.debugMode) {
-      console.log(`[GitHub 中文翻译] 当前页面模式: $`, modeConfig)
+      console.log(`[GitHub 中文翻译] 当前页面模式: ${pageMode}`, modeConfig)
 }
 
     // 重置性能统计数据
@@ -6503,7 +7117,7 @@ reject(recoverError)
   logPerformanceData() {
     if (CONFIG.debugMode && CONFIG.performance.logTiming) {
       const duration = Date.now() - this.performanceData.translateStartTime
-console.log(`[GitHub 中文翻译] 性能数据 - 总耗时: $ms`)
+console.log(`[GitHub 中文翻译] 性能数据 - 总耗时: ${duration}ms`)
 console.log(`  元素处理: ${this.performanceData.elementsProcessed}`)
 console.log(`  文本翻译: ${this.performanceData.textsTranslated}`)
 console.log(`  缓存命中: ${this.performanceData.cacheHits}`)
@@ -6521,8 +7135,8 @@ console.log(`  错误次数: ${this.performanceData.errorCount}`)
 
   /**
    * 记录单个性能事件
-   * @param eventType - 事件类型
-   * @param data - 事件数据
+   * @param {string} eventType - 事件类型
+   * @param {object} data - 事件数据
    */
   recordPerformanceEvent(eventType, data = {}) {
     switch (eventType) {
@@ -6553,7 +7167,7 @@ default:
 
   /**
    * 获取当前性能统计数据
-   * @returns - 性能统计数据
+   * @returns {object} - 性能统计数据
    */
   getPerformanceStats() {
     const stats = { ...this.performanceData }
@@ -6586,7 +7200,7 @@ stats.cacheHitRate = totalCacheRequests > 0
 
   /**
    * 导出性能数据
-   * @returns - JSON格式的性能数据
+   * @returns {string} - JSON格式的性能数据
    */
   exportPerformanceData() {
     const data = {
@@ -6651,7 +7265,7 @@ const batch = validElements.slice(startIndex, endIndex)
           // 性能日志记录
           if (CONFIG.performance.logTiming && (endIndex % (batchSize * 5) === 0 || endIndex === validElements.length)) {
             const progress = Math.round((endIndex / validElements.length) * 100)
-console.log(`[GitHub 中文翻译] 翻译进度: $%, 已处理: $/${validElements.length} 元素`)
+console.log(`[GitHub 中文翻译] 翻译进度: ${progress}%, 已处理: ${endIndex}/${validElements.length} 元素`)
 }
 
           if (endIndex < validElements.length) {
@@ -6707,7 +7321,7 @@ if (elements && elements.length > 0) {
         })
 
             if (CONFIG.debugMode) {
-              console.log(`[GitHub 中文翻译] 找到关键元素: $, 数量: ${elements.length}`)
+              console.log(`[GitHub 中文翻译] 找到关键元素: ${selector}, 数量: ${elements.length}`)
 }
         }
         } catch (err) {
@@ -6738,7 +7352,7 @@ ErrorHandler.handleError('关键元素翻译', err, ErrorHandler.ERROR_TYPES.DOM
 
       // 记录统计信息
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: $, 失败: $`)
+        console.log(`[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: ${processedElements}, 失败: ${failedElements}`)
 }
 
       resolve()
@@ -6768,7 +7382,7 @@ Array.from(allElements).forEach(element => {
 }
         })
 if (CONFIG.debugMode && CONFIG.performance.logTiming) {
-          console.log(`[GitHub 中文翻译] 合并查询选择器: $, 结果数量: ${allElements.length}`)
+          console.log(`[GitHub 中文翻译] 合并查询选择器: ${combinedSelector}, 结果数量: ${allElements.length}`)
 }
         return Array.from(uniqueElements)
 } catch (error) {
@@ -6791,7 +7405,7 @@ Array.from(matchedElements).forEach(element => {
         })
 } catch (error) {
         if (CONFIG.debugMode) {
-          console.warn(`[GitHub 中文翻译] 选择器 "$" 解析失败:`, error)
+          console.warn(`[GitHub 中文翻译] 选择器 "${selector}" 解析失败:`, error)
 }
         }
     })
@@ -6803,8 +7417,8 @@ Array.from(matchedElements).forEach(element => {
   /**
    * 判断元素是否应该被翻译
    * 优化版：增加更多过滤条件和快速路径
-   * @param element - 要检查的元素
-   * @returns 是否应该翻译
+   * @param {HTMLElement} element - 要检查的元素
+   * @returns {boolean} 是否应该翻译
    */
   shouldTranslateElement(element) {
     // 快速路径：无效元素检查
@@ -7093,8 +7707,8 @@ if (textContent.length === 0) {
   /**
  * 翻译单个元素
  * 性能优化：使用更高效的DOM遍历和翻译策略
- * @param element - 要翻译的元素
- * @returns 是否成功翻译了元素
+ * @param {HTMLElement} element - 要翻译的元素
+ * @returns {boolean} 是否成功翻译了元素
  */
 translateElement(element) {
     // 快速检查：避免无效元素
@@ -7252,7 +7866,7 @@ this.performanceData.textsTranslated++
   /**
    * 获取文本的翻译结果
    * 优化版：改进缓存策略、添加更智能的文本处理
-   * @param text - 原始文本
+   * @param {string} text - 原始文本
    * @returns {string|null} 翻译后的文本，如果没有找到翻译则返回null
    */
   getTranslatedText(text) {
@@ -7318,7 +7932,7 @@ const enablePartialMatch = modeConfig.enablePartialMatch !== undefined ?
   /**
    * 执行部分翻译匹配
    * 优化版：使用Trie树进行高效匹配，减少不必要的字典遍历
-   * @param text - 要翻译的文本
+   * @param {string} text - 要翻译的文本
    * @returns {string|null} - 翻译后的文本
    */
   performPartialTranslation(text) {
@@ -7355,7 +7969,7 @@ const enablePartialMatch = modeConfig.enablePartialMatch !== undefined ?
 
       // 尝试将key视为一个完整的单词进行匹配
       // 使用单词边界的正则表达式
-      const wordRegexKey = `word_$`
+      const wordRegexKey = `word_${key}`
 let wordRegex
 
       // 检查正则表达式缓存
@@ -7384,7 +7998,7 @@ if (wordRegex) {
         })
 } else {
         // 如果不是完整单词，也记录匹配项
-        const nonWordRegexKey = `nonword_$`
+        const nonWordRegexKey = `nonword_${key}`
 let nonWordRegex
 
         // 检查正则表达式缓存
@@ -7448,7 +8062,7 @@ hasReplaced = true
 
   /**
    * 实现LRU缓存策略的辅助方法：获取缓存项
-   * @param key - 缓存键
+   * @param {string} key - 缓存键
    * @returns {string|null} 缓存的值，如果不存在返回null
    */
   getFromCache(key) {
@@ -7474,10 +8088,15 @@ return null
 
   /**
    * 实现LRU缓存策略的辅助方法：设置缓存项
-   * @param key - 缓存键
-   * @param value - 缓存值
+   * @param {string} key - 缓存键
+   * @param {string} value - 缓存值
    */
   setToCache(key, value) {
+    // 检查页面是否正在卸载
+    if (this.isPageUnloading) {
+      return
+}
+    
     // 检查缓存大小是否超过限制
     this.checkCacheSizeLimit()
 
@@ -7507,7 +8126,7 @@ return null
 
   /**
    * 执行LRU缓存淘汰
-   * @param maxSize - 最大缓存大小
+   * @param {number} maxSize - 最大缓存大小
    */
   performLRUCacheEviction(maxSize) {
     try {
@@ -7545,7 +8164,7 @@ this.cacheStats.size = this.translationCache.size
 this.performanceData.cacheEvictions += evictedCount
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] LRU缓存淘汰完成，移除了$项，当前缓存大小：${this.translationCache.size}`)
+        console.log(`[GitHub 中文翻译] LRU缓存淘汰完成，移除了${evictedCount}项，当前缓存大小：${this.translationCache.size}`)
 }
         } catch (error) {
       if (CONFIG.debugMode) {
@@ -7620,33 +8239,93 @@ this.cacheStats.size = 0
         },
 
   /**
- * 清除翻译缓存
- */
-clearCache() {
-    // 清除虚拟DOM缓存
-    virtualDomManager.clear()
-this.translationCache.clear()
-
-    // 清除元素缓存
-    this.elementCache = new WeakMap()
-
-    // 重置缓存统计
-    this.cacheStats = {
-      hits: 0,
-      misses: 0,
-      evictions: 0,
-      size: 0
-    }
-
-    // 重置已翻译标记
-    const translatedElements = document.querySelectorAll('[data-github-zh-translated]')
-translatedElements.forEach(element => {
-      element.removeAttribute('data-github-zh-translated')
-})
-
-    if (CONFIG.debugMode) {
-      console.log('[GitHub 中文翻译] 翻译缓存已清除，已移除所有翻译标记')
+   * 清除翻译缓存
+   * 彻底清理所有缓存和内存引用，防止内存泄漏
+   */
+  clearCache() {
+    try {
+      // 清除虚拟DOM缓存
+      if (virtualDomManager && typeof virtualDomManager.clear === 'function') {
+        virtualDomManager.clear()
 }
+      
+      // 清除翻译缓存
+      if (this.translationCache) {
+        this.translationCache.clear()
+}
+      
+      // 清除元素缓存
+      if (this.elementCache) {
+        this.elementCache = new WeakMap()
+}
+      
+      // 清除节点检查缓存
+      if (this.nodeCheckCache) {
+        this.nodeCheckCache = new WeakMap()
+}
+      
+      // 清除页面模式缓存
+      if (this.pageModeCache) {
+        this.pageModeCache.clear()
+}
+      
+      // 清除文本变化阈值缓存
+      if (this.textThresholdCache) {
+        this.textThresholdCache.clear()
+}
+      
+      // 清除重要元素缓存
+      if (this.importantElementsCache) {
+        this.importantElementsCache.clear()
+}
+      
+      // 重置缓存统计
+      this.cacheStats = {
+        hits: 0,
+        misses: 0,
+        evictions: 0,
+        size: 0
+      }
+
+      // 重置性能数据
+      this.resetPerformanceData()
+
+      // 重置已翻译标记
+      try {
+        const translatedElements = document.querySelectorAll('[data-github-zh-translated]')
+translatedElements.forEach(element => {
+          element.removeAttribute('data-github-zh-translated')
+})
+} catch (domError) {
+        if (CONFIG.debugMode) {
+          console.warn('[GitHub 中文翻译] 清除翻译标记时出错:', domError)
+}
+        }
+
+      // 清理其他可能的缓存引用
+      this.lastProcessedElements = []
+this.batchProcessQueue = []
+this.pendingTranslations = new Set()
+
+      if (CONFIG.debugMode) {
+        console.log('[GitHub 中文翻译] 翻译缓存已彻底清除，所有内存引用已清理')
+}
+        } catch (error) {
+      if (CONFIG.debugMode) {
+        console.error('[GitHub 中文翻译] 清除缓存时出错:', error)
+}
+      
+      // 出错时尝试基本清理
+      try {
+        if (this.translationCache) this.translationCache.clear()
+if (this.elementCache) this.elementCache = new WeakMap()
+this.cacheStats = { hits: 0, misses: 0, evictions: 0, size: 0 }
+        } catch (fallbackError) {
+        if (CONFIG.debugMode) {
+          console.error('[GitHub 中文翻译] 基本缓存清理也失败:', fallbackError)
+}
+        }
+    }
         },
 
   /**
@@ -7680,7 +8359,7 @@ this.setToCache(key, value)
   /**
    * 更新词典
    * 支持动态更新词典内容
-   * @param newDictionary - 新的词典条目
+   * @param {Object} newDictionary - 新的词典条目
    */
   updateDictionary(newDictionary) {
     try {
@@ -7704,7 +8383,11 @@ this.setToCache(key, value)
 
 /**
  * 页面监控模块
- * 负责监听GitHub页面的变化，检测DOM更新并触发翻译
+ * @file pageMonitor.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 负责监听GitHub页面的变化，检测DOM更新并触发翻译
  */
 /**
  * 页面监控对象
@@ -7718,12 +8401,14 @@ const pageMonitor = {
     
     /**
      * 最后翻译的路径
-     * @type */
+     * @type {string}
+     */
     lastPath: '',
     
     /**
      * 最后翻译的时间戳
-     * @type */
+     * @type {number}
+     */
     lastTranslateTimestamp: 0,
     
     /**
@@ -7734,25 +8419,163 @@ const pageMonitor = {
     
     /**
      * 存储定时检查的interval ID
-     * @type */
+     * @type {number}
+     */
     fallbackIntervalId: null,
+    
+    /**
+     * 页面卸载标记
+     * @type {boolean}
+     */
+    isPageUnloading: false,
+    
+    /**
+     * 节点检查缓存，用于性能优化
+     * @type {Map<Node, boolean>}
+     */
+    nodeCheckCache: new Map(),
+    
+    /**
+     * 缓存清理间隔（毫秒）
+     * @type {number}
+     */
+    cacheCleanupInterval: 30000, // 30秒清理一次
+    
+    /**
+     * 上次缓存清理时间
+     * @type {number}
+     */
+    lastCacheCleanupTime: Date.now(),
+    
+    /**
+     * 缓存清理定时器ID
+     * @type {number}
+     */
+    cacheCleanupTimerId: null,
     
     /**
      * 初始化监控
      */
     init() {
         try {
+            // 设置页面卸载监听，确保资源清理
+            this.setupPageUnloadHandler()
+
             // 设置路径变化监听
             this.setupPathListener()
 
             // 设置DOM变化监听
             this.setupDomObserver()
 
+            // 启动缓存清理定时器
+            this.startCacheCleanupTimer()
+
             // 页面监控已初始化
         } catch (error) {
             console.error('[GitHub 中文翻译] 页面监控初始化失败:', error)
 }
         },
+    
+    /**
+     * 设置页面卸载处理器
+     */
+    setupPageUnloadHandler() {
+        // 监听页面卸载事件
+        const unloadHandler = () => {
+            this.isPageUnloading = true
+this.cleanup()
+}
+
+        // 监听多种卸载事件以确保兼容性
+        window.addEventListener('beforeunload', unloadHandler)
+window.addEventListener('unload', unloadHandler)
+window.addEventListener('pagehide', unloadHandler)
+
+        // 存储监听器引用以便清理
+        this.eventListeners.push(
+            { target: window, type: 'beforeunload', handler: unloadHandler },
+            { target: window, type: 'unload', handler: unloadHandler },
+            { target: window, type: 'pagehide', handler: unloadHandler }
+        )
+},
+    
+    /**
+     * 启动缓存清理定时器
+     */
+    startCacheCleanupTimer() {
+        // 清理现有定时器
+        this.stopCacheCleanupTimer()
+
+        // 设置新的定时器
+        this.cacheCleanupTimerId = setInterval(() => {
+            if (!this.isPageUnloading) {
+                this.cleanupNodeCheckCache()
+}
+        }, this.cacheCleanupInterval)
+},
+    
+    /**
+     * 停止缓存清理定时器
+     */
+    stopCacheCleanupTimer() {
+        if (this.cacheCleanupTimerId) {
+            clearInterval(this.cacheCleanupTimerId)
+this.cacheCleanupTimerId = null
+}
+        },
+    
+    /**
+     * 清理节点检查缓存
+     */
+    cleanupNodeCheckCache() {
+        try {
+            // 如果缓存大小超过限制，清理最旧的条目
+            const maxCacheSize = 1000
+if (this.nodeCheckCache.size > maxCacheSize) {
+                // 删除最旧的条目，保留最新的70%
+                const entriesToRemove = Math.floor(this.nodeCheckCache.size * 0.3)
+const keysToRemove = Array.from(this.nodeCheckCache.keys()).slice(0, entriesToRemove)
+
+                keysToRemove.forEach(key => {
+                    this.nodeCheckCache.delete(key)
+})
+
+                if (CONFIG.debugMode) {
+                    console.log(`[GitHub 中文翻译] 清理了${keysToRemove.length}个节点检查缓存条目`)
+}
+        }
+            
+            this.lastCacheCleanupTime = Date.now()
+} catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 清理节点检查缓存失败:', error)
+}
+        }
+    },
+    
+    /**
+     * 完全清理所有资源
+     */
+    cleanup() {
+        try {
+            // 停止监控
+            this.stop()
+
+            // 清理节点检查缓存
+            this.nodeCheckCache.clear()
+
+            // 停止缓存清理定时器
+            this.stopCacheCleanupTimer()
+
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 页面监控资源已完全清理')
+}
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 清理页面监控资源失败:', error)
+}
+        }
+    },
     
     /**
      * 设置路径变化监听
@@ -7797,7 +8620,7 @@ pageMonitor.handlePathChange()
 this.lastPath = currentPath
 
             if (CONFIG.debugMode) {
-                console.log(`[GitHub 中文翻译] 页面路径变化: $`)
+                console.log(`[GitHub 中文翻译] 页面路径变化: ${currentPath}`)
 }
             
             // 延迟执行翻译，等待页面内容加载完成
@@ -7861,7 +8684,7 @@ this.delayedTranslate(0)
     
     /**
      * 延迟执行翻译
-     * @param delay - 延迟毫秒数
+     * @param {number} delay - 延迟毫秒数
      */
     async delayedTranslate() {
         try {
@@ -7910,7 +8733,7 @@ if (CONFIG.debugMode) {
     /**
      * 批处理元素翻译
      * @param {HTMLElement[]} elements - 要翻译的元素数组
-     * @param batchSize - 每批处理的元素数量
+     * @param {number} batchSize - 每批处理的元素数量
      */
     async processElementsInBatches(elements, batchSize) {
         const performanceConfig = {
@@ -7928,7 +8751,7 @@ await translationCore.translate(batch, performanceConfig)
     
     /**
      * 处理翻译错误
-     * @param error - 错误对象
+     * @param {Error} error - 错误对象
      */
     async handleTranslationError(error) {
         this.handleError('翻译过程', error)
@@ -7948,11 +8771,11 @@ if (CONFIG.debugMode) {
     
     /**
      * 统一错误处理
-     * @param operation - 操作名称
-     * @param error - 错误对象
+     * @param {string} operation - 操作名称
+     * @param {Error} error - 错误对象
      */
     handleError(operation, error) {
-        const errorMessage = `[GitHub 中文翻译] $时出错: ${error.message}`
+        const errorMessage = `[GitHub 中文翻译] ${operation}时出错: ${error.message}`
 if (CONFIG.debugMode) {
             console.error(errorMessage, error)
 } else {
@@ -8138,8 +8961,8 @@ this.eventListeners.push({ target: document, type: 'DOMContentLoaded', handler: 
     /**
      * 选择最佳的DOM观察根节点
      * 减少观察的DOM范围，提高性能
-     * @param pageMode - 页面模式
-     * @returns 最佳观察根节点
+     * @param {string} pageMode - 页面模式
+     * @returns {HTMLElement} 最佳观察根节点
      */
     selectOptimalRootNode(pageMode) {
         // 如果没有提供页面模式，则自动检测
@@ -8294,8 +9117,8 @@ if (element && element.textContent.trim().length > 0) {
     /**
      * 获取优化的观察器配置
      * 根据页面模式和复杂度动态调整观察选项
-     * @param pageMode - 页面模式
-     * @returns 优化的MutationObserver配置
+     * @param {string} pageMode - 页面模式
+     * @returns {Object} 优化的MutationObserver配置
      */
     getOptimizedObserverConfig(pageMode) {
         // 如果没有提供页面模式，则自动检测
@@ -8337,7 +9160,7 @@ baseConfig.attributeFilter = CONFIG.performance.importantAttributes
     
     /**
      * 判断是否为复杂页面
-     * @returns 是否为复杂页面
+     * @returns {boolean} 是否为复杂页面
      */
     isComplexPage() {
         const complexPaths = [
@@ -8354,7 +9177,7 @@ baseConfig.attributeFilter = CONFIG.performance.importantAttributes
     /**
      * 检测当前页面模式
      * 复用translationCore中的页面模式检测逻辑
-     * @returns 当前页面模式
+     * @returns {string} 当前页面模式
      */
     detectPageMode() {
         return translationCore.detectPageMode()
@@ -8362,8 +9185,8 @@ baseConfig.attributeFilter = CONFIG.performance.importantAttributes
     
     /**
      * 根据页面模式获取快速路径阈值
-     * @param pageMode - 页面模式
-     * @returns 快速路径阈值
+     * @param {string} pageMode - 页面模式
+     * @returns {number} 快速路径阈值
      */
     getQuickPathThresholdByPageMode(pageMode) {
         const thresholds = {
@@ -8379,8 +9202,8 @@ return thresholds[pageMode] || 3
     
     /**
      * 获取页面模式特定的阈值
-     * @param pageMode - 页面模式
-     * @returns 页面模式特定的阈值
+     * @param {string} pageMode - 页面模式
+     * @returns {number} 页面模式特定的阈值
      */
     getModeSpecificThreshold(pageMode) {
         const thresholds = {
@@ -8395,8 +9218,8 @@ return thresholds[pageMode]
     
     /**
      * 根据页面模式获取最小文本长度
-     * @param pageMode - 页面模式
-     * @returns 最小文本长度
+     * @param {string} pageMode - 页面模式
+     * @returns {number} 最小文本长度
      */
     getMinTextLengthByPageMode(pageMode) {
         const lengths = {
@@ -8410,9 +9233,9 @@ return lengths[pageMode] || CONFIG.performance.minTextLengthToTranslate || 3
     
     /**
      * 根据页面模式判断是否应该跳过元素
-     * @param element - 元素
-     * @param pageMode - 页面模式
-     * @returns 是否应该跳过
+     * @param {HTMLElement} element - 元素
+     * @param {string} pageMode - 页面模式
+     * @returns {boolean} 是否应该跳过
      */
     shouldSkipElementByPageMode(element, pageMode) {
         if (!element || !pageMode) return false
@@ -8455,8 +9278,8 @@ default:
      * 智能判断是否需要触发翻译
      * 比简单的变化检测更高效
      * @param {MutationRecord[]} mutations - 变更记录数组
-     * @param pageMode - 当前页面模式
-     * @returns 是否需要触发翻译
+     * @param {string} pageMode - 当前页面模式
+     * @returns {boolean} 是否需要触发翻译
      */
     shouldTriggerTranslation(mutations, pageMode) {
         // 如果没有提供页面模式，则自动检测
@@ -8580,9 +9403,9 @@ return false
     
     /**
      * 判断元素是否为重要元素
-     * @param element - 要检查的元素
+     * @param {HTMLElement} element - 要检查的元素
      * @param {string[]} importantElements - 重要元素选择器数组
-     * @returns 是否为重要元素
+     * @returns {boolean} 是否为重要元素
      */
     isImportantElement(element, importantElements, cache, pageMode) {
         try {
@@ -8645,9 +9468,9 @@ return false
     
     /**
      * 判断是否应该忽略元素的变化
-     * @param node - 要检查的节点
+     * @param {Node} node - 要检查的节点
      * @param {string[]} ignoreElements - 忽略元素选择器数组
-     * @returns 是否应该忽略
+     * @returns {boolean} 是否应该忽略
      */
     shouldIgnoreElement(node, ignoreElements, cache, pageMode) {
         try {
@@ -8717,8 +9540,8 @@ return false
     
     /**
      * 判断是否为内容相关的DOM变化
-     * @param mutation - 变更记录
-     * @returns 是否为内容相关变化
+     * @param {MutationRecord} mutation - 变更记录
+     * @returns {boolean} 是否为内容相关变化
      */
     isContentRelatedMutation(mutation, pageMode) {
         try {
@@ -8802,9 +9625,9 @@ return false
     
     /**
      * 判断节点是否需要翻译
-     * @param node - 要检查的节点
-     * @param pageMode - 当前页面模式
-     * @returns 是否需要翻译
+     * @param {Node} node - 要检查的节点
+     * @param {string} pageMode - 当前页面模式
+     * @returns {boolean} 是否需要翻译
      */
     isTranslatableNode(node) {
         // 不再需要页面模式参数，简化函数逻辑
@@ -8853,8 +9676,8 @@ const hasContent = node.textContent.trim().length > 0
     
     /**
      * 检查元素是否包含可翻译的子元素
-     * @param element - 要检查的元素
-     * @returns 是否包含可翻译的子元素
+     * @param {HTMLElement} element - 要检查的元素
+     * @returns {boolean} 是否包含可翻译的子元素
      */
     hasTranslatableChildren(element) {
         // 快速检查：只查看前10个子元素
@@ -8893,8 +9716,8 @@ return ['p', 'span', 'a', 'button', 'label'].includes(tagName) &&
     
     /**
      * 获取页面模式特定的文本变化阈值
-     * @param pageMode - 页面模式
-     * @returns 阈值配置
+     * @param {string} pageMode - 页面模式
+     * @returns {Object} 阈值配置
      */
     getTextChangeThreshold(pageMode) {
         const defaultThresholds = { minLength: 5, lengthDiffThreshold: 3 }
@@ -8920,8 +9743,8 @@ return ['p', 'span', 'a', 'button', 'label'].includes(tagName) &&
      * 检测重要的DOM变化
      * 只在有实际内容变化时触发翻译
      * @param {MutationRecord[]} mutations - 变更记录数组
-     * @param pageMode - 页面模式
-     * @returns 是否有需要触发翻译的重要变化
+     * @param {string} pageMode - 页面模式
+     * @returns {boolean} 是否有需要触发翻译的重要变化
      */
     detectImportantChanges(mutations, pageMode) {
         try {
@@ -9081,6 +9904,12 @@ this.observer = null
             // 清理所有事件监听器
             this.cleanupEventListeners()
 
+            // 停止缓存清理定时器
+            this.stopCacheCleanupTimer()
+
+            // 清理所有缓存，防止内存泄漏
+            this.clearAllCaches()
+
             // 重置状态
             this.lastPath = ''
 this.lastTranslateTimestamp = 0
@@ -9091,6 +9920,46 @@ this.lastTranslateTimestamp = 0
         } catch (error) {
             if (CONFIG.debugMode) {
                 console.error('[GitHub 中文翻译] 停止监控时出错:', error)
+}
+        }
+    },
+    
+    /**
+     * 清理所有缓存
+     */
+    clearAllCaches() {
+        try {
+            // 清理节点检查缓存
+            if (this.nodeCheckCache) {
+                this.nodeCheckCache = new WeakMap()
+}
+            
+            // 清理元素缓存
+            if (this.elementCache) {
+                this.elementCache = new WeakMap()
+}
+            
+            // 清理页面模式缓存
+            if (this.pageModeCache) {
+                this.pageModeCache.clear()
+}
+            
+            // 清理文本变化阈值缓存
+            if (this.textThresholdCache) {
+                this.textThresholdCache.clear()
+}
+            
+            // 清理重要元素缓存
+            if (this.importantElementsCache) {
+                this.importantElementsCache.clear()
+}
+            
+            if (CONFIG.debugMode) {
+                console.log('[GitHub 中文翻译] 所有缓存已清理')
+}
+        } catch (error) {
+            if (CONFIG.debugMode) {
+                console.error('[GitHub 中文翻译] 清理缓存时出错:', error)
 }
         }
     },
@@ -9169,7 +10038,11 @@ this.init()
 
 /**
  * 开发工具模块
- * 包含字符串提取、自动更新和词典处理等开发工具
+ * @file tools.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 包含字符串提取、自动更新和词典处理等开发工具
  */
 // 删除未使用的CONFIG导入
 /**
@@ -9178,7 +10051,7 @@ this.init()
 const stringExtractor = {
     /**
      * 收集页面上的字符串
-     * @param showInConsole - 是否在控制台显示结果
+     * @param {boolean} showInConsole - 是否在控制台显示结果
      * @returns {Set<string>} 收集到的字符串集合
      */
     collectStrings(showInConsole = true) {
@@ -9195,7 +10068,7 @@ console.log('收集到的字符串:', strings)
     
     /**
      * 查找未翻译的字符串
-     * @param showInConsole - 是否在控制台显示结果
+     * @param {boolean} showInConsole - 是否在控制台显示结果
      * @returns {Set<string>} 未翻译的字符串集合
      */
     findUntranslatedStrings(showInConsole = true) {
@@ -9243,7 +10116,7 @@ return new Set(Array.from(untranslated).filter(str => !str.startsWith('待翻译
     
     /**
      * 生成更新报告
-     * @returns 更新报告对象
+     * @returns {Object} 更新报告对象
      */
     generateUpdateReport() {
         const stringsToAdd = this.findStringsToAdd()
@@ -9277,7 +10150,7 @@ class DictionaryProcessor {
     
     /**
      * 合并词典
-     * @returns 合并后的词典
+     * @returns {Object} 合并后的词典
      */
     mergeDictionaries() {
         const merged = {}
@@ -9289,7 +10162,7 @@ for (const module in translationModule) {
     
     /**
      * 验证词典
-     * @returns 词典验证结果
+     * @returns {Object} 词典验证结果
      */
     validateDictionary() {
         const dictionary = this.mergeDictionaries()
@@ -9316,7 +10189,7 @@ console.log(`📈 完成率: ${stats.completionRate}%`)
 
 /**
  * 加载工具类
- * @returns 包含工具类的对象
+ * @returns {Object} 包含工具类的对象
  */
 function loadTools() {
     return { 
@@ -9328,10 +10201,45 @@ function loadTools() {
 
 /**
  * GitHub 中文翻译主入口文件
- * 整合所有模块并初始化脚本
+ * @file main.js
+ * @version 1.8.172
+ * @date 2025-06-17
+ * @author Sut
+ * @description 整合所有模块并初始化脚本
  */
 
 // 导入核心模块
+/**
+ * 清理资源
+ * 在页面卸载时调用，防止内存泄漏
+ */
+function cleanup() {
+    try {
+        // 停止页面监控
+        if (pageMonitor && typeof pageMonitor.stop === 'function') {
+            pageMonitor.stop()
+}
+        
+        // 清理翻译缓存
+        if (translationCore && typeof translationCore.clearCache === 'function') {
+            translationCore.clearCache()
+}
+        
+        // 清理配置界面
+        if (configUI && typeof configUI.cleanup === 'function') {
+            configUI.cleanup()
+}
+        
+        if (CONFIG.debugMode) {
+            console.log('[GitHub 中文翻译] 资源清理完成')
+}
+        } catch (error) {
+        if (CONFIG.debugMode) {
+            console.error('[GitHub 中文翻译] 资源清理失败:', error)
+}
+        }
+}
+
 /**
  * 初始化脚本
  */
@@ -9345,13 +10253,28 @@ async function init() {
 }
         
         // 初始化翻译核心功能
-        translationCore.translate()
+        translationCore.init()
+translationCore.translate()
 
         // 初始化页面监控
         pageMonitor.init()
 
         // 初始化配置界面
         configUI.init()
+
+        // 添加页面卸载事件监听器
+        window.addEventListener('beforeunload', cleanup)
+window.addEventListener('unload', cleanup)
+
+        // 添加页面隐藏事件监听器（当用户切换标签页时）
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                // 页面隐藏时可以清理一些缓存
+                if (translationCore && typeof translationCore.cleanCache === 'function') {
+                    translationCore.cleanCache()
+}
+        }
+        })
 } catch (error) {
         console.error('[GitHub 中文翻译] 脚本初始化失败:', error)
 }
