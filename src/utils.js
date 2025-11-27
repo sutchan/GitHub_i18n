@@ -237,9 +237,13 @@ export const utils = {
      */
     getAllQueryParams(url = window.location.href) {
         const params = {};
-        const searchParams = new URL(url).searchParams;
-        for (const [key, value] of searchParams) {
-            params[key] = value;
+        try {
+            const searchParams = new URL(url || window.location.href).searchParams;
+            for (const [key, value] of searchParams) {
+                params[key] = value;
+            }
+        } catch (error) {
+            console.warn('[GitHub 中文翻译] 解析URL参数失败:', error);
         }
         return params;
     },

@@ -291,6 +291,9 @@ export const translationCore = {
     window.addEventListener('beforeunload', unloadHandler);
     window.addEventListener('unload', unloadHandler);
     window.addEventListener('pagehide', unloadHandler);
+    
+    // 保存事件监听器引用，以便后续清理
+    this.unloadHandler = unloadHandler;
   },
 
   /**
@@ -329,6 +332,14 @@ export const translationCore = {
     try {
       // 停止缓存清理定时器
       this.stopCacheCleanupTimer();
+      
+      // 移除页面卸载事件监听器
+      if (this.unloadHandler) {
+        window.removeEventListener('beforeunload', this.unloadHandler);
+        window.removeEventListener('unload', this.unloadHandler);
+        window.removeEventListener('pagehide', this.unloadHandler);
+        this.unloadHandler = null;
+      }
       
       // 清理所有缓存
       this.clearCache();
@@ -1326,8 +1337,43 @@ translateElement(element) {
   },
 
   /**
+   * 安全过滤函数，防止XSS攻击
+   * @param {string} text - 要过滤的文本
+   * @returns {string} 过滤后的安全文本
+   */
+  sanitizeText(text) {
+    // 移除所有HTML标签
+    let sanitizedText = text.replace(/<[^>]*>/g, '');
+    
+    // 移除所有JavaScript事件处理程序
+    sanitizedText = sanitizedText.replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
+    
+    // 移除所有JavaScript URL
+    sanitizedText = sanitizedText.replace(/javascript:/gi, '');
+    
+    // 移除所有数据URL
+    sanitizedText = sanitizedText.replace(/data:/gi, '');
+    
+    // 移除所有CSS表达式
+    sanitizedText = sanitizedText.replace(/expression\([^)]*\)/gi, '');
+    
+    // 移除所有VBScript
+    sanitizedText = sanitizedText.replace(/vbscript:/gi, '');
+    
+    // 移除所有可能的恶意字符组合
+    sanitizedText = sanitizedText.replace(/<\s*script/gi, '');
+    sanitizedText = sanitizedText.replace(/<\s*iframe/gi, '');
+    sanitizedText = sanitizedText.replace(/<\s*object/gi, '');
+    sanitizedText = sanitizedText.replace(/<\s*embed/gi, '');
+    sanitizedText = sanitizedText.replace(/<\s*link/gi, '');
+    sanitizedText = sanitizedText.replace(/<\s*style/gi, '');
+    
+    return sanitizedText;
+  },
+
+  /**
    * 获取文本的翻译结果
-   * 优化版：改进缓存策略、添加更智能的文本处理
+   * 优化版：改进缓存策略、添加更智能的文本处理和XSS防护
    * @param {string} text - 原始文本
    * @returns {string|null} 翻译后的文本，如果没有找到翻译则返回null
    */
@@ -1377,6 +1423,11 @@ translateElement(element) {
 
     if (result === null && enablePartialMatch) {
       result = this.performPartialTranslation(normalizedText);
+    }
+
+    // 安全过滤：防止XSS攻击
+    if (result !== null) {
+      result = this.sanitizeText(result);
     }
 
     // 更新缓存 - 优化：根据文本长度选择是否缓存

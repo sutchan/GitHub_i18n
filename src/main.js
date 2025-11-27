@@ -35,6 +35,16 @@ function cleanup() {
             configUI.cleanup();
         }
         
+        // 移除页面卸载事件监听器
+        window.removeEventListener('beforeunload', cleanup);
+        window.removeEventListener('unload', cleanup);
+        
+        // 移除页面隐藏事件监听器
+        if (window.visibilityChangeHandler) {
+            document.removeEventListener('visibilitychange', window.visibilityChangeHandler);
+            window.visibilityChangeHandler = null;
+        }
+        
         if (CONFIG.debugMode) {
             console.log('[GitHub 中文翻译] 资源清理完成');
         }
@@ -72,14 +82,18 @@ async function init() {
         window.addEventListener('unload', cleanup);
         
         // 添加页面隐藏事件监听器（当用户切换标签页时）
-        document.addEventListener('visibilitychange', () => {
+        const visibilityChangeHandler = () => {
             if (document.visibilityState === 'hidden') {
                 // 页面隐藏时可以清理一些缓存
                 if (translationCore && typeof translationCore.cleanCache === 'function') {
                     translationCore.cleanCache();
                 }
             }
-        });
+        };
+        document.addEventListener('visibilitychange', visibilityChangeHandler);
+        
+        // 保存事件监听器引用，以便后续清理
+        window.visibilityChangeHandler = visibilityChangeHandler;
     } catch (error) {
         console.error('[GitHub 中文翻译] 脚本初始化失败:', error);
     }
@@ -109,5 +123,3 @@ if (typeof window !== 'undefined') {
     window.configUI = configUI;
 }
 
-// 🕒 启动脚本
-startScript();

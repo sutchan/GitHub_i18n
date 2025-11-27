@@ -14,7 +14,7 @@
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-export const VERSION = '1.8.175';
+export const VERSION = '1.8.182';
 
 /**
  * 版本历史记录

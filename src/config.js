@@ -74,14 +74,34 @@ export const CONFIG = {
       ".js-commit-message", ".js-details-container", ".js-comment-body",
       ".js-activity-item", ".js-blob-content", ".js-repo-description",
       ".js-issue-row", ".js-pinned-issue-list-item", ".js-project-card-content",
-      ".js-user-profile-bio", ".js-header-search-input", ".js-file-line"
+      ".js-user-profile-bio", ".js-header-search-input", ".js-file-line",
+      ".Header-link", ".TabNav-link", ".UnderlineNav-link", ".Label",
+      ".btn-primary", ".btn-secondary", ".TimelineItem-body", ".Box-title",
+      ".Subhead-heading", ".f4", ".f5", ".text-bold", ".text-semibold",
+      ".avatar-user", ".contributor-avatar", ".commit-author", ".issue-author"
     ], // 重要内容元素
     "ignoreElements": [
       "script", "style", "link", "meta", "svg", "canvas",
       "pre", "code", "kbd", "samp", ".blob-code-inner", ".file-line",
       ".highlight", ".language-*", ".mermaid", ".mathjax",
       ".js-zeroclipboard-button", ".js-minimizable-content",
-      ".reponav-dropdown", ".dropdown-caret", ".avatar", ".emoji"
+      ".reponav-dropdown", ".dropdown-caret", ".avatar", ".emoji",
+      ".blob-code", ".blob-code-marker", ".blob-num", ".blob-num-hunk",
+      ".diff-line", ".diff-addition", ".diff-deletion", ".diff-header",
+      ".line-comment", ".inline-comment", ".commit-diff-title",
+      ".copyable-area", ".copy-button", ".token", ".syntax--",
+      ".octicon", ".github-icon", ".icon", ".spinner",
+      ".timestamp", ".time-ago", ".relative-time", ".local-time",
+      ".sha", ".shortsha", ".commit-sha", ".blob-sha",
+      ".username", ".login", ".user-mention", ".team-mention",
+      ".repo-name", ".repo-link", ".branch-name", ".tag-name",
+      ".file-name", ".file-path", ".directory", ".folder",
+      ".language-color", ".repo-language-color", ".color-block",
+      ".progress-bar", ".meter", ".counter", ".number",
+      ".size", ".bytes", ".count", ".stat", ".statistic",
+      ".code-search-result-match", ".search-match", ".highlighted-text",
+      ".notification-indicator", ".notification-badge", ".notification-count",
+      ".unread-indicator", ".new-indicator", ".badge", ".label"
     ], // 忽略翻译的元素
     "mutationThreshold": 30, // 单次突变数量阈值
     "contentChangeWeight": 1, // 内容变化权重
