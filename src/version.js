@@ -1,8 +1,8 @@
 /**
  * 版本信息模块
  * @file version.js
- * @version 1.8.182
- * @date 2026-01-09
+ * @version 1.9.1
+ * @date 2026-05-01
  * @author Sut
  * @description 统一管理GitHub自动化字符串更新工具的版本信息
  */
@@ -21,6 +21,15 @@ export const VERSION = '1.9.1';
  * @type {Array<{version: string, date: string, changes: string[]}>}
  */
 export const VERSION_HISTORY = [
+  {
+    version: '1.9.1',
+    date: '2026-05-01',
+    changes: [
+      '修复Trie树findAllMatches方法参数问题',
+      '修复i18n.js模块导出问题',
+      '统一所有文件版本号为1.9.1'
+    ]
+  },
   {
     version: '1.8.182',
     date: '2026-01-09',
