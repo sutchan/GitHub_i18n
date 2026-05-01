@@ -463,7 +463,27 @@ async function switchLanguage(locale) {
     return i18nManager.setLocale(locale);
 }
 
-// 导出ES6模块
+// 导出UMD模块（兼容CommonJS和浏览器全局变量）
+const i18nExports = {
+    I18nManager,
+    i18nManager,
+    t,
+    initI18n,
+    loadLocaleTranslations,
+    switchLanguage
+};
+
+// CommonJS环境
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = i18nExports;
+}
+
+// 浏览器全局变量
+if (typeof window !== 'undefined') {
+    Object.assign(window, i18nExports);
+}
+
+// ES6模块导出
 export {
     I18nManager,
     i18nManager,
