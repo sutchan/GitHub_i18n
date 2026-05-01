@@ -1,8 +1,8 @@
 /**
  * 版本信息模块
  * @file version.js
- * @version 1.8.172
- * @date 2025-06-17
+ * @version 1.8.182
+ * @date 2026-01-09
  * @author Sut
  * @description 统一管理GitHub自动化字符串更新工具的版本信息
  */
@@ -14,13 +14,23 @@
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-export const VERSION = '1.8.182';
+export const VERSION = '1.9.1';
 
 /**
  * 版本历史记录
  * @type {Array<{version: string, date: string, changes: string[]}>}
  */
 export const VERSION_HISTORY = [
+  {
+    version: '1.8.182',
+    date: '2026-01-09',
+    changes: ['同步版本号', '优化构建脚本']
+  },
+  {
+    version: '1.8.181',
+    date: '2026-01-08',
+    changes: ['清理冗余代码']
+  },
   {
     version: '1.8.159',
     date: '2025-11-11',
