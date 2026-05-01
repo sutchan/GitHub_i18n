@@ -480,7 +480,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
 // 浏览器全局变量
 if (typeof window !== 'undefined') {
-    Object.assign(window, i18nExports);
+    window.GitHubI18n = i18nExports;
 }
 
 // ES6模块导出
