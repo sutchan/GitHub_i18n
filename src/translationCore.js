@@ -1,7 +1,7 @@
 /**
  * 翻译核心模块
  * @file translationCore.js
- * @version 1.9.4
+ * @version 1.9.5
  * @date 2026-05-01
  * @author Sut
  * @description 负责页面内容的实际翻译工作
