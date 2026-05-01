@@ -1,7 +1,7 @@
 /**
  * 页面监控缓存管理模块
  * @file pageMonitor/cacheManager.js
- * @version 1.9.7
+ * @version 1.9.8
  * @date 2026-05-01
  * @author Sut
  * @description 管理页面监控中的缓存

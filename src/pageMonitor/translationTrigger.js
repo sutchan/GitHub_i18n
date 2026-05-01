@@ -1,7 +1,7 @@
 /**
  * 翻译触发模块
  * @file pageMonitor/translationTrigger.js
- * @version 1.9.7
+ * @version 1.9.8
  * @date 2026-05-01
  * @author Sut
  * @description 管理翻译触发和节流
