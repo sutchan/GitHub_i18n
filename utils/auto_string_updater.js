@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json({ limit: '50mb' }));
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, '..')));
 
 const CONFIG = {
   dictionaryPath: path.resolve(__dirname, '../src/dictionaries'),
@@ -287,12 +287,12 @@ app.post('/api/settings', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tool.html'));
+  res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 app.listen(PORT, () => {
   console.log(`GitHub i18n 自动化工具已启动: http://localhost:${PORT}`);
-  console.log(`打开 ${path.join(__dirname, 'tool.html')} 开始使用`);
+  console.log(`打开 http://localhost:${PORT} 开始使用`);
 });
 
 module.exports = app;
