@@ -1,7 +1,7 @@
 /**
  * Trie树数据结构模块
  * @file trie.js
- * @version 1.9.5
+ * @version 1.9.6
  * @date 2026-05-01
  * @author Sut
  * @description 高效的字符串匹配数据结构，用于部分匹配翻译

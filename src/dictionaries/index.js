@@ -1,7 +1,7 @@
 /**
  * 翻译词典合并模块
  * @file index.js
- * @version 1.9.5
+ * @version 1.9.6
  * @date 2026-05-01
  * @author Sut
  * @description 整合所有页面的翻译词典

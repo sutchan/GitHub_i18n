@@ -1,7 +1,7 @@
 /**
  * 工具函数模块
  * @file utils.js
- * @version 1.9.5
+ * @version 1.9.6
  * @date 2026-05-01
  * @author Sut
  * @description 包含各种通用的辅助函数
