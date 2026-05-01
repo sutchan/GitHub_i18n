@@ -32,8 +32,6 @@
  * @author Sut
  * @description 统一管理GitHub自动化字符串更新工具的版本信息
  */
-// 作者: Sut
-// 此文件用于统一管理GitHub自动化字符串更新工具的版本信息
 /**
  * 当前工具版本号
  * @type {string}
@@ -45,6 +43,15 @@ const VERSION = '1.9.5';
  * @type {Array<{version: string, date: string, changes: string[]}>}
  */
 const VERSION_HISTORY = [
+  {
+    version: '1.9.5',
+    date: '2026-05-01',
+    changes: [
+      '修复构建脚本对export default语法的处理',
+      '修复virtualDom.js版本号不一致问题',
+      '优化导出语句的处理逻辑'
+    ]
+  },
   {
     version: '1.9.1',
     date: '2026-05-01',
@@ -622,7 +629,6 @@ const CONFIG = {
     "trending": /\/trending/
   }
 };
-{ getVersionFromComment };
 // ===== trie.js =====
 /**
  * Trie树数据结构模块
@@ -4887,7 +4893,6 @@ const versionChecker = {
     }
   }
 };
-{ versionChecker };
 // ===== virtualDom.js =====
 /**
  * 虚拟DOM模块
@@ -5318,8 +5323,6 @@ class VirtualDomManager {
 }
 // 创建单例实例
 const virtualDomManager = new VirtualDomManager();
-virtualDomManager;
-{ VirtualNode, VirtualDomManager };
 // ===== i18n.js =====
 /**
  * 国际化支持框架
@@ -5727,14 +5730,6 @@ async function switchLanguage(locale) {
     return i18nManager.setLocale(locale);
 }
 // ES6模块导出
-{
-    I18nManager,
-    i18nManager,
-    t,
-    initI18n,
-    loadLocaleTranslations,
-    switchLanguage
-};
 // ===== dictionaries/index.js =====
 /**
  * 翻译词典合并模块
@@ -6351,7 +6346,6 @@ function startScript() {
   }
 }
 // 导出函数供其他模块使用
-{ init, startScript, cleanup };
 // 将核心模块暴露到全局作用域，便于调试和配置界面使用
 if (typeof window !== 'undefined') {
   window.translationCore = translationCore;

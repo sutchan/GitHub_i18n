@@ -130,7 +130,8 @@ function mergeSourceFiles() {
     if (fs.existsSync(filePath)) {
       let content = fs.readFileSync(filePath, 'utf-8');
       content = content.replace(/^import\s+.*from\s+['"].+['"];?\s*$/gm, '');
-      content = content.replace(/^export\s+default\s+(\w+);?\s*$/gm, '');
+      content = content.replace(/^export\s+default\s+(\w+);?\s*$/gm, '$1;');
+      content = content.replace(/^export\s+default\s+/gm, '');
       content = content.replace(/^export\s+{\s*([^}]+)\s*};?\s*$/gm, '');
       content = content.replace(/^export\s+/gm, '');
       content = content.replace(/\/\*[#@]\s*(?:sourceMappingURL|mapping).*?\*\//g, '');

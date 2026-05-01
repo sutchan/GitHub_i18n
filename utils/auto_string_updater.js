@@ -57,7 +57,7 @@ async function readDictionary() {
         const match = content.match(/export\s+default\s+(\{[\s\S]*?\});?$/m);
         if (match) {
           try {
-            dictionary[moduleName] = eval('(' + match[1] + ')');
+            dictionary[moduleName] = JSON.parse(match[1].replace(/'/g, '"'));
           } catch {
             const keyValueRegex = /['"](\w+)['"]\s*:\s*['"]([^'"]*)['"]/g;
             const moduleDict = {};
