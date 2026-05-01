@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub i18n 自动化工具 v1.0</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #58a6ff;
+    }
+    h2 {
+      font-size: 18px;
+      margin: 20px 0 10px;
+      color: #8b949e;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: #f0f6fc;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #8b949e;
+    }
+    input[type="text"], input[type="url"], textarea, select {
+      width: 100%;
+      padding: 10px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      font-size: 14px;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #58a6ff;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #238636;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #2ea043;
+    }
+    .btn-secondary {
+      background: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+    }
+    .btn-secondary:hover {
+      background: #30363d;
+    }
+    .btn-danger {
+      background: #da3633;
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: #f85149;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .log-container {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .log-entry {
+      margin-bottom: 5px;
+    }
+    .log-entry.info { color: #58a6ff; }
+    .log-entry.success { color: #3fb950; }
+    .log-entry.error { color: #f85149; }
+    .log-entry.warn { color: #d29922; }
+    .log-entry .timestamp {
+      color: #6e7681;
+      margin-right: 8px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-item {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 15px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #58a6ff;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #8b949e;
+      margin-top: 5px;
+    }
+    .progress-bar {
+      height: 8px;
+      background: #21262d;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #238636;
+      transition: width 0.3s;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-badge.idle { background: #21262d; color: #8b949e; }
+    .status-badge.running { background: #1f6feb; color: #fff; }
+    .status-badge.success { background: #238636; color: #fff; }
+    .status-badge.error { background: #da3633; color: #fff; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #30363d;
+    }
+    th {
+      color: #8b949e;
+      font-weight: 600;
+    }
+    .action-btns {
+      display: flex;
+      gap: 5px;
+    }
+    .tab-container {
+      margin-bottom: 20px;
+    }
+    .tab-list {
+      display: flex;
+      gap: 5px;
+      border-bottom: 1px solid #30363d;
+      padding-bottom: 10px;
+    }
+    .tab-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      color: #8b949e;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      background: #21262d;
+    }
+    .tab-btn.active {
+      background: #21262d;
+      color: #f0f6fc;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid #58a6ff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔄 GitHub i18n 自动化工具</h1>
+
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-item">
+        <div class="stat-value" id="totalStrings">-</div>
+        <div class="stat-label">总字符串数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="totalModules">-</div>
+        <div class="stat-label">模块数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="pendingTranslations">-</div>
+        <div class="stat-label">待翻译</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="lastUpdated">-</div>
+        <div class="stat-label">最后更新</div>
+      </div>
+    </div>
+
+    <div class="tab-container">
+      <div class="tab-list">
+        <button class="tab-btn active" data-tab="collect">📥 字符串采集</button>
+        <button class="tab-btn" data-tab="dictionary">📚 词典管理</button>
+        <button class="tab-btn" data-tab="settings">⚙️ 设置</button>
+      </div>
+
+      <div id="collectTab" class="tab-content active">
+        <div class="card">
+          <h3>📥 采集新字符串</h3>
+          <div class="form-group">
+            <label>GitHub URL（每行一个）</label>
+            <textarea id="urlsInput" placeholder="https://github.com/facebook/react
+https://github.com/microsoft/vscode
+https://github.com/torvalds/linux"></textarea>
+          </div>
+          <div class="form-group">
+            <label>CSS 选择器（可选，默认为 body）</label>
+            <input type="text" id="selectorsInput" placeholder="h1, h2, h3, p, span, a, button">
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" id="startCollectBtn">🚀 开始采集</button>
+            <button class="btn btn-secondary" id="stopCollectBtn" disabled>⏹ 停止</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📊 采集进度</h3>
+          <div class="progress-bar">
+            <div class="progress-fill" id="collectProgress" style="width: 0%"></div>
+          </div>
+          <div id="progressText" style="margin-top: 10px; color: #8b949e;">等待开始...</div>
+        </div>
+
+        <div class="card">
+          <h3>📋 采集日志</h3>
+          <div class="log-container" id="collectLog"></div>
+        </div>
+      </div>
+
+      <div id="dictionaryTab" class="tab-content">
+        <div class="card">
+          <h3>📚 词典操作</h3>
+          <div class="btn-group">
+            <button class="btn btn-primary" id="exportDictBtn">📤 导出词典</button>
+            <button class="btn btn-primary" id="importDictBtn">📥 导入词典</button>
+            <button class="btn btn-secondary" id="optimizeDictBtn">✨ 优化词典</button>
+            <button class="btn btn-danger" id="backupDictBtn">💾 备份词典</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🔍 词典预览</h3>
+          <div style="margin-bottom: 15px;">
+            <input type="text" id="dictSearchInput" placeholder="搜索字符串...">
+          </div>
+          <div id="dictionaryPreview" style="max-height: 400px; overflow-y: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>模块</th>
+                  <th>原文</th>
+                  <th>译文</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="dictTableBody">
+                <tr><td colspan="4" style="text-align: center; color: #6e7681;">加载中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📋 操作日志</h3>
+          <div class="log-container" id="dictLog"></div>
+        </div>
+      </div>
+
+      <div id="settingsTab" class="tab-content">
+        <div class="card">
+          <h3>⚙️ 采集设置</h3>
+          <div class="form-group">
+            <label>请求间隔 (ms)</label>
+            <input type="number" id="requestInterval" value="1000" min="500" max="5000">
+          </div>
+          <div class="form-group">
+            <label>最大重试次数</label>
+            <input type="number" id="maxRetries" value="3" min="0" max="10">
+          </div>
+          <div class="form-group">
+            <label>HTTP 超时 (ms)</label>
+            <input type="number" id="httpTimeout" value="30000" min="5000" max="60000">
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>💾 保存设置</h3>
+          <div class="btn-group">
+            <button class="btn btn-primary" id="saveSettingsBtn">💾 保存设置</button>
+            <button class="btn btn-secondary" id="resetSettingsBtn">🔄 重置默认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000/api';
+
+    let isCollecting = false;
+    let collectController = null;
+
+    function init() {
+      loadDictionary();
+      loadSettings();
+      setupEventListeners();
+      updateStats();
+    }
+
+    function setupEventListeners() {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
+        });
+      });
+
+      document.getElementById('startCollectBtn').addEventListener('click', startCollection);
+      document.getElementById('stopCollectBtn').addEventListener('click', stopCollection);
+      document.getElementById('exportDictBtn').addEventListener('click', exportDictionary);
+      document.getElementById('importDictBtn').addEventListener('click', importDictionary);
+      document.getElementById('optimizeDictBtn').addEventListener('click', optimizeDictionary);
+      document.getElementById('backupDictBtn').addEventListener('click', backupDictionary);
+      document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+      document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
+      document.getElementById('dictSearchInput').addEventListener('input', filterDictionary);
+    }
+
+    function addLog(containerId, message, level = 'info') {
+      const container = document.getElementById(containerId);
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${level}`;
+      const time = new Date().toLocaleTimeString();
+      entry.innerHTML = `<span class="timestamp">[${time}]</span>${message}`;
+      container.appendChild(entry);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function clearLog(containerId) {
+      document.getElementById(containerId).innerHTML = '';
+    }
+
+    function updateStats() {
+      fetch(`${API_BASE}/stats`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('totalStrings').textContent = data.totalStrings?.toLocaleString() || '0';
+          document.getElementById('totalModules').textContent = data.moduleCount || '0';
+          document.getElementById('pendingTranslations').textContent = data.pendingCount || '0';
+          document.getElementById('lastUpdated').textContent = data.lastUpdated || '从未';
+        })
+        .catch(() => {
+          document.getElementById('totalStrings').textContent = 'N/A';
+          document.getElementById('totalModules').textContent = 'N/A';
+        });
+    }
+
+    async function startCollection() {
+      const urlsText = document.getElementById('urlsInput').value.trim();
+      const selectors = document.getElementById('selectorsInput').value.trim() || 'body';
+
+      if (!urlsText) {
+        addLog('collectLog', '请输入至少一个 URL', 'error');
+        return;
+      }
+
+      const urls = urlsText.split('\n').map(u => u.trim()).filter(u => u);
+      if (urls.length === 0) {
+        addLog('collectLog', '请输入有效的 URL', 'error');
+        return;
+      }
+
+      isCollecting = true;
+      collectController = new AbortController();
+      document.getElementById('startCollectBtn').disabled = true;
+      document.getElementById('stopCollectBtn').disabled = false;
+      document.getElementById('startCollectBtn').classList.add('loading');
+      clearLog('collectLog');
+
+      const pages = urls.map((url, index) => ({
+        id: `page_${index}`,
+        name: new URL(url).pathname.split('/').pop() || 'unknown',
+        url,
+        selectors: selectors.split(',').map(s => s.trim()),
+        enabled: true
+      }));
+
+      addLog('collectLog', `开始采集 ${pages.length} 个页面...`, 'info');
+
+      try {
+        const response = await fetch(`${API_BASE}/collect`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pages }),
+          signal: collectController.signal
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          addLog('collectLog', `采集完成! 成功: ${result.summary.successCount}, 失败: ${result.summary.failedCount}`, 'success');
+          addLog('collectLog', `共提取 ${result.summary.totalStrings} 个唯一字符串`, 'success');
+        } else {
+          addLog('collectLog', `采集失败: ${result.error}`, 'error');
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          addLog('collectLog', '采集已停止', 'warn');
+        } else {
+          addLog('collectLog', `错误: ${err.message}`, 'error');
+        }
+      } finally {
+        isCollecting = false;
+        document.getElementById('startCollectBtn').disabled = false;
+        document.getElementById('stopCollectBtn').disabled = true;
+        document.getElementById('startCollectBtn').classList.remove('loading');
+        updateStats();
+      }
+    }
+
+    function stopCollection() {
+      if (collectController) {
+        collectController.abort();
+      }
+    }
+
+    function loadDictionary() {
+      fetch(`${API_BASE}/dictionary`)
+        .then(res => res.json())
+        .then(data => {
+          renderDictionary(data);
+        })
+        .catch(() => {
+          document.getElementById('dictTableBody').innerHTML = 
+            '<tr><td colspan="4" style="text-align: center; color: #f85149;">加载失败</td></tr>';
+        });
+    }
+
+    function renderDictionary(data) {
+      const tbody = document.getElementById('dictTableBody');
+      if (!data || Object.keys(data).length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6e7681;">暂无数据</td></tr>';
+        return;
+      }
+
+      let html = '';
+      let count = 0;
+      for (const [module, entries] of Object.entries(data)) {
+        for (const [key, value] of Object.entries(entries)) {
+          if (count >= 100) break;
+          const isPending = value && value.startsWith('待翻译:');
+          html += `<tr>
+            <td>${escapeHtml(module)}</td>
+            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(key)}</td>
+            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(value || '-')}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-secondary" onclick="editEntry('${escapeHtml(module)}', '${escapeHtml(key)}', '${escapeHtml(value || '')}')">✏️</button>
+              </div>
+            </td>
+          </tr>`;
+          count++;
+        }
+        if (count >= 100) break;
+      }
+      tbody.innerHTML = html || '<tr><td colspan="4" style="text-align: center; color: #6e7681;">暂无数据</td></tr>';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[m]);
+    }
+
+    function filterDictionary() {
+      loadDictionary();
+    }
+
+    function editEntry(module, key, value) {
+      const newValue = prompt(`修改译文 (${module}):`, value);
+      if (newValue !== null) {
+        fetch(`${API_BASE}/dictionary/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ module, key, value: newValue })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              addLog('dictLog', `更新成功: ${key}`, 'success');
+              loadDictionary();
+            } else {
+              addLog('dictLog', `更新失败: ${data.error}`, 'error');
+            }
+          });
+      }
+    }
+
+    function exportDictionary() {
+      addLog('dictLog', '正在导出词典...', 'info');
+      fetch(`${API_BASE}/export`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            addLog('dictLog', `导出成功，共 ${data.stringCount} 个字符串`, 'success');
+          } else {
+            addLog('dictLog', `导出失败: ${data.error}`, 'error');
+          }
+        })
+        .catch(err => addLog('dictLog', `导出失败: ${err.message}`, 'error'));
+    }
+
+    function importDictionary() {
+      addLog('dictLog', '正在导入词典...', 'info');
+      fetch(`${API_BASE}/import`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            addLog('dictLog', '导入成功', 'success');
+            loadDictionary();
+            updateStats();
+          } else {
+            addLog('dictLog', `导入失败: ${data.error}`, 'error');
+          }
+        })
+        .catch(err => addLog('dictLog', `导入失败: ${err.message}`, 'error'));
+    }
+
+    function optimizeDictionary() {
+      addLog('dictLog', '正在优化词典...', 'info');
+      fetch(`${API_BASE}/optimize`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            addLog('dictLog', `优化完成，原始 ${data.originalCount} 个字符串，优化后 ${data.optimizedCount} 个`, 'success');
+            loadDictionary();
+            updateStats();
+          } else {
+            addLog('dictLog', `优化失败: ${data.error}`, 'error');
+          }
+        })
+        .catch(err => addLog('dictLog', `优化失败: ${err.message}`, 'error'));
+    }
+
+    function backupDictionary() {
+      addLog('dictLog', '正在备份词典...', 'info');
+      fetch(`${API_BASE}/backup`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            addLog('dictLog', `备份成功: ${data.path}`, 'success');
+          } else {
+            addLog('dictLog', `备份失败: ${data.error}`, 'error');
+          }
+        })
+        .catch(err => addLog('dictLog', `备份失败: ${err.message}`, 'error'));
+    }
+
+    function loadSettings() {
+      fetch(`${API_BASE}/settings`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('requestInterval').value = data.requestInterval || 1000;
+          document.getElementById('maxRetries').value = data.maxRetries || 3;
+          document.getElementById('httpTimeout').value = data.httpTimeout || 30000;
+        });
+    }
+
+    function saveSettings() {
+      const settings = {
+        requestInterval: parseInt(document.getElementById('requestInterval').value),
+        maxRetries: parseInt(document.getElementById('maxRetries').value),
+        httpTimeout: parseInt(document.getElementById('httpTimeout').value)
+      };
+      fetch(`${API_BASE}/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings)
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            addLog('dictLog', '设置已保存', 'success');
+          }
+        });
+    }
+
+    function resetSettings() {
+      document.getElementById('requestInterval').value = 1000;
+      document.getElementById('maxRetries').value = 3;
+      document.getElementById('httpTimeout').value = 30000;
+      saveSettings();
+    }
+
+    init();
+  </script>
+</body>
+</html>

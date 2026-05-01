@@ -22,6 +22,15 @@ export const VERSION = '1.9.5';
  */
 export const VERSION_HISTORY = [
   {
+    version: '1.9.5',
+    date: '2026-05-01',
+    changes: [
+      '修复构建脚本对export default语法的处理',
+      '修复virtualDom.js版本号不一致问题',
+      '优化导出语句的处理逻辑'
+    ]
+  },
+  {
     version: '1.9.1',
     date: '2026-05-01',
     changes: [
