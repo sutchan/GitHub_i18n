@@ -156,7 +156,6 @@ function createBuildDir() {
 
 function fixBuildOutput(content) {
   content = content.replace(/export\s+const\s+VERSION\s+=/g, 'const VERSION =');
-  content = content.replace(/@version\s+[\d.]+/g, '');
   content = content.replace(/\n{3,}/g, '\n\n');
   content = content.replace(/\s+\n/g, '\n');
   return content;

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-//
+// @version      1.9.4
 // @description  GitHub页面自动翻译为中文
 // @author       Sut
 // @match        https://github.com/*
@@ -26,7 +26,7 @@
 // ===== version.js =====
 // 作者: Sut
 // 此文件用于统一管理GitHub自动化字符串更新工具的版本信息
-const VERSION = '1.9.3';
+const VERSION = '1.9.4';
 const VERSION_HISTORY = [
   {
     version: '1.9.1',
