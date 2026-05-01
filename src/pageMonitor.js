@@ -1,8 +1,8 @@
 /**
  * 页面监控模块
  * @file pageMonitor.js
- * @version 1.8.172
- * @date 2025-06-17
+ * @version 1.9.1
+ * @date 2026-05-01
  * @author Sut
  * @description 负责监听GitHub页面的变化，检测DOM更新并触发翻译
  */

@@ -1,8 +1,8 @@
 /**
  * 翻译核心模块
  * @file translationCore.js
- * @version 1.8.172
- * @date 2025-06-17
+ * @version 1.9.1
+ * @date 2026-05-01
  * @author Sut
  * @description 负责页面内容的实际翻译工作
  */
@@ -57,9 +57,10 @@ class Trie {
     /**
      * 在Trie树中查找所有匹配的单词
      * @param {string} text - 要查找的文本
+     * @param {number} [minKeyLength] - 最小键长（可选）
      * @returns {Array} 匹配结果数组
      */
-    findAllMatches(text) {
+    findAllMatches(text, minKeyLength = 0) {
         if (!text || typeof text !== 'string' || text.length === 0) {
             return [];
         }
@@ -80,7 +81,7 @@ class Trie {
                 node = node.children.get(char);
                 currentWord += char;
 
-                if (node.isEndOfWord) {
+                if (node.isEndOfWord && currentWord.length >= minKeyLength) {
                     matches.push({
                         key: currentWord,
                         value: node.value,
@@ -1464,14 +1465,15 @@ translateElement(element) {
     const minKeyLength = Math.min(4, Math.floor(textLen / 2)); // 最小键长度至少为4或文本长度的一半
 
     // 使用Trie树查找所有可能的匹配项，避免遍历整个字典
-    const potentialKeys = this.dictionaryTrie.findAllMatches(text, minKeyLength);
+        const potentialMatches = this.dictionaryTrie.findAllMatches(text, minKeyLength);
 
-    // 处理找到的潜在匹配项
-    for (const key of potentialKeys) {
-      if (!this.dictionary.hasOwnProperty(key) || 
-          this.dictionary[key].startsWith('待翻译: ')) {
-        continue;
-      }
+        // 处理找到的潜在匹配项
+        for (const match of potentialMatches) {
+            const key = match.key;
+            if (!this.dictionary.hasOwnProperty(key) || 
+                this.dictionary[key].startsWith('待翻译: ')) {
+                continue;
+            }
 
       const value = this.dictionary[key];
       

@@ -1,8 +1,8 @@
 /**
  * 版本更新检查模块
  * @file versionChecker.js
- * @version 1.8.172
- * @date 2025-06-17
+ * @version 1.9.1
+ * @date 2026-05-01
  * @author Sut
  * @description 负责检查和处理脚本更新
  */

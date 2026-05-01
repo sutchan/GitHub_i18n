@@ -1,8 +1,8 @@
 /**
  * 通用翻译词典
  * @file common.js
- * @version 1.8.172
- * @date 2025-06-17
+ * @version 1.9.1
+ * @date 2026-05-01
  * @author Sut
  * @description 包含所有页面共用的翻译字符串
  */

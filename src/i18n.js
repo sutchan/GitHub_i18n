@@ -1,6 +1,10 @@
 /**
  * 国际化支持框架
- * 为GitHub翻译插件提供多语言支持的基础框架
+ * @file i18n.js
+ * @version 1.9.1
+ * @date 2026-05-01
+ * @author Sut
+ * @description 为GitHub翻译插件提供多语言支持的基础框架
  */
 
 /**
@@ -459,23 +463,12 @@ async function switchLanguage(locale) {
     return i18nManager.setLocale(locale);
 }
 
-// 导出国际化管理器和相关函数
-if (typeof module !== 'undefined' && module.exports) {
-    // Node.js 环境
-    module.exports = {
-        I18nManager,
-        i18nManager,
-        t,
-        initI18n,
-        loadLocaleTranslations,
-        switchLanguage
-    };
-} else if (typeof window !== 'undefined') {
-    // 浏览器环境
-    window.I18nManager = I18nManager;
-    window.i18nManager = i18nManager;
-    window.t = t;
-    window.initI18n = initI18n;
-    window.loadLocaleTranslations = loadLocaleTranslations;
-    window.switchLanguage = switchLanguage;
-}
+// 导出ES6模块
+export {
+    I18nManager,
+    i18nManager,
+    t,
+    initI18n,
+    loadLocaleTranslations,
+    switchLanguage
+};
