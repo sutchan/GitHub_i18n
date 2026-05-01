@@ -36,7 +36,7 @@
 ### 用户脚本
 
 1. 安装 [Tampermonkey](https://www.tampermonkey.net/)
-2. 点击 [安装脚本](https://github.com/sutchan/GitHub_i18n/raw/refs/heads/main/dist/GitHub_zh-CN.user.js)
+2. 点击 [安装脚本](https://github.com/sutchan/GitHub_i18n/raw/refs/heads/main/build/GitHub_i18n.user.js)
 3. 刷新 GitHub 页面即可看到中文界面
 
 ### 自动化工具
