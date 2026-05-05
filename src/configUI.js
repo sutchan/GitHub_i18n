@@ -770,8 +770,7 @@ class ConfigUI {
     
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'github-i18n-toggle-btn';
-    // 使用安全的DOM操作方法替代innerHTML
-    toggleBtn.textContent = '⚙️';
+    toggleBtn.textContent = '设置';
     toggleBtn.title = 'GitHub 中文翻译配置';
     
     this.addTrackedEventListener(toggleBtn, 'click', () => {
