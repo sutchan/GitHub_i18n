@@ -1,7 +1,7 @@
 /**
  * GitHub 中文翻译配置界面模块
  * @file configUI.js
- * @version 1.9.8
+ * @version 1.9.9
  * @date 2026-05-01
  * @author Sut
  * @description 提供用户友好的配置界面，允许用户调整插件参数
@@ -770,8 +770,7 @@ class ConfigUI {
     
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'github-i18n-toggle-btn';
-    // 使用安全的DOM操作方法替代innerHTML
-    toggleBtn.textContent = '⚙️';
+    toggleBtn.textContent = '设置';
     toggleBtn.title = 'GitHub 中文翻译配置';
     
     this.addTrackedEventListener(toggleBtn, 'click', () => {

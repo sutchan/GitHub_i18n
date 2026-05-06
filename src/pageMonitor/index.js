@@ -1,7 +1,7 @@
 /**
  * 页面监控主模块
  * @file pageMonitor/index.js
- * @version 1.9.8
+ * @version 1.9.9
  * @date 2026-05-01
  * @author Sut
  * @description 页面监控主入口，整合所有子模块

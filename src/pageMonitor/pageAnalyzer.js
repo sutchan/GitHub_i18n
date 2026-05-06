@@ -1,7 +1,7 @@
 /**
  * 页面分析模块
  * @file pageMonitor/pageAnalyzer.js
- * @version 1.9.8
+ * @version 1.9.9
  * @date 2026-05-01
  * @author Sut
  * @description 分析页面类型和关键区域
@@ -109,7 +109,7 @@ export const pageAnalyzer = {
     } else if (/\/search/.test(path)) {
       keySelectors.push('.codesearch-results', '.search-title');
     } else if (/\/orgs\//.test(path) || /\/users\//.test(path)) {
-      keySelectors.push('.org-profile, .profile-timeline', '.user-profile-sticky-header', '.user-profile-main');
+      keySelectors.push('.org-profile', '.profile-timeline', '.user-profile-sticky-header', '.user-profile-main');
     } else if (/\/repos\/\w+\/\w+/.test(path)) {
       keySelectors.push('.repository-content', '.repository-meta-content', '.readme');
     } else {
