@@ -1,7 +1,7 @@
 /**
  * 部分匹配翻译模块
  * @file translationCore/partialTranslator.js
- * @version 1.9.8
+ * @version 1.9.9
  * @date 2026-05-01
  * @author Sut
  * @description 使用Trie树进行部分匹配翻译

@@ -1,0 +1,19 @@
+{
+  "common": {
+    "search": "搜索",
+    "new": "新建",
+    "actions": "操作",
+    "settings": "设置",
+    "help": "帮助"
+  },
+  "codespaces": {
+    "Codespaces": "代码空间",
+    "Start a codespace": "启动代码空间",
+    "Create codespace": "创建代码空间"
+  },
+  "explore": {
+    "Explore": "探索",
+    "Trending": "趋势",
+    "Topics": "主题"
+  }
+}
