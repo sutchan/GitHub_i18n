@@ -1,7 +1,7 @@
 /**
  * 翻译元素选择模块
  * @file translationCore/elementSelector.js
- * @version 1.9.9
+ * @version 1.9.10
  * @date 2026-05-01
  * @author Sut
  * @description 选择需要翻译的DOM元素
