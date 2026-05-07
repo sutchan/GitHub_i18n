@@ -1,0 +1,60 @@
+{
+  "name": "github-i18n",
+  "version": "1.9.12",
+  "description": "GitHub 中文本地化解决方案 - 用户脚本及自动化工具",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "build:minor": "node build.js minor",
+    "build:major": "node build.js major",
+    "lint": "eslint src/ utils/ build.js",
+    "lint:fix": "eslint src/ utils/ build.js --fix",
+    "format": "prettier --write \"src/**/*.js\" \"utils/**/*.js\" \"build.js\"",
+    "format:check": "prettier --check \"src/**/*.js\" \"utils/**/*.js\" \"build.js\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "validate": "node -e \"const fs=require('fs');const path=require('path');const buildFile=path.join('build','GitHub_i18n.user.js');if(!fs.existsSync(buildFile)){console.error('构建产物不存在');process.exit(1)}const content=fs.readFileSync(buildFile,'utf-8');if(content.length<1000){console.error('构建产物过小');process.exit(1)}console.log('验证通过');process.exit(0)\"",
+    "clean": "node -e \"const fs=require('fs');const path=require('path');['build','dist','coverage'].forEach(dir=>{if(fs.existsSync(dir)){fs.rmSync(dir,{recursive:true});console.log('已清理:',dir)}})\"",
+    "prepare": "husky install || true"
+  },
+  "keywords": [
+    "github",
+    "i18n",
+    "translation",
+    "chinese",
+    "localization",
+    "userscript",
+    "tampermonkey"
+  ],
+  "author": "Sut",
+  "license": "GPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sutchan/GitHub_i18n.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sutchan/GitHub_i18n/issues"
+  },
+  "homepage": "https://github.com/sutchan/GitHub_i18n#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^14.0.0",
+    "husky": "^9.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.2.0"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

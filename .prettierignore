@@ -1,0 +1,11 @@
+# 构建产物
+build/
+dist/
+coverage/
+
+# 依赖
+node_modules/
+
+# 其他
+*.min.js
+*.log

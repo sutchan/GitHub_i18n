@@ -1,0 +1,23 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# 简单的提交信息格式检查
+commit_msg=$(cat "$1")
+
+# 检查提交信息长度
+if [ ${#commit_msg} -lt 10 ]; then
+  echo "❌ 提交信息太短，请至少输入 10 个字符"
+  exit 1
+fi
+
+# 检查是否以特定前缀开头
+if ! echo "$commit_msg" | grep -qE "^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?:"; then
+  echo "⚠️  警告: 提交信息建议使用 conventional commits 格式"
+  echo "   例如: feat: 添加新功能"
+  echo "         fix: 修复某个bug"
+  echo "         docs: 更新文档"
+  echo ""
+  echo "   允许的前缀: feat, fix, docs, style, refactor, test, chore, perf, ci, build, revert"
+fi
+
+echo "✅ 提交信息检查通过"
