@@ -1,7 +1,7 @@
 /**
  * 页面监控模块
  * @file pageMonitor.js
- * @version 1.9.9
+ * @version 1.9.12
  * @date 2026-05-01
  * @author Sut
  * @description 负责监听GitHub页面的变化，检测DOM更新并触发翻译
@@ -456,7 +456,7 @@ export const pageMonitor = {
             keySelectors.push('.codesearch-results', '.search-title');
         } else if (/\/orgs\//.test(path) || /\/users\//.test(path)) {
             // 组织或用户页面
-            keySelectors.push('.org-profile, .profile-timeline', '.user-profile-sticky-header', '.user-profile-main');
+            keySelectors.push('.org-profile', '.profile-timeline', '.user-profile-sticky-header', '.user-profile-main');
         } else if (/\/repos\/\w+\/\w+/.test(path)) {
             // 仓库主页面
             keySelectors.push('.repository-content', '.repository-meta-content', '.readme');
