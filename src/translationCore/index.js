@@ -246,7 +246,7 @@ export const translationCore = {
     });
   },
 
-  async translateCriticalElementsOnly() {
+  translateCriticalElementsOnly() {
     return elementTranslator.translateCriticalElementsOnly();
   },
 

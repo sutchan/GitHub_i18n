@@ -14,7 +14,7 @@ export const translationTrigger = {
   lastTranslateTimestamp: 0,
   scheduledTranslate: null,
 
-  async translateWithThrottle() {
+  translateWithThrottle() {
     try {
       const now = Date.now();
       const minInterval = CONFIG.performance?.minTranslateInterval || 500;

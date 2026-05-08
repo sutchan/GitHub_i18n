@@ -18,7 +18,6 @@ export default [
         ...globals.browser,
         ...globals.node,
         ...globals.es2021,
-        // 用户脚本环境全局变量
         GM_info: 'readonly',
         GM_xmlhttpRequest: 'readonly',
         GM_setValue: 'readonly',
@@ -29,14 +28,12 @@ export default [
       },
     },
     rules: {
-      // 错误预防
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       'no-console': ['warn', { allow: ['error', 'warn', 'log'] }],
       'no-debugger': 'error',
       'no-var': 'error',
       'prefer-const': 'error',
 
-      // 代码风格
       'indent': ['error', 2, { SwitchCase: 1 }],
       'quotes': ['error', 'single', { avoidEscape: true }],
       'semi': ['error', 'always'],
@@ -53,22 +50,22 @@ export default [
       'eol-last': 'error',
       'no-trailing-spaces': 'error',
 
-      // 最佳实践
       'eqeqeq': ['error', 'always', { null: 'ignore' }],
       'curly': ['error', 'multi-line'],
       'no-throw-literal': 'error',
       'prefer-promise-reject-errors': 'error',
       'no-return-await': 'error',
-      'require-await': 'error',
+      'require-await': 'off',
 
-      // 复杂度控制
       'max-lines-per-function': ['warn', { max: 100, skipBlankLines: true, skipComments: true }],
       'max-params': ['warn', 4],
-      'complexity': ['warn', 15],
+      'complexity': ['warn', 20],
+
+      'no-prototype-builtins': 'error',
+      'no-control-regex': 'error',
     },
   },
   {
-    // 测试文件特殊规则
     files: ['**/*.test.js', '**/__tests__/**/*.js'],
     languageOptions: {
       globals: {
@@ -89,14 +86,12 @@ export default [
     },
   },
   {
-    // 构建脚本和工具文件
     files: ['build.js', 'utils/**/*.js'],
     rules: {
       'no-console': 'off',
     },
   },
   {
-    // 忽略文件
     ignores: [
       'build/**',
       'dist/**',

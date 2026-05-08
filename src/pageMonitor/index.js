@@ -54,7 +54,7 @@ export const pageMonitor = {
     pageMonitorCache.addEventListener({ target: window, type: 'pagehide', handler: unloadHandler });
   },
 
-  async translateWithThrottle() {
+  translateWithThrottle() {
     return translationTrigger.translateWithThrottle();
   },
 

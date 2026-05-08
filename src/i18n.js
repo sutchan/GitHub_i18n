@@ -354,7 +354,7 @@ async function initI18n(defaultLocale = 'zh-CN', fallbackLocale = 'en-US') {
  * @param {string} locale - 语言代码
  * @returns {Promise<boolean>} 加载是否成功
  */
-async function loadLocaleTranslations(locale) {
+function loadLocaleTranslations(locale) {
   // 在实际应用中，这里应该从服务器或本地文件加载翻译
   // 这里提供一些示例翻译
 

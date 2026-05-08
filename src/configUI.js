@@ -126,7 +126,7 @@ class ConfigUI {
     // 递归合并配置
     const merge = (target, source) => {
       for (const key in source) {
-        if (source.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
           if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
             if (!target[key]) target[key] = {};
             merge(target[key], source[key]);

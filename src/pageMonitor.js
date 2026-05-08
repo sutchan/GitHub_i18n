@@ -263,7 +263,7 @@ export const pageMonitor = {
      * 优化版：增加智能节流和翻译范围判断，支持Promise链式调用
      * @returns {Promise<void>} 翻译完成的Promise
      */
-  async translateWithThrottle() {
+  translateWithThrottle() {
     try {
       const now = Date.now();
       // 从配置中读取性能参数，确保有默认值

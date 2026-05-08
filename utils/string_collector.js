@@ -68,7 +68,7 @@ async function ensureDirectoryExists(dirPath) {
 /**
  * 下载网页内容
  */
-async function downloadPage(url, retryCount = 0) {
+function downloadPage(url, retryCount = 0) {
   try {
     // 验证URL格式
     try {

@@ -832,7 +832,7 @@ export const translationCore = {
 
     for (const match of potentialMatches) {
       const key = match.key;
-      if (!this.dictionary.hasOwnProperty(key) ||
+      if (!Object.prototype.hasOwnProperty.call(this.dictionary, key) ||
         this.dictionary[key].startsWith('待翻译: ')) {
         continue;
       }

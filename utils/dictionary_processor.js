@@ -62,10 +62,10 @@ function log(level, message, details = null) {
  * @returns {Object} 解析后的对象
  */
 function safeParseModuleContent(moduleContent) {
-  try {
-    // 确保内容是一个有效的对象字面量
-    const trimmedContent = moduleContent.trim();
+  // 确保内容是一个有效的对象字面量
+  const trimmedContent = moduleContent.trim();
 
+  try {
     // 验证内容以 { 开始和以 } 结束
     if (!trimmedContent.startsWith('{') || !trimmedContent.endsWith('}')) {
       throw new Error('模块内容格式不正确，不是有效的对象字面量');

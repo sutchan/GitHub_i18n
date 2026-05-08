@@ -102,7 +102,7 @@ export const elementTranslator = {
 
       if (translatedText && typeof translatedText === 'string' && translatedText !== originalText) {
         try {
-          const safeTranslatedText = String(translatedText).replace(/[\x00-\x1F\x7F]/g, '');
+          const safeTranslatedText = String(translatedText).replace(/[\u0000-\u001F\u007F]/gu, '');
           const translatedNode = document.createTextNode(safeTranslatedText);
           fragment.appendChild(translatedNode);
 

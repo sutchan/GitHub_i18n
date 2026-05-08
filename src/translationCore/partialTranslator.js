@@ -26,7 +26,7 @@ export const partialTranslator = {
 
     for (const match of potentialMatches) {
       const key = match.key;
-      if (!dictionaryManager.dictionary.hasOwnProperty(key) || dictionaryManager.dictionary[key].startsWith('待翻译: ')) {
+      if (!Object.prototype.hasOwnProperty.call(dictionaryManager.dictionary, key) || dictionaryManager.dictionary[key].startsWith('待翻译: ')) {
         continue;
       }
 

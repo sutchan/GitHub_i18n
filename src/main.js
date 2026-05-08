@@ -58,7 +58,7 @@ function cleanup() {
 /**
  * 初始化脚本
  */
-async function init() {
+function init() {
   try {
     // 检查更新
     if (CONFIG.updateCheck.enabled) {

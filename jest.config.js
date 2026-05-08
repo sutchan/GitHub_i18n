@@ -8,6 +8,12 @@ export default {
   testEnvironment: 'jsdom',
   testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).js'],
   testPathIgnorePatterns: ['/node_modules/', '/build/', '/dist/'],
+  transform: {
+    '^.+\\.js$': 'babel-jest',
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(jsesc)/)',
+  ],
   collectCoverageFrom: [
     'src/**/*.js',
     '!src/dictionaries/*.js',

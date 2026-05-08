@@ -42,7 +42,10 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.5",
     "@eslint/js": "^9.0.0",
+    "babel-jest": "^30.4.1",
     "eslint": "^9.0.0",
     "globals": "^14.0.0",
     "husky": "^9.0.0",
