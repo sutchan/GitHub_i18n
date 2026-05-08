@@ -1,7 +1,7 @@
 /**
  * 翻译元素选择模块
  * @file translationCore/elementSelector.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 选择需要翻译的DOM元素
@@ -88,7 +88,7 @@ export const elementSelector = {
         /hex-color/, /code/, /gist/, /language-/, /markdown-/, /monaco-editor/,
         /syntax-/, /highlight-/, /clipboard/, /progress-/, /count/, /size/,
         /time/, /date/, /sortable/, /label/, /badge/, /url/, /email/, /key/,
-        /token/, /user-name/, /repo-name/
+        /token/, /user-name/, /repo-name/,
       ];
 
       if (skipClassPatterns.some(pattern => pattern.test(className))) {
@@ -130,7 +130,7 @@ export const elementSelector = {
         /team-/, /project-/, /milestone-/, /label-/, /assignee-/,
         /reporter-/, /reviewer-/, /author-/, /committer-/,
         /contributor-/, /sponsor-/, /funding-/, /donation-/, /payment-/,
-        /\b\w+[0-9]\w*\b/
+        /\b\w+[0-9]\w*\b/,
       ];
 
       if (skipIdPatterns.some(pattern => pattern.test(id))) {
@@ -160,5 +160,5 @@ export const elementSelector = {
 
   shouldTranslate(element) {
     return virtualDomManager.shouldTranslate(element);
-  }
+  },
 };

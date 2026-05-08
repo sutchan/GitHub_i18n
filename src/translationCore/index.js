@@ -1,7 +1,7 @@
 /**
  * 翻译核心主模块
  * @file translationCore/index.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 翻译核心主入口，整合所有子模块
@@ -161,7 +161,7 @@ export const translationCore = {
                     reject(recoverError);
                   });
               },
-              maxRetries: 2
+              maxRetries: 2,
             });
           });
       } catch (error) {
@@ -179,7 +179,7 @@ export const translationCore = {
                 reject(recoverError);
               });
           },
-          maxRetries: 2
+          maxRetries: 2,
         });
       }
     });
@@ -363,5 +363,5 @@ export const translationCore = {
   logPerformanceData: () => performanceMonitor.logPerformanceData(),
   recordPerformanceEvent: (eventType, data) => performanceMonitor.recordPerformanceEvent(eventType, data),
   getPerformanceStats: () => performanceMonitor.getPerformanceStats(),
-  exportPerformanceData: () => performanceMonitor.exportPerformanceData()
+  exportPerformanceData: () => performanceMonitor.exportPerformanceData(),
 };

@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
 };
 
 // 配置对象
-let CONFIG = { ...DEFAULT_CONFIG };
+const CONFIG = { ...DEFAULT_CONFIG };
 
 /**
  * 统一日志处理函数
@@ -41,7 +41,7 @@ function log(level, message, details = null) {
         try {
           logMessage += `\n详细信息: ${JSON.stringify(details, null, 2)}`;
         } catch (e) {
-          logMessage += `\n详细信息: [对象序列化失败]`;
+          logMessage += '\n详细信息: [对象序列化失败]';
         }
       } else {
         logMessage += `\n详细信息: ${details}`;
@@ -65,15 +65,15 @@ function safeParseModuleContent(moduleContent) {
   try {
     // 确保内容是一个有效的对象字面量
     const trimmedContent = moduleContent.trim();
-    
+
     // 验证内容以 { 开始和以 } 结束
     if (!trimmedContent.startsWith('{') || !trimmedContent.endsWith('}')) {
       throw new Error('模块内容格式不正确，不是有效的对象字面量');
     }
-    
+
     // 使用JSON.parse替代eval，但需要先处理非标准JSON格式
     // 将单引号替换为双引号，并处理JavaScript对象字面量中的其他格式差异
-    let jsonCompatibleContent = trimmedContent
+    const jsonCompatibleContent = trimmedContent
       // 替换单引号为双引号
       .replace(/'/g, '"')
       // 移除对象字面量中的尾随逗号（JSON不允许）
@@ -89,12 +89,12 @@ function safeParseModuleContent(moduleContent) {
       .replace(/"\s*\+\s*"/g, '')
       // 处理字符串中的换行符
       .replace(/[\r\n]+/g, ' ');
-    
+
     // 尝试解析处理后的内容
     return JSON.parse(jsonCompatibleContent);
   } catch (error) {
     log('warn', '使用JSON.parse解析失败，尝试使用更安全的解析方法', error.message);
-    
+
     try {
       // 作为后备方案，使用更安全的解析方法
       // 1. 尝试使用简单的正则表达式解析键值对
@@ -102,19 +102,19 @@ function safeParseModuleContent(moduleContent) {
       // 匹配键值对的正则表达式，支持单引号和双引号
       const keyValueRegex = /(['"])([^'"]+)\1\s*:\s*(['"])([^'"]*)\3/g;
       let match;
-      
+
       while ((match = keyValueRegex.exec(trimmedContent)) !== null) {
         const key = match[2];
         const value = match[4];
         result[key] = value;
       }
-      
+
       // 如果找到了键值对，返回结果
       if (Object.keys(result).length > 0) {
         log('info', `使用正则表达式解析成功，提取了 ${Object.keys(result).length} 个键值对`);
         return result;
       }
-      
+
       // 2. 如果正则表达式解析失败，尝试使用更宽松的解析方法
       // 注意：这是一个最后的后备方案，可能不适用于所有情况
       // 在生产环境中，应该确保模块内容是有效的JSON格式
@@ -454,29 +454,26 @@ async function cli(command, options = {}) {
     Object.assign(CONFIG, options);
 
     switch (command) {
-      case 'export':
-        // 从用户脚本导出词典到JSON文件
+      case 'export': {
         const dictionary = await extractDictionaryFromUserScript();
         const optimizedDictionary = optimizeDictionary(dictionary);
         await saveDictionaryToJson(optimizedDictionary);
         log('info', '词典导出完成');
         break;
-
-      case 'import':
-        // 从JSON文件导入词典到用户脚本
+      }
+      case 'import': {
         const importDictionary = await readDictionaryFromJson();
         await writeDictionaryToUserScript(importDictionary);
         log('info', '词典导入完成');
         break;
-
-      case 'optimize':
-        // 优化JSON词典文件
+      }
+      case 'optimize': {
         const currentDictionary = await readDictionaryFromJson();
         const optimized = optimizeDictionary(currentDictionary);
         await saveDictionaryToJson(optimized);
         log('info', '词典优化完成');
         break;
-
+      }
       default:
         log('error', `未知命令: ${command}`);
         log('info', '可用命令: export, import, optimize');
@@ -526,5 +523,5 @@ module.exports = {
   writeDictionaryToUserScript,
   optimizeDictionary,
   saveExtractedStringsToDictionary,
-  cli
+  cli,
 };

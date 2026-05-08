@@ -1,7 +1,7 @@
 /**
  * 页面分析模块
  * @file pageMonitor/pageAnalyzer.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 分析页面类型和关键区域
@@ -15,9 +15,9 @@ export const pageAnalyzer = {
       /\/issues\/\d+/,
       /\/blob\//,
       /\/commit\//,
-      /\/compare\//
+      /\/compare\//,
     ];
-    
+
     return complexPaths.some(pattern => pattern.test(window.location.pathname));
   },
 
@@ -28,7 +28,7 @@ export const pageAnalyzer = {
       'pullRequests': 4,
       'wiki': 6,
       'actions': 5,
-      'codespaces': 3
+      'codespaces': 3,
     };
     return thresholds[pageMode] || 3;
   },
@@ -39,7 +39,7 @@ export const pageAnalyzer = {
       'pullRequests': 0.35,
       'wiki': 0.4,
       'search': 0.3,
-      'codespaces': 0.25
+      'codespaces': 0.25,
     };
     return thresholds[pageMode];
   },
@@ -49,26 +49,26 @@ export const pageAnalyzer = {
       'issues': 4,
       'pullRequests': 4,
       'wiki': 5,
-      'search': 3
+      'search': 3,
     };
     return lengths[pageMode] || CONFIG.performance?.minTextLengthToTranslate || 3;
   },
 
   shouldSkipElementByPageMode(element, pageMode) {
     if (!element || !pageMode) return false;
-    
-    if (element.tagName === 'CODE' || element.tagName === 'SCRIPT' || 
+
+    if (element.tagName === 'CODE' || element.tagName === 'SCRIPT' ||
         element.tagName === 'STYLE' || element.classList.contains('blob-code')) {
       return true;
     }
-    
+
     switch (pageMode) {
       case 'codespaces':
-        return element.classList.contains('terminal') || 
+        return element.classList.contains('terminal') ||
                element.classList.contains('command-input') ||
                element.dataset.terminal;
       case 'wiki':
-        return element.classList.contains('codehilite') || 
+        return element.classList.contains('codehilite') ||
                element.classList.contains('highlight') ||
                element.closest('.highlight');
       case 'issues':
@@ -89,7 +89,7 @@ export const pageAnalyzer = {
   identifyKeyTranslationAreas() {
     const keySelectors = [];
     const path = window.location.pathname;
-    
+
     if (/\/pull\/\d+/.test(path) || /\/issues\/\d+/.test(path)) {
       keySelectors.push('.js-discussion', '.issue-details', '.js-issue-title', '.js-issue-labels');
     } else if (/\/blob\//.test(path)) {
@@ -115,7 +115,7 @@ export const pageAnalyzer = {
     } else {
       keySelectors.push('.repository-content', '.profile-timeline', '.application-main', 'main');
     }
-    
+
     const elements = [];
     for (const selector of keySelectors) {
       const element = document.querySelector(selector);
@@ -123,7 +123,7 @@ export const pageAnalyzer = {
         elements.push(element);
       }
     }
-    
+
     if (elements.length === 0) {
       const genericSelectors = ['#js-pjax-container', '.application-main', 'main', 'body'];
       for (const selector of genericSelectors) {
@@ -134,7 +134,7 @@ export const pageAnalyzer = {
         }
       }
     }
-    
+
     return elements;
-  }
+  },
 };

@@ -1,7 +1,7 @@
 /**
  * DOM变化观察器模块
  * @file pageMonitor/domObserver.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 观察DOM变化并触发翻译
@@ -453,5 +453,5 @@ export const domObserver = {
       this.observer.disconnect();
       this.observer = null;
     }
-  }
+  },
 };

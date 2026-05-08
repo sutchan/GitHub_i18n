@@ -1,7 +1,7 @@
 /**
  * 页面监控缓存管理模块
  * @file pageMonitor/cacheManager.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 管理页面监控中的缓存
@@ -36,16 +36,16 @@ export const pageMonitorCache = {
       if (this.nodeCheckCache.size > maxCacheSize) {
         const entriesToRemove = Math.floor(this.nodeCheckCache.size * 0.3);
         const keysToRemove = Array.from(this.nodeCheckCache.keys()).slice(0, entriesToRemove);
-        
+
         keysToRemove.forEach(key => {
           this.nodeCheckCache.delete(key);
         });
-        
+
         if (CONFIG.debugMode) {
           console.log(`[GitHub 中文翻译] 清理了${keysToRemove.length}个节点检查缓存条目`);
         }
       }
-      
+
       this.lastCacheCleanupTime = Date.now();
     } catch (error) {
       if (CONFIG.debugMode) {
@@ -71,5 +71,5 @@ export const pageMonitorCache = {
       }
     });
     this.eventListeners = [];
-  }
+  },
 };

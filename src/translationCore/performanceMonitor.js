@@ -1,7 +1,7 @@
 /**
  * 性能监控模块
  * @file translationCore/performanceMonitor.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 监控翻译性能数据
@@ -32,7 +32,7 @@ export const performanceMonitor = {
       partialMatches: 0,
       batchProcessings: 0,
       errorCount: 0,
-      totalMemory: 0
+      totalMemory: 0,
     };
   },
 
@@ -99,8 +99,8 @@ export const performanceMonitor = {
       timestamp: new Date().toISOString(),
       stats: this.getPerformanceStats(),
       userAgent: navigator.userAgent,
-      browserLanguage: navigator.language
+      browserLanguage: navigator.language,
     };
     return JSON.stringify(data, null, 2);
-  }
+  },
 };

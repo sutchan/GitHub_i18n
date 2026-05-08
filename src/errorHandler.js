@@ -1,7 +1,7 @@
 /**
  * 错误处理模块
  * @file errorHandler.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 负责统一管理所有错误处理和恢复机制
@@ -12,7 +12,7 @@ import { CONFIG } from './config.js';
 export const ErrorHandler = {
   // 错误计数器
   errorCounts: new Map(),
-  
+
   // 错误类型定义
   ERROR_TYPES: {
     TRANSLATION: 'translation',
@@ -20,7 +20,7 @@ export const ErrorHandler = {
     DICTIONARY: 'dictionary',
     NETWORK: 'network',
     PERFORMANCE: 'performance',
-    OTHER: 'other'
+    OTHER: 'other',
   },
 
   /**
@@ -69,10 +69,10 @@ export const ErrorHandler = {
    */
   logError(context, error, type) {
     const errorMessage = `[GitHub 中文翻译] ${context}时出错 (${type}): ${error.message}`;
-    
+
     if (CONFIG.debugMode) {
       console.error(errorMessage, error);
-      
+
       // 在调试模式下，提供更详细的错误信息
       if (error.stack) {
         console.error('[GitHub 中文翻译] 错误堆栈:', error.stack);
@@ -123,11 +123,11 @@ export const ErrorHandler = {
       [this.ERROR_TYPES.DICTIONARY]: CONFIG.performance?.maxDictionaryErrorCount || 5,
       [this.ERROR_TYPES.NETWORK]: CONFIG.performance?.maxNetworkErrorCount || 3,
       [this.ERROR_TYPES.PERFORMANCE]: CONFIG.performance?.maxPerformanceErrorCount || 15,
-      [this.ERROR_TYPES.OTHER]: CONFIG.performance?.maxOtherErrorCount || 25
+      [this.ERROR_TYPES.OTHER]: CONFIG.performance?.maxOtherErrorCount || 25,
     };
 
     const threshold = thresholds[type] || 20;
-    
+
     if (count >= threshold) {
       this.handleErrorOverflow(type, count, threshold);
     }
@@ -196,7 +196,7 @@ export const ErrorHandler = {
     } else {
       this.init();
     }
-  }
+  },
 };
 
 // 初始化错误处理器

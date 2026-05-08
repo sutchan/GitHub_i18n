@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.9.12
+// @version      1.9.13
 // @description  GitHub页面自动翻译为中文
 // @author       Sut
 // @match        https://github.com/*
@@ -27,7 +27,7 @@
 /**
  * 版本信息模块
  * @file version.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 统一管理GitHub自动化字符串更新工具的版本信息
@@ -37,7 +37,7 @@
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-const VERSION = '1.9.12';
+const VERSION = '1.9.13';
 /**
  * 版本历史记录
  * @type {Array<{version: string, date: string, changes: string[]}>}
@@ -49,8 +49,8 @@ const VERSION_HISTORY = [
     changes: [
       '修复构建脚本对export default语法的处理',
       '修复virtualDom.js版本号不一致问题',
-      '优化导出语句的处理逻辑'
-    ]
+      '优化导出语句的处理逻辑',
+    ],
   },
   {
     version: '1.9.1',
@@ -58,368 +58,368 @@ const VERSION_HISTORY = [
     changes: [
       '修复Trie树findAllMatches方法参数问题',
       '修复i18n.js模块导出问题',
-      '统一所有文件版本号为1.9.1'
-    ]
+      '统一所有文件版本号为1.9.1',
+    ],
   },
   {
     version: '1.8.182',
     date: '2026-01-09',
-    changes: ['同步版本号', '优化构建脚本']
+    changes: ['同步版本号', '优化构建脚本'],
   },
   {
     version: '1.8.181',
     date: '2026-01-08',
-    changes: ['清理冗余代码']
+    changes: ['清理冗余代码'],
   },
   {
     version: '1.8.159',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.158',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.157',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.156',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.155',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.154',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.153',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.152',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.151',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.150',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.149',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.148',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.147',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.146',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.145',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.144',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.142',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.141',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.140',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.139',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.138',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.137',
     date: '2025-11-11',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.136',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.135',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.134',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.133',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.132',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.131',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.130',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.129',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.128',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.127',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.126',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.125',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.124',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.123',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.122',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.121',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.120',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.119',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.118',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.117',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.116',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.115',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.114',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.113',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.112',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.111',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.110',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.109',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.108',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.107',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.106',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.105',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.104',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.103',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.102',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.101',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.100',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.99',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.98',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.97',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.96',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.95',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.94',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.93',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.92',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.91',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.90',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.89',
     date: '2025-11-10',
-    changes: ['自动版本更新']
+    changes: ['自动版本更新'],
   },
   {
     version: '1.8.88',
@@ -427,8 +427,8 @@ const VERSION_HISTORY = [
     changes: [
       '修复代码规范问题',
       '统一项目版本号管理',
-      '优化.gitignore配置'
-    ]
+      '优化.gitignore配置',
+    ],
   },
   {
     version: '1.8.87',
@@ -436,8 +436,8 @@ const VERSION_HISTORY = [
     changes: [
       '增强页面监控性能',
       '优化翻译缓存机制',
-      '修复已知兼容性问题'
-    ]
+      '修复已知兼容性问题',
+    ],
   },
   {
     version: '1.8.86',
@@ -445,8 +445,8 @@ const VERSION_HISTORY = [
     changes: [
       '更新翻译词典',
       '添加新页面模式支持',
-      '改进错误处理机制'
-    ]
+      '改进错误处理机制',
+    ],
   },
   {
     version: '1.8.85',
@@ -454,8 +454,8 @@ const VERSION_HISTORY = [
     changes: [
       '优化DOM操作性能',
       '添加更详细的错误日志',
-      '更新构建脚本功能'
-    ]
+      '更新构建脚本功能',
+    ],
   },
   {
     version: '1.8.84',
@@ -463,15 +463,15 @@ const VERSION_HISTORY = [
     changes: [
       '支持更多GitHub页面',
       '优化翻译效率',
-      '修复界面布局问题'
-    ]
-  }
+      '修复界面布局问题',
+    ],
+  },
 ];
 // ===== config.js =====
 /**
  * GitHub 中文翻译配置文件
  * @file config.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 包含脚本所有可配置项
@@ -501,214 +501,214 @@ function getVersionFromComment() {
  * 配置对象，包含所有可配置项
  */
 const CONFIG = {
-  "version": VERSION,
-  "debounceDelay": 500,
-  "routeChangeDelay": 500,
-  "debugMode": false,
-  "updateCheck": {
-    "enabled": true,
-    "intervalHours": 24,
-    "scriptUrl": "https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js",
-    "autoUpdateVersion": true
+  'version': VERSION,
+  'debounceDelay': 500,
+  'routeChangeDelay': 500,
+  'debugMode': false,
+  'updateCheck': {
+    'enabled': true,
+    'intervalHours': 24,
+    'scriptUrl': 'https://github.com/sutchan/GitHub_i18n/raw/main/dist/GitHub_zh-CN.user.js',
+    'autoUpdateVersion': true,
   },
-  "externalTranslation": {
-    "enabled": false,
-    "minLength": 20,
-    "maxLength": 500,
-    "timeout": 3000,
-    "requestInterval": 500,
-    "cacheSize": 500
+  'externalTranslation': {
+    'enabled': false,
+    'minLength': 20,
+    'maxLength': 500,
+    'timeout': 3000,
+    'requestInterval': 500,
+    'cacheSize': 500,
   },
-  "performance": {
-    "enableDeepObserver": true,
-    "enablePartialMatch": false,
-    "maxDictSize": 2000,
-    "enableTranslationCache": true,
-    "batchSize": 50,
-    "batchDelay": 0,
-    "logTiming": false,
-    "cacheExpiration": 3600000, // 缓存过期时间（毫秒）
-    "minTextLengthToTranslate": 3, // 最小翻译文本长度
-    "minTranslateInterval": 500, // 最小翻译间隔（毫秒）
-    "observeAttributes": true, // 是否观察属性变化
-    "observeSubtree": true, // 是否观察子树变化
-    "importantAttributes": ["title", "alt", "aria-label", "placeholder", "data-hovercard-url", "data-hovercard-type"], // 重要的属性列表
-    "importantElements": [
-      ".HeaderNavlink", ".js-selected-navigation-item", ".js-issue-title",
-      ".js-commit-message", ".js-details-container", ".js-comment-body",
-      ".js-activity-item", ".js-blob-content", ".js-repo-description",
-      ".js-issue-row", ".js-pinned-issue-list-item", ".js-project-card-content",
-      ".js-user-profile-bio", ".js-header-search-input", ".js-file-line",
-      ".Header-link", ".TabNav-link", ".UnderlineNav-link", ".Label",
-      ".btn-primary", ".btn-secondary", ".TimelineItem-body", ".Box-title",
-      ".Subhead-heading", ".f4", ".f5", ".text-bold", ".text-semibold",
-      ".avatar-user", ".contributor-avatar", ".commit-author", ".issue-author"
+  'performance': {
+    'enableDeepObserver': true,
+    'enablePartialMatch': false,
+    'maxDictSize': 2000,
+    'enableTranslationCache': true,
+    'batchSize': 50,
+    'batchDelay': 0,
+    'logTiming': false,
+    'cacheExpiration': 3600000, // 缓存过期时间（毫秒）
+    'minTextLengthToTranslate': 3, // 最小翻译文本长度
+    'minTranslateInterval': 500, // 最小翻译间隔（毫秒）
+    'observeAttributes': true, // 是否观察属性变化
+    'observeSubtree': true, // 是否观察子树变化
+    'importantAttributes': ['title', 'alt', 'aria-label', 'placeholder', 'data-hovercard-url', 'data-hovercard-type'], // 重要的属性列表
+    'importantElements': [
+      '.HeaderNavlink', '.js-selected-navigation-item', '.js-issue-title',
+      '.js-commit-message', '.js-details-container', '.js-comment-body',
+      '.js-activity-item', '.js-blob-content', '.js-repo-description',
+      '.js-issue-row', '.js-pinned-issue-list-item', '.js-project-card-content',
+      '.js-user-profile-bio', '.js-header-search-input', '.js-file-line',
+      '.Header-link', '.TabNav-link', '.UnderlineNav-link', '.Label',
+      '.btn-primary', '.btn-secondary', '.TimelineItem-body', '.Box-title',
+      '.Subhead-heading', '.f4', '.f5', '.text-bold', '.text-semibold',
+      '.avatar-user', '.contributor-avatar', '.commit-author', '.issue-author',
     ], // 重要内容元素
-    "ignoreElements": [
-      "script", "style", "link", "meta", "svg", "canvas",
-      "pre", "code", "kbd", "samp", ".blob-code-inner", ".file-line",
-      ".highlight", ".language-*", ".mermaid", ".mathjax",
-      ".js-zeroclipboard-button", ".js-minimizable-content",
-      ".reponav-dropdown", ".dropdown-caret", ".avatar", ".emoji",
-      ".blob-code", ".blob-code-marker", ".blob-num", ".blob-num-hunk",
-      ".diff-line", ".diff-addition", ".diff-deletion", ".diff-header",
-      ".line-comment", ".inline-comment", ".commit-diff-title",
-      ".copyable-area", ".copy-button", ".token", ".syntax--",
-      ".octicon", ".github-icon", ".icon", ".spinner",
-      ".timestamp", ".time-ago", ".relative-time", ".local-time",
-      ".sha", ".shortsha", ".commit-sha", ".blob-sha",
-      ".username", ".login", ".user-mention", ".team-mention",
-      ".repo-name", ".repo-link", ".branch-name", ".tag-name",
-      ".file-name", ".file-path", ".directory", ".folder",
-      ".language-color", ".repo-language-color", ".color-block",
-      ".progress-bar", ".meter", ".counter", ".number",
-      ".size", ".bytes", ".count", ".stat", ".statistic",
-      ".code-search-result-match", ".search-match", ".highlighted-text",
-      ".notification-indicator", ".notification-badge", ".notification-count",
-      ".unread-indicator", ".new-indicator", ".badge", ".label"
+    'ignoreElements': [
+      'script', 'style', 'link', 'meta', 'svg', 'canvas',
+      'pre', 'code', 'kbd', 'samp', '.blob-code-inner', '.file-line',
+      '.highlight', '.language-*', '.mermaid', '.mathjax',
+      '.js-zeroclipboard-button', '.js-minimizable-content',
+      '.reponav-dropdown', '.dropdown-caret', '.avatar', '.emoji',
+      '.blob-code', '.blob-code-marker', '.blob-num', '.blob-num-hunk',
+      '.diff-line', '.diff-addition', '.diff-deletion', '.diff-header',
+      '.line-comment', '.inline-comment', '.commit-diff-title',
+      '.copyable-area', '.copy-button', '.token', '.syntax--',
+      '.octicon', '.github-icon', '.icon', '.spinner',
+      '.timestamp', '.time-ago', '.relative-time', '.local-time',
+      '.sha', '.shortsha', '.commit-sha', '.blob-sha',
+      '.username', '.login', '.user-mention', '.team-mention',
+      '.repo-name', '.repo-link', '.branch-name', '.tag-name',
+      '.file-name', '.file-path', '.directory', '.folder',
+      '.language-color', '.repo-language-color', '.color-block',
+      '.progress-bar', '.meter', '.counter', '.number',
+      '.size', '.bytes', '.count', '.stat', '.statistic',
+      '.code-search-result-match', '.search-match', '.highlighted-text',
+      '.notification-indicator', '.notification-badge', '.notification-count',
+      '.unread-indicator', '.new-indicator', '.badge', '.label',
     ], // 忽略翻译的元素
-    "mutationThreshold": 30, // 单次突变数量阈值
-    "contentChangeWeight": 1, // 内容变化权重
-    "importantChangeWeight": 2, // 重要变化权重
-    "translationTriggerRatio": 0.3, // 触发翻译的变化比例
-    "enableVirtualDom": true, // 是否启用虚拟DOM优化
-    "virtualDomCleanupInterval": 60000, // 虚拟DOM清理间隔（毫秒）
-    "virtualDomNodeTimeout": 3600000, // 虚拟DOM节点超时时间（毫秒）
-    "useSmartThrottling": true, // 启用智能节流
-    "ignoreCharacterDataMutations": false, // 是否忽略字符数据变化（用于性能优化）
-    "ignoreAttributeMutations": false, // 是否忽略属性变化（用于性能优化）
-    "minContentChangesToTrigger": 3, // 触发翻译的最小内容变化数
-    "maxMutationProcessing": 50, // 单次处理的最大突变数
-    "enableFullTranslation": true, // 是否启用完整翻译模式
-    "networkRequestInterval": 1000, // 网络请求间隔（毫秒）
-    "maxTranslationErrorCount": 10, // 最大翻译错误数
-    "maxDomErrorCount": 20, // 最大DOM操作错误数
-    "maxDictionaryErrorCount": 5, // 最大词典错误数
-    "maxNetworkErrorCount": 3, // 最大网络错误数
-    "maxPerformanceErrorCount": 15, // 最大性能错误数
-    "maxOtherErrorCount": 25 // 最大其他错误数
+    'mutationThreshold': 30, // 单次突变数量阈值
+    'contentChangeWeight': 1, // 内容变化权重
+    'importantChangeWeight': 2, // 重要变化权重
+    'translationTriggerRatio': 0.3, // 触发翻译的变化比例
+    'enableVirtualDom': true, // 是否启用虚拟DOM优化
+    'virtualDomCleanupInterval': 60000, // 虚拟DOM清理间隔（毫秒）
+    'virtualDomNodeTimeout': 3600000, // 虚拟DOM节点超时时间（毫秒）
+    'useSmartThrottling': true, // 启用智能节流
+    'ignoreCharacterDataMutations': false, // 是否忽略字符数据变化（用于性能优化）
+    'ignoreAttributeMutations': false, // 是否忽略属性变化（用于性能优化）
+    'minContentChangesToTrigger': 3, // 触发翻译的最小内容变化数
+    'maxMutationProcessing': 50, // 单次处理的最大突变数
+    'enableFullTranslation': true, // 是否启用完整翻译模式
+    'networkRequestInterval': 1000, // 网络请求间隔（毫秒）
+    'maxTranslationErrorCount': 10, // 最大翻译错误数
+    'maxDomErrorCount': 20, // 最大DOM操作错误数
+    'maxDictionaryErrorCount': 5, // 最大词典错误数
+    'maxNetworkErrorCount': 3, // 最大网络错误数
+    'maxPerformanceErrorCount': 15, // 最大性能错误数
+    'maxOtherErrorCount': 25, // 最大其他错误数
   },
-  "selectors": {
-    "primary": [
-      "h1, h2, h3, h4, h5, h6",
-      "p, span, a, button",
-      "label, strong, em",
-      "li, td, th",
-      ".btn, .button",
-      ".link, .text",
-      ".nav-item, .menu-item"
+  'selectors': {
+    'primary': [
+      'h1, h2, h3, h4, h5, h6',
+      'p, span, a, button',
+      'label, strong, em',
+      'li, td, th',
+      '.btn, .button',
+      '.link, .text',
+      '.nav-item, .menu-item',
     ],
-    "popupMenus": [
-      ".dropdown-menu",
-      ".menu-dropdown",
-      ".context-menu",
-      ".notification-popover"
-    ]
+    'popupMenus': [
+      '.dropdown-menu',
+      '.menu-dropdown',
+      '.context-menu',
+      '.notification-popover',
+    ],
   },
-  "pagePatterns": {
-    "search": /\/search/,
-    "repository": /\/[\w-]+\/[\w-]+/,
-    "issues": /\/[\w-]+\/[\w-]+\/issues/,
-    "pullRequests": /\/[\w-]+\/[\w-]+\/pull/,
-    "settings": /\/settings/,
-    "dashboard": /^\/$/,
-    "explore": /\/explore/,
-    "codespaces": /\/codespaces/,
-    "notifications": /\/notifications/,
-    "profile": /\/[\w-]+$/,
-    "organizations": /\/organizations/,
-    "projects": /\/[\w-]+\/[\w-]+\/projects/,
-    "wiki": /\/[\w-]+\/[\w-]+\/wiki/,
-    "actions": /\/[\w-]+\/[\w-]+\/actions/,
-    "packages": /\/[\w-]+\/[\w-]+\/packages/,
-    "security": /\/[\w-]+\/[\w-]+\/security/,
-    "insights": /\/[\w-]+\/[\w-]+\/insights/,
-    "marketplace": /\/marketplace/,
-    "topics": /\/topics/,
-    "stars": /\/stars/,
-    "trending": /\/trending/
-  }
+  'pagePatterns': {
+    'search': /\/search/,
+    'repository': /\/[\w-]+\/[\w-]+/,
+    'issues': /\/[\w-]+\/[\w-]+\/issues/,
+    'pullRequests': /\/[\w-]+\/[\w-]+\/pull/,
+    'settings': /\/settings/,
+    'dashboard': /^\/$/,
+    'explore': /\/explore/,
+    'codespaces': /\/codespaces/,
+    'notifications': /\/notifications/,
+    'profile': /\/[\w-]+$/,
+    'organizations': /\/organizations/,
+    'projects': /\/[\w-]+\/[\w-]+\/projects/,
+    'wiki': /\/[\w-]+\/[\w-]+\/wiki/,
+    'actions': /\/[\w-]+\/[\w-]+\/actions/,
+    'packages': /\/[\w-]+\/[\w-]+\/packages/,
+    'security': /\/[\w-]+\/[\w-]+\/security/,
+    'insights': /\/[\w-]+\/[\w-]+\/insights/,
+    'marketplace': /\/marketplace/,
+    'topics': /\/topics/,
+    'stars': /\/stars/,
+    'trending': /\/trending/,
+  },
 };
 // ===== trie.js =====
 /**
  * Trie树数据结构模块
  * @file trie.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 高效的字符串匹配数据结构，用于部分匹配翻译
  */
 class TrieNode {
-    constructor() {
-        this.children = new Map();
-        this.isEndOfWord = false;
-        this.value = null;
-        this.length = 0;
-    }
+  constructor() {
+    this.children = new Map();
+    this.isEndOfWord = false;
+    this.value = null;
+    this.length = 0;
+  }
 }
 class Trie {
-    constructor() {
-        this.root = new TrieNode();
-        this.size = 0;
+  constructor() {
+    this.root = new TrieNode();
+    this.size = 0;
+  }
+  insert(word, value) {
+    if (!word || typeof word !== 'string' || word.length === 0) {
+      return;
     }
-    insert(word, value) {
-        if (!word || typeof word !== 'string' || word.length === 0) {
-            return;
+    let node = this.root;
+    for (const char of word) {
+      if (!node.children.has(char)) {
+        node.children.set(char, new TrieNode());
+      }
+      node = node.children.get(char);
+    }
+    node.isEndOfWord = true;
+    node.value = value;
+    node.length = word.length;
+    this.size++;
+  }
+  findAllMatches(text, minKeyLength = 0) {
+    if (!text || typeof text !== 'string' || text.length === 0) {
+      return [];
+    }
+    const matches = [];
+    const textLen = text.length;
+    for (let i = 0; i < textLen; i++) {
+      let node = this.root;
+      let currentWord = '';
+      for (let j = i; j < textLen; j++) {
+        const char = text[j];
+        if (!node.children.has(char)) {
+          break;
         }
-        let node = this.root;
-        for (const char of word) {
-            if (!node.children.has(char)) {
-                node.children.set(char, new TrieNode());
-            }
-            node = node.children.get(char);
+        node = node.children.get(char);
+        currentWord += char;
+        if (node.isEndOfWord && currentWord.length >= minKeyLength) {
+          matches.push({
+            key: currentWord,
+            value: node.value,
+            start: i,
+            end: j,
+            length: node.length,
+          });
         }
-        node.isEndOfWord = true;
-        node.value = value;
-        node.length = word.length;
-        this.size++;
+      }
     }
-    findAllMatches(text, minKeyLength = 0) {
-        if (!text || typeof text !== 'string' || text.length === 0) {
-            return [];
-        }
-        const matches = [];
-        const textLen = text.length;
-        for (let i = 0; i < textLen; i++) {
-            let node = this.root;
-            let currentWord = '';
-            for (let j = i; j < textLen; j++) {
-                const char = text[j];
-                if (!node.children.has(char)) {
-                    break;
-                }
-                node = node.children.get(char);
-                currentWord += char;
-                if (node.isEndOfWord && currentWord.length >= minKeyLength) {
-                    matches.push({
-                        key: currentWord,
-                        value: node.value,
-                        start: i,
-                        end: j,
-                        length: node.length
-                    });
-                }
-            }
-        }
-        return matches;
-    }
-    clear() {
-        this.root = new TrieNode();
-        this.size = 0;
-    }
-    getSize() {
-        return this.size;
-    }
+    return matches;
+  }
+  clear() {
+    this.root = new TrieNode();
+    this.size = 0;
+  }
+  getSize() {
+    return this.size;
+  }
 }
 // ===== utils.js =====
 /**
  * 工具函数模块
  * @file utils.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 包含各种通用的辅助函数
@@ -717,7 +717,7 @@ class Trie {
  * 工具函数集合
  */
 const utils = {
-    /**
+  /**
      * 节流函数，用于限制高频操作的执行频率
      * 支持返回Promise
      * @param {Function} func - 要节流的函数
@@ -727,36 +727,36 @@ const utils = {
      * @param {boolean} options.trailing - 是否在结束后执行（默认true）
      * @returns {Function} 节流后的函数
      */
-    throttle(func, limit, options = {}) {
-        const { leading = true, trailing = true } = options;
-        let inThrottle, lastArgs, lastThis, result, timerId;
-        const later = (context, args) => {
-            inThrottle = false;
-            if (trailing && lastArgs) {
-                result = func.apply(context, args);
-                lastArgs = lastThis = null;
-            }
-        };
-        return function() {
-            const args = arguments;
-            const context = this;
-            if (!inThrottle) {
-                if (leading) {
-                    result = func.apply(context, args);
-                }
-                inThrottle = true;
-                timerId = setTimeout(() => later(context, args), limit);
-            } else if (trailing) {
-                lastArgs = args;
-                lastThis = context;
-                // 确保只有一个定时器
-                clearTimeout(timerId);
-                timerId = setTimeout(() => later(lastThis, lastArgs), limit);
-            }
-            return result;
-        };
-    },
-    /**
+  throttle(func, limit, options = {}) {
+    const { leading = true, trailing = true } = options;
+    let inThrottle, lastArgs, lastThis, result, timerId;
+    const later = (context, args) => {
+      inThrottle = false;
+      if (trailing && lastArgs) {
+        result = func.apply(context, args);
+        lastArgs = lastThis = null;
+      }
+    };
+    return function () {
+      const args = arguments;
+      const context = this;
+      if (!inThrottle) {
+        if (leading) {
+          result = func.apply(context, args);
+        }
+        inThrottle = true;
+        timerId = setTimeout(() => later(context, args), limit);
+      } else if (trailing) {
+        lastArgs = args;
+        lastThis = context;
+        // 确保只有一个定时器
+        clearTimeout(timerId);
+        timerId = setTimeout(() => later(lastThis, lastArgs), limit);
+      }
+      return result;
+    };
+  },
+  /**
      * 防抖函数，延迟执行函数直到停止触发一段时间
      * 支持返回Promise
      * @param {Function} func - 要防抖的函数
@@ -765,168 +765,168 @@ const utils = {
      * @param {boolean} options.leading - 是否在开始时执行一次（默认false）
      * @returns {Function} 防抖后的函数
      */
-    debounce(func, delay, options = {}) {
-        const { leading = false } = options;
-        let timeout, result;
-        const later = (context, args) => {
-            result = func.apply(context, args);
-        };
-        return function() {
-            const args = arguments;
-            const context = this;
-            const isLeadingCall = !timeout && leading;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => later(context, args), delay);
-            if (isLeadingCall) {
-                result = func.apply(context, args);
-            }
-            return result;
-        };
-    },
-    /**
+  debounce(func, delay, options = {}) {
+    const { leading = false } = options;
+    let timeout, result;
+    const later = (context, args) => {
+      result = func.apply(context, args);
+    };
+    return function () {
+      const args = arguments;
+      const context = this;
+      const isLeadingCall = !timeout && leading;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => later(context, args), delay);
+      if (isLeadingCall) {
+        result = func.apply(context, args);
+      }
+      return result;
+    };
+  },
+  /**
      * 延迟函数，返回Promise的setTimeout
      * @param {number} ms - 延迟时间（毫秒）
      * @returns {Promise<void>}
      */
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    },
-    /**
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
+  /**
      * 转义正则表达式中的特殊字符
      * @param {string} string - 要转义的字符串
      * @returns {string} 转义后的字符串
      */
-    escapeRegExp(string) {
-        // 转义所有正则表达式特殊字符，包括/字符
-        return string.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
-    },
-    /**
+  escapeRegExp(string) {
+    // 转义所有正则表达式特殊字符，包括/字符
+    return string.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+  },
+  /**
      * 安全地解析JSON字符串
      * @param {string} jsonString - JSON字符串
      * @param {*} defaultValue - 解析失败时的默认值
      * @returns {*} 解析结果或默认值
      */
-    safeJSONParse(jsonString, defaultValue = null) {
-        try {
-            return JSON.parse(jsonString);
-        } catch (error) {
-            console.warn('[GitHub 中文翻译] JSON解析失败:', error);
-            return defaultValue;
-        }
-    },
-    /**
+  safeJSONParse(jsonString, defaultValue = null) {
+    try {
+      return JSON.parse(jsonString);
+    } catch (error) {
+      console.warn('[GitHub 中文翻译] JSON解析失败:', error);
+      return defaultValue;
+    }
+  },
+  /**
      * 检查正则表达式是否存在潜在的ReDoS风险
      * @param {string|RegExp} pattern - 正则表达式模式
      * @returns {boolean} - 是否安全
      */
-    isSafeRegex(pattern) {
-        if (typeof pattern === 'string') {
-            pattern = new RegExp(pattern);
-        }
-        const source = pattern.source;
-        let depth = 0;
-        let hasNestedRepetition = false;
-        // 检查是否存在嵌套的重复量词（ReDoS的主要来源）
-        for (let i = 0; i < source.length; i++) {
-            const char = source[i];
-            if (char === '(' && source[i - 1] !== '\\') {
-                depth++;
-            } else if (char === ')' && source[i - 1] !== '\\') {
-                depth--;
-            } else if (depth > 0 && /[*+?]/.test(char) && source[i - 1] !== '\\') {
-                // 在分组内发现重复量词
-                hasNestedRepetition = true;
-                break;
-            }
-        }
-        // 检查是否存在长时间运行的可能性
-        const longPatternWarning = source.length > 100; // 过长的正则表达式
-        const hasMultipleRepetitions = (source.match(/[*+?]/g) || []).length > 5; // 过多的重复量词
-        return !hasNestedRepetition && !longPatternWarning && !hasMultipleRepetitions;
-    },
-    /**
+  isSafeRegex(pattern) {
+    if (typeof pattern === 'string') {
+      pattern = new RegExp(pattern);
+    }
+    const source = pattern.source;
+    let depth = 0;
+    let hasNestedRepetition = false;
+    // 检查是否存在嵌套的重复量词（ReDoS的主要来源）
+    for (let i = 0; i < source.length; i++) {
+      const char = source[i];
+      if (char === '(' && source[i - 1] !== '\\') {
+        depth++;
+      } else if (char === ')' && source[i - 1] !== '\\') {
+        depth--;
+      } else if (depth > 0 && /[*+?]/.test(char) && source[i - 1] !== '\\') {
+        // 在分组内发现重复量词
+        hasNestedRepetition = true;
+        break;
+      }
+    }
+    // 检查是否存在长时间运行的可能性
+    const longPatternWarning = source.length > 100; // 过长的正则表达式
+    const hasMultipleRepetitions = (source.match(/[*+?]/g) || []).length > 5; // 过多的重复量词
+    return !hasNestedRepetition && !longPatternWarning && !hasMultipleRepetitions;
+  },
+  /**
      * 安全地创建正则表达式，防止ReDoS攻击
      * @param {string} pattern - 正则表达式模式
      * @param {string} flags - 正则表达式标志
      * @returns {RegExp|null} - 安全的正则表达式或null
      */
-    safeRegExp(pattern, flags = '') {
-        try {
-            const regex = new RegExp(pattern, flags);
-            if (this.isSafeRegex(regex)) {
-                return regex;
-            }
-            console.warn('[GitHub 中文翻译] 检测到可能存在ReDoS风险的正则表达式:', pattern);
-            return null;
-        } catch (error) {
-            console.warn('[GitHub 中文翻译] 创建正则表达式失败:', error);
-            return null;
-        }
-    },
-    /**
+  safeRegExp(pattern, flags = '') {
+    try {
+      const regex = new RegExp(pattern, flags);
+      if (this.isSafeRegex(regex)) {
+        return regex;
+      }
+      console.warn('[GitHub 中文翻译] 检测到可能存在ReDoS风险的正则表达式:', pattern);
+      return null;
+    } catch (error) {
+      console.warn('[GitHub 中文翻译] 创建正则表达式失败:', error);
+      return null;
+    }
+  },
+  /**
      * 安全地序列化对象为JSON字符串
      * @param {*} obj - 要序列化的对象
      * @param {string} defaultValue - 序列化失败时的默认值
      * @returns {string} JSON字符串或默认值
      */
-    safeJSONStringify(obj, defaultValue = '{}') {
-        try {
-            return JSON.stringify(obj);
-        } catch (error) {
-            console.warn('[GitHub 中文翻译] JSON序列化失败:', error);
-            return defaultValue;
-        }
-    },
-    /**
+  safeJSONStringify(obj, defaultValue = '{}') {
+    try {
+      return JSON.stringify(obj);
+    } catch (error) {
+      console.warn('[GitHub 中文翻译] JSON序列化失败:', error);
+      return defaultValue;
+    }
+  },
+  /**
      * 获取当前页面路径
      * @returns {string} 当前页面的路径
      */
-    getCurrentPath() {
-        return window.location.pathname;
-    },
-    /**
+  getCurrentPath() {
+    return window.location.pathname;
+  },
+  /**
      * 获取完整的当前页面URL（包含查询参数）
      * @returns {string} 完整的URL
      */
-    getCurrentUrl() {
-        return window.location.href;
-    },
-    /**
+  getCurrentUrl() {
+    return window.location.href;
+  },
+  /**
      * 判断当前页面是否匹配某个路径模式
      * @param {RegExp} pattern - 路径模式
      * @returns {boolean} 是否匹配
      */
-    isCurrentPathMatch(pattern) {
-        return pattern.test(this.getCurrentPath());
-    },
-    /**
+  isCurrentPathMatch(pattern) {
+    return pattern.test(this.getCurrentPath());
+  },
+  /**
      * 从URL获取查询参数
      * @param {string} name - 参数名
      * @param {string} url - URL字符串，默认使用当前页面URL
      * @returns {string|null} 参数值或null
      */
-    getQueryParam(name, url = window.location.href) {
-        const match = RegExp(`[?&]${name}=([^&]*)`).exec(url);
-        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-    },
-    /**
+  getQueryParam(name, url = window.location.href) {
+    const match = RegExp(`[?&]${name}=([^&]*)`).exec(url);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+  },
+  /**
      * 获取URL中的所有查询参数
      * @param {string} url - URL字符串，默认使用当前页面URL
      * @returns {Object} 查询参数对象
      */
-    getAllQueryParams(url = window.location.href) {
-        const params = {};
-        try {
-            const searchParams = new URL(url || window.location.href).searchParams;
-            for (const [key, value] of searchParams) {
-                params[key] = value;
-            }
-        } catch (error) {
-            console.warn('[GitHub 中文翻译] 解析URL参数失败:', error);
-        }
-        return params;
-    },
-    /**
+  getAllQueryParams(url = window.location.href) {
+    const params = {};
+    try {
+      const searchParams = new URL(url || window.location.href).searchParams;
+      for (const [key, value] of searchParams) {
+        params[key] = value;
+      }
+    } catch (error) {
+      console.warn('[GitHub 中文翻译] 解析URL参数失败:', error);
+    }
+    return params;
+  },
+  /**
      * 收集DOM树中的所有文本节点内容
      * @param {HTMLElement} element - 要收集文本的起始元素
      * @param {Set<string>} resultSet - 用于存储结果的Set集合
@@ -934,91 +934,91 @@ const utils = {
      * @param {number} options.maxLength - 最大文本长度（默认200）
      * @param {string[]} options.skipTags - 跳过的标签名数组
      */
-    collectTextNodes(element, resultSet, options = {}) {
-        if (!element || !resultSet || typeof resultSet.add !== 'function') return;
-        const {
-            maxLength = 200,
-            skipTags = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select', 'noscript', 'template']
-        } = options;
-        try {
-            // 检查是否需要跳过此元素
-            if (element.tagName && skipTags.includes(element.tagName.toLowerCase())) {
-                return;
-            }
-            // 检查元素是否有隐藏类或样式
-            if (element.classList && element.classList.contains('sr-only')) {
-                return;
-            }
-            // 遍历所有子节点
-            const childNodes = Array.from(element.childNodes || []);
-            for (const node of childNodes) {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    const text = node.nodeValue ? node.nodeValue.trim() : '';
-                    // 只收集符合条件的文本
-                    if (text &&
+  collectTextNodes(element, resultSet, options = {}) {
+    if (!element || !resultSet || typeof resultSet.add !== 'function') return;
+    const {
+      maxLength = 200,
+      skipTags = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select', 'noscript', 'template'],
+    } = options;
+    try {
+      // 检查是否需要跳过此元素
+      if (element.tagName && skipTags.includes(element.tagName.toLowerCase())) {
+        return;
+      }
+      // 检查元素是否有隐藏类或样式
+      if (element.classList && element.classList.contains('sr-only')) {
+        return;
+      }
+      // 遍历所有子节点
+      const childNodes = Array.from(element.childNodes || []);
+      for (const node of childNodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.nodeValue ? node.nodeValue.trim() : '';
+          // 只收集符合条件的文本
+          if (text &&
                         text.length > 0 &&
                         text.length < maxLength &&
                         !/^\d+$/.test(text) &&
                         // 使用基础字符类替代Unicode属性转义，避免构建过程中的解析问题
                         !/^[\s\u0021-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u007E\u00A1-\u00BF\u2000-\u206F\u3000-\u303F]+$/.test(text)) {
-                        resultSet.add(text);
-                    }
-                } else if (node.nodeType === Node.ELEMENT_NODE) {
-                    // 递归收集子元素的文本
-                    this.collectTextNodes(node, resultSet, options);
-                }
-            }
-        } catch (error) {
-            console.error('[GitHub 中文翻译] 收集文本节点时出错:', error);
+            resultSet.add(text);
+          }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          // 递归收集子元素的文本
+          this.collectTextNodes(node, resultSet, options);
         }
-    },
-    /**
+      }
+    } catch (error) {
+      console.error('[GitHub 中文翻译] 收集文本节点时出错:', error);
+    }
+  },
+  /**
      * 安全地访问对象属性，避免嵌套属性访问出错
      * @param {Object} obj - 目标对象
      * @param {string|string[]} path - 属性路径，如'a.b.c'或['a','b','c']
      * @param {*} defaultValue - 获取失败时的默认值
      * @returns {*} 属性值或默认值
      */
-    getNestedProperty(obj, path, defaultValue = null) {
-        try {
-            const pathArray = Array.isArray(path) ? path : path.split('.');
-            let result = obj;
-            for (const key of pathArray) {
-                if (result === null || result === undefined) {
-                    return defaultValue;
-                }
-                result = result[key];
-            }
-            return result === undefined ? defaultValue : result;
-        } catch (error) {
-            return defaultValue;
+  getNestedProperty(obj, path, defaultValue = null) {
+    try {
+      const pathArray = Array.isArray(path) ? path : path.split('.');
+      let result = obj;
+      for (const key of pathArray) {
+        if (result === null || result === undefined) {
+          return defaultValue;
         }
-    },
-    /**
+        result = result[key];
+      }
+      return result === undefined ? defaultValue : result;
+    } catch (error) {
+      return defaultValue;
+    }
+  },
+  /**
      * 深拷贝对象
      * @param {*} obj - 要拷贝的对象
      * @returns {*} 拷贝后的对象
      */
-    deepClone(obj) {
-        try {
-            if (obj === null || typeof obj !== 'object') return obj;
-            if (obj instanceof Date) return new Date(obj.getTime());
-            if (obj instanceof Array) return obj.map(item => this.deepClone(item));
-            if (obj instanceof Object) {
-                const clonedObj = {};
-                for (const key in obj) {
-                    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                        clonedObj[key] = this.deepClone(obj[key]);
-                    }
-                }
-                return clonedObj;
-            }
-        } catch (error) {
-            console.warn('[GitHub 中文翻译] 深拷贝失败:', error);
-            return obj;
+  deepClone(obj) {
+    try {
+      if (obj === null || typeof obj !== 'object') return obj;
+      if (obj instanceof Date) return new Date(obj.getTime());
+      if (obj instanceof Array) return obj.map(item => this.deepClone(item));
+      if (obj instanceof Object) {
+        const clonedObj = {};
+        for (const key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            clonedObj[key] = this.deepClone(obj[key]);
+          }
         }
-    },
-    /**
+        return clonedObj;
+      }
+    } catch (error) {
+      console.warn('[GitHub 中文翻译] 深拷贝失败:', error);
+      return obj;
+    }
+  },
+  /**
      * 安全地执行函数，捕获可能的异常
      * @param {Function} fn - 要执行的函数
      * @param {*} defaultValue - 执行失败时的默认返回值
@@ -1026,117 +1026,117 @@ const utils = {
      * @param {...*} args - 函数参数
      * @returns {*} 函数返回值或默认值
      */
-    safeExecute(fn, defaultValue = null, context = null, ...args) {
-        try {
-            if (typeof fn === 'function') {
-                return fn.apply(context, args);
-            }
-            return defaultValue;
-        } catch (error) {
-            console.error('[GitHub 中文翻译] 安全执行函数失败:', error);
-            return defaultValue;
-        }
+  safeExecute(fn, defaultValue = null, context = null, ...args) {
+    try {
+      if (typeof fn === 'function') {
+        return fn.apply(context, args);
+      }
+      return defaultValue;
+    } catch (error) {
+      console.error('[GitHub 中文翻译] 安全执行函数失败:', error);
+      return defaultValue;
     }
+  },
 };
 // ===== cacheManager.js =====
 /**
  * LRU缓存管理模块
  * @file cacheManager.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 实现LRU缓存策略，用于翻译结果缓存
  */
 class CacheManager {
-    constructor(maxSize = 2000) {
-        this.translationCache = new Map();
-        this.maxSize = maxSize;
-        this.cacheStats = {
-            hits: 0,
-            misses: 0,
-            evictions: 0,
-            size: 0
-        };
+  constructor(maxSize = 2000) {
+    this.translationCache = new Map();
+    this.maxSize = maxSize;
+    this.cacheStats = {
+      hits: 0,
+      misses: 0,
+      evictions: 0,
+      size: 0,
+    };
+  }
+  getFromCache(key) {
+    const cacheItem = this.translationCache.get(key);
+    if (cacheItem && cacheItem.value) {
+      cacheItem.timestamp = Date.now();
+      cacheItem.accessCount = (cacheItem.accessCount || 0) + 1;
+      this.cacheStats.hits++;
+      return cacheItem.value;
     }
-    getFromCache(key) {
-        const cacheItem = this.translationCache.get(key);
-        if (cacheItem && cacheItem.value) {
-            cacheItem.timestamp = Date.now();
-            cacheItem.accessCount = (cacheItem.accessCount || 0) + 1;
-            this.cacheStats.hits++;
-            return cacheItem.value;
+    this.cacheStats.misses++;
+    return null;
+  }
+  setToCache(key, value, isPageUnloading = false) {
+    if (isPageUnloading) {
+      return;
+    }
+    this.checkCacheSizeLimit();
+    this.translationCache.set(key, {
+      value,
+      timestamp: Date.now(),
+      accessCount: 1,
+    });
+    this.cacheStats.size = this.translationCache.size;
+  }
+  checkCacheSizeLimit() {
+    if (this.translationCache.size >= this.maxSize) {
+      this.performLRUCacheEviction(this.maxSize);
+    }
+  }
+  performLRUCacheEviction(maxSize) {
+    try {
+      const targetSize = Math.floor(maxSize * 0.8);
+      const cacheEntries = Array.from(this.translationCache.entries());
+      cacheEntries.sort(([, itemA], [, itemB]) => {
+        if (itemB.timestamp !== itemA.timestamp) {
+          return itemB.timestamp - itemA.timestamp;
         }
-        this.cacheStats.misses++;
-        return null;
+        return (itemB.accessCount || 0) - (itemA.accessCount || 0);
+      });
+      const entriesToKeep = cacheEntries.slice(0, targetSize);
+      const evictedCount = cacheEntries.length - entriesToKeep.length;
+      this.translationCache.clear();
+      entriesToKeep.forEach(([key, item]) => {
+        this.translationCache.set(key, item);
+      });
+      this.cacheStats.evictions += evictedCount;
+      this.cacheStats.size = this.translationCache.size;
+    } catch (error) {
+      const evictCount = Math.max(50, Math.floor(this.translationCache.size * 0.2));
+      const oldestEntries = Array.from(this.translationCache.entries())
+        .sort(([, itemA], [, itemB]) => itemA.timestamp - itemB.timestamp)
+        .slice(0, evictCount);
+      oldestEntries.forEach(([key]) => {
+        this.translationCache.delete(key);
+      });
+      this.cacheStats.evictions += evictCount;
+      this.cacheStats.size = this.translationCache.size;
     }
-    setToCache(key, value, isPageUnloading = false) {
-        if (isPageUnloading) {
-            return;
-        }
-        this.checkCacheSizeLimit();
-        this.translationCache.set(key, {
-            value,
-            timestamp: Date.now(),
-            accessCount: 1
-        });
-        this.cacheStats.size = this.translationCache.size;
-    }
-    checkCacheSizeLimit() {
-        if (this.translationCache.size >= this.maxSize) {
-            this.performLRUCacheEviction(this.maxSize);
-        }
-    }
-    performLRUCacheEviction(maxSize) {
-        try {
-            const targetSize = Math.floor(maxSize * 0.8);
-            const cacheEntries = Array.from(this.translationCache.entries());
-            cacheEntries.sort(([, itemA], [, itemB]) => {
-                if (itemB.timestamp !== itemA.timestamp) {
-                    return itemB.timestamp - itemA.timestamp;
-                }
-                return (itemB.accessCount || 0) - (itemA.accessCount || 0);
-            });
-            const entriesToKeep = cacheEntries.slice(0, targetSize);
-            const evictedCount = cacheEntries.length - entriesToKeep.length;
-            this.translationCache.clear();
-            entriesToKeep.forEach(([key, item]) => {
-                this.translationCache.set(key, item);
-            });
-            this.cacheStats.evictions += evictedCount;
-            this.cacheStats.size = this.translationCache.size;
-        } catch (error) {
-            const evictCount = Math.max(50, Math.floor(this.translationCache.size * 0.2));
-            const oldestEntries = Array.from(this.translationCache.entries())
-                .sort(([, itemA], [, itemB]) => itemA.timestamp - itemB.timestamp)
-                .slice(0, evictCount);
-            oldestEntries.forEach(([key]) => {
-                this.translationCache.delete(key);
-            });
-            this.cacheStats.evictions += evictCount;
-            this.cacheStats.size = this.translationCache.size;
-        }
-    }
-    cleanCache() {
-        this.checkCacheSizeLimit();
-    }
-    clearCache() {
-        this.translationCache.clear();
-        this.cacheStats = {
-            hits: 0,
-            misses: 0,
-            evictions: 0,
-            size: 0
-        };
-    }
-    getStats() {
-        return { ...this.cacheStats };
-    }
+  }
+  cleanCache() {
+    this.checkCacheSizeLimit();
+  }
+  clearCache() {
+    this.translationCache.clear();
+    this.cacheStats = {
+      hits: 0,
+      misses: 0,
+      evictions: 0,
+      size: 0,
+    };
+  }
+  getStats() {
+    return { ...this.cacheStats };
+  }
 }
 // ===== errorHandler.js =====
 /**
  * 错误处理模块
  * @file errorHandler.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 负责统一管理所有错误处理和恢复机制
@@ -1151,7 +1151,7 @@ const ErrorHandler = {
     DICTIONARY: 'dictionary',
     NETWORK: 'network',
     PERFORMANCE: 'performance',
-    OTHER: 'other'
+    OTHER: 'other',
   },
   /**
    * 初始化错误处理器
@@ -1243,7 +1243,7 @@ const ErrorHandler = {
       [this.ERROR_TYPES.DICTIONARY]: CONFIG.performance?.maxDictionaryErrorCount || 5,
       [this.ERROR_TYPES.NETWORK]: CONFIG.performance?.maxNetworkErrorCount || 3,
       [this.ERROR_TYPES.PERFORMANCE]: CONFIG.performance?.maxPerformanceErrorCount || 15,
-      [this.ERROR_TYPES.OTHER]: CONFIG.performance?.maxOtherErrorCount || 25
+      [this.ERROR_TYPES.OTHER]: CONFIG.performance?.maxOtherErrorCount || 25,
     };
     const threshold = thresholds[type] || 20;
     if (count >= threshold) {
@@ -1309,7 +1309,7 @@ const ErrorHandler = {
     } else {
       this.init();
     }
-  }
+  },
 };
 // 初始化错误处理器
 ErrorHandler.init();
@@ -1317,7 +1317,7 @@ ErrorHandler.init();
 /**
  * 开发工具模块
  * @file tools.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 包含字符串提取、自动更新和词典处理等开发工具
@@ -1327,144 +1327,144 @@ ErrorHandler.init();
  * 字符串提取器对象
  */
 const stringExtractor = {
-    /**
+  /**
      * 收集页面上的字符串
      * @param {boolean} showInConsole - 是否在控制台显示结果
      * @returns {Set<string>} 收集到的字符串集合
      */
-    collectStrings(showInConsole = true) {
-        const strings = new Set();
-        utils.collectTextNodes(document.body, strings);
-        if (showInConsole) {
-            console.log(`[GitHub 中文翻译] 收集到 ${strings.size} 个字符串`);
-            console.log('收集到的字符串:', strings);
-        }
-        return strings;
-    },
-    /**
+  collectStrings(showInConsole = true) {
+    const strings = new Set();
+    utils.collectTextNodes(document.body, strings);
+    if (showInConsole) {
+      console.log(`[GitHub 中文翻译] 收集到 ${strings.size} 个字符串`);
+      console.log('收集到的字符串:', strings);
+    }
+    return strings;
+  },
+  /**
      * 查找未翻译的字符串
      * @param {boolean} showInConsole - 是否在控制台显示结果
      * @returns {Set<string>} 未翻译的字符串集合
      */
-    findUntranslatedStrings(showInConsole = true) {
-        const allStrings = this.collectStrings(false);
-        const untranslated = new Set();
-        // 合并所有词典
-        const mergedDictionary = {};
-        for (const module in translationModule) {
-            Object.assign(mergedDictionary, translationModule[module]);
-        }
-        // 检查每个字符串是否已翻译
-        allStrings.forEach(string => {
-            if (!mergedDictionary[string] || mergedDictionary[string].startsWith('待翻译: ')) {
-                untranslated.add(string);
-            }
-        });
-        if (showInConsole) {
-            console.log(`[GitHub 中文翻译] 找到 ${untranslated.size} 个未翻译的字符串`);
-            console.log('未翻译的字符串:', untranslated);
-        }
-        return untranslated;
+  findUntranslatedStrings(showInConsole = true) {
+    const allStrings = this.collectStrings(false);
+    const untranslated = new Set();
+    // 合并所有词典
+    const mergedDictionary = {};
+    for (const module in translationModule) {
+      Object.assign(mergedDictionary, translationModule[module]);
     }
+    // 检查每个字符串是否已翻译
+    allStrings.forEach(string => {
+      if (!mergedDictionary[string] || mergedDictionary[string].startsWith('待翻译: ')) {
+        untranslated.add(string);
+      }
+    });
+    if (showInConsole) {
+      console.log(`[GitHub 中文翻译] 找到 ${untranslated.size} 个未翻译的字符串`);
+      console.log('未翻译的字符串:', untranslated);
+    }
+    return untranslated;
+  },
 };
 /**
  * 自动字符串更新器类
  */
 class AutoStringUpdater {
-    constructor() {
-        this.processedCount = 0;
-    }
-    /**
+  constructor() {
+    this.processedCount = 0;
+  }
+  /**
      * 查找需要添加的字符串
      * @returns {Set<string>} 需要添加的字符串集合
      */
-    findStringsToAdd() {
-        const untranslated = stringExtractor.findUntranslatedStrings(false);
-        return new Set(Array.from(untranslated).filter(str => !str.startsWith('待翻译: ')));
-    }
-    /**
+  findStringsToAdd() {
+    const untranslated = stringExtractor.findUntranslatedStrings(false);
+    return new Set(Array.from(untranslated).filter(str => !str.startsWith('待翻译: ')));
+  }
+  /**
      * 生成更新报告
      * @returns {Object} 更新报告对象
      */
-    generateUpdateReport() {
-        const stringsToAdd = this.findStringsToAdd();
-        return {
-            timestamp: new Date().toISOString(),
-            pageUrl: window.location.href,
-            pageTitle: document.title,
-            stringsToAdd: Array.from(stringsToAdd),
-            totalNew: stringsToAdd.size
-        };
-    }
-    /**
+  generateUpdateReport() {
+    const stringsToAdd = this.findStringsToAdd();
+    return {
+      timestamp: new Date().toISOString(),
+      pageUrl: window.location.href,
+      pageTitle: document.title,
+      stringsToAdd: Array.from(stringsToAdd),
+      totalNew: stringsToAdd.size,
+    };
+  }
+  /**
      * 在控制台显示报告
      */
-    showReportInConsole() {
-        const report = this.generateUpdateReport();
-        console.log('[GitHub 中文翻译] 字符串更新报告');
-        console.log(`📄 页面: ${report.pageTitle}`);
-        console.log(`✅ 找到 ${report.totalNew} 个新字符串`);
-    }
+  showReportInConsole() {
+    const report = this.generateUpdateReport();
+    console.log('[GitHub 中文翻译] 字符串更新报告');
+    console.log(`📄 页面: ${report.pageTitle}`);
+    console.log(`✅ 找到 ${report.totalNew} 个新字符串`);
+  }
 }
 /**
  * 词典处理器类
  */
 class DictionaryProcessor {
-    constructor() {
-        this.processedCount = 0;
-    }
-    /**
+  constructor() {
+    this.processedCount = 0;
+  }
+  /**
      * 合并词典
      * @returns {Object} 合并后的词典
      */
-    mergeDictionaries() {
-        const merged = {};
-        for (const module in translationModule) {
-            Object.assign(merged, translationModule[module]);
-        }
-        return merged;
+  mergeDictionaries() {
+    const merged = {};
+    for (const module in translationModule) {
+      Object.assign(merged, translationModule[module]);
     }
-    /**
+    return merged;
+  }
+  /**
      * 验证词典
      * @returns {Object} 词典验证结果
      */
-    validateDictionary() {
-        const dictionary = this.mergeDictionaries();
-        const total = Object.keys(dictionary).length;
-        const untranslated = Array.from(stringExtractor.findUntranslatedStrings(false)).length;
-        return {
-            totalEntries: total,
-            translatedEntries: total - untranslated,
-            completionRate: total > 0 ? ((total - untranslated) / total * 100).toFixed(2) : '0.00'
-        };
-    }
-    /**
+  validateDictionary() {
+    const dictionary = this.mergeDictionaries();
+    const total = Object.keys(dictionary).length;
+    const untranslated = Array.from(stringExtractor.findUntranslatedStrings(false)).length;
+    return {
+      totalEntries: total,
+      translatedEntries: total - untranslated,
+      completionRate: total > 0 ? ((total - untranslated) / total * 100).toFixed(2) : '0.00',
+    };
+  }
+  /**
      * 在控制台显示统计信息
      */
-    showStatisticsInConsole() {
-        const stats = this.validateDictionary();
-        console.log('[GitHub 中文翻译] 词典统计');
-        console.log(`📊 总条目数: ${stats.totalEntries}`);
-        console.log(`✅ 已翻译条目: ${stats.translatedEntries}`);
-        console.log(`📈 完成率: ${stats.completionRate}%`);
-    }
+  showStatisticsInConsole() {
+    const stats = this.validateDictionary();
+    console.log('[GitHub 中文翻译] 词典统计');
+    console.log(`📊 总条目数: ${stats.totalEntries}`);
+    console.log(`✅ 已翻译条目: ${stats.translatedEntries}`);
+    console.log(`📈 完成率: ${stats.completionRate}%`);
+  }
 }
 /**
  * 加载工具类
  * @returns {Object} 包含工具类的对象
  */
 function loadTools() {
-    return {
-        stringExtractor,
-        AutoStringUpdater,
-        DictionaryProcessor
-    };
+  return {
+    stringExtractor,
+    AutoStringUpdater,
+    DictionaryProcessor,
+  };
 }
 // ===== pageMonitor/cacheManager.js =====
 /**
  * 页面监控缓存管理模块
  * @file pageMonitor/cacheManager.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 管理页面监控中的缓存
@@ -1523,13 +1523,13 @@ const pageMonitorCache = {
       }
     });
     this.eventListeners = [];
-  }
+  },
 };
 // ===== pageMonitor/pageAnalyzer.js =====
 /**
  * 页面分析模块
  * @file pageMonitor/pageAnalyzer.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 分析页面类型和关键区域
@@ -1541,7 +1541,7 @@ const pageAnalyzer = {
       /\/issues\/\d+/,
       /\/blob\//,
       /\/commit\//,
-      /\/compare\//
+      /\/compare\//,
     ];
     return complexPaths.some(pattern => pattern.test(window.location.pathname));
   },
@@ -1552,7 +1552,7 @@ const pageAnalyzer = {
       'pullRequests': 4,
       'wiki': 6,
       'actions': 5,
-      'codespaces': 3
+      'codespaces': 3,
     };
     return thresholds[pageMode] || 3;
   },
@@ -1562,7 +1562,7 @@ const pageAnalyzer = {
       'pullRequests': 0.35,
       'wiki': 0.4,
       'search': 0.3,
-      'codespaces': 0.25
+      'codespaces': 0.25,
     };
     return thresholds[pageMode];
   },
@@ -1571,7 +1571,7 @@ const pageAnalyzer = {
       'issues': 4,
       'pullRequests': 4,
       'wiki': 5,
-      'search': 3
+      'search': 3,
     };
     return lengths[pageMode] || CONFIG.performance?.minTextLengthToTranslate || 3;
   },
@@ -1650,13 +1650,13 @@ const pageAnalyzer = {
       }
     }
     return elements;
-  }
+  },
 };
 // ===== pageMonitor/pathListener.js =====
 /**
  * 路径变化监听模块
  * @file pageMonitor/pathListener.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 监听URL路径变化
@@ -1680,11 +1680,11 @@ const pathListener = {
     pageMonitorCache.addEventListener({ target: window, type: 'popstate', handler: popstateHandler });
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
-    history.pushState = function(...args) {
+    history.pushState = function (...args) {
       originalPushState.apply(this, args);
       pathListener.handlePathChange();
     };
-    history.replaceState = function(...args) {
+    history.replaceState = function (...args) {
       originalReplaceState.apply(this, args);
       pathListener.handlePathChange();
     };
@@ -1704,13 +1704,13 @@ const pathListener = {
     } catch (error) {
       console.error('[GitHub 中文翻译] 路径变化处理失败:', error);
     }
-  }
+  },
 };
 // ===== pageMonitor/domObserver.js =====
 /**
  * DOM变化观察器模块
  * @file pageMonitor/domObserver.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 观察DOM变化并触发翻译
@@ -2099,13 +2099,13 @@ const domObserver = {
       this.observer.disconnect();
       this.observer = null;
     }
-  }
+  },
 };
 // ===== pageMonitor/translationTrigger.js =====
 /**
  * 翻译触发模块
  * @file pageMonitor/translationTrigger.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 管理翻译触发和节流
@@ -2185,13 +2185,13 @@ const translationTrigger = {
         console.error('[GitHub 中文翻译] 错误恢复失败:', recoverError);
       }
     }
-  }
+  },
 };
 // ===== pageMonitor/index.js =====
 /**
  * 页面监控主模块
  * @file pageMonitor/index.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 页面监控主入口，整合所有子模块
@@ -2264,13 +2264,13 @@ const pageMonitor = {
     setTimeout(() => {
       this.init();
     }, 100);
-  }
+  },
 };
 // ===== translationCore/dictionaryManager.js =====
 /**
  * 翻译词典管理模块
  * @file translationCore/dictionaryManager.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 管理翻译词典的加载和查询
@@ -2380,13 +2380,13 @@ const dictionaryManager = {
     } catch (error) {
       console.error('[GitHub 中文翻译] 更新词典失败:', error);
     }
-  }
+  },
 };
 // ===== translationCore/pageModeDetector.js =====
 /**
  * 页面模式检测模块
  * @file translationCore/pageModeDetector.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 检测当前页面的模式
@@ -2396,7 +2396,7 @@ const pageModeDetector = {
   pageModeConfig: {
     default: {
       batchSize: CONFIG.performance?.batchSize,
-      enablePartialMatch: CONFIG.performance?.enablePartialMatch
+      enablePartialMatch: CONFIG.performance?.enablePartialMatch,
     },
     search: { batchSize: 100, enablePartialMatch: false },
     repository: { batchSize: 50, enablePartialMatch: false },
@@ -2407,7 +2407,7 @@ const pageModeDetector = {
     marketplace: { batchSize: 80, enablePartialMatch: true },
     codespaces: { batchSize: 50, enablePartialMatch: false },
     wiki: { batchSize: 120, enablePartialMatch: true },
-    actions: { batchSize: 60, enablePartialMatch: false }
+    actions: { batchSize: 60, enablePartialMatch: false },
   },
   detectPageMode() {
     try {
@@ -2440,13 +2440,13 @@ const pageModeDetector = {
   getCurrentPageModeConfig() {
     const mode = this.currentPageMode || this.detectPageMode();
     return this.pageModeConfig[mode] || this.pageModeConfig.default;
-  }
+  },
 };
 // ===== translationCore/elementSelector.js =====
 /**
  * 翻译元素选择模块
  * @file translationCore/elementSelector.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 选择需要翻译的DOM元素
@@ -2520,7 +2520,7 @@ const elementSelector = {
         /hex-color/, /code/, /gist/, /language-/, /markdown-/, /monaco-editor/,
         /syntax-/, /highlight-/, /clipboard/, /progress-/, /count/, /size/,
         /time/, /date/, /sortable/, /label/, /badge/, /url/, /email/, /key/,
-        /token/, /user-name/, /repo-name/
+        /token/, /user-name/, /repo-name/,
       ];
       if (skipClassPatterns.some(pattern => pattern.test(className))) {
         return false;
@@ -2560,7 +2560,7 @@ const elementSelector = {
         /team-/, /project-/, /milestone-/, /label-/, /assignee-/,
         /reporter-/, /reviewer-/, /author-/, /committer-/,
         /contributor-/, /sponsor-/, /funding-/, /donation-/, /payment-/,
-        /\b\w+[0-9]\w*\b/
+        /\b\w+[0-9]\w*\b/,
       ];
       if (skipIdPatterns.some(pattern => pattern.test(id))) {
         return false;
@@ -2584,13 +2584,13 @@ const elementSelector = {
   },
   shouldTranslate(element) {
     return virtualDomManager.shouldTranslate(element);
-  }
+  },
 };
 // ===== translationCore/elementTranslator.js =====
 /**
  * 元素翻译模块
  * @file translationCore/elementTranslator.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 实际翻译DOM元素的模块
@@ -2613,7 +2613,7 @@ const elementTranslator = {
     partialMatches: 0,
     batchProcessings: 0,
     errorCount: 0,
-    totalMemory: 0
+    totalMemory: 0,
   },
   translateElement(element) {
     if (!element || !(element instanceof HTMLElement)) {
@@ -2714,7 +2714,7 @@ const elementTranslator = {
       '.Header',
       '.repository-content',
       '.js-repo-pjax-container',
-      'main'
+      'main',
     ];
     const criticalElements = [];
     let processedElements = 0;
@@ -2754,13 +2754,13 @@ const elementTranslator = {
     if (CONFIG.debugMode) {
       console.log(`[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: ${processedElements}, 失败: ${failedElements}`);
     }
-  }
+  },
 };
 // ===== translationCore/partialTranslator.js =====
 /**
  * 部分匹配翻译模块
  * @file translationCore/partialTranslator.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 使用Trie树进行部分匹配翻译
@@ -2805,7 +2805,7 @@ const partialTranslator = {
           value,
           length: key.length,
           matches: wordMatches.length,
-          regex: wordRegex
+          regex: wordRegex,
         });
       } else {
         const nonWordRegexKey = `nonword_${key}`;
@@ -2825,7 +2825,7 @@ const partialTranslator = {
           value,
           length: key.length,
           matches: 1,
-          regex: nonWordRegex
+          regex: nonWordRegex,
         });
       }
     }
@@ -2850,13 +2850,13 @@ const partialTranslator = {
       }
     }
     return hasReplaced ? result : null;
-  }
+  },
 };
 // ===== translationCore/performanceMonitor.js =====
 /**
  * 性能监控模块
  * @file translationCore/performanceMonitor.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 监控翻译性能数据
@@ -2883,7 +2883,7 @@ const performanceMonitor = {
       partialMatches: 0,
       batchProcessings: 0,
       errorCount: 0,
-      totalMemory: 0
+      totalMemory: 0,
     };
   },
   logPerformanceData() {
@@ -2943,16 +2943,16 @@ const performanceMonitor = {
       timestamp: new Date().toISOString(),
       stats: this.getPerformanceStats(),
       userAgent: navigator.userAgent,
-      browserLanguage: navigator.language
+      browserLanguage: navigator.language,
     };
     return JSON.stringify(data, null, 2);
-  }
+  },
 };
 // ===== translationCore/index.js =====
 /**
  * 翻译核心主模块
  * @file translationCore/index.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 翻译核心主入口，整合所有子模块
@@ -3081,7 +3081,7 @@ const translationCore = {
                     reject(recoverError);
                   });
               },
-              maxRetries: 2
+              maxRetries: 2,
             });
           });
       } catch (error) {
@@ -3099,7 +3099,7 @@ const translationCore = {
                 reject(recoverError);
               });
           },
-          maxRetries: 2
+          maxRetries: 2,
         });
       }
     });
@@ -3256,13 +3256,13 @@ const translationCore = {
   logPerformanceData: () => performanceMonitor.logPerformanceData(),
   recordPerformanceEvent: (eventType, data) => performanceMonitor.recordPerformanceEvent(eventType, data),
   getPerformanceStats: () => performanceMonitor.getPerformanceStats(),
-  exportPerformanceData: () => performanceMonitor.exportPerformanceData()
+  exportPerformanceData: () => performanceMonitor.exportPerformanceData(),
 };
 // ===== configUI.js =====
 /**
  * GitHub 中文翻译配置界面模块
  * @file configUI.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 提供用户友好的配置界面，允许用户调整插件参数
@@ -3414,14 +3414,14 @@ class ConfigUI {
         type: 'checkbox',
         id: 'github-i18n-debug-mode',
         label: '启用调试模式',
-        checked: this.config.debugMode
+        checked: this.config.debugMode,
       },
       {
         type: 'checkbox',
         id: 'github-i18n-enable-partial-match',
         label: '启用部分匹配',
-        checked: this.config.performance.enablePartialMatch
-      }
+        checked: this.config.performance.enablePartialMatch,
+      },
     ]);
     // 更新设置部分
     const updateSection = this.createConfigSection('更新设置', [
@@ -3429,8 +3429,8 @@ class ConfigUI {
         type: 'checkbox',
         id: 'github-i18n-auto-update',
         label: '自动检查更新',
-        checked: this.config.updateCheck.enabled
-      }
+        checked: this.config.updateCheck.enabled,
+      },
     ]);
     // 性能设置部分
     const performanceSection = this.createConfigSection('性能设置', [
@@ -3438,14 +3438,14 @@ class ConfigUI {
         type: 'checkbox',
         id: 'github-i18n-translation-cache',
         label: '启用翻译缓存',
-        checked: this.config.performance.enableTranslationCache
+        checked: this.config.performance.enableTranslationCache,
       },
       {
         type: 'checkbox',
         id: 'github-i18n-virtual-dom',
         label: '启用虚拟DOM优化',
-        checked: this.config.performance.enableVirtualDom
-      }
+        checked: this.config.performance.enableVirtualDom,
+      },
     ]);
     // 性能监控部分
     const monitoringSection = this.createPerformanceMonitoringSection();
@@ -3526,7 +3526,7 @@ class ConfigUI {
       { label: '总耗时:', id: 'github-i18n-stat-duration' },
       { label: '元素处理:', id: 'github-i18n-stat-elements' },
       { label: '文本翻译:', id: 'github-i18n-stat-texts' },
-      { label: '缓存命中率:', id: 'github-i18n-stat-cache-rate' }
+      { label: '缓存命中率:', id: 'github-i18n-stat-cache-rate' },
     ];
     basicStats.forEach(stat => {
       const itemDiv = document.createElement('div');
@@ -3549,7 +3549,7 @@ class ConfigUI {
       { label: '缓存未命中:', id: 'github-i18n-stat-cache-misses' },
       { label: 'DOM操作:', id: 'github-i18n-stat-dom' },
       { label: '网络请求:', id: 'github-i18n-stat-network' },
-      { label: '批处理次数:', id: 'github-i18n-stat-batches' }
+      { label: '批处理次数:', id: 'github-i18n-stat-batches' },
     ];
     advancedStats.forEach(stat => {
       const itemDiv = document.createElement('div');
@@ -3839,11 +3839,11 @@ class ConfigUI {
       performance: {
         enablePartialMatch: partialMatchEl ? partialMatchEl.checked : this.config.performance.enablePartialMatch,
         enableTranslationCache: translationCacheEl ? translationCacheEl.checked : this.config.performance.enableTranslationCache,
-        enableVirtualDom: virtualDomEl ? virtualDomEl.checked : this.config.performance.enableVirtualDom
+        enableVirtualDom: virtualDomEl ? virtualDomEl.checked : this.config.performance.enableVirtualDom,
       },
       updateCheck: {
-        enabled: autoUpdateEl ? autoUpdateEl.checked : this.config.updateCheck.enabled
-      }
+        enabled: autoUpdateEl ? autoUpdateEl.checked : this.config.updateCheck.enabled,
+      },
     };
     this.saveUserSettings(newConfig);
     this.close();
@@ -3937,7 +3937,7 @@ const configUI = new ConfigUI();
 /**
  * 版本更新检查模块
  * @file versionChecker.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 负责检查和处理脚本更新
@@ -4004,7 +4004,7 @@ const versionChecker = {
       try {
         localStorage.setItem('githubZhUpdateError', JSON.stringify({
           message: error.message,
-          timestamp: now
+          timestamp: now,
         }));
       } catch (e) {
         // 忽略存储错误
@@ -4033,10 +4033,10 @@ const versionChecker = {
           method: 'GET',
           headers: {
             'Cache-Control': 'no-cache',
-            'Accept': 'text/javascript, text/plain, */*'
+            'Accept': 'text/javascript, text/plain, */*',
           },
           signal: controller.signal,
-          credentials: 'omit' // 不发送凭证信息
+          credentials: 'omit', // 不发送凭证信息
         });
         clearTimeout(timeoutId);
         if (!response.ok) {
@@ -4071,7 +4071,7 @@ const versionChecker = {
       // 变量赋值格式
       /version\s*=\s*['"](\d+\.\d+\.\d+)['"]/i,
       // 对象属性格式
-      /version:\s*['"](\d+\.\d+\.\d+)['"]/i
+      /version:\s*['"](\d+\.\d+\.\d+)['"]/i,
     ];
     for (const pattern of patterns) {
       const match = content.match(pattern);
@@ -4256,7 +4256,7 @@ const versionChecker = {
       // 添加新版本记录
       history.push({
         version,
-        detectedAt: Date.now()
+        detectedAt: Date.now(),
       });
       // 限制历史记录数量
       if (history.length > 10) {
@@ -4276,7 +4276,7 @@ const versionChecker = {
       const cacheData = {
         version: newVersion,
         cachedAt: Date.now(),
-        currentVersion: CONFIG.version
+        currentVersion: CONFIG.version,
       };
       localStorage.setItem('githubZhCachedVersion', utils.safeJSONStringify(cacheData));
       if (CONFIG.debugMode) {
@@ -4320,13 +4320,13 @@ const versionChecker = {
       }
       return false;
     }
-  }
+  },
 };
 // ===== virtualDom.js =====
 /**
  * 虚拟DOM模块
  * @file virtualDom.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 用于跟踪已翻译元素的状态，避免重复翻译和不必要的DOM操作
@@ -4746,7 +4746,7 @@ class VirtualDomManager {
   getStats() {
     return {
       nodeCount: this.nodes.size,
-      lastCleanupTime: this.lastCleanupTime
+      lastCleanupTime: this.lastCleanupTime,
     };
   }
 }
@@ -4757,7 +4757,7 @@ virtualDomManager;
 /**
  * 国际化支持框架
  * @file i18n.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 为GitHub翻译插件提供多语言支持的基础框架
@@ -4766,266 +4766,266 @@ virtualDomManager;
  * 国际化管理器
  */
 class I18nManager {
-    constructor() {
-        this.currentLocale = 'zh-CN'; // 默认中文
-        this.fallbackLocale = 'en-US'; // 回退语言
-        this.translations = new Map(); // 存储所有翻译
-        this.loadedLocales = new Set(); // 已加载的语言
-        this.observers = []; // 语言变更观察者
-    }
-    /**
+  constructor() {
+    this.currentLocale = 'zh-CN'; // 默认中文
+    this.fallbackLocale = 'en-US'; // 回退语言
+    this.translations = new Map(); // 存储所有翻译
+    this.loadedLocales = new Set(); // 已加载的语言
+    this.observers = []; // 语言变更观察者
+  }
+  /**
      * 初始化国际化管理器
      * @param {string} defaultLocale - 默认语言
      * @param {string} fallbackLocale - 回退语言
      */
-    init(defaultLocale = 'zh-CN', fallbackLocale = 'en-US') {
-        this.currentLocale = defaultLocale;
-        this.fallbackLocale = fallbackLocale;
-        // 尝试从本地存储获取用户语言偏好
-        if (typeof localStorage !== 'undefined') {
-            const savedLocale = localStorage.getItem('github-i18n-locale');
-            if (savedLocale) {
-                this.currentLocale = savedLocale;
-            } else {
-                // 尝试从浏览器语言设置获取
-                const browserLocale = navigator.language || navigator.userLanguage;
-                if (browserLocale) {
-                    this.currentLocale = browserLocale;
-                }
-            }
+  init(defaultLocale = 'zh-CN', fallbackLocale = 'en-US') {
+    this.currentLocale = defaultLocale;
+    this.fallbackLocale = fallbackLocale;
+    // 尝试从本地存储获取用户语言偏好
+    if (typeof localStorage !== 'undefined') {
+      const savedLocale = localStorage.getItem('github-i18n-locale');
+      if (savedLocale) {
+        this.currentLocale = savedLocale;
+      } else {
+        // 尝试从浏览器语言设置获取
+        const browserLocale = navigator.language || navigator.userLanguage;
+        if (browserLocale) {
+          this.currentLocale = browserLocale;
         }
-        console.log(`国际化管理器已初始化，当前语言: ${this.currentLocale}`);
+      }
     }
-    /**
+    console.log(`国际化管理器已初始化，当前语言: ${this.currentLocale}`);
+  }
+  /**
      * 加载翻译文件
      * @param {string} locale - 语言代码
      * @param {Object} translations - 翻译对象
      */
-    loadTranslations(locale, translations) {
-        if (!translations || typeof translations !== 'object') {
-            console.error(`无效的翻译数据: ${locale}`);
-            return false;
-        }
-        this.translations.set(locale, translations);
-        this.loadedLocales.add(locale);
-        console.log(`已加载翻译: ${locale}`);
-        return true;
+  loadTranslations(locale, translations) {
+    if (!translations || typeof translations !== 'object') {
+      console.error(`无效的翻译数据: ${locale}`);
+      return false;
     }
-    /**
+    this.translations.set(locale, translations);
+    this.loadedLocales.add(locale);
+    console.log(`已加载翻译: ${locale}`);
+    return true;
+  }
+  /**
      * 异步加载翻译文件
      * @param {string} locale - 语言代码
      * @param {string} url - 翻译文件URL
      * @returns {Promise<boolean>} 加载是否成功
      */
-    async loadTranslationsAsync(locale, url) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            const translations = await response.json();
-            return this.loadTranslations(locale, translations);
-        } catch (error) {
-            console.error(`加载翻译失败 ${locale}:`, error);
-            return false;
-        }
+  async loadTranslationsAsync(locale, url) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const translations = await response.json();
+      return this.loadTranslations(locale, translations);
+    } catch (error) {
+      console.error(`加载翻译失败 ${locale}:`, error);
+      return false;
     }
-    /**
+  }
+  /**
      * 获取翻译文本
      * @param {string} key - 翻译键
      * @param {Object} params - 参数对象
      * @param {string} locale - 指定语言（可选）
      * @returns {string} 翻译文本
      */
-    t(key, params = {}, locale = null) {
-        const targetLocale = locale || this.currentLocale;
-        // 尝试获取指定语言的翻译
-        let translation = this.getTranslationByKey(key, targetLocale);
-        // 如果没有找到，尝试回退语言
-        if (!translation && targetLocale !== this.fallbackLocale) {
-            translation = this.getTranslationByKey(key, this.fallbackLocale);
-        }
-        // 如果仍然没有找到，返回键名
-        if (!translation) {
-            console.warn(`未找到翻译: ${key} (${targetLocale})`);
-            return key;
-        }
-        // 处理参数替换
-        return this.interpolate(translation, params);
+  t(key, params = {}, locale = null) {
+    const targetLocale = locale || this.currentLocale;
+    // 尝试获取指定语言的翻译
+    let translation = this.getTranslationByKey(key, targetLocale);
+    // 如果没有找到，尝试回退语言
+    if (!translation && targetLocale !== this.fallbackLocale) {
+      translation = this.getTranslationByKey(key, this.fallbackLocale);
     }
-    /**
+    // 如果仍然没有找到，返回键名
+    if (!translation) {
+      console.warn(`未找到翻译: ${key} (${targetLocale})`);
+      return key;
+    }
+    // 处理参数替换
+    return this.interpolate(translation, params);
+  }
+  /**
      * 根据键获取翻译
      * @param {string} key - 翻译键
      * @param {string} locale - 语言代码
      * @returns {string|null} 翻译文本
      */
-    getTranslationByKey(key, locale) {
-        const translations = this.translations.get(locale);
-        if (!translations) return null;
-        // 支持嵌套键，如 "menu.file.open"
-        const keys = key.split('.');
-        let result = translations;
-        for (const k of keys) {
-            if (result && typeof result === 'object' && k in result) {
-                result = result[k];
-            } else {
-                return null;
-            }
-        }
-        return typeof result === 'string' ? result : null;
+  getTranslationByKey(key, locale) {
+    const translations = this.translations.get(locale);
+    if (!translations) return null;
+    // 支持嵌套键，如 "menu.file.open"
+    const keys = key.split('.');
+    let result = translations;
+    for (const k of keys) {
+      if (result && typeof result === 'object' && k in result) {
+        result = result[k];
+      } else {
+        return null;
+      }
     }
-    /**
+    return typeof result === 'string' ? result : null;
+  }
+  /**
      * 插值处理
      * @param {string} template - 模板字符串
      * @param {Object} params - 参数对象
      * @returns {string} 处理后的字符串
      */
-    interpolate(template, params) {
-        if (!template || typeof template !== 'string') return template;
-        if (!params || typeof params !== 'object') return template;
-        return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-            return params[key] !== undefined ? params[key] : match;
-        });
-    }
-    /**
+  interpolate(template, params) {
+    if (!template || typeof template !== 'string') return template;
+    if (!params || typeof params !== 'object') return template;
+    return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+      return params[key] !== undefined ? params[key] : match;
+    });
+  }
+  /**
      * 设置当前语言
      * @param {string} locale - 语言代码
      * @returns {boolean} 设置是否成功
      */
-    setLocale(locale) {
-        if (!this.loadedLocales.has(locale)) {
-            console.warn(`语言未加载: ${locale}`);
-            return false;
-        }
-        const oldLocale = this.currentLocale;
-        this.currentLocale = locale;
-        // 保存到本地存储
-        if (typeof localStorage !== 'undefined') {
-            localStorage.setItem('github-i18n-locale', locale);
-        }
-        // 通知观察者
-        this.notifyObservers(locale, oldLocale);
-        console.log(`语言已更改: ${oldLocale} -> ${locale}`);
-        return true;
+  setLocale(locale) {
+    if (!this.loadedLocales.has(locale)) {
+      console.warn(`语言未加载: ${locale}`);
+      return false;
     }
-    /**
+    const oldLocale = this.currentLocale;
+    this.currentLocale = locale;
+    // 保存到本地存储
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('github-i18n-locale', locale);
+    }
+    // 通知观察者
+    this.notifyObservers(locale, oldLocale);
+    console.log(`语言已更改: ${oldLocale} -> ${locale}`);
+    return true;
+  }
+  /**
      * 获取当前语言
      * @returns {string} 当前语言代码
      */
-    getCurrentLocale() {
-        return this.currentLocale;
-    }
-    /**
+  getCurrentLocale() {
+    return this.currentLocale;
+  }
+  /**
      * 获取已加载的语言列表
      * @returns {Array<string>} 语言代码列表
      */
-    getLoadedLocales() {
-        return Array.from(this.loadedLocales);
-    }
-    /**
+  getLoadedLocales() {
+    return Array.from(this.loadedLocales);
+  }
+  /**
      * 添加语言变更观察者
      * @param {Function} observer - 观察者函数
      */
-    addObserver(observer) {
-        if (typeof observer === 'function') {
-            this.observers.push(observer);
-        }
+  addObserver(observer) {
+    if (typeof observer === 'function') {
+      this.observers.push(observer);
     }
-    /**
+  }
+  /**
      * 移除语言变更观察者
      * @param {Function} observer - 观察者函数
      */
-    removeObserver(observer) {
-        const index = this.observers.indexOf(observer);
-        if (index !== -1) {
-            this.observers.splice(index, 1);
-        }
+  removeObserver(observer) {
+    const index = this.observers.indexOf(observer);
+    if (index !== -1) {
+      this.observers.splice(index, 1);
     }
-    /**
+  }
+  /**
      * 通知所有观察者
      * @param {string} newLocale - 新语言
      * @param {string} oldLocale - 旧语言
      */
-    notifyObservers(newLocale, oldLocale) {
-        this.observers.forEach(observer => {
-            try {
-                observer(newLocale, oldLocale);
-            } catch (error) {
-                console.error('观察者执行错误:', error);
-            }
-        });
-    }
-    /**
+  notifyObservers(newLocale, oldLocale) {
+    this.observers.forEach(observer => {
+      try {
+        observer(newLocale, oldLocale);
+      } catch (error) {
+        console.error('观察者执行错误:', error);
+      }
+    });
+  }
+  /**
      * 格式化日期
      * @param {Date} date - 日期对象
      * @param {Object} options - 格式化选项
      * @param {string} locale - 语言代码（可选）
      * @returns {string} 格式化后的日期字符串
      */
-    formatDate(date, options = {}, locale = null) {
-        const targetLocale = locale || this.currentLocale;
-        // 默认选项
-        const defaultOptions = {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        };
-        const formatOptions = { ...defaultOptions, ...options };
-        try {
-            return new Intl.DateTimeFormat(targetLocale, formatOptions).format(date);
-        } catch (error) {
-            console.error('日期格式化错误:', error);
-            return date.toLocaleDateString();
-        }
+  formatDate(date, options = {}, locale = null) {
+    const targetLocale = locale || this.currentLocale;
+    // 默认选项
+    const defaultOptions = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    };
+    const formatOptions = { ...defaultOptions, ...options };
+    try {
+      return new Intl.DateTimeFormat(targetLocale, formatOptions).format(date);
+    } catch (error) {
+      console.error('日期格式化错误:', error);
+      return date.toLocaleDateString();
     }
-    /**
+  }
+  /**
      * 格式化数字
      * @param {number} number - 数字
      * @param {Object} options - 格式化选项
      * @param {string} locale - 语言代码（可选）
      * @returns {string} 格式化后的数字字符串
      */
-    formatNumber(number, options = {}, locale = null) {
-        const targetLocale = locale || this.currentLocale;
-        try {
-            return new Intl.NumberFormat(targetLocale, options).format(number);
-        } catch (error) {
-            console.error('数字格式化错误:', error);
-            return number.toString();
-        }
+  formatNumber(number, options = {}, locale = null) {
+    const targetLocale = locale || this.currentLocale;
+    try {
+      return new Intl.NumberFormat(targetLocale, options).format(number);
+    } catch (error) {
+      console.error('数字格式化错误:', error);
+      return number.toString();
     }
-    /**
+  }
+  /**
      * 格式化相对时间
      * @param {Date} date - 日期对象
      * @param {string} locale - 语言代码（可选）
      * @returns {string} 相对时间字符串
      */
-    formatRelativeTime(date, locale = null) {
-        const targetLocale = locale || this.currentLocale;
-        const now = new Date();
-        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-        // 定义时间单位
-        const units = [
-            { max: 60, unit: 'second' },
-            { max: 3600, unit: 'minute' },
-            { max: 86400, unit: 'hour' },
-            { max: 2592000, unit: 'day' },
-            { max: 31536000, unit: 'month' },
-            { max: Infinity, unit: 'year' }
-        ];
-        for (const { max, unit } of units) {
-            if (diffInSeconds < max) {
-                const value = Math.floor(diffInSeconds / (max / 60));
-                try {
-                    return new Intl.RelativeTimeFormat(targetLocale).format(-value, unit);
-                } catch (error) {
-                    console.error('相对时间格式化错误:', error);
-                    break;
-                }
-            }
+  formatRelativeTime(date, locale = null) {
+    const targetLocale = locale || this.currentLocale;
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    // 定义时间单位
+    const units = [
+      { max: 60, unit: 'second' },
+      { max: 3600, unit: 'minute' },
+      { max: 86400, unit: 'hour' },
+      { max: 2592000, unit: 'day' },
+      { max: 31536000, unit: 'month' },
+      { max: Infinity, unit: 'year' },
+    ];
+    for (const { max, unit } of units) {
+      if (diffInSeconds < max) {
+        const value = Math.floor(diffInSeconds / (max / 60));
+        try {
+          return new Intl.RelativeTimeFormat(targetLocale).format(-value, unit);
+        } catch (error) {
+          console.error('相对时间格式化错误:', error);
+          break;
         }
-        return date.toLocaleDateString();
+      }
     }
+    return date.toLocaleDateString();
+  }
 }
 // 创建全局国际化管理器实例
 const i18nManager = new I18nManager();
@@ -5036,7 +5036,7 @@ const i18nManager = new I18nManager();
  * @returns {string} 翻译文本
  */
 function t(key, params = {}) {
-    return i18nManager.t(key, params);
+  return i18nManager.t(key, params);
 }
 /**
  * 初始化国际化支持
@@ -5045,17 +5045,17 @@ function t(key, params = {}) {
  * @returns {Promise<boolean>} 初始化是否成功
  */
 async function initI18n(defaultLocale = 'zh-CN', fallbackLocale = 'en-US') {
-    i18nManager.init(defaultLocale, fallbackLocale);
-    // 加载中文翻译
-    await loadLocaleTranslations('zh-CN');
-    // 加载英文翻译
-    await loadLocaleTranslations('en-US');
-    // 如果当前语言不是中文或英文，尝试加载对应翻译
-    if (i18nManager.getCurrentLocale() !== 'zh-CN' &&
+  i18nManager.init(defaultLocale, fallbackLocale);
+  // 加载中文翻译
+  await loadLocaleTranslations('zh-CN');
+  // 加载英文翻译
+  await loadLocaleTranslations('en-US');
+  // 如果当前语言不是中文或英文，尝试加载对应翻译
+  if (i18nManager.getCurrentLocale() !== 'zh-CN' &&
         i18nManager.getCurrentLocale() !== 'en-US') {
-        await loadLocaleTranslations(i18nManager.getCurrentLocale());
-    }
-    return true;
+    await loadLocaleTranslations(i18nManager.getCurrentLocale());
+  }
+  return true;
 }
 /**
  * 加载指定语言的翻译
@@ -5063,85 +5063,85 @@ async function initI18n(defaultLocale = 'zh-CN', fallbackLocale = 'en-US') {
  * @returns {Promise<boolean>} 加载是否成功
  */
 async function loadLocaleTranslations(locale) {
-    // 在实际应用中，这里应该从服务器或本地文件加载翻译
-    // 这里提供一些示例翻译
-    const translations = {};
-    if (locale === 'zh-CN') {
-        // 中文翻译
-        Object.assign(translations, {
-            // 通用翻译
-            'common.loading': '加载中...',
-            'common.error': '错误',
-            'common.success': '成功',
-            'common.cancel': '取消',
-            'common.confirm': '确认',
-            'common.save': '保存',
-            'common.delete': '删除',
-            'common.edit': '编辑',
-            'common.close': '关闭',
-            // GitHub 界面翻译
-            'github.pull_request': '拉取请求',
-            'github.issues': '问题',
-            'github.code': '代码',
-            'github.actions': '操作',
-            'github.projects': '项目',
-            'github.security': '安全',
-            'github.insights': '洞察',
-            'github.settings': '设置',
-            // 设置界面
-            'settings.title': '设置',
-            'settings.language': '语言',
-            'settings.theme': '主题',
-            'settings.save_success': '设置已保存',
-            'settings.save_error': '保存设置失败',
-            // 时间格式
-            'time.now': '刚刚',
-            'time.minutes_ago': '{{count}} 分钟前',
-            'time.hours_ago': '{{count}} 小时前',
-            'time.days_ago': '{{count}} 天前',
-            'time.weeks_ago': '{{count}} 周前',
-            'time.months_ago': '{{count}} 个月前',
-            'time.years_ago': '{{count}} 年前'
-        });
-    } else if (locale === 'en-US') {
-        // 英文翻译（作为回退语言）
-        Object.assign(translations, {
-            // 通用翻译
-            'common.loading': 'Loading...',
-            'common.error': 'Error',
-            'common.success': 'Success',
-            'common.cancel': 'Cancel',
-            'common.confirm': 'Confirm',
-            'common.save': 'Save',
-            'common.delete': 'Delete',
-            'common.edit': 'Edit',
-            'common.close': 'Close',
-            // GitHub 界面翻译
-            'github.pull_request': 'Pull Request',
-            'github.issues': 'Issues',
-            'github.code': 'Code',
-            'github.actions': 'Actions',
-            'github.projects': 'Projects',
-            'github.security': 'Security',
-            'github.insights': 'Insights',
-            'github.settings': 'Settings',
-            // 设置界面
-            'settings.title': 'Settings',
-            'settings.language': 'Language',
-            'settings.theme': 'Theme',
-            'settings.save_success': 'Settings saved',
-            'settings.save_error': 'Failed to save settings',
-            // 时间格式
-            'time.now': 'now',
-            'time.minutes_ago': '{{count}} minutes ago',
-            'time.hours_ago': '{{count}} hours ago',
-            'time.days_ago': '{{count}} days ago',
-            'time.weeks_ago': '{{count}} weeks ago',
-            'time.months_ago': '{{count}} months ago',
-            'time.years_ago': '{{count}} years ago'
-        });
-    }
-    return i18nManager.loadTranslations(locale, translations);
+  // 在实际应用中，这里应该从服务器或本地文件加载翻译
+  // 这里提供一些示例翻译
+  const translations = {};
+  if (locale === 'zh-CN') {
+    // 中文翻译
+    Object.assign(translations, {
+      // 通用翻译
+      'common.loading': '加载中...',
+      'common.error': '错误',
+      'common.success': '成功',
+      'common.cancel': '取消',
+      'common.confirm': '确认',
+      'common.save': '保存',
+      'common.delete': '删除',
+      'common.edit': '编辑',
+      'common.close': '关闭',
+      // GitHub 界面翻译
+      'github.pull_request': '拉取请求',
+      'github.issues': '问题',
+      'github.code': '代码',
+      'github.actions': '操作',
+      'github.projects': '项目',
+      'github.security': '安全',
+      'github.insights': '洞察',
+      'github.settings': '设置',
+      // 设置界面
+      'settings.title': '设置',
+      'settings.language': '语言',
+      'settings.theme': '主题',
+      'settings.save_success': '设置已保存',
+      'settings.save_error': '保存设置失败',
+      // 时间格式
+      'time.now': '刚刚',
+      'time.minutes_ago': '{{count}} 分钟前',
+      'time.hours_ago': '{{count}} 小时前',
+      'time.days_ago': '{{count}} 天前',
+      'time.weeks_ago': '{{count}} 周前',
+      'time.months_ago': '{{count}} 个月前',
+      'time.years_ago': '{{count}} 年前',
+    });
+  } else if (locale === 'en-US') {
+    // 英文翻译（作为回退语言）
+    Object.assign(translations, {
+      // 通用翻译
+      'common.loading': 'Loading...',
+      'common.error': 'Error',
+      'common.success': 'Success',
+      'common.cancel': 'Cancel',
+      'common.confirm': 'Confirm',
+      'common.save': 'Save',
+      'common.delete': 'Delete',
+      'common.edit': 'Edit',
+      'common.close': 'Close',
+      // GitHub 界面翻译
+      'github.pull_request': 'Pull Request',
+      'github.issues': 'Issues',
+      'github.code': 'Code',
+      'github.actions': 'Actions',
+      'github.projects': 'Projects',
+      'github.security': 'Security',
+      'github.insights': 'Insights',
+      'github.settings': 'Settings',
+      // 设置界面
+      'settings.title': 'Settings',
+      'settings.language': 'Language',
+      'settings.theme': 'Theme',
+      'settings.save_success': 'Settings saved',
+      'settings.save_error': 'Failed to save settings',
+      // 时间格式
+      'time.now': 'now',
+      'time.minutes_ago': '{{count}} minutes ago',
+      'time.hours_ago': '{{count}} hours ago',
+      'time.days_ago': '{{count}} days ago',
+      'time.weeks_ago': '{{count}} weeks ago',
+      'time.months_ago': '{{count}} months ago',
+      'time.years_ago': '{{count}} years ago',
+    });
+  }
+  return i18nManager.loadTranslations(locale, translations);
 }
 /**
  * 切换语言
@@ -5149,22 +5149,22 @@ async function loadLocaleTranslations(locale) {
  * @returns {Promise<boolean>} 切换是否成功
  */
 async function switchLanguage(locale) {
-    // 如果语言未加载，尝试加载
-    if (!i18nManager.getLoadedLocales().includes(locale)) {
-        const success = await loadLocaleTranslations(locale);
-        if (!success) {
-            console.error(`无法加载语言: ${locale}`);
-            return false;
-        }
+  // 如果语言未加载，尝试加载
+  if (!i18nManager.getLoadedLocales().includes(locale)) {
+    const success = await loadLocaleTranslations(locale);
+    if (!success) {
+      console.error(`无法加载语言: ${locale}`);
+      return false;
     }
-    return i18nManager.setLocale(locale);
+  }
+  return i18nManager.setLocale(locale);
 }
 // ES6模块导出
 // ===== dictionaries/index.js =====
 /**
  * 翻译词典合并模块
  * @file index.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 整合所有页面的翻译词典
@@ -5173,517 +5173,515 @@ async function switchLanguage(locale) {
  * 翻译词典对象，包含所有需要翻译的字符串
  */
 const translationModule = {
-    "common": commonDictionary,
-    "codespaces": codespacesDictionary,
-    "explore": exploreDictionary
-    // 可以根据需要添加更多页面的词典
+  'common': commonDictionary,
+  'codespaces': codespacesDictionary,
+  'explore': exploreDictionary,
+  // 可以根据需要添加更多页面的词典
 };
 /**
  * 合并所有词典为一个完整的词典对象
  * @returns {Object} 合并后的词典
  */
 function mergeAllDictionaries() {
-    const merged = {};
-    for (const module in translationModule) {
-        Object.assign(merged, translationModule[module]);
-    }
-    return merged;
+  const merged = {};
+  for (const module in translationModule) {
+    Object.assign(merged, translationModule[module]);
+  }
+  return merged;
 }
 // ===== dictionaries/common.js =====
 /**
  * 通用翻译词典
  * @file common.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 包含所有页面共用的翻译字符串
  */
 const commonDictionary = {
-  "common": "通用",
-  "search": "搜索",
-  "new": "新建",
-  "actions": "操作",
-  "settings": "设置",
-  "help": "帮助",
-  "sign_in": "登录",
-  "sign_up": "注册",
-  "home": "首页",
-  "dashboard": "仪表盘",
-  "explore": "探索",
-  "notifications": "通知",
-  "profile": "个人资料",
-  "repositories": "仓库",
-  "projects": "项目",
-  "stars": "星标",
-  "followers": "关注者",
-  "following": "关注中",
-  "organizations": "组织",
-  "codespaces": "代码空间",
-  "marketplace": "应用市场",
-  "topics": "主题",
-  "trending": "趋势",
-  "pull_requests": "拉取请求",
-  "issues": "问题",
-  "wiki": "维基",
-  "security": "安全",
-  "insights": "洞察",
-  "packages": "包",
-  "code": "代码",
-  "commits": "提交",
-  "branches": "分支",
-  "tags": "标签",
-  "releases": "发布",
-  "contributors": "贡献者",
-  "compare": "比较",
-  "new_issue": "新建问题",
-  "new_pull_request": "新建拉取请求",
-  "clone_or_download": "克隆或下载",
-  "watch": "关注",
-  "star": "星标",
-  "fork": "复刻",
-  "create": "创建",
-  "delete": "删除",
-  "edit": "编辑",
-  "save": "保存",
-  "cancel": "取消",
-  "close": "关闭",
-  "merge": "合并",
-  "rebase": "变基",
-  "squash": "压缩",
-  "approve": "批准",
-  "comment": "评论",
-  "assign": "分配",
-  "label": "标签",
-  "milestone": "里程碑",
-  "project": "项目",
-  "draft": "草稿",
-  "ready_for_review": "准备审核",
-  "review_changes": "审核更改",
-  "add_reviewer": "添加审核者",
-  "add_assignee": "添加负责人",
-  "add_label": "添加标签",
-  "add_milestone": "添加里程碑",
-  "add_project": "添加到项目",
-  "open": "打开",
-  "closed": "已关闭",
-  "merged": "已合并",
-  "locked": "已锁定",
-  "unlocked": "已解锁",
-  "all": "全部",
-  "open_issues": "打开的问题",
-  "closed_issues": "已关闭的问题",
-  "open_pull_requests": "打开的拉取请求",
-  "closed_pull_requests": "已关闭的拉取请求",
-  "merged_pull_requests": "已合并的拉取请求",
-  "your_issues": "你的问题",
-  "your_pull_requests": "你的拉取请求",
-  "assigned_issues": "分配给你的问题",
-  "mentioned_issues": "提及你的问题",
-  "milestones": "里程碑",
-  "labels": "标签",
-  "projects_board": "项目看板",
-  "wiki_pages": "维基页面",
-  "security_alerts": "安全警报",
-  "insights_overview": "洞察概览",
-  "traffic": "流量",
-  "community": "社区",
-  "dependency_graph": "依赖图",
-  "code_frequency": "代码频率",
-  "commit_activity": "提交活动",
-  "pulse": "动态",
-  "network": "网络",
-  "forks": "复刻",
-  "package_registry": "包注册表",
-  "action_workflows": "Action 工作流",
-  "action_runs": "Action 运行",
-  "action_jobs": "Action 任务",
-  "marketplace_apps": "应用市场应用",
-  "topic_explore": "探索主题",
-  "trending_repositories": "趋势仓库",
-  "trending_developers": "趋势开发者",
-  "trending_collections": "趋势集合",
-  "personal_access_tokens": "个人访问令牌",
-  "ssh_keys": "SSH 密钥",
-  "gpg_keys": "GPG 密钥",
-  "security_log": "安全日志",
-  "billing": "账单",
-  "plan": "计划",
-  "email_preferences": "邮件偏好设置",
-  "notifications_settings": "通知设置",
-  "profile_settings": "个人资料设置",
-  "repository_settings": "仓库设置",
-  "organization_settings": "组织设置",
-  "team_settings": "团队设置",
-  "developer_settings": "开发者设置",
-  "api_settings": "API 设置",
-  "webhooks": "Webhooks",
-  "integrations": "集成",
-  "oauth_applications": "OAuth 应用",
-  "github_apps": "GitHub 应用",
-  "marketplace_listings": "应用市场列表",
-  "enterprise": "企业",
-  "admin": "管理员",
-  "moderator": "版主",
-  "member": "成员",
-  "guest": "访客",
-  "public": "公开",
-  "private": "私有",
-  "internal": "内部",
-  "forked_from": "从何处复刻",
-  "archived": "已归档",
-  "template": "模板",
-  "mirror": "镜像",
-  "fork_of": "复刻自",
-  "parent": "父仓库",
-  "source": "源仓库",
-  "forks_count": "复刻数",
-  "stars_count": "星标数",
-  "watchers_count": "关注数",
-  "issues_count": "问题数",
-  "pull_requests_count": "拉取请求数",
-  "commits_count": "提交数",
-  "branches_count": "分支数",
-  "tags_count": "标签数",
-  "releases_count": "发布数",
-  "contributors_count": "贡献者数",
-  "language": "语言",
-  "size": "大小",
-  "created_at": "创建于",
-  "updated_at": "更新于",
-  "pushed_at": "推送于",
-  "last_commit": "最后提交",
-  "readme": "README",
-  "license": "许可证",
-  "contributing": "贡献指南",
-  "code_of_conduct": "行为准则",
-  "security_policy": "安全政策",
-  "support": "支持",
-  "sponsor": "赞助",
-  "sponsors": "赞助者",
-  "sponsoring": "赞助中",
-  "sponsor_this_project": "赞助此项目",
-  "become_a_sponsor": "成为赞助者",
-  "view_sponsors": "查看赞助者",
-  "sponsorship_tier": "赞助等级",
-  "sponsorship_rewards": "赞助奖励",
-  "sponsorship_history": "赞助历史",
-  "sponsorship_settings": "赞助设置",
-  "about": "关于",
-  "contact": "联系",
-  "blog": "博客",
-  "docs": "文档",
-  "status": "状态",
-  "terms": "条款",
-  "privacy": "隐私",
-  "cookies": "Cookie",
-  "site_map": "网站地图",
-  "language_settings": "语言设置",
-  "theme_settings": "主题设置",
-  "accessibility_settings": "无障碍设置",
-  "developer_overview": "开发者概览",
-  "developer_blog": "开发者博客",
-  "developer_docs": "开发者文档",
-  "api_reference": "API 参考",
-  "graphql_api": "GraphQL API",
-  "rest_api": "REST API",
-  "webhooks_api": "Webhooks API",
-  "oauth_authorizations_api": "OAuth 授权 API",
-  "apps_api": "应用 API",
-  "enterprise_api": "企业 API",
-  "developer_program": "开发者计划",
-  "github_campus_program": "GitHub 校园计划",
-  "github_education": "GitHub 教育",
-  "classroom": "教室",
-  "student_developer_pack": "学生开发者包",
-  "teacher_toolbox": "教师工具箱",
-  "campus_experts": "校园专家",
-  "education_community": "教育社区",
-  "education_events": "教育活动",
-  "education_blog": "教育博客",
-  "education_docs": "教育文档",
-  "enterprise_cloud": "企业云",
-  "enterprise_server": "企业服务器",
-  "enterprise_managed_users": "企业托管用户",
-  "enterprise_support": "企业支持",
-  "enterprise_partners": "企业合作伙伴",
-  "enterprise_events": "企业活动",
-  "enterprise_blog": "企业博客",
-  "enterprise_docs": "企业文档",
-  "security_advisories": "安全公告",
-  "security_blog": "安全博客",
-  "security_docs": "安全文档",
-  "security_labs": "安全实验室",
-  "security_community": "安全社区",
-  "security_events": "安全活动",
-  "community_standards": "社区标准",
-  "community_guidelines": "社区指南",
-  "community_blog": "社区博客",
-  "community_events": "社区活动",
-  "community_forums": "社区论坛",
-  "community_teams": "社区团队",
-  "community_projects": "社区项目",
-  "community_resources": "社区资源",
-  "community_support": "社区支持",
-  "open_source_guide": "开源指南",
-  "open_source_blog": "开源博客",
-  "open_source_events": "开源活动",
-  "open_source_projects": "开源项目",
-  "open_source_resources": "开源资源",
-  "open_source_support": "开源支持",
-  "open_source_program": "开源计划",
-  "open_source_community": "开源社区",
-  "open_source_licenses": "开源许可证",
-  "open_source_best_practices": "开源最佳实践",
-  "open_source_security": "开源安全",
-  "open_source_governance": "开源治理",
-  "open_source_metrics": "开源指标",
-  "open_source_funding": "开源 funding",
-  "open_source_careers": "开源职业",
-  "open_source_education": "开源教育",
-  "open_source_research": "开源研究",
-  "open_source_policy": "开源政策",
-  "open_source_advocacy": "开源倡导",
-  "open_source_outreach": "开源推广",
-  "open_source_collaboration": "开源协作",
-  "open_source_inclusion": "开源包容性",
-  "open_source_sustainability": "开源可持续性",
-  "navigation_menu": "导航菜单",
-  "toggle_navigation": "切换导航",
-  "appearance_settings": "外观设置",
-  "sign_in": "登录",
-  "sign_out": "登出",
-  "reload": "重新加载",
-  "dismiss_alert": "关闭警告",
-  "error_loading_page": "加载时发生错误",
-  "sign_in_with_passkey": "使用通行密钥登录",
-  "manage_cookies": "管理 Cookie",
-  "do_not_share_info": "不要分享我的个人信息",
-  "action_not_available": "您现在无法执行此操作。",
-  "new": "新建",
-  "code_review": "代码审查",
-  "discussions": "讨论",
-  "code_search": "代码搜索",
-  "mcp_registry": "MCP 注册表",
-  "view_all_features": "查看全部功能",
-  "by_company_size": "按公司规模",
-  "small_medium_teams": "中小型团队",
-  "by_use_case": "按使用场景",
-  "app_modernization": "应用现代化",
-  "devops": "开发运维",
-  "ci_cd": "持续集成/持续部署",
-  "view_all_use_cases": "查看全部使用场景",
-  "by_industry": "按行业",
-  "financial_services": "金融服务",
-  "view_all_industries": "查看全部行业",
-  "view_all_solutions": "查看全部解决方案",
-  "ai": "人工智能",
-  "software_development": "软件开发",
-  "view_all": "查看全部",
-  "learning_pathways": "学习路径",
-  "events_webinars": "活动与网络研讨会",
-  "ebooks_whitepapers": "电子书与白皮书",
-  "customer_stories": "客户案例",
-  "executive_insights": "高管见解",
-  "open_source": "开源",
-  "the_readme_project": "ReadME 项目",
-  "enterprise_platform": "企业平台",
-  "ai_powered_platform": "人工智能驱动的开发者平台",
-  "available_addons": "可用附加组件",
-  "copilot_for_business": "商业版 Copilot",
-  "enterprise_grade_ai": "企业级人工智能功能",
-  "premium_support": "高级支持",
-  "enterprise_247_support": "企业级 24/7 支持",
-  "pricing": "价格",
-  "search_jump_to": "搜索或跳转到...",
-  "clear": "清除",
-  "search_syntax_tips": "搜索语法提示",
-  "provide_feedback": "提供反馈",
-  "read_feedback": "我们会阅读每一条反馈，并非常重视您的意见。",
-  "submit_feedback": "提交反馈",
-  "saved_searches": "已保存的搜索",
-  "use_saved_searches": "使用已保存的搜索更快地筛选结果",
-  "name": "名称",
-  "query": "查询",
-  "see_qualifiers": "查看我们的文档了解所有可用的限定符。",
-  "create_saved_search": "创建已保存的搜索",
-  "resetting_focus": "重置焦点",
-  "events": "活动",
-  "collections": "收藏集",
-  "curated_lists": "精选列表和对新兴行业、主题和社区的洞察。",
-  "trending_repository": "热门仓库",
-  "updated": "更新于",
-  "skip_to_content": "跳转到内容",
-  "you_signed_in_another_tab": "您已在另一个标签页或窗口中登录。请重新加载以刷新您的会话。",
-  "you_signed_out_another_tab": "您已在另一个标签页或窗口中登出。请重新加载以刷新您的会话。"
+  'common': '通用',
+  'search': '搜索',
+  'new': '新建',
+  'actions': '操作',
+  'settings': '设置',
+  'help': '帮助',
+  'sign_in': '登录',
+  'sign_up': '注册',
+  'home': '首页',
+  'dashboard': '仪表盘',
+  'explore': '探索',
+  'notifications': '通知',
+  'profile': '个人资料',
+  'repositories': '仓库',
+  'projects': '项目',
+  'stars': '星标',
+  'followers': '关注者',
+  'following': '关注中',
+  'organizations': '组织',
+  'codespaces': '代码空间',
+  'marketplace': '应用市场',
+  'topics': '主题',
+  'trending': '趋势',
+  'pull_requests': '拉取请求',
+  'issues': '问题',
+  'wiki': '维基',
+  'security': '安全',
+  'insights': '洞察',
+  'packages': '包',
+  'code': '代码',
+  'commits': '提交',
+  'branches': '分支',
+  'tags': '标签',
+  'releases': '发布',
+  'contributors': '贡献者',
+  'compare': '比较',
+  'new_issue': '新建问题',
+  'new_pull_request': '新建拉取请求',
+  'clone_or_download': '克隆或下载',
+  'watch': '关注',
+  'star': '星标',
+  'fork': '复刻',
+  'create': '创建',
+  'delete': '删除',
+  'edit': '编辑',
+  'save': '保存',
+  'cancel': '取消',
+  'close': '关闭',
+  'merge': '合并',
+  'rebase': '变基',
+  'squash': '压缩',
+  'approve': '批准',
+  'comment': '评论',
+  'assign': '分配',
+  'label': '标签',
+  'milestone': '里程碑',
+  'project': '项目',
+  'draft': '草稿',
+  'ready_for_review': '准备审核',
+  'review_changes': '审核更改',
+  'add_reviewer': '添加审核者',
+  'add_assignee': '添加负责人',
+  'add_label': '添加标签',
+  'add_milestone': '添加里程碑',
+  'add_project': '添加到项目',
+  'open': '打开',
+  'closed': '已关闭',
+  'merged': '已合并',
+  'locked': '已锁定',
+  'unlocked': '已解锁',
+  'all': '全部',
+  'open_issues': '打开的问题',
+  'closed_issues': '已关闭的问题',
+  'open_pull_requests': '打开的拉取请求',
+  'closed_pull_requests': '已关闭的拉取请求',
+  'merged_pull_requests': '已合并的拉取请求',
+  'your_issues': '你的问题',
+  'your_pull_requests': '你的拉取请求',
+  'assigned_issues': '分配给你的问题',
+  'mentioned_issues': '提及你的问题',
+  'milestones': '里程碑',
+  'labels': '标签',
+  'projects_board': '项目看板',
+  'wiki_pages': '维基页面',
+  'security_alerts': '安全警报',
+  'insights_overview': '洞察概览',
+  'traffic': '流量',
+  'community': '社区',
+  'dependency_graph': '依赖图',
+  'code_frequency': '代码频率',
+  'commit_activity': '提交活动',
+  'pulse': '动态',
+  'network': '网络',
+  'forks': '复刻',
+  'package_registry': '包注册表',
+  'action_workflows': 'Action 工作流',
+  'action_runs': 'Action 运行',
+  'action_jobs': 'Action 任务',
+  'marketplace_apps': '应用市场应用',
+  'topic_explore': '探索主题',
+  'trending_repositories': '趋势仓库',
+  'trending_developers': '趋势开发者',
+  'trending_collections': '趋势集合',
+  'personal_access_tokens': '个人访问令牌',
+  'ssh_keys': 'SSH 密钥',
+  'gpg_keys': 'GPG 密钥',
+  'security_log': '安全日志',
+  'billing': '账单',
+  'plan': '计划',
+  'email_preferences': '邮件偏好设置',
+  'notifications_settings': '通知设置',
+  'profile_settings': '个人资料设置',
+  'repository_settings': '仓库设置',
+  'organization_settings': '组织设置',
+  'team_settings': '团队设置',
+  'developer_settings': '开发者设置',
+  'api_settings': 'API 设置',
+  'webhooks': 'Webhooks',
+  'integrations': '集成',
+  'oauth_applications': 'OAuth 应用',
+  'github_apps': 'GitHub 应用',
+  'marketplace_listings': '应用市场列表',
+  'enterprise': '企业',
+  'admin': '管理员',
+  'moderator': '版主',
+  'member': '成员',
+  'guest': '访客',
+  'public': '公开',
+  'private': '私有',
+  'internal': '内部',
+  'forked_from': '从何处复刻',
+  'archived': '已归档',
+  'template': '模板',
+  'mirror': '镜像',
+  'fork_of': '复刻自',
+  'parent': '父仓库',
+  'source': '源仓库',
+  'forks_count': '复刻数',
+  'stars_count': '星标数',
+  'watchers_count': '关注数',
+  'issues_count': '问题数',
+  'pull_requests_count': '拉取请求数',
+  'commits_count': '提交数',
+  'branches_count': '分支数',
+  'tags_count': '标签数',
+  'releases_count': '发布数',
+  'contributors_count': '贡献者数',
+  'language': '语言',
+  'size': '大小',
+  'created_at': '创建于',
+  'updated_at': '更新于',
+  'pushed_at': '推送于',
+  'last_commit': '最后提交',
+  'readme': 'README',
+  'license': '许可证',
+  'contributing': '贡献指南',
+  'code_of_conduct': '行为准则',
+  'security_policy': '安全政策',
+  'support': '支持',
+  'sponsor': '赞助',
+  'sponsors': '赞助者',
+  'sponsoring': '赞助中',
+  'sponsor_this_project': '赞助此项目',
+  'become_a_sponsor': '成为赞助者',
+  'view_sponsors': '查看赞助者',
+  'sponsorship_tier': '赞助等级',
+  'sponsorship_rewards': '赞助奖励',
+  'sponsorship_history': '赞助历史',
+  'sponsorship_settings': '赞助设置',
+  'about': '关于',
+  'contact': '联系',
+  'blog': '博客',
+  'docs': '文档',
+  'status': '状态',
+  'terms': '条款',
+  'privacy': '隐私',
+  'cookies': 'Cookie',
+  'site_map': '网站地图',
+  'language_settings': '语言设置',
+  'theme_settings': '主题设置',
+  'accessibility_settings': '无障碍设置',
+  'developer_overview': '开发者概览',
+  'developer_blog': '开发者博客',
+  'developer_docs': '开发者文档',
+  'api_reference': 'API 参考',
+  'graphql_api': 'GraphQL API',
+  'rest_api': 'REST API',
+  'webhooks_api': 'Webhooks API',
+  'oauth_authorizations_api': 'OAuth 授权 API',
+  'apps_api': '应用 API',
+  'enterprise_api': '企业 API',
+  'developer_program': '开发者计划',
+  'github_campus_program': 'GitHub 校园计划',
+  'github_education': 'GitHub 教育',
+  'classroom': '教室',
+  'student_developer_pack': '学生开发者包',
+  'teacher_toolbox': '教师工具箱',
+  'campus_experts': '校园专家',
+  'education_community': '教育社区',
+  'education_events': '教育活动',
+  'education_blog': '教育博客',
+  'education_docs': '教育文档',
+  'enterprise_cloud': '企业云',
+  'enterprise_server': '企业服务器',
+  'enterprise_managed_users': '企业托管用户',
+  'enterprise_support': '企业支持',
+  'enterprise_partners': '企业合作伙伴',
+  'enterprise_events': '企业活动',
+  'enterprise_blog': '企业博客',
+  'enterprise_docs': '企业文档',
+  'security_advisories': '安全公告',
+  'security_blog': '安全博客',
+  'security_docs': '安全文档',
+  'security_labs': '安全实验室',
+  'security_community': '安全社区',
+  'security_events': '安全活动',
+  'community_standards': '社区标准',
+  'community_guidelines': '社区指南',
+  'community_blog': '社区博客',
+  'community_events': '社区活动',
+  'community_forums': '社区论坛',
+  'community_teams': '社区团队',
+  'community_projects': '社区项目',
+  'community_resources': '社区资源',
+  'community_support': '社区支持',
+  'open_source_guide': '开源指南',
+  'open_source_blog': '开源博客',
+  'open_source_events': '开源活动',
+  'open_source_projects': '开源项目',
+  'open_source_resources': '开源资源',
+  'open_source_support': '开源支持',
+  'open_source_program': '开源计划',
+  'open_source_community': '开源社区',
+  'open_source_licenses': '开源许可证',
+  'open_source_best_practices': '开源最佳实践',
+  'open_source_security': '开源安全',
+  'open_source_governance': '开源治理',
+  'open_source_metrics': '开源指标',
+  'open_source_funding': '开源 funding',
+  'open_source_careers': '开源职业',
+  'open_source_education': '开源教育',
+  'open_source_research': '开源研究',
+  'open_source_policy': '开源政策',
+  'open_source_advocacy': '开源倡导',
+  'open_source_outreach': '开源推广',
+  'open_source_collaboration': '开源协作',
+  'open_source_inclusion': '开源包容性',
+  'open_source_sustainability': '开源可持续性',
+  'navigation_menu': '导航菜单',
+  'toggle_navigation': '切换导航',
+  'appearance_settings': '外观设置',
+  'sign_out': '登出',
+  'reload': '重新加载',
+  'dismiss_alert': '关闭警告',
+  'error_loading_page': '加载时发生错误',
+  'sign_in_with_passkey': '使用通行密钥登录',
+  'manage_cookies': '管理 Cookie',
+  'do_not_share_info': '不要分享我的个人信息',
+  'action_not_available': '您现在无法执行此操作。',
+  'code_review': '代码审查',
+  'discussions': '讨论',
+  'code_search': '代码搜索',
+  'mcp_registry': 'MCP 注册表',
+  'view_all_features': '查看全部功能',
+  'by_company_size': '按公司规模',
+  'small_medium_teams': '中小型团队',
+  'by_use_case': '按使用场景',
+  'app_modernization': '应用现代化',
+  'devops': '开发运维',
+  'ci_cd': '持续集成/持续部署',
+  'view_all_use_cases': '查看全部使用场景',
+  'by_industry': '按行业',
+  'financial_services': '金融服务',
+  'view_all_industries': '查看全部行业',
+  'view_all_solutions': '查看全部解决方案',
+  'ai': '人工智能',
+  'software_development': '软件开发',
+  'view_all': '查看全部',
+  'learning_pathways': '学习路径',
+  'events_webinars': '活动与网络研讨会',
+  'ebooks_whitepapers': '电子书与白皮书',
+  'customer_stories': '客户案例',
+  'executive_insights': '高管见解',
+  'open_source': '开源',
+  'the_readme_project': 'ReadME 项目',
+  'enterprise_platform': '企业平台',
+  'ai_powered_platform': '人工智能驱动的开发者平台',
+  'available_addons': '可用附加组件',
+  'copilot_for_business': '商业版 Copilot',
+  'enterprise_grade_ai': '企业级人工智能功能',
+  'premium_support': '高级支持',
+  'enterprise_247_support': '企业级 24/7 支持',
+  'pricing': '价格',
+  'search_jump_to': '搜索或跳转到...',
+  'clear': '清除',
+  'search_syntax_tips': '搜索语法提示',
+  'provide_feedback': '提供反馈',
+  'read_feedback': '我们会阅读每一条反馈，并非常重视您的意见。',
+  'submit_feedback': '提交反馈',
+  'saved_searches': '已保存的搜索',
+  'use_saved_searches': '使用已保存的搜索更快地筛选结果',
+  'name': '名称',
+  'query': '查询',
+  'see_qualifiers': '查看我们的文档了解所有可用的限定符。',
+  'create_saved_search': '创建已保存的搜索',
+  'resetting_focus': '重置焦点',
+  'events': '活动',
+  'collections': '收藏集',
+  'curated_lists': '精选列表和对新兴行业、主题和社区的洞察。',
+  'trending_repository': '热门仓库',
+  'updated': '更新于',
+  'skip_to_content': '跳转到内容',
+  'you_signed_in_another_tab': '您已在另一个标签页或窗口中登录。请重新加载以刷新您的会话。',
+  'you_signed_out_another_tab': '您已在另一个标签页或窗口中登出。请重新加载以刷新您的会话。',
 };
 // ===== dictionaries/codespaces.js =====
 /**
  * Codespaces 页面翻译词典
  * @file codespaces.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 包含 GitHub Codespaces 页面的翻译词典
  */
 const codespacesDictionary = {
-    "Skip to content": "跳转到内容",
-    "You signed in with another tab or window. Reload to refresh your session.": "您已在另一个标签页或窗口中登录。请重新加载以刷新您的会话。",
-    "Reload": "重新加载",
-    "You signed out in another tab or window. Reload to refresh your session.": "您已在另一个标签页或窗口中登出。请重新加载以刷新您的会话。",
-    "Dismiss alert": "关闭警告",
-    "Uh oh!\n\n              There was an error while loading. Please reload this page.": "哎呀！\n\n              加载时发生错误。请重新加载此页面。",
-    "Uh oh!": "哎呀！",
-    "There was an error while loading. Please reload this page.": "加载时发生错误。请重新加载此页面。",
-    "Please reload this page": "请重新加载此页面",
-    "Sign in with a passkey": "使用通行密钥登录",
-    "Terms": "条款",
-    "Privacy": "隐私",
-    "Docs": "文档",
-    "Manage cookies": "管理 Cookie",
-    "Do not share my personal information": "不要分享我的个人信息",
-    "You can't perform that action at this time.": "您现在无法执行此操作。"
+  'Skip to content': '跳转到内容',
+  'You signed in with another tab or window. Reload to refresh your session.': '您已在另一个标签页或窗口中登录。请重新加载以刷新您的会话。',
+  'Reload': '重新加载',
+  'You signed out in another tab or window. Reload to refresh your session.': '您已在另一个标签页或窗口中登出。请重新加载以刷新您的会话。',
+  'Dismiss alert': '关闭警告',
+  'Uh oh!\n\n              There was an error while loading. Please reload this page.': '哎呀！\n\n              加载时发生错误。请重新加载此页面。',
+  'Uh oh!': '哎呀！',
+  'There was an error while loading. Please reload this page.': '加载时发生错误。请重新加载此页面。',
+  'Please reload this page': '请重新加载此页面',
+  'Sign in with a passkey': '使用通行密钥登录',
+  'Terms': '条款',
+  'Privacy': '隐私',
+  'Docs': '文档',
+  'Manage cookies': '管理 Cookie',
+  'Do not share my personal information': '不要分享我的个人信息',
+  "You can't perform that action at this time.": '您现在无法执行此操作。',
 };
 // ===== dictionaries/explore.js =====
 /**
  * Explore 页面翻译词典
  * @file explore.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 包含 GitHub Explore 页面的翻译词典
  */
 const exploreDictionary = {
-  "Navigation Menu": "导航菜单",
-  "Toggle navigation": "切换导航",
-  "Sign in\n          \n              \n    \n        \n    \n\nAppearance settings": "登录\n          \n              \n    \n        \n    \n\n外观设置",
-  "Sign in": "登录",
-  "Appearance settings": "外观设置",
-  "New": "新建",
-  "Actions\n\n        \n\n        Automate any workflow": "Actions\n\n        \n\n        自动化任何工作流",
-  "Actions": "Actions",
-  "Codespaces\n\n        \n\n        Instant dev environments": "Codespaces\n\n        \n\n        即时开发环境",
-  "Issues\n\n        \n\n        Plan and track work": "Issues\n\n        \n\n        计划和跟踪工作",
-  "Issues": "问题",
-  "Code Review\n\n        \n\n        Manage code changes": "代码审查\n\n        \n\n        管理代码变更",
-  "Code Review": "代码审查",
-  "Discussions\n\n        \n\n        Collaborate outside of code": "讨论\n\n        \n\n        代码外的协作",
-  "Code Search\n\n        \n\n        Find more, search less": "代码搜索\n\n        \n\n        查找更多，搜索更少",
-  "Code Search": "代码搜索",
-  "Explore": "探索",
-  "Blog": "博客",
-  "MCP Registry": "MCP 注册表",
-  "View all features": "查看全部功能",
-  "By company size": "按公司规模",
-  "Small and medium teams": "中小型团队",
-  "By use case": "按使用场景",
-  "App Modernization": "应用现代化",
-  "DevOps": "开发运维",
-  "CI/CD": "持续集成/持续部署",
-  "View all use cases": "查看全部使用场景",
-  "By industry": "按行业",
-  "Financial services": "金融服务",
-  "View all industries": "查看全部行业",
-  "View all solutions": "查看全部解决方案",
-  "Topics": "主题",
-  "AI": "人工智能",
-  "Software Development": "软件开发",
-  "View all": "查看全部",
-  "Learning Pathways": "学习路径",
-  "Events & Webinars": "活动与网络研讨会",
-  "Ebooks & Whitepapers": "电子书与白皮书",
-  "Customer Stories": "客户案例",
-  "Executive Insights": "高管见解",
-  "Open Source": "开源",
-  "The ReadME Project": "ReadME 项目",
-  "Enterprise platform\n\n        \n\n        AI-powered developer platform": "企业平台\n\n        \n\n        人工智能驱动的开发者平台",
-  "Enterprise platform": "企业平台",
-  "Available add-ons": "可用附加组件",
-  "Copilot for business\n\n        \n\n        Enterprise-grade AI features": "商业版 Copilot\n\n        \n\n        企业级人工智能功能",
-  "Copilot for business": "商业版 Copilot",
-  "Premium Support\n\n        \n\n        Enterprise-grade 24/7 support": "高级支持\n\n        \n\n        企业级 24/7 支持",
-  "Premium Support": "高级支持",
-  "Pricing": "价格",
-  "Search or jump to...": "搜索或跳转到...",
-  "Search": "搜索",
-  "Clear": "清除",
-  "Search syntax tips": "搜索语法提示",
-  "Provide feedback": "提供反馈",
-  "We read every piece of feedback, and take your input very seriously.": "我们会阅读每一条反馈，并非常重视您的意见。",
-  "Cancel\n\n              Submit feedback": "取消\n\n              提交反馈",
-  "Cancel": "取消",
-  "Submit feedback": "提交反馈",
-  "Saved searches\n      \n        Use saved searches to filter your results more quickly": "已保存的搜索\n      \n        使用已保存的搜索更快地筛选结果",
-  "Saved searches": "已保存的搜索",
-  "Use saved searches to filter your results more quickly": "使用已保存的搜索更快地筛选结果",
-  "Name": "名称",
-  "Query": "查询",
-  "To see all available qualifiers, see our documentation.": "查看我们的文档了解所有可用的限定符。",
-  "Cancel\n\n              Create saved search": "取消\n\n              创建已保存的搜索",
-  "Create saved search": "创建已保存的搜索",
-  "Sign up": "注册",
-  "Resetting focus": "重置焦点",
-  "Events": "活动",
-  "Collections\n    Curated lists and insight into burgeoning industries, topics, and communities.": "收藏集\n    精选列表和对新兴行业、主题和社区的洞察。",
-  "Curated lists and insight into burgeoning industries, topics, and communities.": "精选列表和对新兴行业、主题和社区的洞察。",
-  "Pixel Art Tools": "像素艺术工具",
-  "Learn to Code\n    Resources to help people learn to code": "学习编程\n    帮助人们学习编程的资源",
-  "Learn to Code": "学习编程",
-  "Resources to help people learn to code": "帮助人们学习编程的资源",
-  "#\n    Game Engines\n    Frameworks for building games across multiple platforms.": "#\n    游戏引擎\n    用于跨平台构建游戏的框架。",
-  "Game Engines": "游戏引擎",
-  "Frameworks for building games across multiple platforms.": "用于跨平台构建游戏的框架。",
-  "How to choose (and contribute to) your first open source project": "如何选择（并贡献于）您的第一个开源项目",
-  "Clean code linters": "代码整洁检查工具",
-  "Open journalism": "开放新闻业",
-  "Design essentials": "设计基础",
-  "#\n    \n\n    \n      Music\n      Drop the code bass with these musically themed repositories.": "#\n    \n\n    \n      音乐\n      用这些音乐主题的仓库释放代码节奏。",
-  "Music\n      Drop the code bass with these musically themed repositories.": "音乐\n      用这些音乐主题的仓库释放代码节奏。",
-  "Music": "音乐",
-  "Government apps": "政府应用",
-  "DevOps tools": "DevOps 工具",
-  "Front-end JavaScript frameworks": "前端 JavaScript 框架",
-  "Hacking Minecraft": "Minecraft 黑客技术",
-  "JavaScript Game Engines": "JavaScript 游戏引擎",
-  "Learn to Code\n      Resources to help people learn to code": "学习编程\n      帮助人们学习编程的资源",
-  "Getting started with machine learning": "机器学习入门",
-  "Made in Africa": "非洲制造",
-  "Net neutrality\n      Software, research, and organizations protecting the free and open internet.": "网络中立性\n      保护自由开放互联网的软件、研究和组织。",
-  "Net neutrality": "网络中立性",
-  "Open data": "开放数据",
-  "Open source organizations\n      A showcase of organizations showcasing their open source projects.": "开源组织\n      展示开源项目的组织展示。",
-  "Open source organizations": "开源组织",
-  "Software productivity tools": "软件生产力工具",
-  "Load more…": "加载更多…",
-  "Footer": "页脚",
-  "Footer navigation": "页脚导航",
-  "Status": "状态",
-  "Contact": "联系",
-  "The Download": "The Download",
-  "Get the latest developer and open source news": "获取最新的开发者和开源新闻",
-  "Trending repository": "热门仓库",
-  "juspay          /\n          hyperswitch": "juspay          /\n          hyperswitch",
-  "juspay": "juspay",
-  "Star\n          35.6k": "星标\n          35.6k",
-  "Star": "星标",
-  "35.6k": "35.6k",
-  "Code": "代码",
-  "Pull requests": "拉取请求",
-  "An open source payments switch written in Rust to make payments fast, reliable and affordable": "一个用 Rust 编写的开源支付交换机，使支付变得快速、可靠且经济实惠",
-  "rust": "rust",
-  "redis": "redis",
-  "open-source": "开源",
-  "finance": "金融",
-  "sdk": "SDK",
-  "high-performance": "高性能",
-  "beginner-friendly": "对初学者友好",
-  "works-with-react": "兼容 React",
-  "Updated\n            Oct 4, 2025": "更新于\n            2025年10月4日"
+  'Navigation Menu': '导航菜单',
+  'Toggle navigation': '切换导航',
+  'Sign in\n          \n              \n    \n        \n    \n\nAppearance settings': '登录\n          \n              \n    \n        \n    \n\n外观设置',
+  'Sign in': '登录',
+  'Appearance settings': '外观设置',
+  'New': '新建',
+  'Actions\n\n        \n\n        Automate any workflow': 'Actions\n\n        \n\n        自动化任何工作流',
+  'Actions': 'Actions',
+  'Codespaces\n\n        \n\n        Instant dev environments': 'Codespaces\n\n        \n\n        即时开发环境',
+  'Issues\n\n        \n\n        Plan and track work': 'Issues\n\n        \n\n        计划和跟踪工作',
+  'Issues': '问题',
+  'Code Review\n\n        \n\n        Manage code changes': '代码审查\n\n        \n\n        管理代码变更',
+  'Code Review': '代码审查',
+  'Discussions\n\n        \n\n        Collaborate outside of code': '讨论\n\n        \n\n        代码外的协作',
+  'Code Search\n\n        \n\n        Find more, search less': '代码搜索\n\n        \n\n        查找更多，搜索更少',
+  'Code Search': '代码搜索',
+  'Explore': '探索',
+  'Blog': '博客',
+  'MCP Registry': 'MCP 注册表',
+  'View all features': '查看全部功能',
+  'By company size': '按公司规模',
+  'Small and medium teams': '中小型团队',
+  'By use case': '按使用场景',
+  'App Modernization': '应用现代化',
+  'DevOps': '开发运维',
+  'CI/CD': '持续集成/持续部署',
+  'View all use cases': '查看全部使用场景',
+  'By industry': '按行业',
+  'Financial services': '金融服务',
+  'View all industries': '查看全部行业',
+  'View all solutions': '查看全部解决方案',
+  'Topics': '主题',
+  'AI': '人工智能',
+  'Software Development': '软件开发',
+  'View all': '查看全部',
+  'Learning Pathways': '学习路径',
+  'Events & Webinars': '活动与网络研讨会',
+  'Ebooks & Whitepapers': '电子书与白皮书',
+  'Customer Stories': '客户案例',
+  'Executive Insights': '高管见解',
+  'Open Source': '开源',
+  'The ReadME Project': 'ReadME 项目',
+  'Enterprise platform\n\n        \n\n        AI-powered developer platform': '企业平台\n\n        \n\n        人工智能驱动的开发者平台',
+  'Enterprise platform': '企业平台',
+  'Available add-ons': '可用附加组件',
+  'Copilot for business\n\n        \n\n        Enterprise-grade AI features': '商业版 Copilot\n\n        \n\n        企业级人工智能功能',
+  'Copilot for business': '商业版 Copilot',
+  'Premium Support\n\n        \n\n        Enterprise-grade 24/7 support': '高级支持\n\n        \n\n        企业级 24/7 支持',
+  'Premium Support': '高级支持',
+  'Pricing': '价格',
+  'Search or jump to...': '搜索或跳转到...',
+  'Search': '搜索',
+  'Clear': '清除',
+  'Search syntax tips': '搜索语法提示',
+  'Provide feedback': '提供反馈',
+  'We read every piece of feedback, and take your input very seriously.': '我们会阅读每一条反馈，并非常重视您的意见。',
+  'Cancel\n\n              Submit feedback': '取消\n\n              提交反馈',
+  'Cancel': '取消',
+  'Submit feedback': '提交反馈',
+  'Saved searches\n      \n        Use saved searches to filter your results more quickly': '已保存的搜索\n      \n        使用已保存的搜索更快地筛选结果',
+  'Saved searches': '已保存的搜索',
+  'Use saved searches to filter your results more quickly': '使用已保存的搜索更快地筛选结果',
+  'Name': '名称',
+  'Query': '查询',
+  'To see all available qualifiers, see our documentation.': '查看我们的文档了解所有可用的限定符。',
+  'Cancel\n\n              Create saved search': '取消\n\n              创建已保存的搜索',
+  'Create saved search': '创建已保存的搜索',
+  'Sign up': '注册',
+  'Resetting focus': '重置焦点',
+  'Events': '活动',
+  'Collections\n    Curated lists and insight into burgeoning industries, topics, and communities.': '收藏集\n    精选列表和对新兴行业、主题和社区的洞察。',
+  'Curated lists and insight into burgeoning industries, topics, and communities.': '精选列表和对新兴行业、主题和社区的洞察。',
+  'Pixel Art Tools': '像素艺术工具',
+  'Learn to Code\n    Resources to help people learn to code': '学习编程\n    帮助人们学习编程的资源',
+  'Learn to Code': '学习编程',
+  'Resources to help people learn to code': '帮助人们学习编程的资源',
+  '#\n    Game Engines\n    Frameworks for building games across multiple platforms.': '#\n    游戏引擎\n    用于跨平台构建游戏的框架。',
+  'Game Engines': '游戏引擎',
+  'Frameworks for building games across multiple platforms.': '用于跨平台构建游戏的框架。',
+  'How to choose (and contribute to) your first open source project': '如何选择（并贡献于）您的第一个开源项目',
+  'Clean code linters': '代码整洁检查工具',
+  'Open journalism': '开放新闻业',
+  'Design essentials': '设计基础',
+  '#\n    \n\n    \n      Music\n      Drop the code bass with these musically themed repositories.': '#\n    \n\n    \n      音乐\n      用这些音乐主题的仓库释放代码节奏。',
+  'Music\n      Drop the code bass with these musically themed repositories.': '音乐\n      用这些音乐主题的仓库释放代码节奏。',
+  'Music': '音乐',
+  'Government apps': '政府应用',
+  'DevOps tools': 'DevOps 工具',
+  'Front-end JavaScript frameworks': '前端 JavaScript 框架',
+  'Hacking Minecraft': 'Minecraft 黑客技术',
+  'JavaScript Game Engines': 'JavaScript 游戏引擎',
+  'Learn to Code\n      Resources to help people learn to code': '学习编程\n      帮助人们学习编程的资源',
+  'Getting started with machine learning': '机器学习入门',
+  'Made in Africa': '非洲制造',
+  'Net neutrality\n      Software, research, and organizations protecting the free and open internet.': '网络中立性\n      保护自由开放互联网的软件、研究和组织。',
+  'Net neutrality': '网络中立性',
+  'Open data': '开放数据',
+  'Open source organizations\n      A showcase of organizations showcasing their open source projects.': '开源组织\n      展示开源项目的组织展示。',
+  'Open source organizations': '开源组织',
+  'Software productivity tools': '软件生产力工具',
+  'Load more…': '加载更多…',
+  'Footer': '页脚',
+  'Footer navigation': '页脚导航',
+  'Status': '状态',
+  'Contact': '联系',
+  'The Download': 'The Download',
+  'Get the latest developer and open source news': '获取最新的开发者和开源新闻',
+  'Trending repository': '热门仓库',
+  'juspay          /\n          hyperswitch': 'juspay          /\n          hyperswitch',
+  'juspay': 'juspay',
+  'Star\n          35.6k': '星标\n          35.6k',
+  'Star': '星标',
+  '35.6k': '35.6k',
+  'Code': '代码',
+  'Pull requests': '拉取请求',
+  'An open source payments switch written in Rust to make payments fast, reliable and affordable': '一个用 Rust 编写的开源支付交换机，使支付变得快速、可靠且经济实惠',
+  'rust': 'rust',
+  'redis': 'redis',
+  'open-source': '开源',
+  'finance': '金融',
+  'sdk': 'SDK',
+  'high-performance': '高性能',
+  'beginner-friendly': '对初学者友好',
+  'works-with-react': '兼容 React',
+  'Updated\n            Oct 4, 2025': '更新于\n            2025年10月4日',
 };
 // ===== main.js =====
 /**
  * GitHub 中文翻译主入口文件
  * @file main.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 整合所有模块并初始化脚本

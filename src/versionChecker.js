@@ -1,7 +1,7 @@
 /**
  * 版本更新检查模块
  * @file versionChecker.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 负责检查和处理脚本更新
@@ -84,7 +84,7 @@ const versionChecker = {
       try {
         localStorage.setItem('githubZhUpdateError', JSON.stringify({
           message: error.message,
-          timestamp: now
+          timestamp: now,
         }));
       } catch (e) {
         // 忽略存储错误
@@ -118,10 +118,10 @@ const versionChecker = {
           method: 'GET',
           headers: {
             'Cache-Control': 'no-cache',
-            'Accept': 'text/javascript, text/plain, */*'
+            'Accept': 'text/javascript, text/plain, */*',
           },
           signal: controller.signal,
-          credentials: 'omit' // 不发送凭证信息
+          credentials: 'omit', // 不发送凭证信息
         });
 
         clearTimeout(timeoutId);
@@ -163,7 +163,7 @@ const versionChecker = {
       // 变量赋值格式
       /version\s*=\s*['"](\d+\.\d+\.\d+)['"]/i,
       // 对象属性格式
-      /version:\s*['"](\d+\.\d+\.\d+)['"]/i
+      /version:\s*['"](\d+\.\d+\.\d+)['"]/i,
     ];
 
     for (const pattern of patterns) {
@@ -380,7 +380,7 @@ const versionChecker = {
       // 添加新版本记录
       history.push({
         version,
-        detectedAt: Date.now()
+        detectedAt: Date.now(),
       });
 
       // 限制历史记录数量
@@ -403,7 +403,7 @@ const versionChecker = {
       const cacheData = {
         version: newVersion,
         cachedAt: Date.now(),
-        currentVersion: CONFIG.version
+        currentVersion: CONFIG.version,
       };
 
       localStorage.setItem('githubZhCachedVersion', utils.safeJSONStringify(cacheData));
@@ -454,7 +454,7 @@ const versionChecker = {
       }
       return false;
     }
-  }
+  },
 };
 
 export { versionChecker };

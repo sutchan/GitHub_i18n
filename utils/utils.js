@@ -9,8 +9,8 @@
  * @returns {string} 转义后的字符串
  */
 function escapeRegExp(string) {
-    // 转义所有正则表达式特殊字符，包括/字符
-    return string.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+  // 转义所有正则表达式特殊字符，包括/字符
+  return string.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 }
 
 /**
@@ -19,7 +19,7 @@ function escapeRegExp(string) {
  * @returns {string} 格式化后的数字字符串
  */
 function formatNumber(num) {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 /**
@@ -28,7 +28,7 @@ function formatNumber(num) {
  * @returns {Promise<void>}
  */
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
@@ -39,17 +39,17 @@ function sleep(ms) {
  * @returns {Promise<Array>} 处理结果
  */
 async function processPagesInBatches(items, processFn, batchSize = 5) {
-    const results = [];
-    for (let i = 0; i < items.length; i += batchSize) {
-        const batch = items.slice(i, i + batchSize);
-        const batchResults = await Promise.all(batch.map(processFn));
-        results.push(...batchResults);
-        // 批次之间添加延迟，避免请求过于频繁
-        if (i + batchSize < items.length) {
-            await sleep(1000);
-        }
+  const results = [];
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.all(batch.map(processFn));
+    results.push(...batchResults);
+    // 批次之间添加延迟，避免请求过于频繁
+    if (i + batchSize < items.length) {
+      await sleep(1000);
     }
-    return results;
+  }
+  return results;
 }
 
 /**
@@ -58,30 +58,30 @@ async function processPagesInBatches(items, processFn, batchSize = 5) {
  * @returns {Object} 验证结果
  */
 function validateConfig(config) {
-    const errors = [];
-    
-    // 验证必要的配置项
-    if (!config.userScriptPath) {
-        errors.push('userScriptPath 是必填项');
-    }
-    
-    if (!config.backupDir) {
-        errors.push('backupDir 是必填项');
-    }
-    
-    // 验证数字配置项
-    if (config.minStringLength && (typeof config.minStringLength !== 'number' || config.minStringLength < 0)) {
-        errors.push('minStringLength 必须是大于等于0的数字');
-    }
-    
-    if (config.maxStringLength && (typeof config.maxStringLength !== 'number' || config.maxStringLength < config.minStringLength)) {
-        errors.push('maxStringLength 必须大于等于 minStringLength');
-    }
-    
-    return {
-        isValid: errors.length === 0,
-        errors
-    };
+  const errors = [];
+
+  // 验证必要的配置项
+  if (!config.userScriptPath) {
+    errors.push('userScriptPath 是必填项');
+  }
+
+  if (!config.backupDir) {
+    errors.push('backupDir 是必填项');
+  }
+
+  // 验证数字配置项
+  if (config.minStringLength && (typeof config.minStringLength !== 'number' || config.minStringLength < 0)) {
+    errors.push('minStringLength 必须是大于等于0的数字');
+  }
+
+  if (config.maxStringLength && (typeof config.maxStringLength !== 'number' || config.maxStringLength < config.minStringLength)) {
+    errors.push('maxStringLength 必须大于等于 minStringLength');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
 }
 
 /**
@@ -90,16 +90,16 @@ function validateConfig(config) {
  * @returns {void}
  */
 function updateStatsAfterRun(stats) {
-    // 这里可以添加统计信息的更新逻辑
-    console.log('运行完成，更新统计信息:', stats);
+  // 这里可以添加统计信息的更新逻辑
+  console.log('运行完成，更新统计信息:', stats);
 }
 
 // 导出所有函数
 module.exports = {
-    escapeRegExp,
-    formatNumber,
-    sleep,
-    processPagesInBatches,
-    validateConfig,
-    updateStatsAfterRun
+  escapeRegExp,
+  formatNumber,
+  sleep,
+  processPagesInBatches,
+  validateConfig,
+  updateStatsAfterRun,
 };

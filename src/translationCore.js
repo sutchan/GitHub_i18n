@@ -1,7 +1,7 @@
 /**
  * 翻译核心模块
  * @file translationCore.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 负责页面内容的实际翻译工作
@@ -30,7 +30,7 @@ export const translationCore = {
   pageModeConfig: {
     default: {
       batchSize: CONFIG.performance.batchSize,
-      enablePartialMatch: CONFIG.performance.enablePartialMatch
+      enablePartialMatch: CONFIG.performance.enablePartialMatch,
     },
     search: { batchSize: 100, enablePartialMatch: false },
     repository: { batchSize: 50, enablePartialMatch: false },
@@ -41,7 +41,7 @@ export const translationCore = {
     marketplace: { batchSize: 80, enablePartialMatch: true },
     codespaces: { batchSize: 50, enablePartialMatch: false },
     wiki: { batchSize: 120, enablePartialMatch: true },
-    actions: { batchSize: 60, enablePartialMatch: false }
+    actions: { batchSize: 60, enablePartialMatch: false },
   },
 
   init() {
@@ -250,7 +250,7 @@ export const translationCore = {
                     reject(recoverError);
                   });
               },
-              maxRetries: 2
+              maxRetries: 2,
             });
           });
       } catch (error) {
@@ -268,7 +268,7 @@ export const translationCore = {
                 reject(recoverError);
               });
           },
-          maxRetries: 2
+          maxRetries: 2,
         });
       }
     });
@@ -292,7 +292,7 @@ export const translationCore = {
       partialMatches: 0,
       batchProcessings: 0,
       errorCount: 0,
-      totalMemory: 0
+      totalMemory: 0,
     };
   },
 
@@ -360,7 +360,7 @@ export const translationCore = {
       pageMode: this.currentPageMode,
       stats: this.getPerformanceStats(),
       userAgent: navigator.userAgent,
-      browserLanguage: navigator.language
+      browserLanguage: navigator.language,
     };
     return JSON.stringify(data, null, 2);
   },
@@ -432,7 +432,7 @@ export const translationCore = {
         '.Header',
         '.repository-content',
         '.js-repo-pjax-container',
-        'main'
+        'main',
       ];
 
       const criticalElements = [];
@@ -560,7 +560,7 @@ export const translationCore = {
         /hex-color/, /code/, /gist/, /language-/, /markdown-/, /monaco-editor/,
         /syntax-/, /highlight-/, /clipboard/, /progress-/, /count/, /size/,
         /time/, /date/, /sortable/, /label/, /badge/, /url/, /email/, /key/,
-        /token/, /user-name/, /repo-name/
+        /token/, /user-name/, /repo-name/,
       ];
 
       if (skipClassPatterns.some(pattern => pattern.test(className))) {
@@ -602,7 +602,7 @@ export const translationCore = {
         /team-/, /project-/, /milestone-/, /label-/, /assignee-/,
         /reporter-/, /reviewer-/, /author-/, /committer-/,
         /contributor-/, /sponsor-/, /funding-/, /donation-/, /payment-/,
-        /\b\w+[0-9]\w*\b/
+        /\b\w+[0-9]\w*\b/,
       ];
 
       if (skipIdPatterns.some(pattern => pattern.test(id))) {
@@ -703,7 +703,7 @@ export const translationCore = {
             '\u0000', '\u0001', '\u0002', '\u0003', '\u0004', '\u0005', '\u0006', '\u0007',
             '\u0008', '\u000B', '\u000C', '\u000E', '\u000F', '\u0010', '\u0011', '\u0012',
             '\u0013', '\u0014', '\u0015', '\u0016', '\u0017', '\u0018', '\u0019', '\u001A',
-            '\u001B', '\u001C', '\u001D', '\u001E', '\u001F', '\u007F'
+            '\u001B', '\u001C', '\u001D', '\u001E', '\u001F', '\u007F',
           ];
           let safeTranslatedText = String(translatedText);
           controlChars.forEach(char => {
@@ -865,7 +865,7 @@ export const translationCore = {
           value,
           length: key.length,
           matches: wordMatches.length,
-          regex: wordRegex
+          regex: wordRegex,
         });
       } else {
         const nonWordRegexKey = `nonword_${key}`;
@@ -887,7 +887,7 @@ export const translationCore = {
           value,
           length: key.length,
           matches: 1,
-          regex: nonWordRegex
+          regex: nonWordRegex,
         });
       }
     }
@@ -1057,5 +1057,5 @@ export const translationCore = {
     } catch (error) {
       console.error('[GitHub 中文翻译] 更新词典失败:', error);
     }
-  }
+  },
 };

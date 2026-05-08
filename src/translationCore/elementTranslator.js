@@ -1,7 +1,7 @@
 /**
  * 元素翻译模块
  * @file translationCore/elementTranslator.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 实际翻译DOM元素的模块
@@ -30,7 +30,7 @@ export const elementTranslator = {
     partialMatches: 0,
     batchProcessings: 0,
     errorCount: 0,
-    totalMemory: 0
+    totalMemory: 0,
   },
 
   translateElement(element) {
@@ -149,7 +149,7 @@ export const elementTranslator = {
       '.Header',
       '.repository-content',
       '.js-repo-pjax-container',
-      'main'
+      'main',
     ];
 
     const criticalElements = [];
@@ -195,5 +195,5 @@ export const elementTranslator = {
     if (CONFIG.debugMode) {
       console.log(`[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: ${processedElements}, 失败: ${failedElements}`);
     }
-  }
+  },
 };

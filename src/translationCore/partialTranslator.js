@@ -1,7 +1,7 @@
 /**
  * 部分匹配翻译模块
  * @file translationCore/partialTranslator.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 使用Trie树进行部分匹配翻译
@@ -58,7 +58,7 @@ export const partialTranslator = {
           value,
           length: key.length,
           matches: wordMatches.length,
-          regex: wordRegex
+          regex: wordRegex,
         });
       } else {
         const nonWordRegexKey = `nonword_${key}`;
@@ -80,7 +80,7 @@ export const partialTranslator = {
           value,
           length: key.length,
           matches: 1,
-          regex: nonWordRegex
+          regex: nonWordRegex,
         });
       }
     }
@@ -111,5 +111,5 @@ export const partialTranslator = {
     }
 
     return hasReplaced ? result : null;
-  }
+  },
 };

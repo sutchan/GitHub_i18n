@@ -1,7 +1,7 @@
 /**
  * 翻译词典管理模块
  * @file translationCore/dictionaryManager.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 管理翻译词典的加载和查询
@@ -115,7 +115,7 @@ export const dictionaryManager = {
   updateDictionary(newDictionary) {
     try {
       Object.assign(this.dictionary, newDictionary);
-      
+
       Object.keys(newDictionary).forEach(key => {
         if (!newDictionary[key].startsWith('待翻译: ')) {
           this.dictionaryHash.set(key, newDictionary[key]);
@@ -133,5 +133,5 @@ export const dictionaryManager = {
     } catch (error) {
       console.error('[GitHub 中文翻译] 更新词典失败:', error);
     }
-  }
+  },
 };

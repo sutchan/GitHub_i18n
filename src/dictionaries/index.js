@@ -1,7 +1,7 @@
 /**
  * 翻译词典合并模块
  * @file index.js
- * @version 1.9.12
+ * @version 1.9.13
  * @date 2026-05-01
  * @author Sut
  * @description 整合所有页面的翻译词典
@@ -14,10 +14,10 @@ import { commonDictionary } from './common.js';
  * 翻译词典对象，包含所有需要翻译的字符串
  */
 export const translationModule = {
-    "common": commonDictionary,
-    "codespaces": codespacesDictionary,
-    "explore": exploreDictionary
-    // 可以根据需要添加更多页面的词典
+  'common': commonDictionary,
+  'codespaces': codespacesDictionary,
+  'explore': exploreDictionary,
+  // 可以根据需要添加更多页面的词典
 };
 
 /**
@@ -25,9 +25,9 @@ export const translationModule = {
  * @returns {Object} 合并后的词典
  */
 export function mergeAllDictionaries() {
-    const merged = {};
-    for (const module in translationModule) {
-        Object.assign(merged, translationModule[module]);
-    }
-    return merged;
+  const merged = {};
+  for (const module in translationModule) {
+    Object.assign(merged, translationModule[module]);
+  }
+  return merged;
 }
