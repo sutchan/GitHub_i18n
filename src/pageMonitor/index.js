@@ -1,7 +1,7 @@
 /**
  * 页面监控主模块
  * @file pageMonitor/index.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 页面监控主入口，整合所有子模块
@@ -49,7 +49,11 @@ export const pageMonitor = {
     window.addEventListener('unload', unloadHandler);
     window.addEventListener('pagehide', unloadHandler);
 
-    pageMonitorCache.addEventListener({ target: window, type: 'beforeunload', handler: unloadHandler });
+    pageMonitorCache.addEventListener({
+      target: window,
+      type: 'beforeunload',
+      handler: unloadHandler,
+    });
     pageMonitorCache.addEventListener({ target: window, type: 'unload', handler: unloadHandler });
     pageMonitorCache.addEventListener({ target: window, type: 'pagehide', handler: unloadHandler });
   },

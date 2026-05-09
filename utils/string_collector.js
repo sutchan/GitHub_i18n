@@ -12,7 +12,8 @@ const https = require('https');
 const CONFIG = {
   outputDir: path.resolve(__dirname, '../src/dictionaries'),
   temporaryDir: path.resolve(__dirname, 'temp'),
-  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+  userAgent:
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
   httpTimeout: 30000,
   maxRetries: 3,
   retryDelay: 2000,
@@ -37,7 +38,7 @@ function log(level, message, details = null) {
     } else if (typeof details === 'object') {
       try {
         logMessage += `\n详细信息: ${JSON.stringify(details, null, 2)}`;
-      } catch (e) {
+      } catch (_e) {
         logMessage += '\n详细信息: [对象序列化失败]';
       }
     } else {
@@ -73,7 +74,7 @@ function downloadPage(url, retryCount = 0) {
     // 验证URL格式
     try {
       new URL(url);
-    } catch (e) {
+    } catch (_e) {
       throw new Error(`URL格式无效: ${url}`);
     }
 
@@ -98,10 +99,15 @@ function downloadPage(url, retryCount = 0) {
         if (res.statusCode !== 200) {
           const error = new Error(`请求失败: ${url}, 状态码: ${res.statusCode}`);
           if (retryCount < CONFIG.maxRetries) {
-            log('info', `请求失败，${CONFIG.retryDelay}ms后重试 (${retryCount + 1}/${CONFIG.maxRetries})`);
+            log(
+              'info',
+              `请求失败，${CONFIG.retryDelay}ms后重试 (${retryCount + 1}/${CONFIG.maxRetries})`,
+            );
             req.destroy();
             setTimeout(() => {
-              downloadPage(url, retryCount + 1).then(resolve).catch(reject);
+              downloadPage(url, retryCount + 1)
+                .then(resolve)
+                .catch(reject);
             }, CONFIG.retryDelay);
           } else {
             reject(error);
@@ -125,9 +131,14 @@ function downloadPage(url, retryCount = 0) {
       req.on('error', (e) => {
         const error = new Error(`请求错误: ${url}, 错误: ${e.message}`);
         if (retryCount < CONFIG.maxRetries) {
-          log('info', `请求错误，${CONFIG.retryDelay}ms后重试 (${retryCount + 1}/${CONFIG.maxRetries})`);
+          log(
+            'info',
+            `请求错误，${CONFIG.retryDelay}ms后重试 (${retryCount + 1}/${CONFIG.maxRetries})`,
+          );
           setTimeout(() => {
-            downloadPage(url, retryCount + 1).then(resolve).catch(reject);
+            downloadPage(url, retryCount + 1)
+              .then(resolve)
+              .catch(reject);
           }, CONFIG.retryDelay);
         } else {
           reject(error);
@@ -138,9 +149,14 @@ function downloadPage(url, retryCount = 0) {
         req.destroy();
         const error = new Error(`请求超时: ${url} (${CONFIG.httpTimeout}ms)`);
         if (retryCount < CONFIG.maxRetries) {
-          log('info', `请求超时，${CONFIG.retryDelay}ms后重试 (${retryCount + 1}/${CONFIG.maxRetries})`);
+          log(
+            'info',
+            `请求超时，${CONFIG.retryDelay}ms后重试 (${retryCount + 1}/${CONFIG.maxRetries})`,
+          );
           setTimeout(() => {
-            downloadPage(url, retryCount + 1).then(resolve).catch(reject);
+            downloadPage(url, retryCount + 1)
+              .then(resolve)
+              .catch(reject);
           }, CONFIG.retryDelay);
         } else {
           reject(error);
@@ -166,15 +182,15 @@ function extractStrings(html, selectors = ['body']) {
     const extractedStrings = new Set();
 
     // 遍历所有选择器
-    selectors.forEach(selector => {
+    selectors.forEach((selector) => {
       try {
         const elements = document.querySelectorAll(selector);
-        elements.forEach(element => {
+        elements.forEach((element) => {
           // 提取文本节点
           extractTextFromElement(element, extractedStrings);
         });
-      } catch (e) {
-        log('warn', `无效的选择器: ${selector}`, e);
+      } catch (_e) {
+        log('warn', `无效的选择器: ${selector}`, _e);
       }
     });
 
@@ -196,7 +212,7 @@ function extractTextFromElement(element, stringSet) {
   }
 
   // 处理文本节点
-  Array.from(element.childNodes).forEach(node => {
+  Array.from(element.childNodes).forEach((node) => {
     if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
       const text = node.textContent.trim();
 
@@ -247,8 +263,7 @@ function isValidString(text) {
   }
 
   // 过滤掉纯CSS或HTML代码片段
-  if (/^[\s\S]*<[^>]+>[\s\S]*$/.test(text) ||
-      /^[\s\S]*{[^}]+}[\s\S]*$/.test(text)) {
+  if (/^[\s\S]*<[^>]+>[\s\S]*$/.test(text) || /^[\s\S]*{[^}]+}[\s\S]*$/.test(text)) {
     return false;
   }
 
@@ -356,7 +371,7 @@ async function collectStringsFromPages(pages, onProgress) {
 
     // 添加小延迟，避免请求过快
     if (i < pages.length - 1) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 
@@ -404,15 +419,15 @@ async function exportToDictionary(results, outputPath) {
     // 合并所有页面的字符串并去重
     const allStrings = new Set();
 
-    results.results.forEach(result => {
-      result.strings.forEach(str => {
+    results.results.forEach((result) => {
+      result.strings.forEach((str) => {
         allStrings.add(str);
       });
     });
 
     // 创建字典对象
     const dictionary = {};
-    Array.from(allStrings).forEach(str => {
+    Array.from(allStrings).forEach((str) => {
       dictionary[str] = ''; // 空翻译，等待手动填充
     });
 
@@ -456,7 +471,7 @@ try {
     log,
     ensureDirectoryExists,
   };
-} catch (e) {
+} catch (_e) {
   // 如果在浏览器环境中，导出到全局对象
   if (typeof window !== 'undefined') {
     window.StringCollector = {

@@ -1,7 +1,7 @@
 /**
  * 翻译词典管理模块
  * @file translationCore/dictionaryManager.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 管理翻译词典的加载和查询
@@ -30,7 +30,7 @@ export const dictionaryManager = {
       this.dictionaryTrie.clear();
       this.regexCache.clear();
 
-      Object.keys(this.dictionary).forEach(key => {
+      Object.keys(this.dictionary).forEach((key) => {
         if (!this.dictionary[key].startsWith('待翻译: ')) {
           this.dictionaryHash.set(key, this.dictionary[key]);
           if (key.length <= 100) {
@@ -87,7 +87,10 @@ export const dictionaryManager = {
       result = this.sanitizeText(result);
     }
 
-    if (CONFIG.performance?.enableTranslationCache && normalizedText.length <= CONFIG.performance?.maxCachedTextLength) {
+    if (
+      CONFIG.performance?.enableTranslationCache &&
+      normalizedText.length <= CONFIG.performance?.maxCachedTextLength
+    ) {
       if (result !== null) {
         this.cacheManager.setToCache(normalizedText, result, false);
       }
@@ -116,7 +119,7 @@ export const dictionaryManager = {
     try {
       Object.assign(this.dictionary, newDictionary);
 
-      Object.keys(newDictionary).forEach(key => {
+      Object.keys(newDictionary).forEach((key) => {
         if (!newDictionary[key].startsWith('待翻译: ')) {
           this.dictionaryHash.set(key, newDictionary[key]);
           if (key.length <= 100) {
@@ -128,7 +131,9 @@ export const dictionaryManager = {
       });
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 词典已更新，新增/修改${Object.keys(newDictionary).length}个条目`);
+        console.log(
+          `[GitHub 中文翻译] 词典已更新，新增/修改${Object.keys(newDictionary).length}个条目`,
+        );
       }
     } catch (error) {
       console.error('[GitHub 中文翻译] 更新词典失败:', error);

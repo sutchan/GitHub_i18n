@@ -1,7 +1,7 @@
 /**
  * 性能监控模块
  * @file translationCore/performanceMonitor.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 监控翻译性能数据
@@ -75,21 +75,24 @@ export const performanceMonitor = {
   getPerformanceStats() {
     const stats = { ...elementTranslator.performanceData };
     if (stats.translateStartTime > 0) {
-      stats.totalDuration = stats.translateEndTime > 0
-        ? stats.translateEndTime - stats.translateStartTime
-        : Date.now() - stats.translateStartTime;
+      stats.totalDuration =
+        stats.translateEndTime > 0
+          ? stats.translateEndTime - stats.translateStartTime
+          : Date.now() - stats.translateStartTime;
     } else {
       stats.totalDuration = 0;
     }
 
     const totalCacheRequests = stats.cacheHits + stats.cacheMisses;
-    stats.cacheHitRate = totalCacheRequests > 0
-      ? (stats.cacheHits / totalCacheRequests * 100).toFixed(2) + '%'
-      : '0%';
+    stats.cacheHitRate =
+      totalCacheRequests > 0
+        ? ((stats.cacheHits / totalCacheRequests) * 100).toFixed(2) + '%'
+        : '0%';
 
-    stats.avgDomOperationTime = stats.domOperations > 0
-      ? (stats.domOperationTime / stats.domOperations).toFixed(2) + 'ms'
-      : '0ms';
+    stats.avgDomOperationTime =
+      stats.domOperations > 0
+        ? (stats.domOperationTime / stats.domOperations).toFixed(2) + 'ms'
+        : '0ms';
 
     return stats;
   },

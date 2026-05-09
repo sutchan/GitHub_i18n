@@ -1,7 +1,7 @@
 /**
  * 页面模式检测模块
  * @file translationCore/pageModeDetector.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 检测当前页面的模式
@@ -35,8 +35,16 @@ export const pageModeDetector = {
       for (const [mode, pattern] of Object.entries(CONFIG.pagePatterns)) {
         if (pattern && pattern instanceof RegExp && pattern.test(currentPath)) {
           if (mode === 'repository') {
-            const isSubPage = ['issues', 'pullRequests', 'projects', 'wiki', 'actions', 'packages', 'security', 'insights']
-              .some(subMode => CONFIG.pagePatterns[subMode]?.test(currentPath));
+            const isSubPage = [
+              'issues',
+              'pullRequests',
+              'projects',
+              'wiki',
+              'actions',
+              'packages',
+              'security',
+              'insights',
+            ].some((subMode) => CONFIG.pagePatterns[subMode]?.test(currentPath));
             if (!isSubPage) {
               this.currentPageMode = mode;
               return mode;

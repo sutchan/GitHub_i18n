@@ -1,7 +1,7 @@
 /**
  * 页面分析模块
  * @file pageMonitor/pageAnalyzer.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 分析页面类型和关键区域
@@ -10,46 +10,40 @@ import { CONFIG } from '../config.js';
 
 export const pageAnalyzer = {
   isComplexPage() {
-    const complexPaths = [
-      /\/pull\/\d+/,
-      /\/issues\/\d+/,
-      /\/blob\//,
-      /\/commit\//,
-      /\/compare\//,
-    ];
+    const complexPaths = [/\/pull\/\d+/, /\/issues\/\d+/, /\/blob\//, /\/commit\//, /\/compare\//];
 
-    return complexPaths.some(pattern => pattern.test(window.location.pathname));
+    return complexPaths.some((pattern) => pattern.test(window.location.pathname));
   },
 
   getQuickPathThresholdByPageMode(pageMode) {
     const thresholds = {
-      'search': 5,
-      'issues': 4,
-      'pullRequests': 4,
-      'wiki': 6,
-      'actions': 5,
-      'codespaces': 3,
+      search: 5,
+      issues: 4,
+      pullRequests: 4,
+      wiki: 6,
+      actions: 5,
+      codespaces: 3,
     };
     return thresholds[pageMode] || 3;
   },
 
   getModeSpecificThreshold(pageMode) {
     const thresholds = {
-      'issues': 0.35,
-      'pullRequests': 0.35,
-      'wiki': 0.4,
-      'search': 0.3,
-      'codespaces': 0.25,
+      issues: 0.35,
+      pullRequests: 0.35,
+      wiki: 0.4,
+      search: 0.3,
+      codespaces: 0.25,
     };
     return thresholds[pageMode];
   },
 
   getMinTextLengthByPageMode(pageMode) {
     const lengths = {
-      'issues': 4,
-      'pullRequests': 4,
-      'wiki': 5,
-      'search': 3,
+      issues: 4,
+      pullRequests: 4,
+      wiki: 5,
+      search: 3,
     };
     return lengths[pageMode] || CONFIG.performance?.minTextLengthToTranslate || 3;
   },
@@ -57,30 +51,36 @@ export const pageAnalyzer = {
   shouldSkipElementByPageMode(element, pageMode) {
     if (!element || !pageMode) return false;
 
-    if (element.tagName === 'CODE' || element.tagName === 'SCRIPT' ||
-        element.tagName === 'STYLE' || element.classList.contains('blob-code')) {
+    if (
+      element.tagName === 'CODE' ||
+      element.tagName === 'SCRIPT' ||
+      element.tagName === 'STYLE' ||
+      element.classList.contains('blob-code')
+    ) {
       return true;
     }
 
     switch (pageMode) {
       case 'codespaces':
-        return element.classList.contains('terminal') ||
-               element.classList.contains('command-input') ||
-               element.dataset.terminal;
+        return (
+          element.classList.contains('terminal') ||
+          element.classList.contains('command-input') ||
+          element.dataset.terminal
+        );
       case 'wiki':
-        return element.classList.contains('codehilite') ||
-               element.classList.contains('highlight') ||
-               element.closest('.highlight');
+        return (
+          element.classList.contains('codehilite') ||
+          element.classList.contains('highlight') ||
+          element.closest('.highlight')
+        );
       case 'issues':
       case 'pullRequests':
-        return element.classList.contains('blob-code') ||
-               element.classList.contains('diff-line');
+        return element.classList.contains('blob-code') || element.classList.contains('diff-line');
       case 'search':
         if (element.classList.contains('search-match')) {
           return false;
         }
-        return element.classList.contains('text-small') ||
-               element.classList.contains('link-gray');
+        return element.classList.contains('text-small') || element.classList.contains('link-gray');
       default:
         return false;
     }
@@ -109,7 +109,12 @@ export const pageAnalyzer = {
     } else if (/\/search/.test(path)) {
       keySelectors.push('.codesearch-results', '.search-title');
     } else if (/\/orgs\//.test(path) || /\/users\//.test(path)) {
-      keySelectors.push('.org-profile', '.profile-timeline', '.user-profile-sticky-header', '.user-profile-main');
+      keySelectors.push(
+        '.org-profile',
+        '.profile-timeline',
+        '.user-profile-sticky-header',
+        '.user-profile-main',
+      );
     } else if (/\/repos\/\w+\/\w+/.test(path)) {
       keySelectors.push('.repository-content', '.repository-meta-content', '.readme');
     } else {

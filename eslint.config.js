@@ -28,30 +28,40 @@ export default [
       },
     },
     rules: {
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
       'no-console': ['warn', { allow: ['error', 'warn', 'log'] }],
       'no-debugger': 'error',
       'no-var': 'error',
       'prefer-const': 'error',
 
-      'indent': ['error', 2, { SwitchCase: 1 }],
-      'quotes': ['error', 'single', { avoidEscape: true }],
-      'semi': ['error', 'always'],
+      indent: ['error', 2, { SwitchCase: 1 }],
+      quotes: ['error', 'single', { avoidEscape: true }],
+      semi: ['error', 'always'],
       'comma-dangle': ['error', 'always-multiline'],
       'object-curly-spacing': ['error', 'always'],
       'array-bracket-spacing': ['error', 'never'],
-      'space-before-function-paren': ['error', {
-        anonymous: 'always',
-        named: 'never',
-        asyncArrow: 'always',
-      }],
+      'space-before-function-paren': [
+        'error',
+        {
+          anonymous: 'always',
+          named: 'never',
+          asyncArrow: 'always',
+        },
+      ],
       'keyword-spacing': 'error',
       'space-infix-ops': 'error',
       'eol-last': 'error',
       'no-trailing-spaces': 'error',
 
-      'eqeqeq': ['error', 'always', { null: 'ignore' }],
-      'curly': ['error', 'multi-line'],
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
+      curly: ['error', 'multi-line'],
       'no-throw-literal': 'error',
       'prefer-promise-reject-errors': 'error',
       'no-return-await': 'error',
@@ -59,7 +69,7 @@ export default [
 
       'max-lines-per-function': ['warn', { max: 100, skipBlankLines: true, skipComments: true }],
       'max-params': ['warn', 4],
-      'complexity': ['warn', 20],
+      complexity: ['warn', 20],
 
       'no-prototype-builtins': 'error',
       'no-control-regex': 'error',
@@ -92,12 +102,6 @@ export default [
     },
   },
   {
-    ignores: [
-      'build/**',
-      'dist/**',
-      'node_modules/**',
-      'coverage/**',
-      'docs/**',
-    ],
+    ignores: ['build/**', 'dist/**', 'node_modules/**', 'coverage/**', 'docs/**'],
   },
 ];

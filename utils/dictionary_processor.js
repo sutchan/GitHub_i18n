@@ -40,7 +40,7 @@ function log(level, message, details = null) {
       } else if (typeof details === 'object') {
         try {
           logMessage += `\n详细信息: ${JSON.stringify(details, null, 2)}`;
-        } catch (e) {
+        } catch (_e) {
           logMessage += '\n详细信息: [对象序列化失败]';
         }
       } else {
@@ -211,7 +211,10 @@ async function saveDictionaryToJson(dictionary) {
     }
 
     log('info', `已将词典保存到JSON文件: ${fullPath}`);
-    log('info', `词典包含 ${formatNumber(Object.keys(dictionary).length)} 个模块，共 ${formatNumber(totalStrings)} 个字符串`);
+    log(
+      'info',
+      `词典包含 ${formatNumber(Object.keys(dictionary).length)} 个模块，共 ${formatNumber(totalStrings)} 个字符串`,
+    );
   } catch (error) {
     log('error', '保存词典到JSON文件失败:', error);
     throw error;
@@ -380,7 +383,10 @@ function optimizeDictionary(dictionary) {
       optimizedTotal += Object.keys(optimizedDictionary[moduleName]).length;
     }
 
-    log('info', `词典优化完成: 原始 ${originalTotal} 个字符串，优化后 ${optimizedTotal} 个字符串，移除了 ${originalTotal - optimizedTotal} 个重复或无效字符串`);
+    log(
+      'info',
+      `词典优化完成: 原始 ${originalTotal} 个字符串，优化后 ${optimizedTotal} 个字符串，移除了 ${originalTotal - optimizedTotal} 个重复或无效字符串`,
+    );
     return optimizedDictionary;
   } catch (error) {
     log('error', '优化词典失败:', error);
@@ -399,7 +405,7 @@ async function saveExtractedStringsToDictionary(strings) {
     let existingDictionary = {};
     try {
       existingDictionary = await readDictionaryFromJson();
-    } catch (error) {
+    } catch (_error) {
       log('info', '未找到现有词典，创建新词典');
     }
 

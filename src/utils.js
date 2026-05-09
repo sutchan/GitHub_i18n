@@ -1,7 +1,7 @@
 /**
  * 工具函数模块
  * @file utils.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 包含各种通用的辅助函数
@@ -12,15 +12,15 @@
  */
 export const utils = {
   /**
-     * 节流函数，用于限制高频操作的执行频率
-     * 支持返回Promise
-     * @param {Function} func - 要节流的函数
-     * @param {number} limit - 限制时间（毫秒）
-     * @param {Object} options - 配置选项
-     * @param {boolean} options.leading - 是否在开始时执行（默认true）
-     * @param {boolean} options.trailing - 是否在结束后执行（默认true）
-     * @returns {Function} 节流后的函数
-     */
+   * 节流函数，用于限制高频操作的执行频率
+   * 支持返回Promise
+   * @param {Function} func - 要节流的函数
+   * @param {number} limit - 限制时间（毫秒）
+   * @param {Object} options - 配置选项
+   * @param {boolean} options.leading - 是否在开始时执行（默认true）
+   * @param {boolean} options.trailing - 是否在结束后执行（默认true）
+   * @returns {Function} 节流后的函数
+   */
   throttle(func, limit, options = {}) {
     const { leading = true, trailing = true } = options;
     let inThrottle, lastArgs, lastThis, result, timerId;
@@ -57,14 +57,14 @@ export const utils = {
   },
 
   /**
-     * 防抖函数，延迟执行函数直到停止触发一段时间
-     * 支持返回Promise
-     * @param {Function} func - 要防抖的函数
-     * @param {number} delay - 延迟时间（毫秒）
-     * @param {Object} options - 配置选项
-     * @param {boolean} options.leading - 是否在开始时执行一次（默认false）
-     * @returns {Function} 防抖后的函数
-     */
+   * 防抖函数，延迟执行函数直到停止触发一段时间
+   * 支持返回Promise
+   * @param {Function} func - 要防抖的函数
+   * @param {number} delay - 延迟时间（毫秒）
+   * @param {Object} options - 配置选项
+   * @param {boolean} options.leading - 是否在开始时执行一次（默认false）
+   * @returns {Function} 防抖后的函数
+   */
   debounce(func, delay, options = {}) {
     const { leading = false } = options;
     let timeout, result;
@@ -90,30 +90,30 @@ export const utils = {
   },
 
   /**
-     * 延迟函数，返回Promise的setTimeout
-     * @param {number} ms - 延迟时间（毫秒）
-     * @returns {Promise<void>}
-     */
+   * 延迟函数，返回Promise的setTimeout
+   * @param {number} ms - 延迟时间（毫秒）
+   * @returns {Promise<void>}
+   */
   delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   },
 
   /**
-     * 转义正则表达式中的特殊字符
-     * @param {string} string - 要转义的字符串
-     * @returns {string} 转义后的字符串
-     */
+   * 转义正则表达式中的特殊字符
+   * @param {string} string - 要转义的字符串
+   * @returns {string} 转义后的字符串
+   */
   escapeRegExp(string) {
     // 转义所有正则表达式特殊字符，包括/字符
     return string.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
   },
 
   /**
-     * 安全地解析JSON字符串
-     * @param {string} jsonString - JSON字符串
-     * @param {*} defaultValue - 解析失败时的默认值
-     * @returns {*} 解析结果或默认值
-     */
+   * 安全地解析JSON字符串
+   * @param {string} jsonString - JSON字符串
+   * @param {*} defaultValue - 解析失败时的默认值
+   * @returns {*} 解析结果或默认值
+   */
   safeJSONParse(jsonString, defaultValue = null) {
     try {
       return JSON.parse(jsonString);
@@ -124,10 +124,10 @@ export const utils = {
   },
 
   /**
-     * 检查正则表达式是否存在潜在的ReDoS风险
-     * @param {string|RegExp} pattern - 正则表达式模式
-     * @returns {boolean} - 是否安全
-     */
+   * 检查正则表达式是否存在潜在的ReDoS风险
+   * @param {string|RegExp} pattern - 正则表达式模式
+   * @returns {boolean} - 是否安全
+   */
   isSafeRegex(pattern) {
     if (typeof pattern === 'string') {
       pattern = new RegExp(pattern);
@@ -160,11 +160,11 @@ export const utils = {
   },
 
   /**
-     * 安全地创建正则表达式，防止ReDoS攻击
-     * @param {string} pattern - 正则表达式模式
-     * @param {string} flags - 正则表达式标志
-     * @returns {RegExp|null} - 安全的正则表达式或null
-     */
+   * 安全地创建正则表达式，防止ReDoS攻击
+   * @param {string} pattern - 正则表达式模式
+   * @param {string} flags - 正则表达式标志
+   * @returns {RegExp|null} - 安全的正则表达式或null
+   */
   safeRegExp(pattern, flags = '') {
     try {
       const regex = new RegExp(pattern, flags);
@@ -180,11 +180,11 @@ export const utils = {
   },
 
   /**
-     * 安全地序列化对象为JSON字符串
-     * @param {*} obj - 要序列化的对象
-     * @param {string} defaultValue - 序列化失败时的默认值
-     * @returns {string} JSON字符串或默认值
-     */
+   * 安全地序列化对象为JSON字符串
+   * @param {*} obj - 要序列化的对象
+   * @param {string} defaultValue - 序列化失败时的默认值
+   * @returns {string} JSON字符串或默认值
+   */
   safeJSONStringify(obj, defaultValue = '{}') {
     try {
       return JSON.stringify(obj);
@@ -195,46 +195,46 @@ export const utils = {
   },
 
   /**
-     * 获取当前页面路径
-     * @returns {string} 当前页面的路径
-     */
+   * 获取当前页面路径
+   * @returns {string} 当前页面的路径
+   */
   getCurrentPath() {
     return window.location.pathname;
   },
 
   /**
-     * 获取完整的当前页面URL（包含查询参数）
-     * @returns {string} 完整的URL
-     */
+   * 获取完整的当前页面URL（包含查询参数）
+   * @returns {string} 完整的URL
+   */
   getCurrentUrl() {
     return window.location.href;
   },
 
   /**
-     * 判断当前页面是否匹配某个路径模式
-     * @param {RegExp} pattern - 路径模式
-     * @returns {boolean} 是否匹配
-     */
+   * 判断当前页面是否匹配某个路径模式
+   * @param {RegExp} pattern - 路径模式
+   * @returns {boolean} 是否匹配
+   */
   isCurrentPathMatch(pattern) {
     return pattern.test(this.getCurrentPath());
   },
 
   /**
-     * 从URL获取查询参数
-     * @param {string} name - 参数名
-     * @param {string} url - URL字符串，默认使用当前页面URL
-     * @returns {string|null} 参数值或null
-     */
+   * 从URL获取查询参数
+   * @param {string} name - 参数名
+   * @param {string} url - URL字符串，默认使用当前页面URL
+   * @returns {string|null} 参数值或null
+   */
   getQueryParam(name, url = window.location.href) {
     const match = RegExp(`[?&]${name}=([^&]*)`).exec(url);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
   },
 
   /**
-     * 获取URL中的所有查询参数
-     * @param {string} url - URL字符串，默认使用当前页面URL
-     * @returns {Object} 查询参数对象
-     */
+   * 获取URL中的所有查询参数
+   * @param {string} url - URL字符串，默认使用当前页面URL
+   * @returns {Object} 查询参数对象
+   */
   getAllQueryParams(url = window.location.href) {
     const params = {};
     try {
@@ -249,19 +249,29 @@ export const utils = {
   },
 
   /**
-     * 收集DOM树中的所有文本节点内容
-     * @param {HTMLElement} element - 要收集文本的起始元素
-     * @param {Set<string>} resultSet - 用于存储结果的Set集合
-     * @param {Object} options - 配置选项
-     * @param {number} options.maxLength - 最大文本长度（默认200）
-     * @param {string[]} options.skipTags - 跳过的标签名数组
-     */
+   * 收集DOM树中的所有文本节点内容
+   * @param {HTMLElement} element - 要收集文本的起始元素
+   * @param {Set<string>} resultSet - 用于存储结果的Set集合
+   * @param {Object} options - 配置选项
+   * @param {number} options.maxLength - 最大文本长度（默认200）
+   * @param {string[]} options.skipTags - 跳过的标签名数组
+   */
   collectTextNodes(element, resultSet, options = {}) {
     if (!element || !resultSet || typeof resultSet.add !== 'function') return;
 
     const {
       maxLength = 200,
-      skipTags = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select', 'noscript', 'template'],
+      skipTags = [
+        'script',
+        'style',
+        'code',
+        'pre',
+        'textarea',
+        'input',
+        'select',
+        'noscript',
+        'template',
+      ],
     } = options;
 
     try {
@@ -281,12 +291,16 @@ export const utils = {
         if (node.nodeType === Node.TEXT_NODE) {
           const text = node.nodeValue ? node.nodeValue.trim() : '';
           // 只收集符合条件的文本
-          if (text &&
-                        text.length > 0 &&
-                        text.length < maxLength &&
-                        !/^\d+$/.test(text) &&
-                        // 使用基础字符类替代Unicode属性转义，避免构建过程中的解析问题
-                        !/^[\s\u0021-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u007E\u00A1-\u00BF\u2000-\u206F\u3000-\u303F]+$/.test(text)) {
+          if (
+            text &&
+            text.length > 0 &&
+            text.length < maxLength &&
+            !/^\d+$/.test(text) &&
+            // 使用基础字符类替代Unicode属性转义，避免构建过程中的解析问题
+            !/^[\s\u0021-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u007E\u00A1-\u00BF\u2000-\u206F\u3000-\u303F]+$/.test(
+              text,
+            )
+          ) {
             resultSet.add(text);
           }
         } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -300,12 +314,12 @@ export const utils = {
   },
 
   /**
-     * 安全地访问对象属性，避免嵌套属性访问出错
-     * @param {Object} obj - 目标对象
-     * @param {string|string[]} path - 属性路径，如'a.b.c'或['a','b','c']
-     * @param {*} defaultValue - 获取失败时的默认值
-     * @returns {*} 属性值或默认值
-     */
+   * 安全地访问对象属性，避免嵌套属性访问出错
+   * @param {Object} obj - 目标对象
+   * @param {string|string[]} path - 属性路径，如'a.b.c'或['a','b','c']
+   * @param {*} defaultValue - 获取失败时的默认值
+   * @returns {*} 属性值或默认值
+   */
   getNestedProperty(obj, path, defaultValue = null) {
     try {
       const pathArray = Array.isArray(path) ? path : path.split('.');
@@ -319,21 +333,21 @@ export const utils = {
       }
 
       return result === undefined ? defaultValue : result;
-    } catch (error) {
+    } catch (_error) {
       return defaultValue;
     }
   },
 
   /**
-     * 深拷贝对象
-     * @param {*} obj - 要拷贝的对象
-     * @returns {*} 拷贝后的对象
-     */
+   * 深拷贝对象
+   * @param {*} obj - 要拷贝的对象
+   * @returns {*} 拷贝后的对象
+   */
   deepClone(obj) {
     try {
       if (obj === null || typeof obj !== 'object') return obj;
       if (obj instanceof Date) return new Date(obj.getTime());
-      if (obj instanceof Array) return obj.map(item => this.deepClone(item));
+      if (obj instanceof Array) return obj.map((item) => this.deepClone(item));
       if (obj instanceof Object) {
         const clonedObj = {};
         for (const key in obj) {
@@ -350,13 +364,13 @@ export const utils = {
   },
 
   /**
-     * 安全地执行函数，捕获可能的异常
-     * @param {Function} fn - 要执行的函数
-     * @param {*} defaultValue - 执行失败时的默认返回值
-     * @param {Object} context - 函数执行上下文
-     * @param {...*} args - 函数参数
-     * @returns {*} 函数返回值或默认值
-     */
+   * 安全地执行函数，捕获可能的异常
+   * @param {Function} fn - 要执行的函数
+   * @param {*} defaultValue - 执行失败时的默认返回值
+   * @param {Object} context - 函数执行上下文
+   * @param {...*} args - 函数参数
+   * @returns {*} 函数返回值或默认值
+   */
   safeExecute(fn, defaultValue = null, context = null, ...args) {
     try {
       if (typeof fn === 'function') {

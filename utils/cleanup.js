@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 /**
  * @function cleanupRedundantFiles
@@ -26,7 +25,7 @@ function cleanupRedundantFiles() {
   if (fs.existsSync(distDir)) {
     console.log(`\n清理构建产物目录: ${distDir}`);
     const distFiles = fs.readdirSync(distDir);
-    distFiles.forEach(file => {
+    distFiles.forEach((file) => {
       const filePath = path.join(distDir, file);
       const stats = fs.statSync(filePath);
       const daysOld = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60 * 24);
@@ -42,7 +41,7 @@ function cleanupRedundantFiles() {
   // 清理临时脚本文件
   console.log('\n清理临时脚本文件:');
   let deletedCount = 0;
-  tempFiles.forEach(file => {
+  tempFiles.forEach((file) => {
     const filePath = path.join(utilsDir, file);
     if (fs.existsSync(filePath)) {
       console.log(`删除临时文件: ${file}`);
@@ -90,11 +89,11 @@ function cleanupRedundantFiles() {
     path.join(utilsDir, '使用说明.md'),
   ];
 
-  keyFiles.forEach(filePath => {
+  keyFiles.forEach((filePath) => {
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf8');
       const hasCRLF = /\r\n/.test(content);
-      const hasBOM = content.charCodeAt(0) === 0xFEFF;
+      const hasBOM = content.charCodeAt(0) === 0xfeff;
 
       console.log(`${path.basename(filePath)}:`);
       console.log(`  - 换行符: ${hasCRLF ? 'CRLF ❌' : 'LF ✅'}`);

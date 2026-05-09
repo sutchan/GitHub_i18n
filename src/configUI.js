@@ -1,14 +1,13 @@
 /**
  * GitHub 中文翻译配置界面模块
  * @file configUI.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 提供用户友好的配置界面，允许用户调整插件参数
  */
 
 import { CONFIG } from './config.js';
-import { utils } from './utils.js';
 
 class ConfigUI {
   constructor() {
@@ -268,7 +267,7 @@ class ConfigUI {
     sectionTitle.textContent = title;
     section.appendChild(sectionTitle);
 
-    items.forEach(item => {
+    items.forEach((item) => {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'github-i18n-config-item';
 
@@ -319,7 +318,7 @@ class ConfigUI {
       { label: '缓存命中率:', id: 'github-i18n-stat-cache-rate' },
     ];
 
-    basicStats.forEach(stat => {
+    basicStats.forEach((stat) => {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'github-i18n-config-item';
 
@@ -348,7 +347,7 @@ class ConfigUI {
       { label: '批处理次数:', id: 'github-i18n-stat-batches' },
     ];
 
-    advancedStats.forEach(stat => {
+    advancedStats.forEach((stat) => {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'github-i18n-config-item';
 
@@ -687,9 +686,15 @@ class ConfigUI {
     const newConfig = {
       debugMode: debugModeEl ? debugModeEl.checked : this.config.debugMode,
       performance: {
-        enablePartialMatch: partialMatchEl ? partialMatchEl.checked : this.config.performance.enablePartialMatch,
-        enableTranslationCache: translationCacheEl ? translationCacheEl.checked : this.config.performance.enableTranslationCache,
-        enableVirtualDom: virtualDomEl ? virtualDomEl.checked : this.config.performance.enableVirtualDom,
+        enablePartialMatch: partialMatchEl
+          ? partialMatchEl.checked
+          : this.config.performance.enablePartialMatch,
+        enableTranslationCache: translationCacheEl
+          ? translationCacheEl.checked
+          : this.config.performance.enableTranslationCache,
+        enableVirtualDom: virtualDomEl
+          ? virtualDomEl.checked
+          : this.config.performance.enableVirtualDom,
       },
       updateCheck: {
         enabled: autoUpdateEl ? autoUpdateEl.checked : this.config.updateCheck.enabled,
@@ -736,7 +741,8 @@ class ConfigUI {
     if (partialMatchEl) partialMatchEl.checked = this.config.performance.enablePartialMatch;
 
     const translationCacheEl = document.getElementById('github-i18n-translation-cache');
-    if (translationCacheEl) translationCacheEl.checked = this.config.performance.enableTranslationCache;
+    if (translationCacheEl)
+      translationCacheEl.checked = this.config.performance.enableTranslationCache;
 
     const virtualDomEl = document.getElementById('github-i18n-virtual-dom');
     if (virtualDomEl) virtualDomEl.checked = this.config.performance.enableVirtualDom;

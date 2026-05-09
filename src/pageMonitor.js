@@ -1,7 +1,7 @@
 /**
  * 页面监控模块
  * @file pageMonitor.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 负责监听GitHub页面的变化，检测DOM更新并触发翻译
@@ -9,75 +9,74 @@
 import { CONFIG } from './config.js';
 import { translationCore } from './translationCore.js';
 import { utils } from './utils.js';
-import virtualDomManager from './virtualDom.js';
 
 /**
  * 页面监控对象
  */
 export const pageMonitor = {
   /**
-     * 观察器实例
-     * @type {MutationObserver|null}
-     */
+   * 观察器实例
+   * @type {MutationObserver|null}
+   */
   observer: null,
 
   /**
-     * 最后翻译的路径
-     * @type {string}
-     */
+   * 最后翻译的路径
+   * @type {string}
+   */
   lastPath: '',
 
   /**
-     * 最后翻译的时间戳
-     * @type {number}
-     */
+   * 最后翻译的时间戳
+   * @type {number}
+   */
   lastTranslateTimestamp: 0,
 
   /**
-     * 存储事件监听器引用，用于清理
-     * @type {Array<{target: EventTarget, type: string, handler: Function}>}
-     */
+   * 存储事件监听器引用，用于清理
+   * @type {Array<{target: EventTarget, type: string, handler: Function}>}
+   */
   eventListeners: [],
 
   /**
-     * 存储定时检查的interval ID
-     * @type {number}
-     */
+   * 存储定时检查的interval ID
+   * @type {number}
+   */
   fallbackIntervalId: null,
 
   /**
-     * 页面卸载标记
-     * @type {boolean}
-     */
+   * 页面卸载标记
+   * @type {boolean}
+   */
   isPageUnloading: false,
 
   /**
-     * 节点检查缓存，用于性能优化
-     * @type {Map<Node, boolean>}
-     */
+   * 节点检查缓存，用于性能优化
+   * @type {Map<Node, boolean>}
+   */
   nodeCheckCache: new Map(),
 
   /**
-     * 缓存清理间隔（毫秒）
-     * @type {number}
-     */
+   * 缓存清理间隔（毫秒）
+   * @type {number}
+   */
   cacheCleanupInterval: 30000, // 30秒清理一次
 
   /**
-     * 上次缓存清理时间
-     * @type {number}
-     */
+   * 上次缓存清理时间
+   * @type {number}
+   */
   lastCacheCleanupTime: Date.now(),
 
   /**
-     * 缓存清理定时器ID
-     * @type {number}
-     */
+   * 缓存清理定时器ID
+   * @type {number}
+   */
   cacheCleanupTimerId: null,
 
   /**
-     * 初始化监控
-     */
+   * 初始化监控
+   */
   init() {
     try {
       // 设置页面卸载监听，确保资源清理
@@ -99,8 +98,8 @@ export const pageMonitor = {
   },
 
   /**
-     * 设置页面卸载处理器
-     */
+   * 设置页面卸载处理器
+   */
   setupPageUnloadHandler() {
     // 监听页面卸载事件
     const unloadHandler = () => {
@@ -122,8 +121,8 @@ export const pageMonitor = {
   },
 
   /**
-     * 启动缓存清理定时器
-     */
+   * 启动缓存清理定时器
+   */
   startCacheCleanupTimer() {
     // 清理现有定时器
     this.stopCacheCleanupTimer();
@@ -137,8 +136,8 @@ export const pageMonitor = {
   },
 
   /**
-     * 停止缓存清理定时器
-     */
+   * 停止缓存清理定时器
+   */
   stopCacheCleanupTimer() {
     if (this.cacheCleanupTimerId) {
       clearInterval(this.cacheCleanupTimerId);
@@ -147,8 +146,8 @@ export const pageMonitor = {
   },
 
   /**
-     * 清理节点检查缓存
-     */
+   * 清理节点检查缓存
+   */
   cleanupNodeCheckCache() {
     try {
       // 如果缓存大小超过限制，清理最旧的条目
@@ -158,7 +157,7 @@ export const pageMonitor = {
         const entriesToRemove = Math.floor(this.nodeCheckCache.size * 0.3);
         const keysToRemove = Array.from(this.nodeCheckCache.keys()).slice(0, entriesToRemove);
 
-        keysToRemove.forEach(key => {
+        keysToRemove.forEach((key) => {
           this.nodeCheckCache.delete(key);
         });
 
@@ -176,8 +175,8 @@ export const pageMonitor = {
   },
 
   /**
-     * 完全清理所有资源
-     */
+   * 完全清理所有资源
+   */
   cleanup() {
     try {
       // 停止监控
@@ -200,9 +199,9 @@ export const pageMonitor = {
   },
 
   /**
-     * 设置路径变化监听
-     * 用于监听GitHub的SPA路由变化
-     */
+   * 设置路径变化监听
+   * 用于监听GitHub的SPA路由变化
+   */
   setupPathListener() {
     // 保存当前路径
     this.lastPath = window.location.pathname + window.location.search;
@@ -234,8 +233,8 @@ export const pageMonitor = {
   },
 
   /**
-     * 处理路径变化
-     */
+   * 处理路径变化
+   */
   handlePathChange() {
     try {
       const currentPath = window.location.pathname + window.location.search;
@@ -255,14 +254,14 @@ export const pageMonitor = {
   },
 
   /**
-     * 带节流的翻译方法
-     * 优化版：增加智能节流和翻译范围判断
-     */
+   * 带节流的翻译方法
+   * 优化版：增加智能节流和翻译范围判断
+   */
   /**
-     * 带节流的翻译方法
-     * 优化版：增加智能节流和翻译范围判断，支持Promise链式调用
-     * @returns {Promise<void>} 翻译完成的Promise
-     */
+   * 带节流的翻译方法
+   * 优化版：增加智能节流和翻译范围判断，支持Promise链式调用
+   * @returns {Promise<void>} 翻译完成的Promise
+   */
   translateWithThrottle() {
     try {
       const now = Date.now();
@@ -297,7 +296,9 @@ export const pageMonitor = {
       if (now - this.lastTranslateTimestamp >= minInterval) {
         return this.delayedTranslate(0);
       } else if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 翻译请求被节流，距离上次翻译${now - this.lastTranslateTimestamp}ms`);
+        console.log(
+          `[GitHub 中文翻译] 翻译请求被节流，距离上次翻译${now - this.lastTranslateTimestamp}ms`,
+        );
       }
     } catch (error) {
       this.handleError('translateWithThrottle', error);
@@ -305,9 +306,9 @@ export const pageMonitor = {
   },
 
   /**
-     * 延迟执行翻译
-     * @param {number} delay - 延迟毫秒数
-     */
+   * 延迟执行翻译
+   * @param {number} delay - 延迟毫秒数
+   */
   async delayedTranslate() {
     try {
       // 确保性能配置正确应用
@@ -353,10 +354,10 @@ export const pageMonitor = {
   },
 
   /**
-     * 批处理元素翻译
-     * @param {HTMLElement[]} elements - 要翻译的元素数组
-     * @param {number} batchSize - 每批处理的元素数量
-     */
+   * 批处理元素翻译
+   * @param {HTMLElement[]} elements - 要翻译的元素数组
+   * @param {number} batchSize - 每批处理的元素数量
+   */
   async processElementsInBatches(elements, batchSize) {
     const performanceConfig = {
       batchSize: batchSize,
@@ -372,9 +373,9 @@ export const pageMonitor = {
   },
 
   /**
-     * 处理翻译错误
-     * @param {Error} error - 错误对象
-     */
+   * 处理翻译错误
+   * @param {Error} error - 错误对象
+   */
   async handleTranslationError(error) {
     this.handleError('翻译过程', error);
 
@@ -392,10 +393,10 @@ export const pageMonitor = {
   },
 
   /**
-     * 统一错误处理
-     * @param {string} operation - 操作名称
-     * @param {Error} error - 错误对象
-     */
+   * 统一错误处理
+   * @param {string} operation - 操作名称
+   * @param {Error} error - 错误对象
+   */
   handleError(operation, error) {
     const errorMessage = `[GitHub 中文翻译] ${operation}时出错: ${error.message}`;
     if (CONFIG.debugMode) {
@@ -418,10 +419,10 @@ export const pageMonitor = {
   },
 
   /**
-     * 识别当前页面的关键翻译区域
-     * 性能优化：只翻译需要的区域而不是整个页面
-     * @returns {HTMLElement[]} 关键翻译区域元素数组
-     */
+   * 识别当前页面的关键翻译区域
+   * 性能优化：只翻译需要的区域而不是整个页面
+   * @returns {HTMLElement[]} 关键翻译区域元素数组
+   */
   identifyKeyTranslationAreas() {
     const keySelectors = [];
     const path = window.location.pathname;
@@ -456,7 +457,12 @@ export const pageMonitor = {
       keySelectors.push('.codesearch-results', '.search-title');
     } else if (/\/orgs\//.test(path) || /\/users\//.test(path)) {
       // 组织或用户页面
-      keySelectors.push('.org-profile', '.profile-timeline', '.user-profile-sticky-header', '.user-profile-main');
+      keySelectors.push(
+        '.org-profile',
+        '.profile-timeline',
+        '.user-profile-sticky-header',
+        '.user-profile-main',
+      );
     } else if (/\/repos\/\w+\/\w+/.test(path)) {
       // 仓库主页面
       keySelectors.push('.repository-content', '.repository-meta-content', '.readme');
@@ -476,9 +482,7 @@ export const pageMonitor = {
 
     // 如果没有找到关键区域，尝试使用更通用的选择器
     if (elements.length === 0) {
-      const genericSelectors = [
-        '#js-pjax-container', '.application-main', 'main', 'body',
-      ];
+      const genericSelectors = ['#js-pjax-container', '.application-main', 'main', 'body'];
 
       for (const selector of genericSelectors) {
         const element = document.querySelector(selector);
@@ -493,9 +497,9 @@ export const pageMonitor = {
   },
 
   /**
-     * 设置DOM变化监听
-     * 性能优化：使用更精确的观察范围和优化的配置
-     */
+   * 设置DOM变化监听
+   * 性能优化：使用更精确的观察范围和优化的配置
+   */
   setupDomObserver() {
     try {
       // 先断开之前可能存在的observer
@@ -544,7 +548,10 @@ export const pageMonitor = {
         try {
           this.observer.observe(rootNode, observerConfig);
           if (CONFIG.debugMode) {
-            console.log('[GitHub 中文翻译] DOM观察器已启动，观察范围:', rootNode.tagName + (rootNode.id ? '#' + rootNode.id : ''));
+            console.log(
+              '[GitHub 中文翻译] DOM观察器已启动，观察范围:',
+              rootNode.tagName + (rootNode.id ? '#' + rootNode.id : ''),
+            );
           }
         } catch (error) {
           if (CONFIG.debugMode) {
@@ -567,11 +574,17 @@ export const pageMonitor = {
           // 移除一次性监听器
           document.removeEventListener('DOMContentLoaded', domLoadedHandler);
           // 从事件监听器数组中移除
-          this.eventListeners = this.eventListeners.filter(l => !(l.target === document && l.type === 'DOMContentLoaded'));
+          this.eventListeners = this.eventListeners.filter(
+            (l) => !(l.target === document && l.type === 'DOMContentLoaded'),
+          );
         };
 
         document.addEventListener('DOMContentLoaded', domLoadedHandler);
-        this.eventListeners.push({ target: document, type: 'DOMContentLoaded', handler: domLoadedHandler });
+        this.eventListeners.push({
+          target: document,
+          type: 'DOMContentLoaded',
+          handler: domLoadedHandler,
+        });
       }
     } catch (error) {
       console.error('[GitHub 中文翻译] 设置DOM观察器失败:', error);
@@ -581,11 +594,11 @@ export const pageMonitor = {
   },
 
   /**
-     * 选择最佳的DOM观察根节点
-     * 减少观察的DOM范围，提高性能
-     * @param {string} pageMode - 页面模式
-     * @returns {HTMLElement} 最佳观察根节点
-     */
+   * 选择最佳的DOM观察根节点
+   * 减少观察的DOM范围，提高性能
+   * @param {string} pageMode - 页面模式
+   * @returns {HTMLElement} 最佳观察根节点
+   */
   selectOptimalRootNode(pageMode) {
     // 如果没有提供页面模式，则自动检测
     const effectivePageMode = pageMode || this.detectPageMode();
@@ -596,132 +609,132 @@ export const pageMonitor = {
       case 'search':
         candidateSelectors = [
           '.codesearch-results', // 搜索结果容器
-          '#js-pjax-container',   // 通用PJAX容器
-          'main',                 // 主内容
-          'body',                  // 降级方案
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       case 'issues':
       case 'pullRequests':
         candidateSelectors = [
-          '.js-discussion',       // 讨论区容器
-          '.issue-details',       // 问题详情容器
-          '#js-issue-title',      // 问题标题
-          '#js-pjax-container',   // 通用PJAX容器
-          'main',                 // 主内容
-          'body',                  // 降级方案
+          '.js-discussion', // 讨论区容器
+          '.issue-details', // 问题详情容器
+          '#js-issue-title', // 问题标题
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       case 'repository':
         candidateSelectors = [
           '#js-repo-pjax-container', // 仓库页面主容器
-          '.repository-content',     // 仓库内容区域
-          '.application-main',       // 应用主容器
-          'body',                     // 降级方案
+          '.repository-content', // 仓库内容区域
+          '.application-main', // 应用主容器
+          'body', // 降级方案
         ];
         break;
 
       case 'notifications':
         candidateSelectors = [
-          '.notifications-list',    // 通知列表
-          '.notification-shelf',    // 通知顶栏
-          '#js-pjax-container',     // 通用PJAX容器
-          'main',                   // 主内容
-          'body',                    // 降级方案
+          '.notifications-list', // 通知列表
+          '.notification-shelf', // 通知顶栏
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       case 'wiki':
         candidateSelectors = [
-          '.wiki-wrapper',         // Wiki内容包装器
-          '.markdown-body',        // Markdown内容
-          '#js-pjax-container',    // 通用PJAX容器
-          'main',                  // 主内容
-          'body',                   // 降级方案
+          '.wiki-wrapper', // Wiki内容包装器
+          '.markdown-body', // Markdown内容
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       case 'actions':
         candidateSelectors = [
-          '.workflow-run-list',     // 工作流运行列表
-          '.workflow-jobs',         // 工作流任务列表
-          '.workflow-run-header',   // 工作流运行头部
-          '#js-pjax-container',     // 通用PJAX容器
-          'main',                   // 主内容
-          'body',                    // 降级方案
+          '.workflow-run-list', // 工作流运行列表
+          '.workflow-jobs', // 工作流任务列表
+          '.workflow-run-header', // 工作流运行头部
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       case 'projects':
         candidateSelectors = [
-          '.project-layout',        // 项目布局容器
-          '.project-columns',       // 项目列容器
-          '#js-pjax-container',     // 通用PJAX容器
-          'main',                   // 主内容
-          'body',                    // 降级方案
+          '.project-layout', // 项目布局容器
+          '.project-columns', // 项目列容器
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       case 'packages':
         candidateSelectors = [
-          '.packages-list',         // 包列表容器
-          '.package-details',       // 包详情容器
-          '#js-pjax-container',     // 通用PJAX容器
-          'main',                   // 主内容
-          'body',                    // 降级方案
+          '.packages-list', // 包列表容器
+          '.package-details', // 包详情容器
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       case 'security':
         candidateSelectors = [
-          '.security-overview',     // 安全概览容器
-          '.vulnerability-list',    // 漏洞列表
-          '#js-pjax-container',     // 通用PJAX容器
-          'main',                   // 主内容
-          'body',                    // 降级方案
+          '.security-overview', // 安全概览容器
+          '.vulnerability-list', // 漏洞列表
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       case 'insights':
         candidateSelectors = [
-          '.insights-container',    // 洞察容器
-          '#js-pjax-container',     // 通用PJAX容器
-          'main',                   // 主内容
-          'body',                    // 降级方案
+          '.insights-container', // 洞察容器
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       case 'settings':
         candidateSelectors = [
-          '.settings-content',      // 设置内容
-          '.js-settings-content',   // JS设置内容
-          '#js-pjax-container',     // 通用PJAX容器
-          'main',                   // 主内容
-          'body',                    // 降级方案
+          '.settings-content', // 设置内容
+          '.js-settings-content', // JS设置内容
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       case 'profile':
       case 'organizations':
         candidateSelectors = [
-          '.profile-timeline',      // 个人资料时间线
-          '.org-profile',           // 组织资料
-          '.user-profile-main',     // 用户资料主内容
-          '#js-pjax-container',     // 通用PJAX容器
-          'main',                   // 主内容
-          'body',                    // 降级方案
+          '.profile-timeline', // 个人资料时间线
+          '.org-profile', // 组织资料
+          '.user-profile-main', // 用户资料主内容
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          'body', // 降级方案
         ];
         break;
 
       default:
         // 默认选择器优先级
         candidateSelectors = [
-          '#js-pjax-container',     // 通用PJAX容器
-          'main',                   // 主内容
-          '.application-main',      // 应用主容器
-          'body',                    // 降级方案
+          '#js-pjax-container', // 通用PJAX容器
+          'main', // 主内容
+          '.application-main', // 应用主容器
+          'body', // 降级方案
         ];
     }
 
@@ -737,18 +750,18 @@ export const pageMonitor = {
   },
 
   /**
-     * 获取优化的观察器配置
-     * 根据页面模式和复杂度动态调整观察选项
-     * @param {string} pageMode - 页面模式
-     * @returns {Object} 优化的MutationObserver配置
-     */
+   * 获取优化的观察器配置
+   * 根据页面模式和复杂度动态调整观察选项
+   * @param {string} pageMode - 页面模式
+   * @returns {Object} 优化的MutationObserver配置
+   */
   getOptimizedObserverConfig(pageMode) {
     // 如果没有提供页面模式，则自动检测
     pageMode = pageMode || this.detectPageMode();
 
     // 基础配置
     const baseConfig = {
-      childList: true,  // 始终监听子节点变化
+      childList: true, // 始终监听子节点变化
     };
 
     // 根据配置决定是否监听字符数据变化
@@ -781,128 +794,128 @@ export const pageMonitor = {
   },
 
   /**
-     * 判断是否为复杂页面
-     * @returns {boolean} 是否为复杂页面
-     */
+   * 判断是否为复杂页面
+   * @returns {boolean} 是否为复杂页面
+   */
   isComplexPage() {
-    const complexPaths = [
-      /\/pull\/\d+/,
-      /\/issues\/\d+/,
-      /\/blob\//,
-      /\/commit\//,
-      /\/compare\//,
-    ];
+    const complexPaths = [/\/pull\/\d+/, /\/issues\/\d+/, /\/blob\//, /\/commit\//, /\/compare\//];
 
-    return complexPaths.some(pattern => pattern.test(window.location.pathname));
+    return complexPaths.some((pattern) => pattern.test(window.location.pathname));
   },
 
   /**
-     * 检测当前页面模式
-     * 复用translationCore中的页面模式检测逻辑
-     * @returns {string} 当前页面模式
-     */
+   * 检测当前页面模式
+   * 复用translationCore中的页面模式检测逻辑
+   * @returns {string} 当前页面模式
+   */
   detectPageMode() {
     return translationCore.detectPageMode();
   },
 
   /**
-     * 根据页面模式获取快速路径阈值
-     * @param {string} pageMode - 页面模式
-     * @returns {number} 快速路径阈值
-     */
+   * 根据页面模式获取快速路径阈值
+   * @param {string} pageMode - 页面模式
+   * @returns {number} 快速路径阈值
+   */
   getQuickPathThresholdByPageMode(pageMode) {
     const thresholds = {
-      'search': 5,
-      'issues': 4,
-      'pullRequests': 4,
-      'wiki': 6,
-      'actions': 5,
-      'codespaces': 3,
+      search: 5,
+      issues: 4,
+      pullRequests: 4,
+      wiki: 6,
+      actions: 5,
+      codespaces: 3,
     };
     return thresholds[pageMode] || 3;
   },
 
   /**
-     * 获取页面模式特定的阈值
-     * @param {string} pageMode - 页面模式
-     * @returns {number} 页面模式特定的阈值
-     */
+   * 获取页面模式特定的阈值
+   * @param {string} pageMode - 页面模式
+   * @returns {number} 页面模式特定的阈值
+   */
   getModeSpecificThreshold(pageMode) {
     const thresholds = {
-      'issues': 0.35,
-      'pullRequests': 0.35,
-      'wiki': 0.4,
-      'search': 0.3,
-      'codespaces': 0.25,
+      issues: 0.35,
+      pullRequests: 0.35,
+      wiki: 0.4,
+      search: 0.3,
+      codespaces: 0.25,
     };
     return thresholds[pageMode];
   },
 
   /**
-     * 根据页面模式获取最小文本长度
-     * @param {string} pageMode - 页面模式
-     * @returns {number} 最小文本长度
-     */
+   * 根据页面模式获取最小文本长度
+   * @param {string} pageMode - 页面模式
+   * @returns {number} 最小文本长度
+   */
   getMinTextLengthByPageMode(pageMode) {
     const lengths = {
-      'issues': 4,
-      'pullRequests': 4,
-      'wiki': 5,
-      'search': 3,
+      issues: 4,
+      pullRequests: 4,
+      wiki: 5,
+      search: 3,
     };
     return lengths[pageMode] || CONFIG.performance.minTextLengthToTranslate || 3;
   },
 
   /**
-     * 根据页面模式判断是否应该跳过元素
-     * @param {HTMLElement} element - 元素
-     * @param {string} pageMode - 页面模式
-     * @returns {boolean} 是否应该跳过
-     */
+   * 根据页面模式判断是否应该跳过元素
+   * @param {HTMLElement} element - 元素
+   * @param {string} pageMode - 页面模式
+   * @returns {boolean} 是否应该跳过
+   */
   shouldSkipElementByPageMode(element, pageMode) {
     if (!element || !pageMode) return false;
 
     // 通用跳过规则
-    if (element.tagName === 'CODE' || element.tagName === 'SCRIPT' ||
-            element.tagName === 'STYLE' || element.classList.contains('blob-code')) {
+    if (
+      element.tagName === 'CODE' ||
+      element.tagName === 'SCRIPT' ||
+      element.tagName === 'STYLE' ||
+      element.classList.contains('blob-code')
+    ) {
       return true;
     }
 
     // 特定页面模式的元素跳过规则
     switch (pageMode) {
       case 'codespaces':
-        return element.classList.contains('terminal') ||
-                       element.classList.contains('command-input') ||
-                       element.dataset.terminal;
+        return (
+          element.classList.contains('terminal') ||
+          element.classList.contains('command-input') ||
+          element.dataset.terminal
+        );
       case 'wiki':
         // wiki页面中的代码块
-        return element.classList.contains('codehilite') ||
-                       element.classList.contains('highlight') ||
-                       element.closest('.highlight');
+        return (
+          element.classList.contains('codehilite') ||
+          element.classList.contains('highlight') ||
+          element.closest('.highlight')
+        );
       case 'issues':
       case 'pullRequests':
         // 跳过代码块和diff
-        return element.classList.contains('blob-code') ||
-                       element.classList.contains('diff-line');
+        return element.classList.contains('blob-code') || element.classList.contains('diff-line');
       case 'search':
         // 搜索页面特定跳过规则
         if (element.classList.contains('search-match')) {
           return false; // 搜索匹配结果不要跳过
         }
-        return element.classList.contains('text-small') ||
-                       element.classList.contains('link-gray');
+        return element.classList.contains('text-small') || element.classList.contains('link-gray');
       default:
         return false;
     }
   },
 
   /**
-     * 智能判断是否需要触发翻译
-     * 比简单的变化检测更高效
-     * @param {MutationRecord[]} mutations - 变更记录数组
-     * @param {string} pageMode - 当前页面模式
-     * @returns {boolean} 是否需要触发翻译
-     */
+   * 智能判断是否需要触发翻译
+   * 比简单的变化检测更高效
+   * @param {MutationRecord[]} mutations - 变更记录数组
+   * @param {string} pageMode - 当前页面模式
+   * @returns {boolean} 是否需要触发翻译
+   */
   shouldTriggerTranslation(mutations, pageMode) {
     // 如果没有提供页面模式，则自动检测
     pageMode = pageMode || this.detectPageMode();
@@ -937,7 +950,10 @@ export const pageMonitor = {
       let contentChanges = 0;
       let importantChanges = 0;
       // 限制检查数量，避免处理过多变化
-      const maxCheckCount = Math.min(mutations.length, Math.max(mutationThreshold, maxMutationProcessing));
+      const maxCheckCount = Math.min(
+        mutations.length,
+        Math.max(mutationThreshold, maxMutationProcessing),
+      );
 
       // 缓存重要元素和忽略元素的匹配结果，避免重复计算
       const elementCheckCache = new WeakMap();
@@ -959,7 +975,12 @@ export const pageMonitor = {
           // 从缓存获取忽略结果或计算并缓存
           let isIgnored = elementCheckCache.get(mutation.target);
           if (isIgnored === undefined) {
-            isIgnored = this.shouldIgnoreElement(mutation.target, ignoreElements, elementCheckCache, pageMode);
+            isIgnored = this.shouldIgnoreElement(
+              mutation.target,
+              ignoreElements,
+              elementCheckCache,
+              pageMode,
+            );
             elementCheckCache.set(mutation.target, isIgnored);
           }
 
@@ -970,7 +991,12 @@ export const pageMonitor = {
           // 检查是否为重要元素，结果也加入缓存
           let isImportant = elementCheckCache.get(`important-${mutation.target}`);
           if (isImportant === undefined && mutation.target.nodeType === Node.ELEMENT_NODE) {
-            isImportant = this.isImportantElement(mutation.target, importantElements, elementCheckCache, pageMode);
+            isImportant = this.isImportantElement(
+              mutation.target,
+              importantElements,
+              elementCheckCache,
+              pageMode,
+            );
             elementCheckCache.set(`important-${mutation.target}`, isImportant);
           }
 
@@ -982,7 +1008,10 @@ export const pageMonitor = {
 
         // 检查重要属性变化
         if (mutation.type === 'attributes') {
-          if (CONFIG.performance.observeAttributes && importantAttributes.includes(mutation.attributeName)) {
+          if (
+            CONFIG.performance.observeAttributes &&
+            importantAttributes.includes(mutation.attributeName)
+          ) {
             importantChanges++;
             // 重要属性变化达到阈值直接触发
             if (importantChanges >= 3) {
@@ -1009,7 +1038,8 @@ export const pageMonitor = {
       }
 
       // 计算加权变化比例
-      const weightedChanges = (contentChanges * contentChangeWeight) + (importantChanges * importantChangeWeight);
+      const weightedChanges =
+        contentChanges * contentChangeWeight + importantChanges * importantChangeWeight;
       const totalChangesChecked = maxCheckCount;
 
       // 根据页面模式获取特定阈值或使用默认阈值
@@ -1024,11 +1054,11 @@ export const pageMonitor = {
   },
 
   /**
-     * 判断元素是否为重要元素
-     * @param {HTMLElement} element - 要检查的元素
-     * @param {string[]} importantElements - 重要元素选择器数组
-     * @returns {boolean} 是否为重要元素
-     */
+   * 判断元素是否为重要元素
+   * @param {HTMLElement} element - 要检查的元素
+   * @param {string[]} importantElements - 重要元素选择器数组
+   * @returns {boolean} 是否为重要元素
+   */
   isImportantElement(element, importantElements, cache, pageMode) {
     try {
       // 检查是否应该基于页面模式跳过元素
@@ -1045,10 +1075,10 @@ export const pageMonitor = {
       let isImportant = false;
 
       // 基础重要元素检查
-      isImportant = importantElements.some(selector => {
+      isImportant = importantElements.some((selector) => {
         try {
           return element.matches(selector);
-        } catch (e) {
+        } catch (_e) {
           return false; // 选择器无效时跳过
         }
       });
@@ -1058,17 +1088,19 @@ export const pageMonitor = {
         switch (pageMode) {
           case 'issues':
           case 'pullRequests':
-            isImportant = element.classList.contains('comment-body') ||
-                                     element.classList.contains('timeline-comment-header');
+            isImportant =
+              element.classList.contains('comment-body') ||
+              element.classList.contains('timeline-comment-header');
             break;
           case 'wiki':
-            isImportant = element.classList.contains('markdown-body') ||
-                                     element.tagName === 'H1' ||
-                                     element.tagName === 'H2';
+            isImportant =
+              element.classList.contains('markdown-body') ||
+              element.tagName === 'H1' ||
+              element.tagName === 'H2';
             break;
           case 'search':
-            isImportant = element.classList.contains('search-match') ||
-                                     element.classList.contains('f4');
+            isImportant =
+              element.classList.contains('search-match') || element.classList.contains('f4');
             break;
           case 'codespaces':
             isImportant = element.classList.contains('codespace-status');
@@ -1089,11 +1121,11 @@ export const pageMonitor = {
   },
 
   /**
-     * 判断是否应该忽略元素的变化
-     * @param {Node} node - 要检查的节点
-     * @param {string[]} ignoreElements - 忽略元素选择器数组
-     * @returns {boolean} 是否应该忽略
-     */
+   * 判断是否应该忽略元素的变化
+   * @param {Node} node - 要检查的节点
+   * @param {string[]} ignoreElements - 忽略元素选择器数组
+   * @returns {boolean} 是否应该忽略
+   */
   shouldIgnoreElement(node, ignoreElements, cache, pageMode) {
     try {
       // 非元素节点不忽略
@@ -1117,10 +1149,10 @@ export const pageMonitor = {
       }
 
       // 基础忽略元素检查
-      let shouldIgnore = ignoreElements.some(selector => {
+      let shouldIgnore = ignoreElements.some((selector) => {
         try {
           return element.matches(selector);
-        } catch (e) {
+        } catch (_e) {
           return false; // 选择器无效时跳过
         }
       });
@@ -1129,9 +1161,10 @@ export const pageMonitor = {
       if (!shouldIgnore && pageMode) {
         switch (pageMode) {
           case 'codespaces':
-            shouldIgnore = element.classList.contains('terminal') ||
-                                      element.tagName === 'PRE' ||
-                                      element.classList.contains('command-input');
+            shouldIgnore =
+              element.classList.contains('terminal') ||
+              element.tagName === 'PRE' ||
+              element.classList.contains('command-input');
             break;
           case 'wiki':
             // wiki页面中的代码块不忽略
@@ -1161,10 +1194,10 @@ export const pageMonitor = {
   },
 
   /**
-     * 判断是否为内容相关的DOM变化
-     * @param {MutationRecord} mutation - 变更记录
-     * @returns {boolean} 是否为内容相关变化
-     */
+   * 判断是否为内容相关的DOM变化
+   * @param {MutationRecord} mutation - 变更记录
+   * @returns {boolean} 是否为内容相关变化
+   */
   isContentRelatedMutation(mutation, pageMode) {
     try {
       // 检查字符数据变化
@@ -1182,25 +1215,31 @@ export const pageMonitor = {
         const { minLength, lengthDiffThreshold } = this.getTextChangeThreshold(pageMode);
 
         // 判断变化是否有实质内容
-        const hasMeaningfulChange = oldValue !== newValue &&
-                                           (newValue.length >= minLength || oldValue.length >= minLength ||
-                                            Math.abs(newValue.length - oldValue.length) >= lengthDiffThreshold);
+        const hasMeaningfulChange =
+          oldValue !== newValue &&
+          (newValue.length >= minLength ||
+            oldValue.length >= minLength ||
+            Math.abs(newValue.length - oldValue.length) >= lengthDiffThreshold);
 
         return hasMeaningfulChange;
       }
 
       // 检查子节点变化
-      if (mutation.type === 'childList' &&
-                (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)) {
+      if (
+        mutation.type === 'childList' &&
+        (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)
+      ) {
         // 页面模式特定的子节点过滤逻辑
-        return Array.from(mutation.addedNodes).some(node => {
+        return Array.from(mutation.addedNodes).some((node) => {
           // 忽略脚本、样式等非内容节点
           if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node;
             // 基础过滤
-            if (element.tagName === 'SCRIPT' ||
-                            element.tagName === 'STYLE' ||
-                            element.tagName === 'META') {
+            if (
+              element.tagName === 'SCRIPT' ||
+              element.tagName === 'STYLE' ||
+              element.tagName === 'META'
+            ) {
               return false;
             }
 
@@ -1210,24 +1249,31 @@ export const pageMonitor = {
                 case 'issues':
                 case 'pullRequests':
                   // 对于Issues/PR页面，优先关注评论和描述
-                  return element.classList.contains('comment-body') ||
-                                           element.classList.contains('timeline-comment') ||
-                                           element.classList.contains('js-issue-title');
+                  return (
+                    element.classList.contains('comment-body') ||
+                    element.classList.contains('timeline-comment') ||
+                    element.classList.contains('js-issue-title')
+                  );
                 case 'wiki':
                   // 对于wiki页面，关注内容和标题
-                  return element.classList.contains('markdown-body') ||
-                                           /^H[1-6]$/.test(element.tagName);
+                  return (
+                    element.classList.contains('markdown-body') || /^H[1-6]$/.test(element.tagName)
+                  );
                 case 'codespaces':
                   // 对于codespaces页面，忽略终端输出
-                  if (element.classList.contains('terminal') ||
-                                        element.classList.contains('command-input')) {
+                  if (
+                    element.classList.contains('terminal') ||
+                    element.classList.contains('command-input')
+                  ) {
                     return false;
                   }
                   break;
                 case 'search':
                   // 搜索结果页面
-                  return element.classList.contains('search-result') ||
-                                           element.classList.contains('search-match');
+                  return (
+                    element.classList.contains('search-result') ||
+                    element.classList.contains('search-match')
+                  );
               }
             }
 
@@ -1246,17 +1292,19 @@ export const pageMonitor = {
   },
 
   /**
-     * 判断节点是否需要翻译
-     * @param {Node} node - 要检查的节点
-     * @param {string} pageMode - 当前页面模式
-     * @returns {boolean} 是否需要翻译
-     */
+   * 判断节点是否需要翻译
+   * @param {Node} node - 要检查的节点
+   * @param {string} pageMode - 当前页面模式
+   * @returns {boolean} 是否需要翻译
+   */
   isTranslatableNode(node) {
     // 不再需要页面模式参数，简化函数逻辑
     // 跳过脚本、样式等
-    if (node.nodeType === Node.SCRIPT_NODE ||
-            node.nodeType === Node.STYLE_NODE ||
-            node.nodeType === Node.COMMENT_NODE) {
+    if (
+      node.nodeType === Node.SCRIPT_NODE ||
+      node.nodeType === Node.STYLE_NODE ||
+      node.nodeType === Node.COMMENT_NODE
+    ) {
       return false;
     }
 
@@ -1280,41 +1328,60 @@ export const pageMonitor = {
 
       // 检查是否为内容容器
       const contentTags = [
-        'p', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        'li', 'a', 'button', 'label', 'div', 'td', 'th',
-        'pre', 'code', 'blockquote',
+        'p',
+        'span',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'li',
+        'a',
+        'button',
+        'label',
+        'div',
+        'td',
+        'th',
+        'pre',
+        'code',
+        'blockquote',
       ];
 
       const tagName = node.tagName.toLowerCase();
       const hasContent = node.textContent.trim().length > 0;
 
       // 常见内容容器且有内容，或者包含内容子节点
-      return (contentTags.includes(tagName) && hasContent) ||
-                   (node.children.length > 0 && this.hasTranslatableChildren(node));
+      return (
+        (contentTags.includes(tagName) && hasContent) ||
+        (node.children.length > 0 && this.hasTranslatableChildren(node))
+      );
     }
 
     return false;
   },
 
   /**
-     * 检查元素是否包含可翻译的子元素
-     * @param {HTMLElement} element - 要检查的元素
-     * @returns {boolean} 是否包含可翻译的子元素
-     */
+   * 检查元素是否包含可翻译的子元素
+   * @param {HTMLElement} element - 要检查的元素
+   * @returns {boolean} 是否包含可翻译的子元素
+   */
   hasTranslatableChildren(element) {
     // 快速检查：只查看前10个子元素
     const children = Array.from(element.children).slice(0, 10);
-    return children.some(child => {
+    return children.some((child) => {
       const tagName = child.tagName.toLowerCase();
-      return ['p', 'span', 'a', 'button', 'label'].includes(tagName) &&
-                   child.textContent.trim().length > 0;
+      return (
+        ['p', 'span', 'a', 'button', 'label'].includes(tagName) &&
+        child.textContent.trim().length > 0
+      );
     });
   },
 
   /**
-     * 设置降级监控方案
-     * 当MutationObserver失败时使用
-     */
+   * 设置降级监控方案
+   * 当MutationObserver失败时使用
+   */
   setupFallbackMonitoring() {
     if (CONFIG.debugMode) {
       console.log('[GitHub 中文翻译] 使用降级监控方案');
@@ -1333,14 +1400,19 @@ export const pageMonitor = {
     // 保存interval ID以便后续清理
     this.fallbackIntervalId = intervalId;
     // 也保存到事件监听器数组中便于统一管理
-    this.eventListeners.push({ target: window, type: 'interval', handler: null, intervalId: intervalId });
+    this.eventListeners.push({
+      target: window,
+      type: 'interval',
+      handler: null,
+      intervalId: intervalId,
+    });
   },
 
   /**
-     * 获取页面模式特定的文本变化阈值
-     * @param {string} pageMode - 页面模式
-     * @returns {Object} 阈值配置
-     */
+   * 获取页面模式特定的文本变化阈值
+   * @param {string} pageMode - 页面模式
+   * @returns {Object} 阈值配置
+   */
   getTextChangeThreshold(pageMode) {
     const defaultThresholds = { minLength: 5, lengthDiffThreshold: 3 };
 
@@ -1362,12 +1434,12 @@ export const pageMonitor = {
   },
 
   /**
-     * 检测重要的DOM变化
-     * 只在有实际内容变化时触发翻译
-     * @param {MutationRecord[]} mutations - 变更记录数组
-     * @param {string} pageMode - 页面模式
-     * @returns {boolean} 是否有需要触发翻译的重要变化
-     */
+   * 检测重要的DOM变化
+   * 只在有实际内容变化时触发翻译
+   * @param {MutationRecord[]} mutations - 变更记录数组
+   * @param {string} pageMode - 页面模式
+   * @returns {boolean} 是否有需要触发翻译的重要变化
+   */
   detectImportantChanges(mutations, pageMode) {
     try {
       // 确保页面模式存在
@@ -1402,19 +1474,21 @@ export const pageMonitor = {
             }
           }
           // 重要属性变化检查
-          if (mutation.type === 'attributes' &&
-                        importantAttributes.includes(mutation.attributeName)) {
+          if (
+            mutation.type === 'attributes' &&
+            importantAttributes.includes(mutation.attributeName)
+          ) {
             return true;
           }
         }
       }
 
       // 检查是否有实际内容变化
-      return mutations.some(mutation => {
+      return mutations.some((mutation) => {
         // 子节点变化处理
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
           // 过滤出可见的元素节点
-          return Array.from(mutation.addedNodes).some(node => {
+          return Array.from(mutation.addedNodes).some((node) => {
             // 检查缓存
             const result = nodeCheckCache.get(node);
             if (result !== undefined) {
@@ -1422,10 +1496,12 @@ export const pageMonitor = {
             }
 
             // 忽略不可翻译的节点类型
-            if (node.nodeType === Node.SCRIPT_NODE ||
-                            node.nodeType === Node.STYLE_NODE ||
-                            node.nodeType === Node.COMMENT_NODE ||
-                            node.nodeType === Node.PROCESSING_INSTRUCTION_NODE) {
+            if (
+              node.nodeType === Node.SCRIPT_NODE ||
+              node.nodeType === Node.STYLE_NODE ||
+              node.nodeType === Node.COMMENT_NODE ||
+              node.nodeType === Node.PROCESSING_INSTRUCTION_NODE
+            ) {
               nodeCheckCache.set(node, false);
               return false;
             }
@@ -1458,7 +1534,9 @@ export const pageMonitor = {
               }
 
               // 检查是否为重要元素
-              if (this.isImportantElement(element, importantElements, nodeCheckCache, currentPageMode)) {
+              if (
+                this.isImportantElement(element, importantElements, nodeCheckCache, currentPageMode)
+              ) {
                 nodeCheckCache.set(node, true);
                 return true;
               }
@@ -1492,8 +1570,10 @@ export const pageMonitor = {
         }
 
         // 重要属性变化检查
-        if (mutation.type === 'attributes' &&
-                    importantAttributes.includes(mutation.attributeName)) {
+        if (
+          mutation.type === 'attributes' &&
+          importantAttributes.includes(mutation.attributeName)
+        ) {
           // 对于重要属性，直接认为需要翻译
           return true;
         }
@@ -1507,8 +1587,8 @@ export const pageMonitor = {
   },
 
   /**
-     * 停止监控
-     */
+   * 停止监控
+   */
   stop() {
     try {
       // 断开MutationObserver连接
@@ -1547,8 +1627,8 @@ export const pageMonitor = {
   },
 
   /**
-     * 清理所有缓存
-     */
+   * 清理所有缓存
+   */
   clearAllCaches() {
     try {
       // 清理节点检查缓存
@@ -1586,15 +1666,13 @@ export const pageMonitor = {
     }
   },
 
-
-
   /**
-     * 清理所有注册的事件监听器
-     */
+   * 清理所有注册的事件监听器
+   */
   cleanupEventListeners() {
     try {
       // 清理所有事件监听器
-      this.eventListeners.forEach(listener => {
+      this.eventListeners.forEach((listener) => {
         try {
           if (listener.intervalId) {
             // 清理定时器
@@ -1625,8 +1703,8 @@ export const pageMonitor = {
   },
 
   /**
-     * 重新开始监控
-     */
+   * 重新开始监控
+   */
   restart() {
     try {
       this.stop();
@@ -1643,9 +1721,9 @@ export const pageMonitor = {
   },
 
   /**
-     * 手动触发翻译
-     * 提供外部调用接口
-     */
+   * 手动触发翻译
+   * 提供外部调用接口
+   */
   triggerTranslation() {
     // 性能优化：如果启用了虚拟DOM，先检查是否有需要翻译的元素
     if (CONFIG.performance.enableVirtualDom) {

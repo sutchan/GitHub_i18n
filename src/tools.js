@@ -1,7 +1,7 @@
 /**
  * 开发工具模块
  * @file tools.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 包含字符串提取、自动更新和词典处理等开发工具
@@ -15,10 +15,10 @@ import { translationModule } from './dictionaries/index.js';
  */
 export const stringExtractor = {
   /**
-     * 收集页面上的字符串
-     * @param {boolean} showInConsole - 是否在控制台显示结果
-     * @returns {Set<string>} 收集到的字符串集合
-     */
+   * 收集页面上的字符串
+   * @param {boolean} showInConsole - 是否在控制台显示结果
+   * @returns {Set<string>} 收集到的字符串集合
+   */
   collectStrings(showInConsole = true) {
     const strings = new Set();
     utils.collectTextNodes(document.body, strings);
@@ -32,10 +32,10 @@ export const stringExtractor = {
   },
 
   /**
-     * 查找未翻译的字符串
-     * @param {boolean} showInConsole - 是否在控制台显示结果
-     * @returns {Set<string>} 未翻译的字符串集合
-     */
+   * 查找未翻译的字符串
+   * @param {boolean} showInConsole - 是否在控制台显示结果
+   * @returns {Set<string>} 未翻译的字符串集合
+   */
   findUntranslatedStrings(showInConsole = true) {
     const allStrings = this.collectStrings(false);
     const untranslated = new Set();
@@ -47,7 +47,7 @@ export const stringExtractor = {
     }
 
     // 检查每个字符串是否已翻译
-    allStrings.forEach(string => {
+    allStrings.forEach((string) => {
       if (!mergedDictionary[string] || mergedDictionary[string].startsWith('待翻译: ')) {
         untranslated.add(string);
       }
@@ -71,18 +71,18 @@ export class AutoStringUpdater {
   }
 
   /**
-     * 查找需要添加的字符串
-     * @returns {Set<string>} 需要添加的字符串集合
-     */
+   * 查找需要添加的字符串
+   * @returns {Set<string>} 需要添加的字符串集合
+   */
   findStringsToAdd() {
     const untranslated = stringExtractor.findUntranslatedStrings(false);
-    return new Set(Array.from(untranslated).filter(str => !str.startsWith('待翻译: ')));
+    return new Set(Array.from(untranslated).filter((str) => !str.startsWith('待翻译: ')));
   }
 
   /**
-     * 生成更新报告
-     * @returns {Object} 更新报告对象
-     */
+   * 生成更新报告
+   * @returns {Object} 更新报告对象
+   */
   generateUpdateReport() {
     const stringsToAdd = this.findStringsToAdd();
     return {
@@ -95,8 +95,8 @@ export class AutoStringUpdater {
   }
 
   /**
-     * 在控制台显示报告
-     */
+   * 在控制台显示报告
+   */
   showReportInConsole() {
     const report = this.generateUpdateReport();
     console.log('[GitHub 中文翻译] 字符串更新报告');
@@ -114,9 +114,9 @@ export class DictionaryProcessor {
   }
 
   /**
-     * 合并词典
-     * @returns {Object} 合并后的词典
-     */
+   * 合并词典
+   * @returns {Object} 合并后的词典
+   */
   mergeDictionaries() {
     const merged = {};
     for (const module in translationModule) {
@@ -126,9 +126,9 @@ export class DictionaryProcessor {
   }
 
   /**
-     * 验证词典
-     * @returns {Object} 词典验证结果
-     */
+   * 验证词典
+   * @returns {Object} 词典验证结果
+   */
   validateDictionary() {
     const dictionary = this.mergeDictionaries();
     const total = Object.keys(dictionary).length;
@@ -136,13 +136,13 @@ export class DictionaryProcessor {
     return {
       totalEntries: total,
       translatedEntries: total - untranslated,
-      completionRate: total > 0 ? ((total - untranslated) / total * 100).toFixed(2) : '0.00',
+      completionRate: total > 0 ? (((total - untranslated) / total) * 100).toFixed(2) : '0.00',
     };
   }
 
   /**
-     * 在控制台显示统计信息
-     */
+   * 在控制台显示统计信息
+   */
   showStatisticsInConsole() {
     const stats = this.validateDictionary();
     console.log('[GitHub 中文翻译] 词典统计');

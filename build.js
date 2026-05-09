@@ -4,7 +4,7 @@
  * @version 1.9.1
  * @description 构建脚本入口 - 调用 CommonJS 版本
  */
-import { build, readCurrentVersion, bumpVersion } from './build.cjs';
+import { build } from './build.cjs';
 
 const args = process.argv.slice(2);
 const buildType = args[0] || 'patch';

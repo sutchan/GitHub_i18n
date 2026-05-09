@@ -1,7 +1,7 @@
 /**
  * 虚拟DOM模块
  * @file virtualDom.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 用于跟踪已翻译元素的状态，避免重复翻译和不必要的DOM操作
@@ -67,7 +67,7 @@ class VirtualNode {
         // 保存到元素上用于跟踪
         this.element.dataset.virtualDomId = this.elementId;
       }
-    } catch (error) {
+    } catch (_error) {
       // 生成最基本的ID
       this.elementId = `fallback:${Math.random().toString(36).substr(2, 9)}`;
     }
@@ -82,7 +82,7 @@ class VirtualNode {
       const content = this.element.textContent || '';
       this.contentHash = this.hashString(content);
       return this.contentHash;
-    } catch (error) {
+    } catch (_error) {
       this.contentHash = null;
       return null;
     }
@@ -96,7 +96,7 @@ class VirtualNode {
       // 只跟踪重要属性
       const importantAttrs = CONFIG.performance.importantAttributes || [];
 
-      importantAttrs.forEach(attrName => {
+      importantAttrs.forEach((attrName) => {
         if (this.element.hasAttribute(attrName)) {
           this.attributes.set(attrName, this.element.getAttribute(attrName));
         } else {
@@ -151,7 +151,7 @@ class VirtualNode {
     // 更新实际DOM元素上的标记
     try {
       this.element.dataset.githubZhTranslated = 'true';
-    } catch (error) {
+    } catch (_error) {
       // 忽略错误
     }
   }
@@ -165,7 +165,7 @@ class VirtualNode {
     // 移除实际DOM元素上的标记
     try {
       delete this.element.dataset.githubZhTranslated;
-    } catch (error) {
+    } catch (_error) {
       // 忽略错误
     }
   }
@@ -179,7 +179,7 @@ class VirtualNode {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // 转换为32位整数
     }
     return hash.toString(36);
@@ -344,7 +344,7 @@ class VirtualDomManager {
       if (node) {
         node.markAsTranslated();
       }
-    } catch (error) {
+    } catch (_error) {
       // 忽略错误
     }
   }
@@ -358,7 +358,7 @@ class VirtualDomManager {
     const elementsToTranslate = [];
 
     try {
-      elements.forEach(element => {
+      elements.forEach((element) => {
         if (this.shouldTranslate(element)) {
           elementsToTranslate.push(element);
         }
@@ -455,7 +455,9 @@ class VirtualDomManager {
       }
 
       if (CONFIG.debugMode && removedCount > 0) {
-        console.log(`[GitHub 中文翻译] 清理了${removedCount}个无效虚拟节点，当前节点数：${this.nodes.size}`);
+        console.log(
+          `[GitHub 中文翻译] 清理了${removedCount}个无效虚拟节点，当前节点数：${this.nodes.size}`,
+        );
       }
     } catch (error) {
       if (CONFIG.debugMode) {

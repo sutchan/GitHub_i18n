@@ -10,7 +10,6 @@ const fs = require('fs').promises;
 
 const StringCollector = require('./string_collector');
 const DictionaryProcessor = require('./dictionary_processor');
-const { formatNumber } = require('./utils');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -130,8 +129,10 @@ app.get('/api/dictionary', async (req, res) => {
       for (const [module, entries] of Object.entries(dictionary)) {
         const matched = {};
         for (const [key, value] of Object.entries(entries)) {
-          if (key.toLowerCase().includes(search) ||
-              (value && value.toLowerCase().includes(search))) {
+          if (
+            key.toLowerCase().includes(search) ||
+            (value && value.toLowerCase().includes(search))
+          ) {
             matched[key] = value;
           }
         }
@@ -179,13 +180,15 @@ app.post('/api/collect', async (req, res) => {
     });
 
     const results = await StringCollector.collectStringsFromPages(pages, (progress) => {
-      console.log(`[${progress.current}/${progress.total}] ${progress.page.name}: ${progress.result?.strings?.length || 0} strings`);
+      console.log(
+        `[${progress.current}/${progress.total}] ${progress.page.name}: ${progress.result?.strings?.length || 0} strings`,
+      );
     });
 
     if (results.summary.successCount > 0) {
       const strings = [];
-      results.results.forEach(result => {
-        result.strings.forEach(str => {
+      results.results.forEach((result) => {
+        result.strings.forEach((str) => {
           strings.push({ text: str, module: result.pageId });
         });
       });
@@ -196,7 +199,7 @@ app.post('/api/collect', async (req, res) => {
     res.json({
       success: true,
       summary: results.summary,
-      results: results.results.map(r => ({
+      results: results.results.map((r) => ({
         pageId: r.pageId,
         pageName: r.pageName,
         stringCount: r.strings?.length || 0,
@@ -232,12 +235,18 @@ app.get('/api/import', async (req, res) => {
 app.get('/api/optimize', async (req, res) => {
   try {
     const dictionary = await DictionaryProcessor.readDictionaryFromJson();
-    const originalCount = Object.values(dictionary).reduce((sum, m) => sum + Object.keys(m).length, 0);
+    const originalCount = Object.values(dictionary).reduce(
+      (sum, m) => sum + Object.keys(m).length,
+      0,
+    );
 
     const optimized = DictionaryProcessor.optimizeDictionary(dictionary);
     await DictionaryProcessor.saveDictionaryToJson(optimized);
 
-    const optimizedCount = Object.values(optimized).reduce((sum, m) => sum + Object.keys(m).length, 0);
+    const optimizedCount = Object.values(optimized).reduce(
+      (sum, m) => sum + Object.keys(m).length,
+      0,
+    );
 
     res.json({
       success: true,

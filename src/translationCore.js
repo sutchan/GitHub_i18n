@@ -1,7 +1,7 @@
 /**
  * 翻译核心模块
  * @file translationCore.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 负责页面内容的实际翻译工作
@@ -125,7 +125,7 @@ export const translationCore = {
       this.dictionaryTrie.clear();
       this.regexCache.clear();
 
-      Object.keys(this.dictionary).forEach(key => {
+      Object.keys(this.dictionary).forEach((key) => {
         if (!this.dictionary[key].startsWith('待翻译: ')) {
           this.dictionaryHash.set(key, this.dictionary[key]);
           if (key.length <= 100) {
@@ -158,8 +158,16 @@ export const translationCore = {
       for (const [mode, pattern] of Object.entries(CONFIG.pagePatterns)) {
         if (pattern && pattern instanceof RegExp && pattern.test(currentPath)) {
           if (mode === 'repository') {
-            const isSubPage = ['issues', 'pullRequests', 'projects', 'wiki', 'actions', 'packages', 'security', 'insights']
-              .some(subMode => CONFIG.pagePatterns[subMode]?.test(currentPath));
+            const isSubPage = [
+              'issues',
+              'pullRequests',
+              'projects',
+              'wiki',
+              'actions',
+              'packages',
+              'security',
+              'insights',
+            ].some((subMode) => CONFIG.pagePatterns[subMode]?.test(currentPath));
             if (!isSubPage) {
               this.currentPageMode = mode;
               return mode;
@@ -207,7 +215,7 @@ export const translationCore = {
         let elements;
 
         if (Array.isArray(targetElements)) {
-          elements = targetElements.filter(el => el && el instanceof HTMLElement);
+          elements = targetElements.filter((el) => el && el instanceof HTMLElement);
           if (CONFIG.debugMode) {
             console.log(`[GitHub 中文翻译] 翻译特定区域，目标元素数量: ${elements.length}`);
           }
@@ -234,24 +242,33 @@ export const translationCore = {
             resolve();
           })
           .catch((batchError) => {
-            ErrorHandler.handleError('批处理过程', batchError, ErrorHandler.ERROR_TYPES.TRANSLATION, {
-              retryable: true,
-              recoveryFn: () => {
-                this.translateCriticalElementsOnly()
-                  .then(() => {
-                    this.performanceData.translateEndTime = Date.now();
-                    this.logPerformanceData();
-                    resolve();
-                  })
-                  .catch((recoverError) => {
-                    ErrorHandler.handleError('错误恢复', recoverError, ErrorHandler.ERROR_TYPES.TRANSLATION);
-                    this.performanceData.translateEndTime = Date.now();
-                    this.logPerformanceData();
-                    reject(recoverError);
-                  });
+            ErrorHandler.handleError(
+              '批处理过程',
+              batchError,
+              ErrorHandler.ERROR_TYPES.TRANSLATION,
+              {
+                retryable: true,
+                recoveryFn: () => {
+                  this.translateCriticalElementsOnly()
+                    .then(() => {
+                      this.performanceData.translateEndTime = Date.now();
+                      this.logPerformanceData();
+                      resolve();
+                    })
+                    .catch((recoverError) => {
+                      ErrorHandler.handleError(
+                        '错误恢复',
+                        recoverError,
+                        ErrorHandler.ERROR_TYPES.TRANSLATION,
+                      );
+                      this.performanceData.translateEndTime = Date.now();
+                      this.logPerformanceData();
+                      reject(recoverError);
+                    });
+                },
+                maxRetries: 2,
               },
-              maxRetries: 2,
-            });
+            );
           });
       } catch (error) {
         ErrorHandler.handleError('翻译过程', error, ErrorHandler.ERROR_TYPES.TRANSLATION, {
@@ -263,7 +280,11 @@ export const translationCore = {
                 resolve();
               })
               .catch((recoverError) => {
-                ErrorHandler.handleError('错误恢复', recoverError, ErrorHandler.ERROR_TYPES.TRANSLATION);
+                ErrorHandler.handleError(
+                  '错误恢复',
+                  recoverError,
+                  ErrorHandler.ERROR_TYPES.TRANSLATION,
+                );
                 this.logPerformanceData();
                 reject(recoverError);
               });
@@ -335,21 +356,24 @@ export const translationCore = {
   getPerformanceStats() {
     const stats = { ...this.performanceData };
     if (stats.translateStartTime > 0) {
-      stats.totalDuration = stats.translateEndTime > 0
-        ? stats.translateEndTime - stats.translateStartTime
-        : Date.now() - stats.translateStartTime;
+      stats.totalDuration =
+        stats.translateEndTime > 0
+          ? stats.translateEndTime - stats.translateStartTime
+          : Date.now() - stats.translateStartTime;
     } else {
       stats.totalDuration = 0;
     }
 
     const totalCacheRequests = stats.cacheHits + stats.cacheMisses;
-    stats.cacheHitRate = totalCacheRequests > 0
-      ? (stats.cacheHits / totalCacheRequests * 100).toFixed(2) + '%'
-      : '0%';
+    stats.cacheHitRate =
+      totalCacheRequests > 0
+        ? ((stats.cacheHits / totalCacheRequests) * 100).toFixed(2) + '%'
+        : '0%';
 
-    stats.avgDomOperationTime = stats.domOperations > 0
-      ? (stats.domOperationTime / stats.domOperations).toFixed(2) + 'ms'
-      : '0ms';
+    stats.avgDomOperationTime =
+      stats.domOperations > 0
+        ? (stats.domOperationTime / stats.domOperations).toFixed(2) + 'ms'
+        : '0ms';
 
     return stats;
   },
@@ -375,10 +399,10 @@ export const translationCore = {
       return Promise.resolve();
     }
 
-    const validElements = elements.filter(element => element instanceof HTMLElement);
+    const validElements = elements.filter((element) => element instanceof HTMLElement);
 
     if (validElements.length <= batchSize) {
-      validElements.forEach(element => {
+      validElements.forEach((element) => {
         try {
           this.translateElement(element);
         } catch (error) {
@@ -394,7 +418,7 @@ export const translationCore = {
           const endIndex = Math.min(startIndex + batchSize, validElements.length);
           const batch = validElements.slice(startIndex, endIndex);
 
-          batch.forEach(element => {
+          batch.forEach((element) => {
             try {
               this.translateElement(element);
             } catch (error) {
@@ -402,9 +426,14 @@ export const translationCore = {
             }
           });
 
-          if (CONFIG.performance.logTiming && (endIndex % (batchSize * 5) === 0 || endIndex === validElements.length)) {
+          if (
+            CONFIG.performance.logTiming &&
+            (endIndex % (batchSize * 5) === 0 || endIndex === validElements.length)
+          ) {
             const progress = Math.round((endIndex / validElements.length) * 100);
-            console.log(`[GitHub 中文翻译] 翻译进度: ${progress}%, 已处理: ${endIndex}/${validElements.length} 元素`);
+            console.log(
+              `[GitHub 中文翻译] 翻译进度: ${progress}%, 已处理: ${endIndex}/${validElements.length} 元素`,
+            );
           }
 
           if (endIndex < validElements.length) {
@@ -439,11 +468,11 @@ export const translationCore = {
       let processedElements = 0;
       let failedElements = 0;
 
-      criticalSelectors.forEach(selector => {
+      criticalSelectors.forEach((selector) => {
         try {
           const elements = document.querySelectorAll(selector);
           if (elements && elements.length > 0) {
-            Array.from(elements).forEach(el => {
+            Array.from(elements).forEach((el) => {
               if (el && el instanceof HTMLElement) {
                 criticalElements.push(el);
               }
@@ -466,7 +495,7 @@ export const translationCore = {
         return;
       }
 
-      criticalElements.forEach(element => {
+      criticalElements.forEach((element) => {
         try {
           this.translateElement(element);
           processedElements++;
@@ -477,7 +506,9 @@ export const translationCore = {
       });
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: ${processedElements}, 失败: ${failedElements}`);
+        console.log(
+          `[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: ${processedElements}, 失败: ${failedElements}`,
+        );
       }
 
       resolve();
@@ -492,13 +523,15 @@ export const translationCore = {
       const combinedSelector = allSelectors.join(', ');
       try {
         const allElements = document.querySelectorAll(combinedSelector);
-        Array.from(allElements).forEach(element => {
+        Array.from(allElements).forEach((element) => {
           if (this.shouldTranslateElement(element)) {
             uniqueElements.add(element);
           }
         });
         if (CONFIG.debugMode && CONFIG.performance.logTiming) {
-          console.log(`[GitHub 中文翻译] 合并查询选择器: ${combinedSelector}, 结果数量: ${allElements.length}`);
+          console.log(
+            `[GitHub 中文翻译] 合并查询选择器: ${combinedSelector}, 结果数量: ${allElements.length}`,
+          );
         }
         return Array.from(uniqueElements);
       } catch (error) {
@@ -508,10 +541,10 @@ export const translationCore = {
       }
     }
 
-    allSelectors.forEach(selector => {
+    allSelectors.forEach((selector) => {
       try {
         const matchedElements = document.querySelectorAll(selector);
-        Array.from(matchedElements).forEach(element => {
+        Array.from(matchedElements).forEach((element) => {
           if (this.shouldTranslateElement(element)) {
             uniqueElements.add(element);
           }
@@ -523,7 +556,7 @@ export const translationCore = {
       }
     });
 
-    return Array.from(uniqueElements).filter(element => element instanceof HTMLElement);
+    return Array.from(uniqueElements).filter((element) => element instanceof HTMLElement);
   },
 
   shouldTranslateElement(element) {
@@ -539,31 +572,76 @@ export const translationCore = {
       return false;
     }
 
-    const skipTags = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select', 'img', 'svg', 'canvas', 'video', 'audio'];
+    const skipTags = [
+      'script',
+      'style',
+      'code',
+      'pre',
+      'textarea',
+      'input',
+      'select',
+      'img',
+      'svg',
+      'canvas',
+      'video',
+      'audio',
+    ];
     const tagName = element.tagName.toLowerCase();
     if (skipTags.includes(tagName)) {
       return false;
     }
 
-    if (element.hasAttribute('data-no-translate') ||
-      element.hasAttribute('translate') && element.getAttribute('translate') === 'no' ||
+    if (
+      element.hasAttribute('data-no-translate') ||
+      (element.hasAttribute('translate') && element.getAttribute('translate') === 'no') ||
       element.hasAttribute('aria-hidden') ||
-      element.hasAttribute('hidden')) {
+      element.hasAttribute('hidden')
+    ) {
       return false;
     }
 
     const className = element.className;
     if (className) {
       const skipClassPatterns = [
-        /language-\w+/, /highlight/, /token/, /no-translate/, /octicon/, /emoji/,
-        /avatar/, /timestamp/, /numeral/, /filename/, /hash/, /sha/, /shortsha/,
-        /hex-color/, /code/, /gist/, /language-/, /markdown-/, /monaco-editor/,
-        /syntax-/, /highlight-/, /clipboard/, /progress-/, /count/, /size/,
-        /time/, /date/, /sortable/, /label/, /badge/, /url/, /email/, /key/,
-        /token/, /user-name/, /repo-name/,
+        /language-\w+/,
+        /highlight/,
+        /token/,
+        /no-translate/,
+        /octicon/,
+        /emoji/,
+        /avatar/,
+        /timestamp/,
+        /numeral/,
+        /filename/,
+        /hash/,
+        /sha/,
+        /shortsha/,
+        /hex-color/,
+        /code/,
+        /gist/,
+        /language-/,
+        /markdown-/,
+        /monaco-editor/,
+        /syntax-/,
+        /highlight-/,
+        /clipboard/,
+        /progress-/,
+        /count/,
+        /size/,
+        /time/,
+        /date/,
+        /sortable/,
+        /label/,
+        /badge/,
+        /url/,
+        /email/,
+        /key/,
+        /token/,
+        /user-name/,
+        /repo-name/,
       ];
 
-      if (skipClassPatterns.some(pattern => pattern.test(className))) {
+      if (skipClassPatterns.some((pattern) => pattern.test(className))) {
         return false;
       }
     }
@@ -571,50 +649,190 @@ export const translationCore = {
     const id = element.id;
     if (id) {
       const skipIdPatterns = [
-        /\d+/, /-\d+/, /_\d+/, /sha-/, /hash-/, /commit-/, /issue-/, /pull-/,
-        /pr-/, /repo-/, /user-/, /file-/, /blob-/, /tree-/, /branch-/, /tag-/,
-        /release-/, /gist-/, /discussion-/, /comment-/, /review-/, /workflow-/,
-        /action-/, /job-/, /step-/, /runner-/, /package-/, /registry-/,
-        /marketplace-/, /organization-/, /team-/, /project-/, /milestone-/,
-        /assignee-/, /reporter-/, /reviewer-/, /author-/, /committer-/,
-        /contributor-/, /sponsor-/, /funding-/, /donation-/, /payment-/,
-        /billing-/, /plan-/, /subscription-/, /license-/, /secret-/,
-        /key-/, /token-/, /password-/, /credential-/, /certificate-/,
-        /ssh-/, /git-/, /clone-/, /push-/, /pull-/, /fetch-/, /merge-/,
-        /rebase-/, /cherry-pick-/, /reset-/, /revert-/, /tag-/, /branch-/,
-        /commit-/, /diff-/, /patch-/, /stash-/, /ref-/, /head-/, /remote-/,
-        /upstream-/, /origin-/, /local-/, /tracking-/, /merge-base-/,
-        /conflict-/, /resolve-/, /status-/, /log-/, /blame-/, /bisect-/,
-        /grep-/, /find-/, /filter-/, /archive-/, /submodule-/, /worktree-/,
-        /lfs-/, /graphql-/, /rest-/, /api-/, /webhook-/, /event-/,
-        /payload-/, /callback-/, /redirect-/, /oauth-/, /sso-/, /ldap-/,
-        /saml-/, /2fa-/, /mfa-/, /security-/, /vulnerability-/, /cve-/,
-        /dependency-/, /alert-/, /secret-scanning-/, /code-scanning-/,
-        /codeql-/, /actions-/, /workflow-/, /job-/, /step-/, /runner-/,
-        /artifact-/, /cache-/, /environment-/, /deployment-/, /app-/,
-        /oauth-app-/, /github-app-/, /integration-/, /webhook-/,
-        /marketplace-/, /listing-/, /subscription-/, /billing-/,
-        /plan-/, /usage-/, /limits-/, /quota-/, /traffic-/,
-        /analytics-/, /insights-/, /search-/, /explore-/, /trending-/,
-        /stars-/, /forks-/, /watchers-/, /contributors-/, /activity-/,
-        /events-/, /notifications-/, /feeds-/, /dashboard-/, /profile-/,
-        /settings-/, /preferences-/, /billing-/, /organization-/,
-        /team-/, /project-/, /milestone-/, /label-/, /assignee-/,
-        /reporter-/, /reviewer-/, /author-/, /committer-/,
-        /contributor-/, /sponsor-/, /funding-/, /donation-/, /payment-/,
+        /\d+/,
+        /-\d+/,
+        /_\d+/,
+        /sha-/,
+        /hash-/,
+        /commit-/,
+        /issue-/,
+        /pull-/,
+        /pr-/,
+        /repo-/,
+        /user-/,
+        /file-/,
+        /blob-/,
+        /tree-/,
+        /branch-/,
+        /tag-/,
+        /release-/,
+        /gist-/,
+        /discussion-/,
+        /comment-/,
+        /review-/,
+        /workflow-/,
+        /action-/,
+        /job-/,
+        /step-/,
+        /runner-/,
+        /package-/,
+        /registry-/,
+        /marketplace-/,
+        /organization-/,
+        /team-/,
+        /project-/,
+        /milestone-/,
+        /assignee-/,
+        /reporter-/,
+        /reviewer-/,
+        /author-/,
+        /committer-/,
+        /contributor-/,
+        /sponsor-/,
+        /funding-/,
+        /donation-/,
+        /payment-/,
+        /billing-/,
+        /plan-/,
+        /subscription-/,
+        /license-/,
+        /secret-/,
+        /key-/,
+        /token-/,
+        /password-/,
+        /credential-/,
+        /certificate-/,
+        /ssh-/,
+        /git-/,
+        /clone-/,
+        /push-/,
+        /pull-/,
+        /fetch-/,
+        /merge-/,
+        /rebase-/,
+        /cherry-pick-/,
+        /reset-/,
+        /revert-/,
+        /tag-/,
+        /branch-/,
+        /commit-/,
+        /diff-/,
+        /patch-/,
+        /stash-/,
+        /ref-/,
+        /head-/,
+        /remote-/,
+        /upstream-/,
+        /origin-/,
+        /local-/,
+        /tracking-/,
+        /merge-base-/,
+        /conflict-/,
+        /resolve-/,
+        /status-/,
+        /log-/,
+        /blame-/,
+        /bisect-/,
+        /grep-/,
+        /find-/,
+        /filter-/,
+        /archive-/,
+        /submodule-/,
+        /worktree-/,
+        /lfs-/,
+        /graphql-/,
+        /rest-/,
+        /api-/,
+        /webhook-/,
+        /event-/,
+        /payload-/,
+        /callback-/,
+        /redirect-/,
+        /oauth-/,
+        /sso-/,
+        /ldap-/,
+        /saml-/,
+        /2fa-/,
+        /mfa-/,
+        /security-/,
+        /vulnerability-/,
+        /cve-/,
+        /dependency-/,
+        /alert-/,
+        /secret-scanning-/,
+        /code-scanning-/,
+        /codeql-/,
+        /actions-/,
+        /workflow-/,
+        /job-/,
+        /step-/,
+        /runner-/,
+        /artifact-/,
+        /cache-/,
+        /environment-/,
+        /deployment-/,
+        /app-/,
+        /oauth-app-/,
+        /github-app-/,
+        /integration-/,
+        /webhook-/,
+        /marketplace-/,
+        /listing-/,
+        /subscription-/,
+        /billing-/,
+        /plan-/,
+        /usage-/,
+        /limits-/,
+        /quota-/,
+        /traffic-/,
+        /analytics-/,
+        /insights-/,
+        /search-/,
+        /explore-/,
+        /trending-/,
+        /stars-/,
+        /forks-/,
+        /watchers-/,
+        /contributors-/,
+        /activity-/,
+        /events-/,
+        /notifications-/,
+        /feeds-/,
+        /dashboard-/,
+        /profile-/,
+        /settings-/,
+        /preferences-/,
+        /billing-/,
+        /organization-/,
+        /team-/,
+        /project-/,
+        /milestone-/,
+        /label-/,
+        /assignee-/,
+        /reporter-/,
+        /reviewer-/,
+        /author-/,
+        /committer-/,
+        /contributor-/,
+        /sponsor-/,
+        /funding-/,
+        /donation-/,
+        /payment-/,
         /\b\w+[0-9]\w*\b/,
       ];
 
-      if (skipIdPatterns.some(pattern => pattern.test(id))) {
+      if (skipIdPatterns.some((pattern) => pattern.test(id))) {
         return false;
       }
     }
 
     const computedStyle = window.getComputedStyle(element);
-    if (computedStyle.display === 'none' ||
+    if (
+      computedStyle.display === 'none' ||
       computedStyle.visibility === 'hidden' ||
       computedStyle.opacity === '0' ||
-      computedStyle.position === 'absolute' && computedStyle.left === '-9999px') {
+      (computedStyle.position === 'absolute' && computedStyle.left === '-9999px')
+    ) {
       return false;
     }
 
@@ -690,7 +908,7 @@ export const translationCore = {
       }
     }
 
-    textNodesToProcess.forEach(node => {
+    textNodesToProcess.forEach((node) => {
       const parentNode = node.parentNode;
       parentNode.removeChild(node);
 
@@ -700,13 +918,39 @@ export const translationCore = {
       if (translatedText && typeof translatedText === 'string' && translatedText !== originalText) {
         try {
           const controlChars = [
-            '\u0000', '\u0001', '\u0002', '\u0003', '\u0004', '\u0005', '\u0006', '\u0007',
-            '\u0008', '\u000B', '\u000C', '\u000E', '\u000F', '\u0010', '\u0011', '\u0012',
-            '\u0013', '\u0014', '\u0015', '\u0016', '\u0017', '\u0018', '\u0019', '\u001A',
-            '\u001B', '\u001C', '\u001D', '\u001E', '\u001F', '\u007F',
+            '\u0000',
+            '\u0001',
+            '\u0002',
+            '\u0003',
+            '\u0004',
+            '\u0005',
+            '\u0006',
+            '\u0007',
+            '\u0008',
+            '\u000B',
+            '\u000C',
+            '\u000E',
+            '\u000F',
+            '\u0010',
+            '\u0011',
+            '\u0012',
+            '\u0013',
+            '\u0014',
+            '\u0015',
+            '\u0016',
+            '\u0017',
+            '\u0018',
+            '\u0019',
+            '\u001A',
+            '\u001B',
+            '\u001C',
+            '\u001D',
+            '\u001E',
+            '\u001F',
+            '\u007F',
           ];
           let safeTranslatedText = String(translatedText);
-          controlChars.forEach(char => {
+          controlChars.forEach((char) => {
             safeTranslatedText = safeTranslatedText.split(char).join('');
           });
           const translatedNode = document.createTextNode(safeTranslatedText);
@@ -798,8 +1042,10 @@ export const translationCore = {
     }
 
     const modeConfig = this.getCurrentPageModeConfig();
-    const enablePartialMatch = modeConfig.enablePartialMatch !== undefined
-      ? modeConfig.enablePartialMatch : CONFIG.performance.enablePartialMatch;
+    const enablePartialMatch =
+      modeConfig.enablePartialMatch !== undefined
+        ? modeConfig.enablePartialMatch
+        : CONFIG.performance.enablePartialMatch;
 
     if (result === null && enablePartialMatch) {
       result = this.performPartialTranslation(normalizedText);
@@ -809,8 +1055,10 @@ export const translationCore = {
       result = this.sanitizeText(result);
     }
 
-    if (CONFIG.performance.enableTranslationCache &&
-      normalizedText.length <= CONFIG.performance.maxCachedTextLength) {
+    if (
+      CONFIG.performance.enableTranslationCache &&
+      normalizedText.length <= CONFIG.performance.maxCachedTextLength
+    ) {
       if (result !== null) {
         this.cacheManager.setToCache(normalizedText, result, this.isPageUnloading);
       }
@@ -832,8 +1080,10 @@ export const translationCore = {
 
     for (const match of potentialMatches) {
       const key = match.key;
-      if (!Object.prototype.hasOwnProperty.call(this.dictionary, key) ||
-        this.dictionary[key].startsWith('待翻译: ')) {
+      if (
+        !Object.prototype.hasOwnProperty.call(this.dictionary, key) ||
+        this.dictionary[key].startsWith('待翻译: ')
+      ) {
         continue;
       }
 
@@ -923,7 +1173,10 @@ export const translationCore = {
 
   cleanCache() {
     try {
-      if (!this.cacheManager.translationCache || !(this.cacheManager.translationCache instanceof Map)) {
+      if (
+        !this.cacheManager.translationCache ||
+        !(this.cacheManager.translationCache instanceof Map)
+      ) {
         if (CONFIG.debugMode) {
           console.warn('[GitHub 中文翻译] 缓存对象不存在或无效');
         }
@@ -934,7 +1187,9 @@ export const translationCore = {
       this.performanceData.cacheCleanups = (this.performanceData.cacheCleanups || 0) + 1;
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 缓存清理完成，当前大小：${this.cacheManager.translationCache.size}`);
+        console.log(
+          `[GitHub 中文翻译] 缓存清理完成，当前大小：${this.cacheManager.translationCache.size}`,
+        );
       }
     } catch (error) {
       if (CONFIG.debugMode) {
@@ -989,7 +1244,7 @@ export const translationCore = {
 
       try {
         const translatedElements = document.querySelectorAll('[data-github-zh-translated]');
-        translatedElements.forEach(element => {
+        translatedElements.forEach((element) => {
           element.removeAttribute('data-github-zh-translated');
         });
       } catch (domError) {
@@ -1029,10 +1284,10 @@ export const translationCore = {
 
     try {
       const commonKeys = Object.keys(this.dictionary)
-        .filter(key => !this.dictionary[key].startsWith('待翻译: ') && key.length <= 50)
+        .filter((key) => !this.dictionary[key].startsWith('待翻译: ') && key.length <= 50)
         .slice(0, 100);
 
-      commonKeys.forEach(key => {
+      commonKeys.forEach((key) => {
         const value = this.dictionary[key];
         this.cacheManager.setToCache(key, value, this.isPageUnloading);
       });
@@ -1052,7 +1307,9 @@ export const translationCore = {
       this.warmUpCache();
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 词典已更新，新增/修改${Object.keys(newDictionary).length}个条目`);
+        console.log(
+          `[GitHub 中文翻译] 词典已更新，新增/修改${Object.keys(newDictionary).length}个条目`,
+        );
       }
     } catch (error) {
       console.error('[GitHub 中文翻译] 更新词典失败:', error);

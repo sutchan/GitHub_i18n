@@ -1,7 +1,7 @@
 /**
  * LRU缓存管理模块
  * @file cacheManager.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 实现LRU缓存策略，用于翻译结果缓存
@@ -77,7 +77,7 @@ export class CacheManager {
 
       this.cacheStats.evictions += evictedCount;
       this.cacheStats.size = this.translationCache.size;
-    } catch (error) {
+    } catch (_error) {
       const evictCount = Math.max(50, Math.floor(this.translationCache.size * 0.2));
       const oldestEntries = Array.from(this.translationCache.entries())
         .sort(([, itemA], [, itemB]) => itemA.timestamp - itemB.timestamp)

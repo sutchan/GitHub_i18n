@@ -1,7 +1,7 @@
 /**
  * 路径变化监听模块
  * @file pageMonitor/pathListener.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 监听URL路径变化
@@ -29,7 +29,11 @@ export const pathListener = {
     }, CONFIG.routeChangeDelay || 500);
 
     window.addEventListener('popstate', popstateHandler);
-    pageMonitorCache.addEventListener({ target: window, type: 'popstate', handler: popstateHandler });
+    pageMonitorCache.addEventListener({
+      target: window,
+      type: 'popstate',
+      handler: popstateHandler,
+    });
 
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;

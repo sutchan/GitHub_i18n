@@ -1,7 +1,7 @@
 /**
  * 翻译核心主模块
  * @file translationCore/index.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 翻译核心主入口，整合所有子模块
@@ -13,7 +13,6 @@ import { dictionaryManager } from './dictionaryManager.js';
 import { pageModeDetector } from './pageModeDetector.js';
 import { elementSelector } from './elementSelector.js';
 import { elementTranslator } from './elementTranslator.js';
-import { partialTranslator } from './partialTranslator.js';
 import { performanceMonitor } from './performanceMonitor.js';
 
 export const translationCore = {
@@ -118,7 +117,7 @@ export const translationCore = {
         let elements;
 
         if (Array.isArray(targetElements)) {
-          elements = targetElements.filter(el => el && el instanceof HTMLElement);
+          elements = targetElements.filter((el) => el && el instanceof HTMLElement);
           if (CONFIG.debugMode) {
             console.log(`[GitHub 中文翻译] 翻译特定区域，目标元素数量: ${elements.length}`);
           }
@@ -145,24 +144,33 @@ export const translationCore = {
             resolve();
           })
           .catch((batchError) => {
-            ErrorHandler.handleError('批处理过程', batchError, ErrorHandler.ERROR_TYPES.TRANSLATION, {
-              retryable: true,
-              recoveryFn: () => {
-                this.translateCriticalElementsOnly()
-                  .then(() => {
-                    elementTranslator.performanceData.translateEndTime = Date.now();
-                    performanceMonitor.logPerformanceData();
-                    resolve();
-                  })
-                  .catch((recoverError) => {
-                    ErrorHandler.handleError('错误恢复', recoverError, ErrorHandler.ERROR_TYPES.TRANSLATION);
-                    elementTranslator.performanceData.translateEndTime = Date.now();
-                    performanceMonitor.logPerformanceData();
-                    reject(recoverError);
-                  });
+            ErrorHandler.handleError(
+              '批处理过程',
+              batchError,
+              ErrorHandler.ERROR_TYPES.TRANSLATION,
+              {
+                retryable: true,
+                recoveryFn: () => {
+                  this.translateCriticalElementsOnly()
+                    .then(() => {
+                      elementTranslator.performanceData.translateEndTime = Date.now();
+                      performanceMonitor.logPerformanceData();
+                      resolve();
+                    })
+                    .catch((recoverError) => {
+                      ErrorHandler.handleError(
+                        '错误恢复',
+                        recoverError,
+                        ErrorHandler.ERROR_TYPES.TRANSLATION,
+                      );
+                      elementTranslator.performanceData.translateEndTime = Date.now();
+                      performanceMonitor.logPerformanceData();
+                      reject(recoverError);
+                    });
+                },
+                maxRetries: 2,
               },
-              maxRetries: 2,
-            });
+            );
           });
       } catch (error) {
         ErrorHandler.handleError('翻译过程', error, ErrorHandler.ERROR_TYPES.TRANSLATION, {
@@ -174,7 +182,11 @@ export const translationCore = {
                 resolve();
               })
               .catch((recoverError) => {
-                ErrorHandler.handleError('错误恢复', recoverError, ErrorHandler.ERROR_TYPES.TRANSLATION);
+                ErrorHandler.handleError(
+                  '错误恢复',
+                  recoverError,
+                  ErrorHandler.ERROR_TYPES.TRANSLATION,
+                );
                 performanceMonitor.logPerformanceData();
                 reject(recoverError);
               });
@@ -195,10 +207,10 @@ export const translationCore = {
       return Promise.resolve();
     }
 
-    const validElements = elements.filter(element => element instanceof HTMLElement);
+    const validElements = elements.filter((element) => element instanceof HTMLElement);
 
     if (validElements.length <= batchSize) {
-      validElements.forEach(element => {
+      validElements.forEach((element) => {
         try {
           elementTranslator.translateElement(element);
         } catch (error) {
@@ -214,7 +226,7 @@ export const translationCore = {
           const endIndex = Math.min(startIndex + batchSize, validElements.length);
           const batch = validElements.slice(startIndex, endIndex);
 
-          batch.forEach(element => {
+          batch.forEach((element) => {
             try {
               elementTranslator.translateElement(element);
             } catch (error) {
@@ -222,9 +234,14 @@ export const translationCore = {
             }
           });
 
-          if (CONFIG.performance?.logTiming && (endIndex % (batchSize * 5) === 0 || endIndex === validElements.length)) {
+          if (
+            CONFIG.performance?.logTiming &&
+            (endIndex % (batchSize * 5) === 0 || endIndex === validElements.length)
+          ) {
             const progress = Math.round((endIndex / validElements.length) * 100);
-            console.log(`[GitHub 中文翻译] 翻译进度: ${progress}%, 已处理: ${endIndex}/${validElements.length} 元素`);
+            console.log(
+              `[GitHub 中文翻译] 翻译进度: ${progress}%, 已处理: ${endIndex}/${validElements.length} 元素`,
+            );
           }
 
           if (endIndex < validElements.length) {
@@ -252,7 +269,10 @@ export const translationCore = {
 
   cleanCache() {
     try {
-      if (!dictionaryManager.cacheManager.translationCache || !(dictionaryManager.cacheManager.translationCache instanceof Map)) {
+      if (
+        !dictionaryManager.cacheManager.translationCache ||
+        !(dictionaryManager.cacheManager.translationCache instanceof Map)
+      ) {
         if (CONFIG.debugMode) {
           console.warn('[GitHub 中文翻译] 缓存对象不存在或无效');
         }
@@ -260,10 +280,13 @@ export const translationCore = {
       }
 
       dictionaryManager.cacheManager.cleanCache();
-      elementTranslator.performanceData.cacheCleanups = (elementTranslator.performanceData.cacheCleanups || 0) + 1;
+      elementTranslator.performanceData.cacheCleanups =
+        (elementTranslator.performanceData.cacheCleanups || 0) + 1;
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 缓存清理完成，当前大小: ${dictionaryManager.cacheManager.translationCache.size}`);
+        console.log(
+          `[GitHub 中文翻译] 缓存清理完成，当前大小: ${dictionaryManager.cacheManager.translationCache.size}`,
+        );
       }
     } catch (error) {
       if (CONFIG.debugMode) {
@@ -302,7 +325,7 @@ export const translationCore = {
 
       try {
         const translatedElements = document.querySelectorAll('[data-github-zh-translated]');
-        translatedElements.forEach(element => {
+        translatedElements.forEach((element) => {
           element.removeAttribute('data-github-zh-translated');
         });
       } catch (domError) {
@@ -338,10 +361,12 @@ export const translationCore = {
 
     try {
       const commonKeys = Object.keys(dictionaryManager.dictionary)
-        .filter(key => !dictionaryManager.dictionary[key].startsWith('待翻译: ') && key.length <= 50)
+        .filter(
+          (key) => !dictionaryManager.dictionary[key].startsWith('待翻译: ') && key.length <= 50,
+        )
         .slice(0, 100);
 
-      commonKeys.forEach(key => {
+      commonKeys.forEach((key) => {
         const value = dictionaryManager.dictionary[key];
         dictionaryManager.cacheManager.setToCache(key, value, this.isPageUnloading);
       });
@@ -361,7 +386,8 @@ export const translationCore = {
   // 暴露性能监控方法
   resetPerformanceData: () => performanceMonitor.resetPerformanceData(),
   logPerformanceData: () => performanceMonitor.logPerformanceData(),
-  recordPerformanceEvent: (eventType, data) => performanceMonitor.recordPerformanceEvent(eventType, data),
+  recordPerformanceEvent: (eventType, data) =>
+    performanceMonitor.recordPerformanceEvent(eventType, data),
   getPerformanceStats: () => performanceMonitor.getPerformanceStats(),
   exportPerformanceData: () => performanceMonitor.exportPerformanceData(),
 };

@@ -1,7 +1,7 @@
 /**
  * 错误处理模块
  * @file errorHandler.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 负责统一管理所有错误处理和恢复机制
@@ -29,7 +29,7 @@ export const ErrorHandler = {
   init() {
     this.errorCounts.clear();
     // 初始化所有错误类型的计数器
-    Object.values(this.ERROR_TYPES).forEach(type => {
+    Object.values(this.ERROR_TYPES).forEach((type) => {
       this.errorCounts.set(type, 0);
     });
   },
@@ -98,7 +98,10 @@ export const ErrorHandler = {
     } catch (recoveryError) {
       const attempt = currentAttempt + 1;
       if (CONFIG.debugMode) {
-        console.error(`[GitHub 中文翻译] ${context} - 恢复操作失败 (尝试: ${attempt}/${maxRetries}):`, recoveryError);
+        console.error(
+          `[GitHub 中文翻译] ${context} - 恢复操作失败 (尝试: ${attempt}/${maxRetries}):`,
+          recoveryError,
+        );
       }
 
       if (attempt < maxRetries) {
@@ -162,7 +165,10 @@ export const ErrorHandler = {
         break;
       case this.ERROR_TYPES.NETWORK:
         // 增加网络请求间隔
-        CONFIG.performance.networkRequestInterval = Math.max(CONFIG.performance.networkRequestInterval || 1000, 5000);
+        CONFIG.performance.networkRequestInterval = Math.max(
+          CONFIG.performance.networkRequestInterval || 1000,
+          5000,
+        );
         break;
       default:
         // 通用紧急措施：减少处理频率

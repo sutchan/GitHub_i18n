@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub 中文翻译
 // @namespace    https://github.com/sutchan/GitHub_i18n
-// @version      1.9.13
+// @version      1.9.14
 // @description  GitHub页面自动翻译为中文
 // @author       Sut
 // @match        https://github.com/*
@@ -27,7 +27,7 @@
 /**
  * 版本信息模块
  * @file version.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 统一管理GitHub自动化字符串更新工具的版本信息
@@ -37,7 +37,7 @@
  * @type {string}
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
-const VERSION = '1.9.13';
+const VERSION = '1.9.14';
 /**
  * 版本历史记录
  * @type {Array<{version: string, date: string, changes: string[]}>}
@@ -471,7 +471,7 @@ const VERSION_HISTORY = [
 /**
  * GitHub 中文翻译配置文件
  * @file config.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 包含脚本所有可配置项
@@ -492,7 +492,7 @@ function getVersionFromComment() {
     }
     // 如果greasemonkeyInfo不可用，返回配置中的版本号
     return VERSION;
-  } catch (e) {
+  } catch (_e) {
     // 出错时返回配置中的版本号
     return VERSION;
   }
@@ -633,7 +633,7 @@ const CONFIG = {
 /**
  * Trie树数据结构模块
  * @file trie.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 高效的字符串匹配数据结构，用于部分匹配翻译
@@ -708,7 +708,7 @@ class Trie {
 /**
  * 工具函数模块
  * @file utils.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 包含各种通用的辅助函数
@@ -990,7 +990,7 @@ const utils = {
         result = result[key];
       }
       return result === undefined ? defaultValue : result;
-    } catch (error) {
+    } catch (_error) {
       return defaultValue;
     }
   },
@@ -1042,7 +1042,7 @@ const utils = {
 /**
  * LRU缓存管理模块
  * @file cacheManager.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 实现LRU缓存策略，用于翻译结果缓存
@@ -1104,7 +1104,7 @@ class CacheManager {
       });
       this.cacheStats.evictions += evictedCount;
       this.cacheStats.size = this.translationCache.size;
-    } catch (error) {
+    } catch (_error) {
       const evictCount = Math.max(50, Math.floor(this.translationCache.size * 0.2));
       const oldestEntries = Array.from(this.translationCache.entries())
         .sort(([, itemA], [, itemB]) => itemA.timestamp - itemB.timestamp)
@@ -1136,7 +1136,7 @@ class CacheManager {
 /**
  * 错误处理模块
  * @file errorHandler.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 负责统一管理所有错误处理和恢复机制
@@ -1317,7 +1317,7 @@ ErrorHandler.init();
 /**
  * 开发工具模块
  * @file tools.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 包含字符串提取、自动更新和词典处理等开发工具
@@ -1464,7 +1464,7 @@ function loadTools() {
 /**
  * 页面监控缓存管理模块
  * @file pageMonitor/cacheManager.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 管理页面监控中的缓存
@@ -1529,7 +1529,7 @@ const pageMonitorCache = {
 /**
  * 页面分析模块
  * @file pageMonitor/pageAnalyzer.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 分析页面类型和关键区域
@@ -1656,7 +1656,7 @@ const pageAnalyzer = {
 /**
  * 路径变化监听模块
  * @file pageMonitor/pathListener.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 监听URL路径变化
@@ -1710,7 +1710,7 @@ const pathListener = {
 /**
  * DOM变化观察器模块
  * @file pageMonitor/domObserver.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 观察DOM变化并触发翻译
@@ -1941,7 +1941,7 @@ const domObserver = {
       let isImportant = importantElements.some(selector => {
         try {
           return element.matches(selector);
-        } catch (e) {
+        } catch (_e) {
           return false;
         }
       });
@@ -1993,7 +1993,7 @@ const domObserver = {
       let shouldIgnore = ignoreElements.some(selector => {
         try {
           return element.matches(selector);
-        } catch (e) {
+        } catch (_e) {
           return false;
         }
       });
@@ -2105,7 +2105,7 @@ const domObserver = {
 /**
  * 翻译触发模块
  * @file pageMonitor/translationTrigger.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 管理翻译触发和节流
@@ -2113,7 +2113,7 @@ const domObserver = {
 const translationTrigger = {
   lastTranslateTimestamp: 0,
   scheduledTranslate: null,
-  async translateWithThrottle() {
+  translateWithThrottle() {
     try {
       const now = Date.now();
       const minInterval = CONFIG.performance?.minTranslateInterval || 500;
@@ -2191,7 +2191,7 @@ const translationTrigger = {
 /**
  * 页面监控主模块
  * @file pageMonitor/index.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 页面监控主入口，整合所有子模块
@@ -2229,7 +2229,7 @@ const pageMonitor = {
     pageMonitorCache.addEventListener({ target: window, type: 'unload', handler: unloadHandler });
     pageMonitorCache.addEventListener({ target: window, type: 'pagehide', handler: unloadHandler });
   },
-  async translateWithThrottle() {
+  translateWithThrottle() {
     return translationTrigger.translateWithThrottle();
   },
   stop() {
@@ -2270,7 +2270,7 @@ const pageMonitor = {
 /**
  * 翻译词典管理模块
  * @file translationCore/dictionaryManager.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 管理翻译词典的加载和查询
@@ -2386,7 +2386,7 @@ const dictionaryManager = {
 /**
  * 页面模式检测模块
  * @file translationCore/pageModeDetector.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 检测当前页面的模式
@@ -2446,7 +2446,7 @@ const pageModeDetector = {
 /**
  * 翻译元素选择模块
  * @file translationCore/elementSelector.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 选择需要翻译的DOM元素
@@ -2590,7 +2590,7 @@ const elementSelector = {
 /**
  * 元素翻译模块
  * @file translationCore/elementTranslator.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 实际翻译DOM元素的模块
@@ -2673,7 +2673,9 @@ const elementTranslator = {
       const translatedText = dictionaryManager.getTranslatedText(originalText);
       if (translatedText && typeof translatedText === 'string' && translatedText !== originalText) {
         try {
-          const safeTranslatedText = String(translatedText).replace(/[\x00-\x1F\x7F]/g, '');
+          const safeTranslatedText = typeof translatedText === 'string'
+            ? [...translatedText].filter(c => c.charCodeAt(0) > 31 && c.charCodeAt(0) !== 127).join('')
+            : String(translatedText || '');
           const translatedNode = document.createTextNode(safeTranslatedText);
           fragment.appendChild(translatedNode);
           hasTranslation = true;
@@ -2760,7 +2762,7 @@ const elementTranslator = {
 /**
  * 部分匹配翻译模块
  * @file translationCore/partialTranslator.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 使用Trie树进行部分匹配翻译
@@ -2779,7 +2781,7 @@ const partialTranslator = {
     const potentialMatches = dictionaryManager.dictionaryTrie.findAllMatches(text, minKeyLength);
     for (const match of potentialMatches) {
       const key = match.key;
-      if (!dictionaryManager.dictionary.hasOwnProperty(key) || dictionaryManager.dictionary[key].startsWith('待翻译: ')) {
+      if (!Object.prototype.hasOwnProperty.call(dictionaryManager.dictionary, key) || dictionaryManager.dictionary[key].startsWith('待翻译: ')) {
         continue;
       }
       const value = dictionaryManager.dictionary[key];
@@ -2856,7 +2858,7 @@ const partialTranslator = {
 /**
  * 性能监控模块
  * @file translationCore/performanceMonitor.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 监控翻译性能数据
@@ -2952,7 +2954,7 @@ const performanceMonitor = {
 /**
  * 翻译核心主模块
  * @file translationCore/index.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 翻译核心主入口，整合所有子模块
@@ -3156,7 +3158,7 @@ const translationCore = {
       processBatch(0);
     });
   },
-  async translateCriticalElementsOnly() {
+  translateCriticalElementsOnly() {
     return elementTranslator.translateCriticalElementsOnly();
   },
   cleanCache() {
@@ -3262,7 +3264,7 @@ const translationCore = {
 /**
  * GitHub 中文翻译配置界面模块
  * @file configUI.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 提供用户友好的配置界面，允许用户调整插件参数
@@ -3371,7 +3373,7 @@ class ConfigUI {
     // 递归合并配置
     const merge = (target, source) => {
       for (const key in source) {
-        if (source.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
           if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
             if (!target[key]) target[key] = {};
             merge(target[key], source[key]);
@@ -3937,7 +3939,7 @@ const configUI = new ConfigUI();
 /**
  * 版本更新检查模块
  * @file versionChecker.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 负责检查和处理脚本更新
@@ -4006,7 +4008,7 @@ const versionChecker = {
           message: error.message,
           timestamp: now,
         }));
-      } catch (e) {
+      } catch (_e) {
         // 忽略存储错误
       }
       return false;
@@ -4263,7 +4265,7 @@ const versionChecker = {
         history = history.slice(-10);
       }
       localStorage.setItem(historyKey, JSON.stringify(history));
-    } catch (error) {
+    } catch (_error) {
       // 忽略存储错误
     }
   },
@@ -4298,7 +4300,7 @@ const versionChecker = {
     try {
       const cachedData = utils.safeJSONParse(localStorage.getItem('githubZhCachedVersion'));
       return cachedData;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   },
@@ -4326,7 +4328,7 @@ const versionChecker = {
 /**
  * 虚拟DOM模块
  * @file virtualDom.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 用于跟踪已翻译元素的状态，避免重复翻译和不必要的DOM操作
@@ -4385,7 +4387,7 @@ class VirtualNode {
         // 保存到元素上用于跟踪
         this.element.dataset.virtualDomId = this.elementId;
       }
-    } catch (error) {
+    } catch (_error) {
       // 生成最基本的ID
       this.elementId = `fallback:${Math.random().toString(36).substr(2, 9)}`;
     }
@@ -4399,7 +4401,7 @@ class VirtualNode {
       const content = this.element.textContent || '';
       this.contentHash = this.hashString(content);
       return this.contentHash;
-    } catch (error) {
+    } catch (_error) {
       this.contentHash = null;
       return null;
     }
@@ -4460,7 +4462,7 @@ class VirtualNode {
     // 更新实际DOM元素上的标记
     try {
       this.element.dataset.githubZhTranslated = 'true';
-    } catch (error) {
+    } catch (_error) {
       // 忽略错误
     }
   }
@@ -4473,7 +4475,7 @@ class VirtualNode {
     // 移除实际DOM元素上的标记
     try {
       delete this.element.dataset.githubZhTranslated;
-    } catch (error) {
+    } catch (_error) {
       // 忽略错误
     }
   }
@@ -4629,7 +4631,7 @@ class VirtualDomManager {
       if (node) {
         node.markAsTranslated();
       }
-    } catch (error) {
+    } catch (_error) {
       // 忽略错误
     }
   }
@@ -4757,7 +4759,7 @@ virtualDomManager;
 /**
  * 国际化支持框架
  * @file i18n.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 为GitHub翻译插件提供多语言支持的基础框架
@@ -5062,7 +5064,7 @@ async function initI18n(defaultLocale = 'zh-CN', fallbackLocale = 'en-US') {
  * @param {string} locale - 语言代码
  * @returns {Promise<boolean>} 加载是否成功
  */
-async function loadLocaleTranslations(locale) {
+function loadLocaleTranslations(locale) {
   // 在实际应用中，这里应该从服务器或本地文件加载翻译
   // 这里提供一些示例翻译
   const translations = {};
@@ -5164,7 +5166,7 @@ async function switchLanguage(locale) {
 /**
  * 翻译词典合并模块
  * @file index.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 整合所有页面的翻译词典
@@ -5193,7 +5195,7 @@ function mergeAllDictionaries() {
 /**
  * 通用翻译词典
  * @file common.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 包含所有页面共用的翻译字符串
@@ -5518,7 +5520,7 @@ const commonDictionary = {
 /**
  * Codespaces 页面翻译词典
  * @file codespaces.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 包含 GitHub Codespaces 页面的翻译词典
@@ -5545,7 +5547,7 @@ const codespacesDictionary = {
 /**
  * Explore 页面翻译词典
  * @file explore.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 包含 GitHub Explore 页面的翻译词典
@@ -5681,7 +5683,7 @@ const exploreDictionary = {
 /**
  * GitHub 中文翻译主入口文件
  * @file main.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 整合所有模块并初始化脚本
@@ -5725,7 +5727,7 @@ function cleanup() {
 /**
  * 初始化脚本
  */
-async function init() {
+function init() {
   try {
     // 检查更新
     if (CONFIG.updateCheck.enabled) {

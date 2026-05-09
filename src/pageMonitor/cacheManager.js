@@ -1,7 +1,7 @@
 /**
  * 页面监控缓存管理模块
  * @file pageMonitor/cacheManager.js
- * @version 1.9.13
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 管理页面监控中的缓存
@@ -37,7 +37,7 @@ export const pageMonitorCache = {
         const entriesToRemove = Math.floor(this.nodeCheckCache.size * 0.3);
         const keysToRemove = Array.from(this.nodeCheckCache.keys()).slice(0, entriesToRemove);
 
-        keysToRemove.forEach(key => {
+        keysToRemove.forEach((key) => {
           this.nodeCheckCache.delete(key);
         });
 
@@ -63,7 +63,7 @@ export const pageMonitorCache = {
   },
 
   cleanupEventListeners() {
-    this.eventListeners.forEach(listener => {
+    this.eventListeners.forEach((listener) => {
       try {
         window.removeEventListener(listener.type, listener.handler);
       } catch (error) {
