@@ -1,6 +1,7 @@
 // 词典处理工具
 // 作者: SutChan
-// 版本: 1.8.16
+// 版本: 1.9.0
+// GitHub i18n 项目专用版本
 
 const fs = require('fs').promises;
 const path = require('path');
@@ -8,9 +9,9 @@ const path = require('path');
 // 导入共享工具函数
 const { formatNumber } = require('./utils');
 
-// 默认配置
+// 默认配置 - 适用于 GitHub i18n 项目结构
 const DEFAULT_CONFIG = {
-  userScriptPath: '../GitHub_zh-CN.user.js',
+  srcDir: '../src/dictionaries',
   dictionaryFilePath: '../api/translations.json',
   backupDir: '../backups',
   logLevel: 'info', // error, warn, info, debug
@@ -57,7 +58,7 @@ function log(level, message, details = null) {
 }
 
 /**
- * 安全地解析模块内容为对象，替代eval()以符合CSP要求
+ * 安全地解析模块内容为对象
  * @param {string} moduleContent - 模块内容字符串
  * @returns {Object} 解析后的对象
  */
@@ -71,54 +72,41 @@ function safeParseModuleContent(moduleContent) {
       throw new Error('模块内容格式不正确，不是有效的对象字面量');
     }
 
-    // 使用JSON.parse替代eval，但需要先处理非标准JSON格式
-    // 将单引号替换为双引号，并处理JavaScript对象字面量中的其他格式差异
+    // 尝试使用 JSON.parse，但先处理 JavaScript 对象字面量
     const jsonCompatibleContent = trimmedContent
-      // 替换单引号为双引号
-      .replace(/'/g, '"')
-      // 移除对象字面量中的尾随逗号（JSON不允许）
-      .replace(/,\s*}/g, '}')
-      .replace(/,\s*]/g, ']')
-      // 处理属性名（确保所有属性名都有引号）
-      .replace(/(\w+)\s*:/g, '"$1":')
-      // 处理字符串值中的转义字符
-      .replace(/\\n/g, '\\n')
-      .replace(/\\r/g, '\\r')
-      .replace(/\\t/g, '\\t')
-      // 处理多行字符串（将它们连接成单行）
-      .replace(/"\s*\+\s*"/g, '')
-      // 处理字符串中的换行符
-      .replace(/[\r\n]+/g, ' ');
+      // 替换单引号为双引号，但要小心处理字符串内容中的引号
+      .replace(/^'|'$/g, '"')
+      // 处理属性名（确保所有属性名都有双引号）
+      .replace(/(\w+)(\s*:\s*)/g, '"$1"$2')
+      // 处理字符串值的引号
+      .replace(/:\s*'([^']*)'/g, ': "$1"')
+      // 移除尾随逗号
+      .replace(/,(\s*[}\]])/g, '$1');
 
-    // 尝试解析处理后的内容
+    // 尝试解析
     return JSON.parse(jsonCompatibleContent);
   } catch (error) {
-    log('warn', '使用JSON.parse解析失败，尝试使用更安全的解析方法', error.message);
+    log('warn', '使用JSON.parse解析失败，尝试使用正则表达式解析', error.message);
 
     try {
-      // 作为后备方案，使用更安全的解析方法
-      // 1. 尝试使用简单的正则表达式解析键值对
+      // 回退方案：使用正则表达式提取键值对
       const result = {};
-      // 匹配键值对的正则表达式，支持单引号和双引号
-      const keyValueRegex = /(['"])([^'"]+)\1\s*:\s*(['"])([^'"]*)\3/g;
+      // 匹配键值对：支持单引号或双引号
+      const keyValueRegex = /['"]([^'"]+)['"]\s*:\s*['"]([^'"]*)['"]/g;
       let match;
 
       while ((match = keyValueRegex.exec(trimmedContent)) !== null) {
-        const key = match[2];
-        const value = match[4];
+        const key = match[1];
+        const value = match[2];
         result[key] = value;
       }
 
-      // 如果找到了键值对，返回结果
       if (Object.keys(result).length > 0) {
         log('info', `使用正则表达式解析成功，提取了 ${Object.keys(result).length} 个键值对`);
         return result;
       }
 
-      // 2. 如果正则表达式解析失败，尝试使用更宽松的解析方法
-      // 注意：这是一个最后的后备方案，可能不适用于所有情况
-      // 在生产环境中，应该确保模块内容是有效的JSON格式
-      throw new Error('无法使用安全方法解析模块内容，请确保模块内容是有效的JSON格式');
+      throw new Error('无法使用正则表达式解析模块内容');
     } catch (fallbackError) {
       log('error', '无法安全解析模块内容', fallbackError);
       throw new Error(`解析模块内容失败: ${fallbackError.message}`);
@@ -127,47 +115,43 @@ function safeParseModuleContent(moduleContent) {
 }
 
 /**
- * 从GitHub_zh-CN.user.js中提取翻译词典
+ * 从 src/dictionaries 目录读取翻译词典
  * @returns {Promise<Object>} 提取的词典对象
  */
 async function extractDictionaryFromUserScript() {
   try {
-    const fullPath = path.resolve(__dirname, CONFIG.userScriptPath);
-    const scriptContent = await fs.readFile(fullPath, 'utf8');
-
-    // 匹配translationModule对象
-    const translationModulePattern = /const\s+translationModule\s*=\s*\{[\s\S]*?\};/;
-    const match = scriptContent.match(translationModulePattern);
-
-    if (!match) {
-      throw new Error('未找到translationModule对象');
-    }
-
-    // 提取所有模块的词典
+    const fullPath = path.resolve(__dirname, CONFIG.srcDir);
+    const files = await fs.readdir(fullPath);
     const dictionary = {};
-    const modulePattern = /(\w+)\s*:\s*\{[\s\S]*?\}(?=,|\s*\})/g;
-    let moduleMatch;
 
-    while ((moduleMatch = modulePattern.exec(match[0])) !== null) {
-      try {
-        // 提取模块名和模块内容
-        const moduleName = moduleMatch[1];
-        const moduleContent = moduleMatch[0].replace(`${moduleName}: `, '');
+    for (const file of files) {
+      if (file.endsWith('.js') && file !== 'index.js') {
+        const moduleName = file.replace('.js', '');
+        const filePath = path.join(fullPath, file);
+        const content = await fs.readFile(filePath, 'utf8');
 
-        // 使用安全的方法解析模块内容为对象，替代eval()
-        const moduleDict = safeParseModuleContent(moduleContent);
-        dictionary[moduleName] = moduleDict;
-
-        log('debug', `已提取模块 ${moduleName}，包含 ${Object.keys(moduleDict).length} 个字符串`);
-      } catch (e) {
-        log('warn', `解析模块失败: ${moduleMatch[0]}`, e);
+        // 匹配 export default 后的对象
+        const match = content.match(/export\s+default\s*(\{[\s\S]*?\});?/);
+        if (match) {
+          try {
+            // 解析为对象
+            const moduleDict = safeParseModuleContent(match[1]);
+            dictionary[moduleName] = moduleDict;
+            log(
+              'debug',
+              `已读取模块 ${moduleName}，包含 ${Object.keys(moduleDict).length} 个字符串`,
+            );
+          } catch (e) {
+            log('warn', `解析模块失败: ${file}`, e);
+          }
+        }
       }
     }
 
-    log('info', `已从用户脚本中提取 ${Object.keys(dictionary).length} 个模块的词典`);
+    log('info', `已从目录中读取 ${Object.keys(dictionary).length} 个模块的词典`);
     return dictionary;
   } catch (error) {
-    log('error', '从用户脚本提取词典失败:', error);
+    log('error', '从源文件读取词典失败:', error);
     throw error;
   }
 }
@@ -223,16 +207,17 @@ async function saveDictionaryToJson(dictionary) {
 
 /**
  * 创建文件备份
+ * @param {string} moduleName - 模块名称
  * @param {string} content - 要备份的文件内容
- * @returns {Promise<string>}
+ * @returns {Promise<string|null>} 备份路径或 null
  */
-async function createBackup(content) {
+async function createBackup(moduleName, content) {
   try {
     const backupDir = path.resolve(__dirname, CONFIG.backupDir);
     await fs.mkdir(backupDir, { recursive: true });
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupPath = path.join(backupDir, `GitHub_zh-CN.user.js.${timestamp}.bak`);
+    const backupPath = path.join(backupDir, `${moduleName}.js.${timestamp}.bak`);
 
     await fs.writeFile(backupPath, content, 'utf8');
     log('info', `已创建备份: ${backupPath}`);
@@ -245,77 +230,44 @@ async function createBackup(content) {
 }
 
 /**
- * 将词典写入到GitHub_zh-CN.user.js
+ * 将词典写入到 src/dictionaries 目录
  * @param {Object} dictionary - 要写入的词典对象
  * @returns {Promise<void>}
  */
 async function writeDictionaryToUserScript(dictionary) {
   try {
-    const fullPath = path.resolve(__dirname, CONFIG.userScriptPath);
-    const originalContent = await fs.readFile(fullPath, 'utf8');
-
-    // 创建备份
-    await createBackup(originalContent);
-
-    let updatedContent = originalContent;
+    const fullPath = path.resolve(__dirname, CONFIG.srcDir);
 
     // 对每个模块更新词典
     for (const moduleName in dictionary) {
       const moduleDict = dictionary[moduleName];
+      const filePath = path.join(fullPath, `${moduleName}.js`);
 
-      // 转义模块名中的特殊字符
-      const escapedModule = moduleName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      // 使用字符类和普通字符，避免不必要的转义
-      const moduleRegex = new RegExp(`(\\s+${escapedModule}\\s*=\\s*{[\\s\\S]*?})`);
-
-      const match = updatedContent.match(moduleRegex);
-
-      if (match) {
-        const moduleContent = match[1];
-        const closingBraceIndex = moduleContent.lastIndexOf('}');
-
-        if (closingBraceIndex === -1) {
-          log('error', `无法找到模块 ${moduleName} 的结束标记`);
-          continue;
-        }
-
-        // 构建新的模块内容
-        let newModuleContent = moduleContent.substring(0, moduleContent.indexOf('{') + 1) + '\n';
-
-        // 按字母顺序排序并添加字符串条目
-        const sortedKeys = Object.keys(moduleDict).sort();
-        for (let i = 0; i < sortedKeys.length; i++) {
-          const key = sortedKeys[i];
-          const value = moduleDict[key];
-
-          // 安全地转义字符串内容
-          const safeKey = key.replace(/"/g, '\\"');
-          const safeValue = value.replace(/"/g, '\\"');
-
-          newModuleContent += `    "${safeKey}": "${safeValue}"`;
-
-          // 如果不是最后一个条目，添加逗号
-          if (i < sortedKeys.length - 1) {
-            newModuleContent += ',';
-          }
-          newModuleContent += '\n';
-        }
-
-        newModuleContent += '  }';
-
-        // 替换模块内容
-        updatedContent = updatedContent.replace(moduleContent, newModuleContent);
-        log('info', `已更新模块 ${moduleName}，包含 ${sortedKeys.length} 个字符串`);
-      } else {
-        log('error', `无法找到模块 ${moduleName} 的定义`);
+      let originalContent = '';
+      try {
+        originalContent = await fs.readFile(filePath, 'utf8');
+        // 创建备份
+        await createBackup(moduleName, originalContent);
+      } catch (_e) {
+        // 文件可能不存在，没关系
       }
+
+      // 构建新的模块内容
+      const newContent = `// ${moduleName}.js
+// GitHub i18n 词典模块
+// 版本: 1.0.0
+
+export default ${JSON.stringify(moduleDict, null, 2)};
+`;
+
+      // 保存更新后的模块
+      await fs.writeFile(filePath, newContent, 'utf8');
+      log('info', `已更新模块 ${moduleName}，包含 ${Object.keys(moduleDict).length} 个字符串`);
     }
 
-    // 保存更新后的脚本
-    await fs.writeFile(fullPath, updatedContent, 'utf8');
-    log('info', `已将词典写入到用户脚本: ${fullPath}`);
+    log('info', `已将词典写入到目录: ${fullPath}`);
   } catch (error) {
-    log('error', '将词典写入到用户脚本失败:', error);
+    log('error', '将词典写入到源文件失败:', error);
     throw error;
   }
 }
@@ -474,9 +426,9 @@ async function cli(command, options = {}) {
         break;
       }
       case 'optimize': {
-        const currentDictionary = await readDictionaryFromJson();
+        const currentDictionary = await extractDictionaryFromUserScript();
         const optimized = optimizeDictionary(currentDictionary);
-        await saveDictionaryToJson(optimized);
+        await writeDictionaryToUserScript(optimized);
         log('info', '词典优化完成');
         break;
       }
@@ -507,14 +459,14 @@ if (require.main === module) {
 
   if (command === 'help') {
     console.log('词典处理工具使用帮助:');
-    console.log('  node dictionary_processor.js export [options] - 从用户脚本导出词典到JSON文件');
-    console.log('  node dictionary_processor.js import [options] - 从JSON文件导入词典到用户脚本');
-    console.log('  node dictionary_processor.js optimize [options] - 优化JSON词典文件');
+    console.log('  node dictionary_processor.js export [options]   - 从源文件导出词典到JSON文件');
+    console.log('  node dictionary_processor.js import [options]   - 从JSON文件导入词典到源文件');
+    console.log('  node dictionary_processor.js optimize [options] - 优化源文件中的词典');
     console.log('');
     console.log('选项:');
-    console.log('  --userScriptPath=path - 指定用户脚本文件路径');
-    console.log('  --dictionaryFilePath=path - 指定词典JSON文件路径');
-    console.log('  --logLevel=level - 设置日志级别 (error, warn, info, debug)');
+    console.log('  --srcDir=path               - 指定源文件目录');
+    console.log('  --dictionaryFilePath=path   - 指定词典JSON文件路径');
+    console.log('  --logLevel=level            - 设置日志级别 (error, warn, info, debug)');
     process.exit(0);
   }
 
