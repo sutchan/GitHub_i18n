@@ -72,21 +72,33 @@ async function ensureDirectoryExists(dirPath) {
 function downloadPage(url, retryCount = 0) {
   try {
     // 验证URL格式
+    let parsedUrl;
     try {
-      new URL(url);
+      parsedUrl = new URL(url);
     } catch (_e) {
       throw new Error(`URL格式无效: ${url}`);
     }
 
+    // 确保使用 https 协议
+    if (parsedUrl.protocol !== 'https:') {
+      parsedUrl.protocol = 'https:';
+      url = parsedUrl.href;
+    }
+
     return new Promise((resolve, reject) => {
       const options = {
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port || 443,
+        path: parsedUrl.pathname + parsedUrl.search,
         headers: {
           'User-Agent': CONFIG.userAgent,
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
         },
         timeout: CONFIG.httpTimeout,
       };
 
-      const req = https.get(url, options, (res) => {
+      const req = https.request(options, (res) => {
         // 处理重定向
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           const redirectUrl = new URL(res.headers.location, url).href;
@@ -115,12 +127,24 @@ function downloadPage(url, retryCount = 0) {
           return;
         }
 
+        // 检查 Content-Type 是否为 HTML
+        const contentType = res.headers['content-type'] || '';
+        if (!contentType.includes('text/html') && !contentType.includes('application/xhtml+xml')) {
+          log('warn', `警告: ${url} 返回的 Content-Type 不是 HTML: ${contentType}`);
+        }
+
         const chunks = [];
         res.on('data', (chunk) => chunks.push(chunk));
         res.on('end', () => {
           try {
             const data = Buffer.concat(chunks).toString('utf8');
-            log('info', `成功下载 ${url}`);
+
+            // 验证内容是否为 HTML (至少包含 <html 标签)
+            if (!data.toLowerCase().includes('<html')) {
+              log('warn', `警告: ${url} 返回的内容可能不是有效的 HTML`);
+            }
+
+            log('info', `成功下载 ${url} (${data.length} 字节)`);
             resolve(data);
           } catch (encodingError) {
             reject(new Error(`解析响应内容失败: ${encodingError.message}`));
@@ -162,6 +186,8 @@ function downloadPage(url, retryCount = 0) {
           reject(error);
         }
       });
+
+      req.end();
     });
   } catch (error) {
     log('error', `下载页面时发生错误: ${url}`, error);
