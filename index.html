@@ -475,7 +475,19 @@ https://github.com/torvalds/linux"></textarea>
           signal: collectController.signal
         });
 
-        const result = await response.json();
+        // 检查响应是否成功
+        if (!response.ok) {
+          throw new Error(`HTTP错误: ${response.status} ${response.statusText}`);
+        }
+
+        // 尝试解析 JSON
+        let result;
+        try {
+          const text = await response.text();
+          result = JSON.parse(text);
+        } catch (jsonError) {
+          throw new Error('服务器返回了无效的 JSON 响应');
+        }
         
         if (result.success) {
           addLog('collectLog', `采集完成! 成功: ${result.summary.successCount}, 失败: ${result.summary.failedCount}`, 'success');
@@ -488,6 +500,7 @@ https://github.com/torvalds/linux"></textarea>
           addLog('collectLog', '采集已停止', 'warn');
         } else {
           addLog('collectLog', `错误: ${err.message}`, 'error');
+          console.error('采集错误详情:', err);
         }
       } finally {
         isCollecting = false;
