@@ -10,7 +10,6 @@ const fs = require('fs').promises;
 
 const StringCollector = require('./string_collector');
 const DictionaryProcessor = require('./dictionary_processor');
-const { formatNumber } = require('./utils');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,8 +25,8 @@ const CONFIG = {
   defaultSettings: {
     requestInterval: 1000,
     maxRetries: 3,
-    httpTimeout: 30000
-  }
+    httpTimeout: 30000,
+  },
 };
 
 async function readSettings() {
@@ -47,13 +46,13 @@ async function readDictionary() {
   try {
     const files = await fs.readdir(CONFIG.dictionaryPath);
     const dictionary = {};
-    
+
     for (const file of files) {
       if (file.endsWith('.js')) {
         const moduleName = file.replace('.js', '');
         const filePath = path.join(CONFIG.dictionaryPath, file);
         const content = await fs.readFile(filePath, 'utf8');
-        
+
         const match = content.match(/export\s+default\s+(\{[\s\S]*?\});?$/m);
         if (match) {
           try {
@@ -70,7 +69,7 @@ async function readDictionary() {
         }
       }
     }
-    
+
     return dictionary;
   } catch {
     return {};
@@ -106,7 +105,7 @@ async function getDictionaryStats(dictionary) {
     totalStrings,
     moduleCount: Object.keys(dictionary).length,
     pendingCount,
-    lastUpdated
+    lastUpdated,
   };
 }
 
@@ -124,14 +123,16 @@ app.get('/api/dictionary', async (req, res) => {
   try {
     const dictionary = await readDictionary();
     const search = req.query.search?.toLowerCase();
-    
+
     if (search) {
       const filtered = {};
       for (const [module, entries] of Object.entries(dictionary)) {
         const matched = {};
         for (const [key, value] of Object.entries(entries)) {
-          if (key.toLowerCase().includes(search) || 
-              (value && value.toLowerCase().includes(search))) {
+          if (
+            key.toLowerCase().includes(search) ||
+            (value && value.toLowerCase().includes(search))
+          ) {
             matched[key] = value;
           }
         }
@@ -152,7 +153,7 @@ app.post('/api/dictionary/update', async (req, res) => {
   try {
     const { module, key, value } = req.body;
     const dictionary = await readDictionary();
-    
+
     if (!dictionary[module]) {
       dictionary[module] = {};
     }
@@ -175,17 +176,19 @@ app.post('/api/collect', async (req, res) => {
 
     Object.assign(StringCollector.CONFIG, {
       maxRetries: settings.maxRetries,
-      httpTimeout: settings.httpTimeout
+      httpTimeout: settings.httpTimeout,
     });
 
     const results = await StringCollector.collectStringsFromPages(pages, (progress) => {
-      console.log(`[${progress.current}/${progress.total}] ${progress.page.name}: ${progress.result?.strings?.length || 0} strings`);
+      console.log(
+        `[${progress.current}/${progress.total}] ${progress.page.name}: ${progress.result?.strings?.length || 0} strings`,
+      );
     });
 
     if (results.summary.successCount > 0) {
       const strings = [];
-      results.results.forEach(result => {
-        result.strings.forEach(str => {
+      results.results.forEach((result) => {
+        result.strings.forEach((str) => {
           strings.push({ text: str, module: result.pageId });
         });
       });
@@ -196,12 +199,12 @@ app.post('/api/collect', async (req, res) => {
     res.json({
       success: true,
       summary: results.summary,
-      results: results.results.map(r => ({
+      results: results.results.map((r) => ({
         pageId: r.pageId,
         pageName: r.pageName,
         stringCount: r.strings?.length || 0,
-        error: r.error
-      }))
+        error: r.error,
+      })),
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -213,7 +216,7 @@ app.get('/api/export', async (req, res) => {
     const result = await DictionaryProcessor.extractDictionaryFromUserScript();
     res.json({
       success: true,
-      stringCount: Object.values(result).reduce((sum, m) => sum + Object.keys(m).length, 0)
+      stringCount: Object.values(result).reduce((sum, m) => sum + Object.keys(m).length, 0),
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -232,17 +235,23 @@ app.get('/api/import', async (req, res) => {
 app.get('/api/optimize', async (req, res) => {
   try {
     const dictionary = await DictionaryProcessor.readDictionaryFromJson();
-    const originalCount = Object.values(dictionary).reduce((sum, m) => sum + Object.keys(m).length, 0);
-    
+    const originalCount = Object.values(dictionary).reduce(
+      (sum, m) => sum + Object.keys(m).length,
+      0,
+    );
+
     const optimized = DictionaryProcessor.optimizeDictionary(dictionary);
     await DictionaryProcessor.saveDictionaryToJson(optimized);
-    
-    const optimizedCount = Object.values(optimized).reduce((sum, m) => sum + Object.keys(m).length, 0);
-    
+
+    const optimizedCount = Object.values(optimized).reduce(
+      (sum, m) => sum + Object.keys(m).length,
+      0,
+    );
+
     res.json({
       success: true,
       originalCount,
-      optimizedCount
+      optimizedCount,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -253,15 +262,15 @@ app.get('/api/backup', async (req, res) => {
   try {
     const userScriptPath = path.resolve(__dirname, '../build/GitHub_i18n.user.js');
     const content = await fs.readFile(userScriptPath, 'utf8');
-    
+
     const backupDir = path.resolve(__dirname, 'backups');
     await fs.mkdir(backupDir, { recursive: true });
-    
+
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const backupPath = path.join(backupDir, `GitHub_i18n.user.js.${timestamp}.bak`);
-    
+
     await fs.writeFile(backupPath, content, 'utf8');
-    
+
     res.json({ success: true, path: backupPath });
   } catch (error) {
     res.status(500).json({ error: error.message });

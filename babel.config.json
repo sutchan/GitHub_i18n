@@ -1,0 +1,14 @@
+/**
+ * Babel 配置文件
+ * @file babel.config.json
+ */
+{
+  "presets": [
+    ["@babel/preset-env", {
+      "targets": {
+        "node": "current"
+      },
+      "modules": "auto"
+    }]
+  ]
+}

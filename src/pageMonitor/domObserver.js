@@ -1,7 +1,7 @@
 /**
  * DOM变化观察器模块
  * @file pageMonitor/domObserver.js
- * @version 1.9.12
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 观察DOM变化并触发翻译
@@ -57,13 +57,18 @@ export const domObserver = {
         }
       };
 
-      this.observer = new MutationObserver(utils.debounce(handleMutations, CONFIG.debounceDelay || 300));
+      this.observer = new MutationObserver(
+        utils.debounce(handleMutations, CONFIG.debounceDelay || 300),
+      );
 
       if (rootNode) {
         try {
           this.observer.observe(rootNode, observerConfig);
           if (CONFIG.debugMode) {
-            console.log('[GitHub 中文翻译] DOM观察器已启动，观察范围:', rootNode.tagName + (rootNode.id ? '#' + rootNode.id : ''));
+            console.log(
+              '[GitHub 中文翻译] DOM观察器已启动，观察范围:',
+              rootNode.tagName + (rootNode.id ? '#' + rootNode.id : ''),
+            );
           }
         } catch (error) {
           if (CONFIG.debugMode) {
@@ -83,7 +88,11 @@ export const domObserver = {
           }
         };
         document.addEventListener('DOMContentLoaded', domLoadedHandler);
-        pageMonitorCache.addEventListener({ target: document, type: 'DOMContentLoaded', handler: domLoadedHandler });
+        pageMonitorCache.addEventListener({
+          target: document,
+          type: 'DOMContentLoaded',
+          handler: domLoadedHandler,
+        });
       }
     } catch (error) {
       console.error('[GitHub 中文翻译] 设置DOM观察器失败:', error);
@@ -101,22 +110,59 @@ export const domObserver = {
         break;
       case 'issues':
       case 'pullRequests':
-        candidateSelectors = ['.js-discussion', '.issue-details', '#js-issue-title', '#js-pjax-container', 'main', 'body'];
+        candidateSelectors = [
+          '.js-discussion',
+          '.issue-details',
+          '#js-issue-title',
+          '#js-pjax-container',
+          'main',
+          'body',
+        ];
         break;
       case 'repository':
-        candidateSelectors = ['#js-repo-pjax-container', '.repository-content', '.application-main', 'body'];
+        candidateSelectors = [
+          '#js-repo-pjax-container',
+          '.repository-content',
+          '.application-main',
+          'body',
+        ];
         break;
       case 'notifications':
-        candidateSelectors = ['.notifications-list', '.notification-shelf', '#js-pjax-container', 'main', 'body'];
+        candidateSelectors = [
+          '.notifications-list',
+          '.notification-shelf',
+          '#js-pjax-container',
+          'main',
+          'body',
+        ];
         break;
       case 'wiki':
-        candidateSelectors = ['.wiki-wrapper', '.markdown-body', '#js-pjax-container', 'main', 'body'];
+        candidateSelectors = [
+          '.wiki-wrapper',
+          '.markdown-body',
+          '#js-pjax-container',
+          'main',
+          'body',
+        ];
         break;
       case 'actions':
-        candidateSelectors = ['.workflow-run-list', '.workflow-jobs', '.workflow-run-header', '#js-pjax-container', 'main', 'body'];
+        candidateSelectors = [
+          '.workflow-run-list',
+          '.workflow-jobs',
+          '.workflow-run-header',
+          '#js-pjax-container',
+          'main',
+          'body',
+        ];
         break;
       case 'projects':
-        candidateSelectors = ['.project-layout', '.project-columns', '#js-pjax-container', 'main', 'body'];
+        candidateSelectors = [
+          '.project-layout',
+          '.project-columns',
+          '#js-pjax-container',
+          'main',
+          'body',
+        ];
         break;
       default:
         candidateSelectors = ['#js-pjax-container', 'main', '.application-main', 'body'];
@@ -153,7 +199,12 @@ export const domObserver = {
 
     if (CONFIG.performance?.observeAttributes && !CONFIG.performance?.ignoreAttributeMutations) {
       baseConfig.attributes = true;
-      baseConfig.attributeFilter = CONFIG.performance?.importantAttributes || ['id', 'class', 'href', 'title'];
+      baseConfig.attributeFilter = CONFIG.performance?.importantAttributes || [
+        'id',
+        'class',
+        'href',
+        'title',
+      ];
     }
 
     return baseConfig;
@@ -172,7 +223,17 @@ export const domObserver = {
         return false;
       }
 
-      const { importantElements = [], ignoreElements = [], importantAttributes = ['id', 'class', 'href', 'title'], mutationThreshold = 30, contentChangeWeight = 1, importantChangeWeight = 2, translationTriggerRatio = 0.3, maxMutationProcessing = 50, minContentChangesToTrigger = 3 } = CONFIG.performance || {};
+      const {
+        importantElements = [],
+        ignoreElements = [],
+        importantAttributes = ['id', 'class', 'href', 'title'],
+        mutationThreshold = 30,
+        contentChangeWeight = 1,
+        importantChangeWeight = 2,
+        translationTriggerRatio = 0.3,
+        maxMutationProcessing = 50,
+        minContentChangesToTrigger = 3,
+      } = CONFIG.performance || {};
 
       const quickPathThreshold = pageAnalyzer.getQuickPathThresholdByPageMode(pageMode);
       if (mutations.length <= quickPathThreshold) {
@@ -181,7 +242,10 @@ export const domObserver = {
 
       let contentChanges = 0;
       let importantChanges = 0;
-      const maxCheckCount = Math.min(mutations.length, Math.max(mutationThreshold, maxMutationProcessing));
+      const maxCheckCount = Math.min(
+        mutations.length,
+        Math.max(mutationThreshold, maxMutationProcessing),
+      );
       const elementCheckCache = new WeakMap();
 
       for (let i = 0; i < maxCheckCount; i++) {
@@ -197,7 +261,12 @@ export const domObserver = {
         if (mutation.target) {
           let isIgnored = elementCheckCache.get(mutation.target);
           if (isIgnored === undefined) {
-            isIgnored = this.shouldIgnoreElement(mutation.target, ignoreElements, elementCheckCache, pageMode);
+            isIgnored = this.shouldIgnoreElement(
+              mutation.target,
+              ignoreElements,
+              elementCheckCache,
+              pageMode,
+            );
             elementCheckCache.set(mutation.target, isIgnored);
           }
 
@@ -207,7 +276,12 @@ export const domObserver = {
 
           let isImportant = elementCheckCache.get(`important-${mutation.target}`);
           if (isImportant === undefined && mutation.target.nodeType === Node.ELEMENT_NODE) {
-            isImportant = this.isImportantElement(mutation.target, importantElements, elementCheckCache, pageMode);
+            isImportant = this.isImportantElement(
+              mutation.target,
+              importantElements,
+              elementCheckCache,
+              pageMode,
+            );
             elementCheckCache.set(`important-${mutation.target}`, isImportant);
           }
 
@@ -217,7 +291,10 @@ export const domObserver = {
         }
 
         if (mutation.type === 'attributes') {
-          if (CONFIG.performance?.observeAttributes && importantAttributes.includes(mutation.attributeName)) {
+          if (
+            CONFIG.performance?.observeAttributes &&
+            importantAttributes.includes(mutation.attributeName)
+          ) {
             importantChanges++;
             if (importantChanges >= 3) {
               return true;
@@ -238,7 +315,8 @@ export const domObserver = {
         return false;
       }
 
-      const weightedChanges = (contentChanges * contentChangeWeight) + (importantChanges * importantChangeWeight);
+      const weightedChanges =
+        contentChanges * contentChangeWeight + importantChanges * importantChangeWeight;
       const threshold = pageAnalyzer.getModeSpecificThreshold(pageMode) || translationTriggerRatio;
 
       return weightedChanges / maxCheckCount > threshold;
@@ -272,10 +350,10 @@ export const domObserver = {
         return cache.get(element);
       }
 
-      let isImportant = importantElements.some(selector => {
+      let isImportant = importantElements.some((selector) => {
         try {
           return element.matches(selector);
-        } catch (e) {
+        } catch (_e) {
           return false;
         }
       });
@@ -284,17 +362,19 @@ export const domObserver = {
         switch (pageMode) {
           case 'issues':
           case 'pullRequests':
-            isImportant = element.classList.contains('comment-body') ||
-                         element.classList.contains('timeline-comment-header');
+            isImportant =
+              element.classList.contains('comment-body') ||
+              element.classList.contains('timeline-comment-header');
             break;
           case 'wiki':
-            isImportant = element.classList.contains('markdown-body') ||
-                         element.tagName === 'H1' ||
-                         element.tagName === 'H2';
+            isImportant =
+              element.classList.contains('markdown-body') ||
+              element.tagName === 'H1' ||
+              element.tagName === 'H2';
             break;
           case 'search':
-            isImportant = element.classList.contains('search-match') ||
-                         element.classList.contains('f4');
+            isImportant =
+              element.classList.contains('search-match') || element.classList.contains('f4');
             break;
           case 'codespaces':
             isImportant = element.classList.contains('codespace-status');
@@ -332,10 +412,10 @@ export const domObserver = {
         return true;
       }
 
-      let shouldIgnore = ignoreElements.some(selector => {
+      let shouldIgnore = ignoreElements.some((selector) => {
         try {
           return element.matches(selector);
-        } catch (e) {
+        } catch (_e) {
           return false;
         }
       });
@@ -343,9 +423,10 @@ export const domObserver = {
       if (!shouldIgnore && pageMode) {
         switch (pageMode) {
           case 'codespaces':
-            shouldIgnore = element.classList.contains('terminal') ||
-                          element.tagName === 'PRE' ||
-                          element.classList.contains('command-input');
+            shouldIgnore =
+              element.classList.contains('terminal') ||
+              element.tagName === 'PRE' ||
+              element.classList.contains('command-input');
             break;
           case 'wiki':
             if (element.tagName === 'PRE' && element.classList.contains('codehilite')) {
@@ -382,36 +463,54 @@ export const domObserver = {
         }
 
         const minLength = pageAnalyzer.getMinTextLengthByPageMode(pageMode);
-        return oldValue !== newValue &&
-               (newValue.length >= minLength || oldValue.length >= minLength ||
-                Math.abs(newValue.length - oldValue.length) >= 3);
+        return (
+          oldValue !== newValue &&
+          (newValue.length >= minLength ||
+            oldValue.length >= minLength ||
+            Math.abs(newValue.length - oldValue.length) >= 3)
+        );
       }
 
-      if (mutation.type === 'childList' && (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)) {
-        return Array.from(mutation.addedNodes).some(node => {
+      if (
+        mutation.type === 'childList' &&
+        (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)
+      ) {
+        return Array.from(mutation.addedNodes).some((node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node;
-            if (element.tagName === 'SCRIPT' || element.tagName === 'STYLE' || element.tagName === 'META') {
+            if (
+              element.tagName === 'SCRIPT' ||
+              element.tagName === 'STYLE' ||
+              element.tagName === 'META'
+            ) {
               return false;
             }
             if (pageMode) {
               switch (pageMode) {
                 case 'issues':
                 case 'pullRequests':
-                  return element.classList.contains('comment-body') ||
-                         element.classList.contains('timeline-comment') ||
-                         element.classList.contains('js-issue-title');
+                  return (
+                    element.classList.contains('comment-body') ||
+                    element.classList.contains('timeline-comment') ||
+                    element.classList.contains('js-issue-title')
+                  );
                 case 'wiki':
-                  return element.classList.contains('markdown-body') ||
-                         /^H[1-6]$/.test(element.tagName);
+                  return (
+                    element.classList.contains('markdown-body') || /^H[1-6]$/.test(element.tagName)
+                  );
                 case 'codespaces':
-                  if (element.classList.contains('terminal') || element.classList.contains('command-input')) {
+                  if (
+                    element.classList.contains('terminal') ||
+                    element.classList.contains('command-input')
+                  ) {
                     return false;
                   }
                   break;
                 case 'search':
-                  return element.classList.contains('search-result') ||
-                         element.classList.contains('search-match');
+                  return (
+                    element.classList.contains('search-result') ||
+                    element.classList.contains('search-match')
+                  );
               }
             }
             return true;
@@ -453,5 +552,5 @@ export const domObserver = {
       this.observer.disconnect();
       this.observer = null;
     }
-  }
+  },
 };

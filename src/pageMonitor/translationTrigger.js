@@ -1,7 +1,7 @@
 /**
  * 翻译触发模块
  * @file pageMonitor/translationTrigger.js
- * @version 1.9.12
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 管理翻译触发和节流
@@ -14,7 +14,7 @@ export const translationTrigger = {
   lastTranslateTimestamp: 0,
   scheduledTranslate: null,
 
-  async translateWithThrottle() {
+  translateWithThrottle() {
     try {
       const now = Date.now();
       const minInterval = CONFIG.performance?.minTranslateInterval || 500;
@@ -41,7 +41,9 @@ export const translationTrigger = {
       if (now - this.lastTranslateTimestamp >= minInterval) {
         return this.delayedTranslate(0);
       } else if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 翻译请求被节流，距离上次翻译${now - this.lastTranslateTimestamp}ms`);
+        console.log(
+          `[GitHub 中文翻译] 翻译请求被节流，距离上次翻译${now - this.lastTranslateTimestamp}ms`,
+        );
       }
     } catch (error) {
       console.error('[GitHub 中文翻译] 翻译触发失败:', error);
@@ -100,5 +102,5 @@ export const translationTrigger = {
         console.error('[GitHub 中文翻译] 错误恢复失败:', recoverError);
       }
     }
-  }
+  },
 };

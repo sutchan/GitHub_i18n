@@ -1,7 +1,7 @@
 /**
  * 翻译元素选择模块
  * @file translationCore/elementSelector.js
- * @version 1.9.12
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 选择需要翻译的DOM元素
@@ -20,13 +20,15 @@ export const elementSelector = {
       const combinedSelector = allSelectors.join(', ');
       try {
         const allElements = document.querySelectorAll(combinedSelector);
-        Array.from(allElements).forEach(element => {
+        Array.from(allElements).forEach((element) => {
           if (this.shouldTranslateElement(element)) {
             uniqueElements.add(element);
           }
         });
         if (CONFIG.debugMode && CONFIG.performance?.logTiming) {
-          console.log(`[GitHub 中文翻译] 合并查询选择器: ${combinedSelector}, 结果数量: ${allElements.length}`);
+          console.log(
+            `[GitHub 中文翻译] 合并查询选择器: ${combinedSelector}, 结果数量: ${allElements.length}`,
+          );
         }
         return Array.from(uniqueElements);
       } catch (error) {
@@ -36,10 +38,10 @@ export const elementSelector = {
       }
     }
 
-    allSelectors.forEach(selector => {
+    allSelectors.forEach((selector) => {
       try {
         const matchedElements = document.querySelectorAll(selector);
-        Array.from(matchedElements).forEach(element => {
+        Array.from(matchedElements).forEach((element) => {
           if (this.shouldTranslateElement(element)) {
             uniqueElements.add(element);
           }
@@ -51,7 +53,7 @@ export const elementSelector = {
       }
     });
 
-    return Array.from(uniqueElements).filter(element => element instanceof HTMLElement);
+    return Array.from(uniqueElements).filter((element) => element instanceof HTMLElement);
   },
 
   shouldTranslateElement(element) {
@@ -67,31 +69,76 @@ export const elementSelector = {
       return false;
     }
 
-    const skipTags = ['script', 'style', 'code', 'pre', 'textarea', 'input', 'select', 'img', 'svg', 'canvas', 'video', 'audio'];
+    const skipTags = [
+      'script',
+      'style',
+      'code',
+      'pre',
+      'textarea',
+      'input',
+      'select',
+      'img',
+      'svg',
+      'canvas',
+      'video',
+      'audio',
+    ];
     const tagName = element.tagName.toLowerCase();
     if (skipTags.includes(tagName)) {
       return false;
     }
 
-    if (element.hasAttribute('data-no-translate') ||
-        element.hasAttribute('translate') && element.getAttribute('translate') === 'no' ||
-        element.hasAttribute('aria-hidden') ||
-        element.hasAttribute('hidden')) {
+    if (
+      element.hasAttribute('data-no-translate') ||
+      (element.hasAttribute('translate') && element.getAttribute('translate') === 'no') ||
+      element.hasAttribute('aria-hidden') ||
+      element.hasAttribute('hidden')
+    ) {
       return false;
     }
 
     const className = element.className;
     if (className) {
       const skipClassPatterns = [
-        /language-\w+/, /highlight/, /token/, /no-translate/, /octicon/, /emoji/,
-        /avatar/, /timestamp/, /numeral/, /filename/, /hash/, /sha/, /shortsha/,
-        /hex-color/, /code/, /gist/, /language-/, /markdown-/, /monaco-editor/,
-        /syntax-/, /highlight-/, /clipboard/, /progress-/, /count/, /size/,
-        /time/, /date/, /sortable/, /label/, /badge/, /url/, /email/, /key/,
-        /token/, /user-name/, /repo-name/
+        /language-\w+/,
+        /highlight/,
+        /token/,
+        /no-translate/,
+        /octicon/,
+        /emoji/,
+        /avatar/,
+        /timestamp/,
+        /numeral/,
+        /filename/,
+        /hash/,
+        /sha/,
+        /shortsha/,
+        /hex-color/,
+        /code/,
+        /gist/,
+        /language-/,
+        /markdown-/,
+        /monaco-editor/,
+        /syntax-/,
+        /highlight-/,
+        /clipboard/,
+        /progress-/,
+        /count/,
+        /size/,
+        /time/,
+        /date/,
+        /sortable/,
+        /label/,
+        /badge/,
+        /url/,
+        /email/,
+        /key/,
+        /token/,
+        /user-name/,
+        /repo-name/,
       ];
 
-      if (skipClassPatterns.some(pattern => pattern.test(className))) {
+      if (skipClassPatterns.some((pattern) => pattern.test(className))) {
         return false;
       }
     }
@@ -99,50 +146,190 @@ export const elementSelector = {
     const id = element.id;
     if (id) {
       const skipIdPatterns = [
-        /\d+/, /-\d+/, /_\d+/, /sha-/, /hash-/, /commit-/, /issue-/, /pull-/,
-        /pr-/, /repo-/, /user-/, /file-/, /blob-/, /tree-/, /branch-/, /tag-/,
-        /release-/, /gist-/, /discussion-/, /comment-/, /review-/, /workflow-/,
-        /action-/, /job-/, /step-/, /runner-/, /package-/, /registry-/,
-        /marketplace-/, /organization-/, /team-/, /project-/, /milestone-/,
-        /assignee-/, /reporter-/, /reviewer-/, /author-/, /committer-/,
-        /contributor-/, /sponsor-/, /funding-/, /donation-/, /payment-/,
-        /billing-/, /plan-/, /subscription-/, /license-/, /secret-/,
-        /key-/, /token-/, /password-/, /credential-/, /certificate-/,
-        /ssh-/, /git-/, /clone-/, /push-/, /pull-/, /fetch-/, /merge-/,
-        /rebase-/, /cherry-pick-/, /reset-/, /revert-/, /tag-/, /branch-/,
-        /commit-/, /diff-/, /patch-/, /stash-/, /ref-/, /head-/, /remote-/,
-        /upstream-/, /origin-/, /local-/, /tracking-/, /merge-base-/,
-        /conflict-/, /resolve-/, /status-/, /log-/, /blame-/, /bisect-/,
-        /grep-/, /find-/, /filter-/, /archive-/, /submodule-/, /worktree-/,
-        /lfs-/, /graphql-/, /rest-/, /api-/, /webhook-/, /event-/,
-        /payload-/, /callback-/, /redirect-/, /oauth-/, /sso-/, /ldap-/,
-        /saml-/, /2fa-/, /mfa-/, /security-/, /vulnerability-/, /cve-/,
-        /dependency-/, /alert-/, /secret-scanning-/, /code-scanning-/,
-        /codeql-/, /actions-/, /workflow-/, /job-/, /step-/, /runner-/,
-        /artifact-/, /cache-/, /environment-/, /deployment-/, /app-/,
-        /oauth-app-/, /github-app-/, /integration-/, /webhook-/,
-        /marketplace-/, /listing-/, /subscription-/, /billing-/,
-        /plan-/, /usage-/, /limits-/, /quota-/, /traffic-/,
-        /analytics-/, /insights-/, /search-/, /explore-/, /trending-/,
-        /stars-/, /forks-/, /watchers-/, /contributors-/, /activity-/,
-        /events-/, /notifications-/, /feeds-/, /dashboard-/, /profile-/,
-        /settings-/, /preferences-/, /billing-/, /organization-/,
-        /team-/, /project-/, /milestone-/, /label-/, /assignee-/,
-        /reporter-/, /reviewer-/, /author-/, /committer-/,
-        /contributor-/, /sponsor-/, /funding-/, /donation-/, /payment-/,
-        /\b\w+[0-9]\w*\b/
+        /\d+/,
+        /-\d+/,
+        /_\d+/,
+        /sha-/,
+        /hash-/,
+        /commit-/,
+        /issue-/,
+        /pull-/,
+        /pr-/,
+        /repo-/,
+        /user-/,
+        /file-/,
+        /blob-/,
+        /tree-/,
+        /branch-/,
+        /tag-/,
+        /release-/,
+        /gist-/,
+        /discussion-/,
+        /comment-/,
+        /review-/,
+        /workflow-/,
+        /action-/,
+        /job-/,
+        /step-/,
+        /runner-/,
+        /package-/,
+        /registry-/,
+        /marketplace-/,
+        /organization-/,
+        /team-/,
+        /project-/,
+        /milestone-/,
+        /assignee-/,
+        /reporter-/,
+        /reviewer-/,
+        /author-/,
+        /committer-/,
+        /contributor-/,
+        /sponsor-/,
+        /funding-/,
+        /donation-/,
+        /payment-/,
+        /billing-/,
+        /plan-/,
+        /subscription-/,
+        /license-/,
+        /secret-/,
+        /key-/,
+        /token-/,
+        /password-/,
+        /credential-/,
+        /certificate-/,
+        /ssh-/,
+        /git-/,
+        /clone-/,
+        /push-/,
+        /pull-/,
+        /fetch-/,
+        /merge-/,
+        /rebase-/,
+        /cherry-pick-/,
+        /reset-/,
+        /revert-/,
+        /tag-/,
+        /branch-/,
+        /commit-/,
+        /diff-/,
+        /patch-/,
+        /stash-/,
+        /ref-/,
+        /head-/,
+        /remote-/,
+        /upstream-/,
+        /origin-/,
+        /local-/,
+        /tracking-/,
+        /merge-base-/,
+        /conflict-/,
+        /resolve-/,
+        /status-/,
+        /log-/,
+        /blame-/,
+        /bisect-/,
+        /grep-/,
+        /find-/,
+        /filter-/,
+        /archive-/,
+        /submodule-/,
+        /worktree-/,
+        /lfs-/,
+        /graphql-/,
+        /rest-/,
+        /api-/,
+        /webhook-/,
+        /event-/,
+        /payload-/,
+        /callback-/,
+        /redirect-/,
+        /oauth-/,
+        /sso-/,
+        /ldap-/,
+        /saml-/,
+        /2fa-/,
+        /mfa-/,
+        /security-/,
+        /vulnerability-/,
+        /cve-/,
+        /dependency-/,
+        /alert-/,
+        /secret-scanning-/,
+        /code-scanning-/,
+        /codeql-/,
+        /actions-/,
+        /workflow-/,
+        /job-/,
+        /step-/,
+        /runner-/,
+        /artifact-/,
+        /cache-/,
+        /environment-/,
+        /deployment-/,
+        /app-/,
+        /oauth-app-/,
+        /github-app-/,
+        /integration-/,
+        /webhook-/,
+        /marketplace-/,
+        /listing-/,
+        /subscription-/,
+        /billing-/,
+        /plan-/,
+        /usage-/,
+        /limits-/,
+        /quota-/,
+        /traffic-/,
+        /analytics-/,
+        /insights-/,
+        /search-/,
+        /explore-/,
+        /trending-/,
+        /stars-/,
+        /forks-/,
+        /watchers-/,
+        /contributors-/,
+        /activity-/,
+        /events-/,
+        /notifications-/,
+        /feeds-/,
+        /dashboard-/,
+        /profile-/,
+        /settings-/,
+        /preferences-/,
+        /billing-/,
+        /organization-/,
+        /team-/,
+        /project-/,
+        /milestone-/,
+        /label-/,
+        /assignee-/,
+        /reporter-/,
+        /reviewer-/,
+        /author-/,
+        /committer-/,
+        /contributor-/,
+        /sponsor-/,
+        /funding-/,
+        /donation-/,
+        /payment-/,
+        /\b\w+[0-9]\w*\b/,
       ];
 
-      if (skipIdPatterns.some(pattern => pattern.test(id))) {
+      if (skipIdPatterns.some((pattern) => pattern.test(id))) {
         return false;
       }
     }
 
     const computedStyle = window.getComputedStyle(element);
-    if (computedStyle.display === 'none' ||
-        computedStyle.visibility === 'hidden' ||
-        computedStyle.opacity === '0' ||
-        computedStyle.position === 'absolute' && computedStyle.left === '-9999px') {
+    if (
+      computedStyle.display === 'none' ||
+      computedStyle.visibility === 'hidden' ||
+      computedStyle.opacity === '0' ||
+      (computedStyle.position === 'absolute' && computedStyle.left === '-9999px')
+    ) {
       return false;
     }
 
@@ -160,5 +347,5 @@ export const elementSelector = {
 
   shouldTranslate(element) {
     return virtualDomManager.shouldTranslate(element);
-  }
+  },
 };

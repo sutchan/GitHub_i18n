@@ -1,0 +1,8 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 运行代码检查..."
+npx lint-staged
+
+echo "🧪 运行测试..."
+npm test -- --passWithNoTests --silent

@@ -1,14 +1,13 @@
 /**
  * GitHub 中文翻译配置界面模块
  * @file configUI.js
- * @version 1.9.12
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 提供用户友好的配置界面，允许用户调整插件参数
  */
 
 import { CONFIG } from './config.js';
-import { utils } from './utils.js';
 
 class ConfigUI {
   constructor() {
@@ -19,7 +18,7 @@ class ConfigUI {
     this.settings = this.loadUserSettings();
     this.isPageUnloading = false;
     this.eventListeners = [];
-    
+
     // 设置页面卸载处理
     this.setupPageUnloadHandler();
   }
@@ -46,7 +45,7 @@ class ConfigUI {
       this.isPageUnloading = true;
       this.cleanup();
     };
-    
+
     // 监听多种页面卸载事件
     window.addEventListener('beforeunload', handlePageUnload, { once: true });
     window.addEventListener('unload', handlePageUnload, { once: true });
@@ -62,7 +61,7 @@ class ConfigUI {
    */
   addTrackedEventListener(element, event, handler, options = {}) {
     if (!element || this.isPageUnloading) return;
-    
+
     element.addEventListener(event, handler, options);
     this.eventListeners.push({ element, event, handler, options });
   }
@@ -96,10 +95,10 @@ class ConfigUI {
       }
       this.isOpen = false;
     }
-    
+
     // 清理事件监听器
     this.cleanupEventListeners();
-    
+
     // 清理DOM引用
     this.container = null;
   }
@@ -126,7 +125,7 @@ class ConfigUI {
     // 递归合并配置
     const merge = (target, source) => {
       for (const key in source) {
-        if (source.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
           if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
             if (!target[key]) target[key] = {};
             merge(target[key], source[key]);
@@ -150,100 +149,100 @@ class ConfigUI {
     // 创建容器
     this.container = document.createElement('div');
     this.container.className = 'github-i18n-config-container';
-    
+
     // 使用安全的DOM操作方法创建界面元素，替代innerHTML
     const configPanel = document.createElement('div');
     configPanel.className = 'github-i18n-config-panel';
-    
+
     // 创建头部
     const header = document.createElement('div');
     header.className = 'github-i18n-config-header';
-    
+
     const title = document.createElement('h3');
     title.textContent = 'GitHub 中文翻译配置';
-    
+
     const closeBtn = document.createElement('button');
     closeBtn.className = 'github-i18n-config-close';
     closeBtn.textContent = '×';
-    
+
     header.appendChild(title);
     header.appendChild(closeBtn);
-    
+
     // 创建内容区域
     const content = document.createElement('div');
     content.className = 'github-i18n-config-content';
-    
+
     // 基本设置部分
     const basicSection = this.createConfigSection('基本设置', [
       {
         type: 'checkbox',
         id: 'github-i18n-debug-mode',
         label: '启用调试模式',
-        checked: this.config.debugMode
+        checked: this.config.debugMode,
       },
       {
         type: 'checkbox',
         id: 'github-i18n-enable-partial-match',
         label: '启用部分匹配',
-        checked: this.config.performance.enablePartialMatch
-      }
+        checked: this.config.performance.enablePartialMatch,
+      },
     ]);
-    
+
     // 更新设置部分
     const updateSection = this.createConfigSection('更新设置', [
       {
         type: 'checkbox',
         id: 'github-i18n-auto-update',
         label: '自动检查更新',
-        checked: this.config.updateCheck.enabled
-      }
+        checked: this.config.updateCheck.enabled,
+      },
     ]);
-    
+
     // 性能设置部分
     const performanceSection = this.createConfigSection('性能设置', [
       {
         type: 'checkbox',
         id: 'github-i18n-translation-cache',
         label: '启用翻译缓存',
-        checked: this.config.performance.enableTranslationCache
+        checked: this.config.performance.enableTranslationCache,
       },
       {
         type: 'checkbox',
         id: 'github-i18n-virtual-dom',
         label: '启用虚拟DOM优化',
-        checked: this.config.performance.enableVirtualDom
-      }
+        checked: this.config.performance.enableVirtualDom,
+      },
     ]);
-    
+
     // 性能监控部分
     const monitoringSection = this.createPerformanceMonitoringSection();
-    
+
     // 组装内容区域
     content.appendChild(basicSection);
     content.appendChild(updateSection);
     content.appendChild(performanceSection);
     content.appendChild(monitoringSection);
-    
+
     // 创建底部
     const footer = document.createElement('div');
     footer.className = 'github-i18n-config-footer';
-    
+
     const resetBtn = document.createElement('button');
     resetBtn.className = 'github-i18n-config-reset';
     resetBtn.textContent = '重置默认';
-    
+
     const saveBtn = document.createElement('button');
     saveBtn.className = 'github-i18n-config-save';
     saveBtn.textContent = '保存配置';
-    
+
     footer.appendChild(resetBtn);
     footer.appendChild(saveBtn);
-    
+
     // 组装面板
     configPanel.appendChild(header);
     configPanel.appendChild(content);
     configPanel.appendChild(footer);
-    
+
     // 添加面板到容器
     this.container.appendChild(configPanel);
 
@@ -263,33 +262,33 @@ class ConfigUI {
   createConfigSection(title, items) {
     const section = document.createElement('div');
     section.className = 'github-i18n-config-section';
-    
+
     const sectionTitle = document.createElement('h4');
     sectionTitle.textContent = title;
     section.appendChild(sectionTitle);
-    
-    items.forEach(item => {
+
+    items.forEach((item) => {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'github-i18n-config-item';
-      
+
       const label = document.createElement('label');
       label.className = 'github-i18n-config-label';
-      
+
       const input = document.createElement('input');
       input.type = item.type;
       input.id = item.id;
       if (item.checked !== undefined) {
         input.checked = item.checked;
       }
-      
+
       const textNode = document.createTextNode(item.label);
-      
+
       label.appendChild(input);
       label.appendChild(textNode);
       itemDiv.appendChild(label);
       section.appendChild(itemDiv);
     });
-    
+
     return section;
   }
 
@@ -300,94 +299,94 @@ class ConfigUI {
   createPerformanceMonitoringSection() {
     const section = document.createElement('div');
     section.className = 'github-i18n-config-section';
-    
+
     const sectionTitle = document.createElement('h4');
     sectionTitle.textContent = '性能监控';
     section.appendChild(sectionTitle);
-    
+
     const contentDiv = document.createElement('div');
     contentDiv.className = 'github-i18n-config-content';
-    
+
     const statsContainer = document.createElement('div');
     statsContainer.id = 'github-i18n-performance-stats';
-    
+
     // 基本统计数据
     const basicStats = [
       { label: '总耗时:', id: 'github-i18n-stat-duration' },
       { label: '元素处理:', id: 'github-i18n-stat-elements' },
       { label: '文本翻译:', id: 'github-i18n-stat-texts' },
-      { label: '缓存命中率:', id: 'github-i18n-stat-cache-rate' }
+      { label: '缓存命中率:', id: 'github-i18n-stat-cache-rate' },
     ];
-    
-    basicStats.forEach(stat => {
+
+    basicStats.forEach((stat) => {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'github-i18n-config-item';
-      
+
       const label = document.createElement('span');
       label.className = 'github-i18n-config-label';
       label.textContent = stat.label;
-      
+
       const value = document.createElement('span');
       value.id = stat.id;
       value.textContent = '-';
-      
+
       itemDiv.appendChild(label);
       itemDiv.appendChild(value);
       statsContainer.appendChild(itemDiv);
     });
-    
+
     // 高级统计数据
     const advancedStatsDiv = document.createElement('div');
     advancedStatsDiv.className = 'github-i18n-advanced-stats';
-    
+
     const advancedStats = [
       { label: '缓存命中:', id: 'github-i18n-stat-cache-hits' },
       { label: '缓存未命中:', id: 'github-i18n-stat-cache-misses' },
       { label: 'DOM操作:', id: 'github-i18n-stat-dom' },
       { label: '网络请求:', id: 'github-i18n-stat-network' },
-      { label: '批处理次数:', id: 'github-i18n-stat-batches' }
+      { label: '批处理次数:', id: 'github-i18n-stat-batches' },
     ];
-    
-    advancedStats.forEach(stat => {
+
+    advancedStats.forEach((stat) => {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'github-i18n-config-item';
-      
+
       const label = document.createElement('span');
       label.className = 'github-i18n-config-label';
       label.textContent = stat.label;
-      
+
       const value = document.createElement('span');
       value.id = stat.id;
       value.textContent = '-';
-      
+
       itemDiv.appendChild(label);
       itemDiv.appendChild(value);
       advancedStatsDiv.appendChild(itemDiv);
     });
-    
+
     statsContainer.appendChild(advancedStatsDiv);
-    
+
     // 操作按钮
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'github-i18n-config-actions';
-    
+
     const refreshBtn = document.createElement('button');
     refreshBtn.className = 'github-i18n-config-save';
     refreshBtn.id = 'github-i18n-refresh-stats';
     refreshBtn.textContent = '刷新性能数据';
-    
+
     const exportBtn = document.createElement('button');
     exportBtn.className = 'github-i18n-config-reset';
     exportBtn.id = 'github-i18n-export-stats';
     exportBtn.textContent = '导出性能数据';
-    
+
     actionsDiv.appendChild(refreshBtn);
     actionsDiv.appendChild(exportBtn);
-    
+
     statsContainer.appendChild(actionsDiv);
     contentDiv.appendChild(statsContainer);
     section.appendChild(contentDiv);
-    
+
     return section;
   }
 
@@ -560,37 +559,37 @@ class ConfigUI {
   updatePerformanceStats() {
     // 检查页面是否正在卸载
     if (this.isPageUnloading) return;
-    
+
     // 从translationCore获取性能数据
     if (window.translationCore && window.translationCore.getPerformanceStats) {
       const stats = window.translationCore.getPerformanceStats();
-      
+
       // 更新基本统计
       const durationEl = document.getElementById('github-i18n-stat-duration');
       if (durationEl) durationEl.textContent = `${stats.totalDuration} ms`;
-      
+
       const elementsEl = document.getElementById('github-i18n-stat-elements');
       if (elementsEl) elementsEl.textContent = stats.elementsProcessed;
-      
+
       const textsEl = document.getElementById('github-i18n-stat-texts');
       if (textsEl) textsEl.textContent = stats.textsTranslated;
-      
+
       const cacheRateEl = document.getElementById('github-i18n-stat-cache-rate');
       if (cacheRateEl) cacheRateEl.textContent = `${stats.cacheHitRate}%`;
-      
+
       // 更新高级统计
       const cacheHitsEl = document.getElementById('github-i18n-stat-cache-hits');
       if (cacheHitsEl) cacheHitsEl.textContent = stats.cacheHits;
-      
+
       const cacheMissesEl = document.getElementById('github-i18n-stat-cache-misses');
       if (cacheMissesEl) cacheMissesEl.textContent = stats.cacheMisses;
-      
+
       const domEl = document.getElementById('github-i18n-stat-dom');
       if (domEl) domEl.textContent = stats.domOperations;
-      
+
       const networkEl = document.getElementById('github-i18n-stat-network');
       if (networkEl) networkEl.textContent = stats.networkRequests;
-      
+
       const batchesEl = document.getElementById('github-i18n-stat-batches');
       if (batchesEl) batchesEl.textContent = stats.batchCount;
     }
@@ -602,7 +601,7 @@ class ConfigUI {
   exportPerformanceData() {
     // 检查页面是否正在卸载
     if (this.isPageUnloading) return;
-    
+
     if (window.translationCore && window.translationCore.exportPerformanceData) {
       const data = window.translationCore.exportPerformanceData();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -623,7 +622,7 @@ class ConfigUI {
   addEventListeners() {
     // 检查页面是否正在卸载
     if (this.isPageUnloading) return;
-    
+
     // 关闭按钮
     const closeBtn = this.container.querySelector('.github-i18n-config-close');
     if (closeBtn) {
@@ -654,7 +653,7 @@ class ConfigUI {
         this.close();
       }
     });
-    
+
     // 性能监控按钮
     const refreshBtn = document.getElementById('github-i18n-refresh-stats');
     if (refreshBtn) {
@@ -662,7 +661,7 @@ class ConfigUI {
         this.updatePerformanceStats();
       });
     }
-    
+
     const exportBtn = document.getElementById('github-i18n-export-stats');
     if (exportBtn) {
       this.addTrackedEventListener(exportBtn, 'click', () => {
@@ -677,23 +676,29 @@ class ConfigUI {
   saveConfig() {
     // 检查页面是否正在卸载
     if (this.isPageUnloading) return;
-    
+
     const debugModeEl = document.getElementById('github-i18n-debug-mode');
     const partialMatchEl = document.getElementById('github-i18n-enable-partial-match');
     const translationCacheEl = document.getElementById('github-i18n-translation-cache');
     const virtualDomEl = document.getElementById('github-i18n-virtual-dom');
     const autoUpdateEl = document.getElementById('github-i18n-auto-update');
-    
+
     const newConfig = {
       debugMode: debugModeEl ? debugModeEl.checked : this.config.debugMode,
       performance: {
-        enablePartialMatch: partialMatchEl ? partialMatchEl.checked : this.config.performance.enablePartialMatch,
-        enableTranslationCache: translationCacheEl ? translationCacheEl.checked : this.config.performance.enableTranslationCache,
-        enableVirtualDom: virtualDomEl ? virtualDomEl.checked : this.config.performance.enableVirtualDom
+        enablePartialMatch: partialMatchEl
+          ? partialMatchEl.checked
+          : this.config.performance.enablePartialMatch,
+        enableTranslationCache: translationCacheEl
+          ? translationCacheEl.checked
+          : this.config.performance.enableTranslationCache,
+        enableVirtualDom: virtualDomEl
+          ? virtualDomEl.checked
+          : this.config.performance.enableVirtualDom,
       },
       updateCheck: {
-        enabled: autoUpdateEl ? autoUpdateEl.checked : this.config.updateCheck.enabled
-      }
+        enabled: autoUpdateEl ? autoUpdateEl.checked : this.config.updateCheck.enabled,
+      },
     };
 
     this.saveUserSettings(newConfig);
@@ -706,7 +711,7 @@ class ConfigUI {
   resetConfig() {
     // 检查页面是否正在卸载
     if (this.isPageUnloading) return;
-    
+
     if (confirm('确定要重置所有配置为默认值吗？')) {
       localStorage.removeItem('github-i18n-config');
       this.userConfig = {};
@@ -723,7 +728,7 @@ class ConfigUI {
   open() {
     // 检查页面是否正在卸载
     if (this.isPageUnloading) return;
-    
+
     if (!this.container) {
       this.createUI();
     }
@@ -731,19 +736,21 @@ class ConfigUI {
     // 更新界面值
     const debugModeEl = document.getElementById('github-i18n-debug-mode');
     if (debugModeEl) debugModeEl.checked = this.config.debugMode;
-    
+
     const partialMatchEl = document.getElementById('github-i18n-enable-partial-match');
     if (partialMatchEl) partialMatchEl.checked = this.config.performance.enablePartialMatch;
-    
+
     const translationCacheEl = document.getElementById('github-i18n-translation-cache');
-    if (translationCacheEl) translationCacheEl.checked = this.config.performance.enableTranslationCache;
-    
+    if (translationCacheEl) {
+      translationCacheEl.checked = this.config.performance.enableTranslationCache;
+    }
+
     const virtualDomEl = document.getElementById('github-i18n-virtual-dom');
     if (virtualDomEl) virtualDomEl.checked = this.config.performance.enableVirtualDom;
-    
+
     const autoUpdateEl = document.getElementById('github-i18n-auto-update');
     if (autoUpdateEl) autoUpdateEl.checked = this.config.updateCheck.enabled;
-    
+
     // 更新性能统计数据
     this.updatePerformanceStats();
 
@@ -767,12 +774,12 @@ class ConfigUI {
   createToggleButton() {
     // 检查页面是否正在卸载
     if (this.isPageUnloading) return;
-    
+
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'github-i18n-toggle-btn';
     toggleBtn.textContent = '设置';
     toggleBtn.title = 'GitHub 中文翻译配置';
-    
+
     this.addTrackedEventListener(toggleBtn, 'click', () => {
       this.open();
     });
@@ -786,10 +793,10 @@ class ConfigUI {
   init() {
     // 检查页面是否正在卸载
     if (this.isPageUnloading) return;
-    
+
     // 合并用户配置
     this.mergeUserConfig();
-    
+
     // 创建切换按钮
     if (document.body) {
       this.createToggleButton();

@@ -1,7 +1,7 @@
 /**
  * 元素翻译模块
  * @file translationCore/elementTranslator.js
- * @version 1.9.12
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 实际翻译DOM元素的模块
@@ -30,7 +30,7 @@ export const elementTranslator = {
     partialMatches: 0,
     batchProcessings: 0,
     errorCount: 0,
-    totalMemory: 0
+    totalMemory: 0,
   },
 
   translateElement(element) {
@@ -93,7 +93,7 @@ export const elementTranslator = {
       }
     }
 
-    textNodesToProcess.forEach(node => {
+    textNodesToProcess.forEach((node) => {
       const parentNode = node.parentNode;
       parentNode.removeChild(node);
 
@@ -102,7 +102,12 @@ export const elementTranslator = {
 
       if (translatedText && typeof translatedText === 'string' && translatedText !== originalText) {
         try {
-          const safeTranslatedText = String(translatedText).replace(/[\x00-\x1F\x7F]/g, '');
+          const safeTranslatedText =
+            typeof translatedText === 'string'
+              ? [...translatedText]
+                  .filter((c) => c.charCodeAt(0) > 31 && c.charCodeAt(0) !== 127)
+                  .join('')
+              : String(translatedText || '');
           const translatedNode = document.createTextNode(safeTranslatedText);
           fragment.appendChild(translatedNode);
 
@@ -145,22 +150,17 @@ export const elementTranslator = {
   },
 
   async translateCriticalElementsOnly() {
-    const criticalSelectors = [
-      '.Header',
-      '.repository-content',
-      '.js-repo-pjax-container',
-      'main'
-    ];
+    const criticalSelectors = ['.Header', '.repository-content', '.js-repo-pjax-container', 'main'];
 
     const criticalElements = [];
     let processedElements = 0;
     let failedElements = 0;
 
-    criticalSelectors.forEach(selector => {
+    criticalSelectors.forEach((selector) => {
       try {
         const elements = document.querySelectorAll(selector);
         if (elements && elements.length > 0) {
-          Array.from(elements).forEach(el => {
+          Array.from(elements).forEach((el) => {
             if (el && el instanceof HTMLElement) {
               criticalElements.push(el);
             }
@@ -182,7 +182,7 @@ export const elementTranslator = {
       return;
     }
 
-    criticalElements.forEach(element => {
+    criticalElements.forEach((element) => {
       try {
         this.translateElement(element);
         processedElements++;
@@ -193,7 +193,9 @@ export const elementTranslator = {
     });
 
     if (CONFIG.debugMode) {
-      console.log(`[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: ${processedElements}, 失败: ${failedElements}`);
+      console.log(
+        `[GitHub 中文翻译] 关键元素翻译完成 - 总数量: ${criticalElements.length}, 成功: ${processedElements}, 失败: ${failedElements}`,
+      );
     }
-  }
+  },
 };

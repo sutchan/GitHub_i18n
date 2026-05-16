@@ -1,7 +1,7 @@
 /**
  * 虚拟DOM模块
  * @file virtualDom.js
- * @version 1.9.12
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 用于跟踪已翻译元素的状态，避免重复翻译和不必要的DOM操作
@@ -25,11 +25,11 @@ class VirtualNode {
     this.attributes = new Map();
     this.childNodes = new Map();
     this.lastUpdated = Date.now();
-    
+
     // 初始化节点
     this.initialize();
   }
-  
+
   /**
    * 初始化虚拟节点
    */
@@ -37,10 +37,10 @@ class VirtualNode {
     try {
       // 生成唯一标识符
       this.generateId();
-      
+
       // 计算内容哈希
       this.updateContentHash();
-      
+
       // 记录属性状态
       this.updateAttributes();
     } catch (error) {
@@ -49,7 +49,7 @@ class VirtualNode {
       }
     }
   }
-  
+
   /**
    * 生成唯一标识符
    */
@@ -67,12 +67,12 @@ class VirtualNode {
         // 保存到元素上用于跟踪
         this.element.dataset.virtualDomId = this.elementId;
       }
-    } catch (error) {
+    } catch (_error) {
       // 生成最基本的ID
       this.elementId = `fallback:${Math.random().toString(36).substr(2, 9)}`;
     }
   }
-  
+
   /**
    * 更新内容哈希
    * @returns {string} 内容哈希值
@@ -82,12 +82,12 @@ class VirtualNode {
       const content = this.element.textContent || '';
       this.contentHash = this.hashString(content);
       return this.contentHash;
-    } catch (error) {
+    } catch (_error) {
       this.contentHash = null;
       return null;
     }
   }
-  
+
   /**
    * 更新属性状态
    */
@@ -95,8 +95,8 @@ class VirtualNode {
     try {
       // 只跟踪重要属性
       const importantAttrs = CONFIG.performance.importantAttributes || [];
-      
-      importantAttrs.forEach(attrName => {
+
+      importantAttrs.forEach((attrName) => {
         if (this.element.hasAttribute(attrName)) {
           this.attributes.set(attrName, this.element.getAttribute(attrName));
         } else {
@@ -109,7 +109,7 @@ class VirtualNode {
       }
     }
   }
-  
+
   /**
    * 检查内容是否发生变化
    * @returns {boolean} 是否变化
@@ -118,7 +118,7 @@ class VirtualNode {
     const newHash = this.updateContentHash();
     return newHash !== this.contentHash;
   }
-  
+
   /**
    * 检查属性是否发生变化
    * @returns {boolean} 是否变化
@@ -126,22 +126,22 @@ class VirtualNode {
   hasAttributesChanged() {
     const originalAttributes = new Map(this.attributes);
     this.updateAttributes();
-    
+
     // 检查是否有变化
     if (originalAttributes.size !== this.attributes.size) {
       return true;
     }
-    
+
     // 检查每个属性的值
     for (const [key, value] of originalAttributes) {
       if (!this.attributes.has(key) || this.attributes.get(key) !== value) {
         return true;
       }
     }
-    
+
     return false;
   }
-  
+
   /**
    * 标记为已翻译
    */
@@ -151,11 +151,11 @@ class VirtualNode {
     // 更新实际DOM元素上的标记
     try {
       this.element.dataset.githubZhTranslated = 'true';
-    } catch (error) {
+    } catch (_error) {
       // 忽略错误
     }
   }
-  
+
   /**
    * 重置翻译状态
    */
@@ -165,11 +165,11 @@ class VirtualNode {
     // 移除实际DOM元素上的标记
     try {
       delete this.element.dataset.githubZhTranslated;
-    } catch (error) {
+    } catch (_error) {
       // 忽略错误
     }
   }
-  
+
   /**
    * 简单的字符串哈希函数
    * @param {string} str - 要哈希的字符串
@@ -179,7 +179,7 @@ class VirtualNode {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // 转换为32位整数
     }
     return hash.toString(36);
@@ -202,14 +202,14 @@ class VirtualDomManager {
     this.maxNodes = 5000; // 最大节点数限制
     this.cleanupTimer = null;
     this.isPageUnloading = false;
-    
+
     // 设置页面卸载处理
     this.setupPageUnloadHandler();
-    
+
     // 自动清理定时器
     this.startAutoCleanup();
   }
-  
+
   /**
    * 设置页面卸载处理器
    */
@@ -219,13 +219,13 @@ class VirtualDomManager {
       this.isPageUnloading = true;
       this.cleanup();
     };
-    
+
     // 监听多种卸载事件以确保兼容性
     window.addEventListener('beforeunload', unloadHandler);
     window.addEventListener('unload', unloadHandler);
     window.addEventListener('pagehide', unloadHandler);
   }
-  
+
   /**
    * 为元素获取或创建虚拟节点
    * @param {HTMLElement} element - DOM元素
@@ -237,7 +237,7 @@ class VirtualDomManager {
       if (this.isPageUnloading) {
         return null;
       }
-      
+
       // 先尝试从缓存查找
       if (element.dataset && element.dataset.virtualDomId) {
         const cachedNode = this.nodeCache.get(element.dataset.virtualDomId);
@@ -245,37 +245,37 @@ class VirtualDomManager {
           return cachedNode;
         }
       }
-      
+
       // 检查节点数量限制
       if (this.nodes.size >= this.maxNodes) {
         // 强制清理一次
         this.cleanup(true);
-        
+
         // 如果清理后仍然超过限制，删除最旧的节点
         if (this.nodes.size >= this.maxNodes) {
           const nodesToRemove = Math.floor(this.maxNodes * 0.2); // 删除20%的节点
           const entries = Array.from(this.nodes.entries());
-          
+
           // 按最后更新时间排序，删除最旧的
           entries.sort((a, b) => a[1].lastUpdated - b[1].lastUpdated);
-          
+
           for (let i = 0; i < nodesToRemove; i++) {
             const [id] = entries[i];
             this.nodes.delete(id);
             this.nodeCache.delete(id);
           }
-          
+
           if (CONFIG.debugMode) {
             console.log(`[GitHub 中文翻译] 强制清理了${nodesToRemove}个虚拟节点`);
           }
         }
       }
-      
+
       // 创建新节点
       const node = new VirtualNode(element);
       this.nodes.set(node.elementId, node);
       this.nodeCache.set(node.elementId, node);
-      
+
       return node;
     } catch (error) {
       if (CONFIG.debugMode) {
@@ -284,7 +284,7 @@ class VirtualDomManager {
       return null;
     }
   }
-  
+
   /**
    * 通过ID查找虚拟节点
    * @param {string} elementId - 元素ID
@@ -293,7 +293,7 @@ class VirtualDomManager {
   findNodeById(elementId) {
     return this.nodes.get(elementId) || null;
   }
-  
+
   /**
    * 检查元素是否需要翻译
    * @param {HTMLElement} element - 要检查的元素
@@ -302,27 +302,27 @@ class VirtualDomManager {
   shouldTranslate(element) {
     try {
       const node = this.getOrCreateNode(element);
-      
+
       if (!node) {
         return true; // 如果无法创建虚拟节点，默认需要翻译
       }
-      
+
       // 检查内容是否变化
       const contentChanged = node.hasContentChanged();
       // 检查属性是否变化
       const attributesChanged = node.hasAttributesChanged();
-      
+
       // 如果内容或属性变化，需要重新翻译
       if (contentChanged || attributesChanged) {
         node.resetTranslation();
         return true;
       }
-      
+
       // 如果已经翻译过且内容没有变化，不需要再次翻译
       if (node.isTranslated) {
         return false;
       }
-      
+
       // 其他情况需要翻译
       return true;
     } catch (error) {
@@ -333,7 +333,7 @@ class VirtualDomManager {
       return true;
     }
   }
-  
+
   /**
    * 标记元素为已翻译
    * @param {HTMLElement} element - 已翻译的元素
@@ -344,11 +344,11 @@ class VirtualDomManager {
       if (node) {
         node.markAsTranslated();
       }
-    } catch (error) {
+    } catch (_error) {
       // 忽略错误
     }
   }
-  
+
   /**
    * 批量处理元素
    * @param {NodeList|Array} elements - 要处理的元素列表
@@ -356,9 +356,9 @@ class VirtualDomManager {
    */
   processElements(elements) {
     const elementsToTranslate = [];
-    
+
     try {
-      elements.forEach(element => {
+      elements.forEach((element) => {
         if (this.shouldTranslate(element)) {
           elementsToTranslate.push(element);
         }
@@ -370,10 +370,10 @@ class VirtualDomManager {
       // 出错时返回原始元素列表
       elementsToTranslate.push(...elements);
     }
-    
+
     return elementsToTranslate;
   }
-  
+
   /**
    * 开始自动清理
    */
@@ -385,11 +385,11 @@ class VirtualDomManager {
         this.stopAutoCleanup();
         return;
       }
-      
+
       this.cleanup();
     }, this.cleanupInterval);
   }
-  
+
   /**
    * 停止自动清理
    */
@@ -399,7 +399,7 @@ class VirtualDomManager {
       this.cleanupTimer = null;
     }
   }
-  
+
   /**
    * 清理无效的虚拟节点
    * @param {boolean} force - 是否强制清理所有节点
@@ -407,55 +407,57 @@ class VirtualDomManager {
   cleanup(force = false) {
     try {
       const now = Date.now();
-      
+
       // 如果不是强制清理且距离上次清理时间不足，则跳过
       if (!force && now - this.lastCleanupTime < this.cleanupInterval) {
         return;
       }
-      
+
       this.lastCleanupTime = now;
       let removedCount = 0;
-      
+
       // 如果页面正在卸载或强制清理，删除所有节点
       if (force || this.isPageUnloading) {
         removedCount = this.nodes.size;
         this.nodes.clear();
         this.nodeCache.clear();
-        
+
         if (CONFIG.debugMode) {
           console.log(`[GitHub 中文翻译] 强制清理了${removedCount}个虚拟节点`);
         }
         return;
       }
-      
+
       // 正常清理：删除DOM中不存在的节点或长时间未更新的节点
       const nodesToRemove = [];
-      
+
       for (const [id, node] of this.nodes) {
         // 检查节点是否仍在DOM中
         if (!document.contains(node.element)) {
           nodesToRemove.push(id);
           continue;
         }
-        
+
         // 检查节点是否长时间未更新
         const timeSinceUpdate = now - node.lastUpdated;
         const maxAge = 60 * 60 * 1000; // 1小时
-        
+
         if (timeSinceUpdate > maxAge) {
           nodesToRemove.push(id);
         }
       }
-      
+
       // 删除需要清理的节点
       for (const id of nodesToRemove) {
         this.nodes.delete(id);
         this.nodeCache.delete(id);
         removedCount++;
       }
-      
+
       if (CONFIG.debugMode && removedCount > 0) {
-        console.log(`[GitHub 中文翻译] 清理了${removedCount}个无效虚拟节点，当前节点数：${this.nodes.size}`);
+        console.log(
+          `[GitHub 中文翻译] 清理了${removedCount}个无效虚拟节点，当前节点数：${this.nodes.size}`,
+        );
       }
     } catch (error) {
       if (CONFIG.debugMode) {
@@ -463,7 +465,7 @@ class VirtualDomManager {
       }
     }
   }
-  
+
   /**
    * 清空所有虚拟节点
    */
@@ -472,7 +474,7 @@ class VirtualDomManager {
     this.nodeCache.clear();
     this.lastCleanupTime = Date.now();
   }
-  
+
   /**
    * 获取统计信息
    * @returns {Object} 统计信息
@@ -480,7 +482,7 @@ class VirtualDomManager {
   getStats() {
     return {
       nodeCount: this.nodes.size,
-      lastCleanupTime: this.lastCleanupTime
+      lastCleanupTime: this.lastCleanupTime,
     };
   }
 }

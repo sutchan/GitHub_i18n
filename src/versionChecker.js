@@ -1,7 +1,7 @@
 /**
  * 版本更新检查模块
  * @file versionChecker.js
- * @version 1.9.12
+ * @version 1.9.14
  * @date 2026-05-01
  * @author Sut
  * @description 负责检查和处理脚本更新
@@ -34,7 +34,9 @@ const versionChecker = {
 
     if (lastCheck && now - parseInt(lastCheck) < intervalMs) {
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 未达到更新检查间隔，跳过检查 (上次检查: ${new Date(parseInt(lastCheck)).toLocaleString()})`);
+        console.log(
+          `[GitHub 中文翻译] 未达到更新检查间隔，跳过检查 (上次检查: ${new Date(parseInt(lastCheck)).toLocaleString()})`,
+        );
       }
       return false;
     }
@@ -82,11 +84,14 @@ const versionChecker = {
 
       // 记录错误日志
       try {
-        localStorage.setItem('githubZhUpdateError', JSON.stringify({
-          message: error.message,
-          timestamp: now
-        }));
-      } catch (e) {
+        localStorage.setItem(
+          'githubZhUpdateError',
+          JSON.stringify({
+            message: error.message,
+            timestamp: now,
+          }),
+        );
+      } catch (_e) {
         // 忽略存储错误
       }
 
@@ -118,10 +123,10 @@ const versionChecker = {
           method: 'GET',
           headers: {
             'Cache-Control': 'no-cache',
-            'Accept': 'text/javascript, text/plain, */*'
+            Accept: 'text/javascript, text/plain, */*',
           },
           signal: controller.signal,
-          credentials: 'omit' // 不发送凭证信息
+          credentials: 'omit', // 不发送凭证信息
         });
 
         clearTimeout(timeoutId);
@@ -163,7 +168,7 @@ const versionChecker = {
       // 变量赋值格式
       /version\s*=\s*['"](\d+\.\d+\.\d+)['"]/i,
       // 对象属性格式
-      /version:\s*['"](\d+\.\d+\.\d+)['"]/i
+      /version:\s*['"](\d+\.\d+\.\d+)['"]/i,
     ];
 
     for (const pattern of patterns) {
@@ -216,8 +221,10 @@ const versionChecker = {
     const lastNotifiedVersion = localStorage.getItem(notificationVersionKey);
 
     // 如果用户已经关闭过通知，或者已经通知过相同版本，则不显示
-    if (localStorage.getItem(notificationKey) === 'dismissed' ||
-      lastNotifiedVersion === newVersion) {
+    if (
+      localStorage.getItem(notificationKey) === 'dismissed' ||
+      lastNotifiedVersion === newVersion
+    ) {
       if (CONFIG.debugMode && lastNotifiedVersion === newVersion) {
         console.log(`[GitHub 中文翻译] 已经通知过版本 ${newVersion} 的更新`);
       }
@@ -227,7 +234,8 @@ const versionChecker = {
     try {
       // 创建通知元素 - 安全的DOM操作
       const notification = document.createElement('div');
-      notification.className = 'fixed bottom-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-50 max-w-md transform transition-all duration-300 translate-y-0 opacity-100';
+      notification.className =
+        'fixed bottom-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-50 max-w-md transform transition-all duration-300 translate-y-0 opacity-100';
 
       // 生成唯一的ID
       const notificationId = `github-zh-update-${Date.now()}`;
@@ -287,14 +295,16 @@ const versionChecker = {
       updateButton.href = CONFIG.updateCheck.scriptUrl || '#';
       updateButton.target = '_blank';
       updateButton.rel = 'noopener noreferrer';
-      updateButton.className = 'inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 transition-colors';
+      updateButton.className =
+        'inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 transition-colors';
       updateButton.textContent = '立即更新';
       buttonsContainer.appendChild(updateButton);
 
       // 创建稍后按钮
       const laterButton = document.createElement('button');
       laterButton.id = `${notificationId}-later-btn`;
-      laterButton.className = 'inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors';
+      laterButton.className =
+        'inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors';
       laterButton.textContent = '稍后';
       laterButton.addEventListener('click', () => {
         this.hideNotification(notification, false);
@@ -304,7 +314,8 @@ const versionChecker = {
       // 创建不再提醒按钮
       const dismissButton = document.createElement('button');
       dismissButton.id = `${notificationId}-dismiss-btn`;
-      dismissButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors';
+      dismissButton.className =
+        'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors';
       dismissButton.textContent = '不再提醒';
       dismissButton.addEventListener('click', () => {
         this.hideNotification(notification, true);
@@ -380,7 +391,7 @@ const versionChecker = {
       // 添加新版本记录
       history.push({
         version,
-        detectedAt: Date.now()
+        detectedAt: Date.now(),
       });
 
       // 限制历史记录数量
@@ -389,7 +400,7 @@ const versionChecker = {
       }
 
       localStorage.setItem(historyKey, JSON.stringify(history));
-    } catch (error) {
+    } catch (_error) {
       // 忽略存储错误
     }
   },
@@ -403,13 +414,15 @@ const versionChecker = {
       const cacheData = {
         version: newVersion,
         cachedAt: Date.now(),
-        currentVersion: CONFIG.version
+        currentVersion: CONFIG.version,
       };
 
       localStorage.setItem('githubZhCachedVersion', utils.safeJSONStringify(cacheData));
 
       if (CONFIG.debugMode) {
-        console.log(`[GitHub 中文翻译] 已缓存新版本号: ${newVersion} (缓存时间: ${new Date().toLocaleString()})`);
+        console.log(
+          `[GitHub 中文翻译] 已缓存新版本号: ${newVersion} (缓存时间: ${new Date().toLocaleString()})`,
+        );
       }
 
       return true;
@@ -429,7 +442,7 @@ const versionChecker = {
     try {
       const cachedData = utils.safeJSONParse(localStorage.getItem('githubZhCachedVersion'));
       return cachedData;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   },
@@ -454,7 +467,7 @@ const versionChecker = {
       }
       return false;
     }
-  }
+  },
 };
 
 export { versionChecker };
