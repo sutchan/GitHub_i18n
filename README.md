@@ -107,6 +107,42 @@ A：直接修改 `src/dictionaries/` 下的相应词典文件，提交 PR 即可
 - 漏翻/误翻反馈：[问题反馈](https://github.com/sutchan/GitHub_i18n/issues)
 - 新增术语：直接修改 `src/dictionaries/` 下的词典文件提交 PR
 
+### 开发环境设置
+
+```bash
+# 克隆仓库
+git clone https://github.com/sutchan/GitHub_i18n.git
+cd GitHub_i18n
+
+# 安装依赖
+npm install
+
+# 运行测试
+npm run test
+
+# 代码检查
+npm run lint
+
+# 代码格式化
+npm run format
+
+# 构建用户脚本
+npm run build
+```
+
+### 项目质量保障
+
+项目使用以下工具保证代码质量：
+
+- **ESLint**: 代码规范检查
+- **Prettier**: 代码格式化
+- **Jest**: 单元测试框架（97 个测试用例）
+- **Husky + lint-staged**: Git 提交前自动检查
+
+### 项目规范
+
+详细的项目规范请参考 [openspec/project.md](openspec/project.md)。
+
 ## 许可证
 
 [GNU General Public License v2.0](LICENSE)

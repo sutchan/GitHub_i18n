@@ -741,8 +741,9 @@ class ConfigUI {
     if (partialMatchEl) partialMatchEl.checked = this.config.performance.enablePartialMatch;
 
     const translationCacheEl = document.getElementById('github-i18n-translation-cache');
-    if (translationCacheEl)
+    if (translationCacheEl) {
       translationCacheEl.checked = this.config.performance.enableTranslationCache;
+    }
 
     const virtualDomEl = document.getElementById('github-i18n-virtual-dom');
     if (virtualDomEl) virtualDomEl.checked = this.config.performance.enableVirtualDom;
