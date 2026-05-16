@@ -23,7 +23,6 @@
 // ==/UserScript==
 (function() {
 'use strict';
-// ===== version.js =====
 /**
  * 版本信息模块
  * @file version.js
@@ -38,416 +37,6 @@
  * @description 这是项目的单一版本源，所有其他版本号引用都应从此处获取
  */
 const VERSION = '1.9.15';
-/**
- * 版本历史记录
- * @type {Array<{version: string, date: string, changes: string[]}>}
- */
-const VERSION_HISTORY = [
-  {
-    version: '1.9.5',
-    date: '2026-05-01',
-    changes: [
-      '修复构建脚本对export default语法的处理',
-      '修复virtualDom.js版本号不一致问题',
-      '优化导出语句的处理逻辑',
-    ],
-  },
-  {
-    version: '1.9.1',
-    date: '2026-05-01',
-    changes: [
-      '修复Trie树findAllMatches方法参数问题',
-      '修复i18n.js模块导出问题',
-      '统一所有文件版本号为1.9.1',
-    ],
-  },
-  {
-    version: '1.8.182',
-    date: '2026-01-09',
-    changes: ['同步版本号', '优化构建脚本'],
-  },
-  {
-    version: '1.8.181',
-    date: '2026-01-08',
-    changes: ['清理冗余代码'],
-  },
-  {
-    version: '1.8.159',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.158',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.157',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.156',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.155',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.154',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.153',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.152',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.151',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.150',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.149',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.148',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.147',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.146',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.145',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.144',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.142',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.141',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.140',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.139',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.138',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.137',
-    date: '2025-11-11',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.136',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.135',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.134',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.133',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.132',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.131',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.130',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.129',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.128',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.127',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.126',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.125',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.124',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.123',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.122',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.121',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.120',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.119',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.118',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.117',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.116',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.115',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.114',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.113',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.112',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.111',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.110',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.109',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.108',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.107',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.106',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.105',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.104',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.103',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.102',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.101',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.100',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.99',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.98',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.97',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.96',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.95',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.94',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.93',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.92',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.91',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.90',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.89',
-    date: '2025-11-10',
-    changes: ['自动版本更新'],
-  },
-  {
-    version: '1.8.88',
-    date: '2025-11-10',
-    changes: ['修复代码规范问题', '统一项目版本号管理', '优化.gitignore配置'],
-  },
-  {
-    version: '1.8.87',
-    date: '2025-11-10',
-    changes: ['增强页面监控性能', '优化翻译缓存机制', '修复已知兼容性问题'],
-  },
-  {
-    version: '1.8.86',
-    date: '2025-11-10',
-    changes: ['更新翻译词典', '添加新页面模式支持', '改进错误处理机制'],
-  },
-  {
-    version: '1.8.85',
-    date: '2025-11-10',
-    changes: ['优化DOM操作性能', '添加更详细的错误日志', '更新构建脚本功能'],
-  },
-  {
-    version: '1.8.84',
-    date: '2025-11-10',
-    changes: ['支持更多GitHub页面', '优化翻译效率', '修复界面布局问题'],
-  },
-];
-// ===== config.js =====
 /**
  * GitHub 中文翻译配置文件
  * @file config.js
@@ -696,7 +285,6 @@ const CONFIG = {
     trending: /\/trending/,
   },
 };
-// ===== trie.js =====
 /**
  * Trie树数据结构模块
  * @file trie.js
@@ -771,7 +359,6 @@ class Trie {
     return this.size;
   }
 }
-// ===== utils.js =====
 /**
  * 工具函数模块
  * @file utils.js
@@ -1119,7 +706,6 @@ const utils = {
     }
   },
 };
-// ===== cacheManager.js =====
 /**
  * LRU缓存管理模块
  * @file cacheManager.js
@@ -1213,7 +799,6 @@ class CacheManager {
     return { ...this.cacheStats };
   }
 }
-// ===== errorHandler.js =====
 /**
  * 错误处理模块
  * @file errorHandler.js
@@ -1400,7 +985,6 @@ const ErrorHandler = {
 };
 // 初始化错误处理器
 ErrorHandler.init();
-// ===== tools.js =====
 /**
  * 开发工具模块
  * @file tools.js
@@ -1547,7 +1131,6 @@ function loadTools() {
     DictionaryProcessor,
   };
 }
-// ===== pageMonitor/cacheManager.js =====
 /**
  * 页面监控缓存管理模块
  * @file pageMonitor/cacheManager.js
@@ -1612,7 +1195,6 @@ const pageMonitorCache = {
     this.eventListeners = [];
   },
 };
-// ===== pageMonitor/pageAnalyzer.js =====
 /**
  * 页面分析模块
  * @file pageMonitor/pageAnalyzer.js
@@ -1744,7 +1326,6 @@ const pageAnalyzer = {
     return elements;
   },
 };
-// ===== pageMonitor/pathListener.js =====
 /**
  * 路径变化监听模块
  * @file pageMonitor/pathListener.js
@@ -1802,7 +1383,6 @@ const pathListener = {
     }
   },
 };
-// ===== pageMonitor/domObserver.js =====
 /**
  * DOM变化观察器模块
  * @file pageMonitor/domObserver.js
@@ -2296,7 +1876,6 @@ const domObserver = {
     }
   },
 };
-// ===== pageMonitor/translationTrigger.js =====
 /**
  * 翻译触发模块
  * @file pageMonitor/translationTrigger.js
@@ -2384,7 +1963,6 @@ const translationTrigger = {
     }
   },
 };
-// ===== pageMonitor/index.js =====
 /**
  * 页面监控主模块
  * @file pageMonitor/index.js
@@ -2467,7 +2045,6 @@ const pageMonitor = {
     }, 100);
   },
 };
-// ===== translationCore/dictionaryManager.js =====
 /**
  * 翻译词典管理模块
  * @file translationCore/dictionaryManager.js
@@ -2588,7 +2165,6 @@ const dictionaryManager = {
     }
   },
 };
-// ===== translationCore/pageModeDetector.js =====
 /**
  * 页面模式检测模块
  * @file translationCore/pageModeDetector.js
@@ -2656,7 +2232,6 @@ const pageModeDetector = {
     return this.pageModeConfig[mode] || this.pageModeConfig.default;
   },
 };
-// ===== translationCore/elementSelector.js =====
 /**
  * 翻译元素选择模块
  * @file translationCore/elementSelector.js
@@ -2987,7 +2562,6 @@ const elementSelector = {
     return virtualDomManager.shouldTranslate(element);
   },
 };
-// ===== translationCore/elementTranslator.js =====
 /**
  * 元素翻译模块
  * @file translationCore/elementTranslator.js
@@ -3159,7 +2733,6 @@ const elementTranslator = {
     }
   },
 };
-// ===== translationCore/partialTranslator.js =====
 /**
  * 部分匹配翻译模块
  * @file translationCore/partialTranslator.js
@@ -3258,7 +2831,6 @@ const partialTranslator = {
     return hasReplaced ? result : null;
   },
 };
-// ===== translationCore/performanceMonitor.js =====
 /**
  * 性能监控模块
  * @file translationCore/performanceMonitor.js
@@ -3357,7 +2929,6 @@ const performanceMonitor = {
     return JSON.stringify(data, null, 2);
   },
 };
-// ===== translationCore/index.js =====
 /**
  * 翻译核心主模块
  * @file translationCore/index.js
@@ -3694,7 +3265,6 @@ const translationCore = {
   getPerformanceStats: () => performanceMonitor.getPerformanceStats(),
   exportPerformanceData: () => performanceMonitor.exportPerformanceData(),
 };
-// ===== configUI.js =====
 /**
  * GitHub 中文翻译配置界面模块
  * @file configUI.js
@@ -4377,7 +3947,6 @@ class ConfigUI {
 }
 // 导出配置界面实例
 const configUI = new ConfigUI();
-// ===== versionChecker.js =====
 /**
  * 版本更新检查模块
  * @file versionChecker.js
@@ -4779,7 +4348,6 @@ const versionChecker = {
     }
   },
 };
-// ===== virtualDom.js =====
 /**
  * 虚拟DOM模块
  * @file virtualDom.js
@@ -5212,7 +4780,6 @@ class VirtualDomManager {
 // 创建单例实例
 const virtualDomManager = new VirtualDomManager();
 virtualDomManager;
-// ===== i18n.js =====
 /**
  * 国际化支持框架
  * @file i18n.js
@@ -5618,7 +5185,6 @@ async function switchLanguage(locale) {
   return i18nManager.setLocale(locale);
 }
 // ES6模块导出
-// ===== dictionaries/index.js =====
 /**
  * 翻译词典合并模块
  * @file index.js
@@ -5647,7 +5213,6 @@ function mergeAllDictionaries() {
   }
   return merged;
 }
-// ===== dictionaries/common.js =====
 /**
  * 通用翻译词典
  * @file common.js
@@ -5972,7 +5537,6 @@ const commonDictionary = {
   you_signed_in_another_tab: '您已在另一个标签页或窗口中登录。请重新加载以刷新您的会话。',
   you_signed_out_another_tab: '您已在另一个标签页或窗口中登出。请重新加载以刷新您的会话。',
 };
-// ===== dictionaries/codespaces.js =====
 /**
  * Codespaces 页面翻译词典
  * @file codespaces.js
@@ -6003,7 +5567,6 @@ const codespacesDictionary = {
   'Do not share my personal information': '不要分享我的个人信息',
   "You can't perform that action at this time.": '您现在无法执行此操作。',
 };
-// ===== dictionaries/explore.js =====
 /**
  * Explore 页面翻译词典
  * @file explore.js
@@ -6162,7 +5725,6 @@ const exploreDictionary = {
   'works-with-react': '兼容 React',
   'Updated\n            Oct 4, 2025': '更新于\n            2025年10月4日',
 };
-// ===== main.js =====
 /**
  * GitHub 中文翻译主入口文件
  * @file main.js
@@ -6264,4 +5826,5 @@ if (typeof window !== 'undefined') {
   window.translationCore = translationCore;
   window.configUI = configUI;
 }
-})();
+// 启动脚本
+startScript();})();
