@@ -1,8 +1,8 @@
 /**
  * GitHub 中文翻译插件构建脚本
  * @file build.js
- * @version 1.9.1
- * @description 简化的单文件构建脚本 - 合并源代码并生成用户脚本
+ * @version 1.9.15
+ * @description 简化的单文件构建脚本
  */
 
 const fs = require('fs');
@@ -85,55 +85,7 @@ function readCurrentVersion() {
   return match ? match[1] : '0.0.0';
 }
 
-function bumpVersion(version, level) {
-  const parts = version.split('.').map(Number);
-  const [major, minor, patch] = parts;
-  switch (level) {
-    case 'major': return `${major + 1}.0.0`;
-    case 'minor': return `${major}.${minor + 1}.0`;
-    case 'patch': return `${major}.${minor}.${patch + 1}`;
-    default: return `${major}.${minor}.${patch + 1}`;
-  }
-}
-
-function updateVersionInFiles(newVersion) {
-  const versionFile = path.join(SRC_DIR, 'version.js');
-  let content = fs.readFileSync(versionFile, 'utf-8');
-  content = content.replace(
-    /export\s+const\s+VERSION\s+=\s+['"][^'"]+['"]/,
-    `export const VERSION = '${newVersion}'`,
-  );
-  fs.writeFileSync(versionFile, content, 'utf-8');
-
-  const srcFiles = getAllJsFiles(SRC_DIR);
-  srcFiles.forEach(file => {
-    let fileContent = fs.readFileSync(file, 'utf-8');
-    fileContent = fileContent.replace(
-      /@version\s+[\d.]+/g,
-      `@version ${newVersion}`,
-    );
-    fs.writeFileSync(file, fileContent, 'utf-8');
-  });
-
-  console.log(`  版本已更新为: ${newVersion}`);
-}
-
-function getAllJsFiles(dir) {
-  const files = [];
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...getAllJsFiles(fullPath));
-    } else if (entry.name.endsWith('.js')) {
-      files.push(fullPath);
-    }
-  }
-  return files;
-}
-
 function mergeSourceFiles() {
-  console.log('  合并源文件...');
   const mergedParts = [];
 
   for (const file of SOURCE_ORDER) {
@@ -145,13 +97,11 @@ function mergeSourceFiles() {
       content = content.replace(/^export\s+default\s+/gm, '');
       content = content.replace(/^export\s+{\s*([^}]+)\s*};?\s*$/gm, '');
       content = content.replace(/^export\s+/gm, '');
-      content = content.replace(/\/\*[#@]\s*(?:sourceMappingURL|mapping).*?\*\//g, '');
-      content = content.replace(/\/\/\s*[@#]\s*(?:sourceMappingURL|mapping).*$/gm, '');
-      mergedParts.push(`\n// ===== ${file} =====\n${content.trim()}\n`);
+      mergedParts.push(content.trim());
     }
   }
 
-  return mergedParts.join('\n');
+  return mergedParts.join('\n\n');
 }
 
 function cleanProject() {
@@ -168,46 +118,21 @@ function createBuildDir() {
   fs.mkdirSync(DIST_DIR, { recursive: true });
 }
 
-function fixBuildOutput(content) {
-  content = content.replace(/export\s+const\s+VERSION\s+=/g, 'const VERSION =');
-  content = content.replace(/\n{3,}/g, '\n\n');
-  content = content.replace(/\s+\n/g, '\n');
-  return content;
-}
-
 function buildUserScript(version) {
-  console.log('  生成用户脚本...');
   createBuildDir();
 
   const mergedCode = mergeSourceFiles();
   let scriptContent = USER_SCRIPT_HEADER.replace('{VERSION}', version) + mergedCode + USER_SCRIPT_FOOTER;
-  scriptContent = fixBuildOutput(scriptContent);
+  
+  scriptContent = scriptContent.replace(/export\s+const\s+VERSION\s+=/g, 'const VERSION =');
+  scriptContent = scriptContent.replace(/\n{3,}/g, '\n\n');
+  scriptContent = scriptContent.replace(/\s+\n/g, '\n');
 
   fs.writeFileSync(OUTPUT_FILE, scriptContent, 'utf-8');
-  console.log(`  输出: ${OUTPUT_FILE}`);
   return true;
 }
 
-function copyFilesToDist() {
-  fs.copyFileSync(OUTPUT_FILE, DIST_OUTPUT);
-  console.log(`  复制到: ${DIST_OUTPUT}`);
-}
-
-function validateBuild(version) {
-  if (!fs.existsSync(OUTPUT_FILE)) {
-    return { valid: false, error: '构建产物不存在' };
-  }
-  const content = fs.readFileSync(OUTPUT_FILE, 'utf-8');
-  if (!content.match(/@version\s+[\d.]+/)) {
-    return { valid: false, error: '版本号不匹配' };
-  }
-  if (content.length < 1000) {
-    return { valid: false, error: '构建产物过小' };
-  }
-  return { valid: true, version, size: content.length };
-}
-
-function build(versionLevel = 'patch') {
+function build() {
   console.log('\n========================================');
   console.log('  GitHub 中文翻译插件构建');
   console.log('========================================\n');
@@ -215,51 +140,31 @@ function build(versionLevel = 'patch') {
   cleanProject();
   console.log('✓ 清理完成');
 
-  const currentVersion = readCurrentVersion();
-  console.log(`\n📌 当前版本: ${currentVersion}`);
+  const version = readCurrentVersion();
+  console.log(`📌 当前版本: ${version}`);
 
-  const newVersion = bumpVersion(currentVersion, versionLevel);
-  console.log(`📈 升级到版本: ${newVersion} (${versionLevel})`);
+  console.log('🔨 开始构建...');
+  buildUserScript(version);
+  fs.copyFileSync(OUTPUT_FILE, DIST_OUTPUT);
 
-  updateVersionInFiles(newVersion);
-
-  console.log('\n🔨 开始构建...');
-  const success = buildUserScript(newVersion);
-  if (!success) {
-    console.error('❌ 构建失败');
-    process.exit(1);
-  }
-
-  copyFilesToDist();
-
-  const validation = validateBuild(newVersion);
-  if (!validation.valid) {
-    console.error('❌ 验证失败:', validation.error);
-    process.exit(1);
-  }
-
+  const fileSize = (fs.readFileSync(OUTPUT_FILE, 'utf-8').length / 1024).toFixed(2);
+  
   console.log('\n========================================');
   console.log('  🎉 构建完成!');
   console.log(`  📦 构建产物: ${OUTPUT_FILE}`);
-  console.log(`  📊 文件大小: ${(validation.size / 1024).toFixed(2)} KB`);
-  console.log(`  🔍 版本验证: ${validation.version}`);
+  console.log(`  📊 文件大小: ${fileSize} KB`);
   console.log('========================================\n');
 
   return true;
 }
 
 if (require.main === module) {
-  const args = process.argv.slice(2);
-  const buildType = args[0] || 'patch';
-  const validTypes = ['patch', 'minor', 'major'];
-  const versionLevel = validTypes.includes(buildType) ? buildType : 'patch';
-
   try {
-    build(versionLevel);
+    build();
   } catch (error) {
-    console.error('❌ 构建流程失败:', error.message);
+    console.error('❌ 构建失败:', error.message);
     process.exit(1);
   }
 }
 
-module.exports = { build, readCurrentVersion, bumpVersion };
+module.exports = { build, readCurrentVersion };

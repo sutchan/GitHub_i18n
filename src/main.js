@@ -122,3 +122,6 @@ if (typeof window !== 'undefined') {
   window.translationCore = translationCore;
   window.configUI = configUI;
 }
+
+// 启动脚本
+startScript();
