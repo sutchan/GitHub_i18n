@@ -13,9 +13,15 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "validate": "node -e \"const fs=require('fs');const path=require('path');const buildFile=path.join('build','GitHub_i18n.user.js');if(!fs.existsSync(buildFile)){console.error('构建产物不存在');process.exit(1)}const content=fs.readFileSync(buildFile,'utf-8');if(content.length<1000){console.error('构建产物过小');process.exit(1)}console.log('验证通过');process.exit(0)\"",
+    "validate": "node -e \"const fs=require('fs');const path=require('path');const buildFile=path.join('build','GitHub_i18n.user.js');if(!fs.existsSync(buildFile)){console.error('构建产物不存在');process.exit(1)}const content=fs.readFileSync(buildFile,'utf8');if(content.length<1000){console.error('构建产物过小');process.exit(1)}console.log('验证通过');process.exit(0)\"",
     "clean": "node -e \"const fs=require('fs');const path=require('path');['build','dist','coverage'].forEach(dir=>{if(fs.existsSync(dir)){fs.rmSync(dir,{recursive:true});console.log('已清理:',dir)}})\"",
-    "prepare": "husky install || true"
+    "prepare": "husky install || true",
+    "tools:install": "cd utils && npm install",
+    "tools:server": "cd utils && npm run server",
+    "tools:start": "cd utils && npm run start",
+    "dictionary:export": "cd utils && node dictionary_processor.js export",
+    "dictionary:import": "cd utils && node dictionary_processor.js import",
+    "dictionary:optimize": "cd utils && node dictionary_processor.js optimize"
   },
   "keywords": [
     "github",

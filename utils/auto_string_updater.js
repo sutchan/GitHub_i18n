@@ -1,6 +1,7 @@
 // auto_string_updater.js
 // GitHub i18n 自动化工具服务器
-// 版本: 1.0.0
+// 版本: 1.1.0
+// 为 GitHub i18n 项目优化的版本
 
 const express = require('express');
 const cors = require('cors');
@@ -30,10 +31,12 @@ app.use((error, req, res, next) => {
 const CONFIG = {
   dictionaryPath: path.resolve(__dirname, '../src/dictionaries'),
   settingsPath: path.resolve(__dirname, 'settings.json'),
+  statsPath: path.resolve(__dirname, 'api/stats.json'),
   defaultSettings: {
     requestInterval: 1000,
     maxRetries: 3,
     httpTimeout: 30000,
+    autoBackup: true,
   },
 };
 
@@ -47,7 +50,22 @@ async function readSettings() {
 }
 
 async function saveSettings(settings) {
+  await fs.mkdir(path.dirname(CONFIG.settingsPath), { recursive: true });
   await fs.writeFile(CONFIG.settingsPath, JSON.stringify(settings, null, 2), 'utf8');
+}
+
+async function readStats() {
+  try {
+    const data = await fs.readFile(CONFIG.statsPath, 'utf8');
+    return JSON.parse(data);
+  } catch {
+    return { lastUpdated: null, totalStrings: 0, modules: 0, updates: 0 };
+  }
+}
+
+async function saveStats(stats) {
+  await fs.mkdir(path.dirname(CONFIG.statsPath), { recursive: true });
+  await fs.writeFile(CONFIG.statsPath, JSON.stringify(stats, null, 2), 'utf8');
 }
 
 async function readDictionary() {
@@ -56,17 +74,17 @@ async function readDictionary() {
     const dictionary = {};
 
     for (const file of files) {
-      if (file.endsWith('.js')) {
+      if (file.endsWith('.js') && file !== 'index.js') {
         const moduleName = file.replace('.js', '');
         const filePath = path.join(CONFIG.dictionaryPath, file);
         const content = await fs.readFile(filePath, 'utf8');
 
-        const match = content.match(/export\s+default\s+(\{[\s\S]*?\});?$/m);
+        const match = content.match(/export\s+default\s*(\{[\s\S]*?\});?/);
         if (match) {
           try {
             dictionary[moduleName] = JSON.parse(match[1].replace(/'/g, '"'));
           } catch {
-            const keyValueRegex = /['"](\w+)['"]\s*:\s*['"]([^'"]*)['"]/g;
+            const keyValueRegex = /['"]([^'"]+)['"]\s*:\s*['"]([^'"]*)['"]/g;
             const moduleDict = {};
             let m;
             while ((m = keyValueRegex.exec(match[1])) !== null) {
@@ -87,7 +105,7 @@ async function readDictionary() {
 async function getDictionaryStats(dictionary) {
   let totalStrings = 0;
   let pendingCount = 0;
-  let lastUpdated = null;
+  const stats = await readStats();
 
   for (const moduleName in dictionary) {
     const entries = dictionary[moduleName];
@@ -100,20 +118,12 @@ async function getDictionaryStats(dictionary) {
     }
   }
 
-  try {
-    const statFile = path.join(CONFIG.dictionaryPath, 'last_updated.json');
-    const data = await fs.readFile(statFile, 'utf8');
-    const stats = JSON.parse(data);
-    lastUpdated = stats.lastUpdated;
-  } catch {
-    lastUpdated = null;
-  }
-
   return {
     totalStrings,
     moduleCount: Object.keys(dictionary).length,
     pendingCount,
-    lastUpdated,
+    lastUpdated: stats.lastUpdated,
+    updates: stats.updates || 0,
   };
 }
 
@@ -168,7 +178,12 @@ app.post('/api/dictionary/update', async (req, res) => {
     dictionary[module][key] = value;
 
     const filePath = path.join(CONFIG.dictionaryPath, `${module}.js`);
-    const content = `// ${module}.js\n// GitHub i18n 词典模块\n// 版本: 1.0.0\n\nexport default ${JSON.stringify(dictionary[module], null, 2)};`;
+    const content = `// ${module}.js
+// GitHub i18n 词典模块
+// 版本: 1.0.0
+
+export default ${JSON.stringify(dictionary[module], null, 2)};
+`;
     await fs.writeFile(filePath, content, 'utf8');
 
     res.json({ success: true });
@@ -195,6 +210,7 @@ app.post('/api/collect', async (req, res) => {
 
     if (results.summary.successCount > 0) {
       const dictionary = await readDictionary();
+      let newStringsCount = 0;
 
       results.results.forEach((result) => {
         if (result.strings && result.strings.length > 0) {
@@ -206,6 +222,7 @@ app.post('/api/collect', async (req, res) => {
           result.strings.forEach((str) => {
             if (!dictionary[moduleName][str]) {
               dictionary[moduleName][str] = '';
+              newStringsCount++;
             }
           });
         }
@@ -218,63 +235,47 @@ app.post('/api/collect', async (req, res) => {
 // GitHub i18n 词典模块
 // 版本: 1.0.0
 
-export default ${JSON.stringify(entries, null, 2)};`;
+export default ${JSON.stringify(entries, null, 2)};
+`;
         await fs.writeFile(filePath, content, 'utf8');
       }
 
-      // 更新最后修改时间
-      const statFile = path.join(CONFIG.dictionaryPath, 'last_updated.json');
-      await fs.writeFile(
-        statFile,
-        JSON.stringify({ lastUpdated: new Date().toISOString() }, null, 2),
-        'utf8',
-      );
-    }
+      // 更新统计信息
+      const stats = await readStats();
+      stats.lastUpdated = new Date().toISOString();
+      stats.updates = (stats.updates || 0) + 1;
+      await saveStats(stats);
 
-    res.json({
-      success: true,
-      summary: results.summary,
-      results: results.results.map((r) => ({
-        pageId: r.pageId,
-        pageName: r.pageName,
-        stringCount: r.strings?.length || 0,
-        error: r.error,
-      })),
-    });
+      res.json({
+        success: true,
+        summary: results.summary,
+        newStrings: newStringsCount,
+        results: results.results.map((r) => ({
+          pageId: r.pageId,
+          pageName: r.pageName,
+          stringCount: r.strings?.length || 0,
+          error: r.error,
+        })),
+      });
+    } else {
+      res.json({
+        success: true,
+        summary: results.summary,
+        results: results.results.map((r) => ({
+          pageId: r.pageId,
+          pageName: r.pageName,
+          stringCount: r.strings?.length || 0,
+          error: r.error,
+        })),
+      });
+    }
   } catch (error) {
     console.error('采集过程出错:', error);
     res.status(500).json({ error: error.message || '采集过程出错' });
   }
 });
 
-app.get('/api/export', async (req, res) => {
-  try {
-    // 简单的导出功能：直接使用当前的词典
-    const dictionary = await readDictionary();
-    const stringCount = Object.values(dictionary).reduce(
-      (sum, m) => sum + Object.keys(m).length,
-      0,
-    );
-
-    res.json({
-      success: true,
-      stringCount,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/api/import', async (req, res) => {
-  try {
-    // 简单的导入功能：目前只是标记成功
-    res.json({ success: true, message: '导入功能需要手动同步词典' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/api/optimize', async (req, res) => {
+app.post('/api/dictionary/optimize', async (req, res) => {
   try {
     const dictionary = await readDictionary();
     const originalCount = Object.values(dictionary).reduce(
@@ -282,30 +283,17 @@ app.get('/api/optimize', async (req, res) => {
       0,
     );
 
-    // 优化词典：去重，清理空值
-    const optimized = {};
-    for (const [moduleName, entries] of Object.entries(dictionary)) {
-      const cleanEntries = {};
-      for (const [key, value] of Object.entries(entries)) {
-        if (key && key.trim()) {
-          cleanEntries[key.trim()] = value;
-        }
-      }
-      if (Object.keys(cleanEntries).length > 0) {
-        optimized[moduleName] = cleanEntries;
-      }
-    }
+    // 使用 DictionaryProcessor 进行优化
+    const optimized = DictionaryProcessor.optimizeDictionary(dictionary);
 
     // 保存优化后的词典
-    for (const [moduleName, entries] of Object.entries(optimized)) {
-      const filePath = path.join(CONFIG.dictionaryPath, `${moduleName}.js`);
-      const content = `// ${moduleName}.js
-// GitHub i18n 词典模块
-// 版本: 1.0.0
+    await DictionaryProcessor.writeDictionaryToUserScript(optimized);
 
-export default ${JSON.stringify(entries, null, 2)};`;
-      await fs.writeFile(filePath, content, 'utf8');
-    }
+    // 更新统计信息
+    const stats = await readStats();
+    stats.lastUpdated = new Date().toISOString();
+    stats.updates = (stats.updates || 0) + 1;
+    await saveStats(stats);
 
     const optimizedCount = Object.values(optimized).reduce(
       (sum, m) => sum + Object.keys(m).length,
@@ -316,6 +304,55 @@ export default ${JSON.stringify(entries, null, 2)};`;
       success: true,
       originalCount,
       optimizedCount,
+      removed: originalCount - optimizedCount,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/dictionary/export', async (req, res) => {
+  try {
+    // 导出词典到 JSON 文件
+    const dictionary = await readDictionary();
+    await DictionaryProcessor.saveDictionaryToJson(dictionary);
+
+    const stringCount = Object.values(dictionary).reduce(
+      (sum, m) => sum + Object.keys(m).length,
+      0,
+    );
+
+    res.json({
+      success: true,
+      stringCount,
+      message: '词典已成功导出到 JSON 文件',
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/dictionary/import', async (req, res) => {
+  try {
+    // 从 JSON 文件导入词典
+    const importDictionary = await DictionaryProcessor.readDictionaryFromJson();
+    await DictionaryProcessor.writeDictionaryToUserScript(importDictionary);
+
+    // 更新统计信息
+    const stats = await readStats();
+    stats.lastUpdated = new Date().toISOString();
+    stats.updates = (stats.updates || 0) + 1;
+    await saveStats(stats);
+
+    const stringCount = Object.values(importDictionary).reduce(
+      (sum, m) => sum + Object.keys(m).length,
+      0,
+    );
+
+    res.json({
+      success: true,
+      stringCount,
+      message: '词典已成功从 JSON 文件导入',
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -324,18 +361,24 @@ export default ${JSON.stringify(entries, null, 2)};`;
 
 app.get('/api/backup', async (req, res) => {
   try {
-    const userScriptPath = path.resolve(__dirname, '../build/GitHub_i18n.user.js');
-    const content = await fs.readFile(userScriptPath, 'utf8');
-
+    const dictionary = await readDictionary();
     const backupDir = path.resolve(__dirname, 'backups');
     await fs.mkdir(backupDir, { recursive: true });
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupPath = path.join(backupDir, `GitHub_i18n.user.js.${timestamp}.bak`);
 
-    await fs.writeFile(backupPath, content, 'utf8');
+    for (const [moduleName, entries] of Object.entries(dictionary)) {
+      const backupPath = path.join(backupDir, `${moduleName}.js.${timestamp}.bak`);
+      const content = `// ${moduleName}.js
+// GitHub i18n 词典模块 - 备份
+// 备份时间: ${new Date().toISOString()}
 
-    res.json({ success: true, path: backupPath });
+export default ${JSON.stringify(entries, null, 2)};
+`;
+      await fs.writeFile(backupPath, content, 'utf8');
+    }
+
+    res.json({ success: true, backupDir, timestamp, message: '备份创建成功' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -364,8 +407,22 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`GitHub i18n 自动化工具已启动: http://localhost:${PORT}`);
-  console.log(`打开 http://localhost:${PORT} 开始使用`);
+  console.log('='.repeat(60));
+  console.log('  GitHub i18n 自动化工具服务器已启动!');
+  console.log(`  访问地址: http://localhost:${PORT}`);
+  console.log('='.repeat(60));
+  console.log('');
+  console.log('可用的 API 端点:');
+  console.log('  GET /api/stats                  - 获取统计信息');
+  console.log('  GET /api/dictionary             - 获取词典');
+  console.log('  POST /api/dictionary/update     - 更新翻译');
+  console.log('  POST /api/collect               - 采集字符串');
+  console.log('  POST /api/dictionary/optimize   - 优化词典');
+  console.log('  GET /api/dictionary/export      - 导出词典到 JSON');
+  console.log('  GET /api/dictionary/import      - 从 JSON 导入词典');
+  console.log('  GET /api/backup                 - 创建备份');
+  console.log('  GET/POST /api/settings          - 设置管理');
+  console.log('');
 });
 
 module.exports = app;
