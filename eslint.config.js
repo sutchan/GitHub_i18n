@@ -96,6 +96,7 @@ export default [
     },
   },
   {
+  {
     files: ['build.cjs'],
     languageOptions: {
       sourceType: 'commonjs',
