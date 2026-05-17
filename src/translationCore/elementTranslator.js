@@ -105,8 +105,8 @@ export const elementTranslator = {
           const safeTranslatedText =
             typeof translatedText === 'string'
               ? [...translatedText]
-                  .filter((c) => c.charCodeAt(0) > 31 && c.charCodeAt(0) !== 127)
-                  .join('')
+                .filter((c) => c.charCodeAt(0) > 31 && c.charCodeAt(0) !== 127)
+                .join('')
               : String(translatedText || '');
           const translatedNode = document.createTextNode(safeTranslatedText);
           fragment.appendChild(translatedNode);
