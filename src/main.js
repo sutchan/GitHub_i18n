@@ -68,14 +68,32 @@ function init() {
     }
 
     // 初始化翻译核心功能
+    if (typeof translationCore === 'undefined') {
+      console.error('[GitHub 中文翻译] translationCore 未定义');
+      return;
+    }
+    if (typeof translationCore.init !== 'function') {
+      console.error('[GitHub 中文翻译] translationCore.init 不是函数');
+      return;
+    }
     translationCore.init();
-    translationCore.translate();
+
+    // 执行页面翻译
+    if (typeof translationCore.translate === 'function') {
+      translationCore.translate();
+    } else {
+      console.error('[GitHub 中文翻译] translationCore.translate 不是函数');
+    }
 
     // 初始化页面监控
-    pageMonitor.init();
+    if (typeof pageMonitor !== 'undefined' && typeof pageMonitor.init === 'function') {
+      pageMonitor.init();
+    }
 
     // 初始化配置界面
-    configUI.init();
+    if (typeof configUI !== 'undefined' && typeof configUI.init === 'function') {
+      configUI.init();
+    }
 
     // 添加页面卸载事件监听器
     window.addEventListener('beforeunload', cleanup);
@@ -103,14 +121,20 @@ function init() {
  * 启动脚本
  */
 function startScript() {
-  // 当DOM加载完成后初始化
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
-      await init();
+      try {
+        await init();
+      } catch (error) {
+        console.error('[GitHub 中文翻译] DOMContentLoaded 回调中初始化失败:', error);
+      }
     });
   } else {
-    // 如果DOM已经加载完成，直接初始化
-    init();
+    try {
+      init();
+    } catch (error) {
+      console.error('[GitHub 中文翻译] 直接初始化失败:', error);
+    }
   }
 }
 
