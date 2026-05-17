@@ -3,436 +3,806 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitHub i18n 自动化工具 v1.0</title>
+  <title>GitHub i18n 自动化工具 v2.0</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: #0d1117;
-      color: #c9d1d9;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
       min-height: 100vh;
-      padding: 20px;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: #58a6ff;
-    }
-    h2 {
-      font-size: 18px;
-      margin: 20px 0 10px;
-      color: #8b949e;
-    }
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    .card h3 {
-      font-size: 16px;
-      margin-bottom: 15px;
-      color: #f0f6fc;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 14px;
-      color: #8b949e;
-    }
-    input[type="text"], input[type="url"], textarea, select {
-      width: 100%;
-      padding: 10px;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 6px;
       color: #c9d1d9;
-      font-size: 14px;
+      margin: 0;
     }
+    
+    .glass-card {
+      background: rgba(22, 27, 34, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(48, 54, 61, 0.5);
+      border-radius: 12px;
+    }
+    
+    .stat-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .tab-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .tab-btn.active {
+      background: rgba(48, 54, 61, 0.5);
+      color: white;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+      transition: all 0.3s ease;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2ea043 0%, #3fb950 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(35, 134, 54, 0.4);
+    }
+    
+    .btn-secondary {
+      background: rgba(48, 54, 61, 0.8);
+      border: 1px solid rgba(48, 54, 61, 0.5);
+      transition: all 0.3s ease;
+      color: #c9d1d9;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(48, 54, 61, 1);
+      border-color: #58a6ff;
+    }
+    
+    .progress-bar {
+      background: linear-gradient(90deg, #21262d 0%, #30363d 100%);
+    }
+    
+    .progress-fill {
+      background: linear-gradient(90deg, #238636 0%, #2ea043 50%, #3fb950 100%);
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .table-row:hover {
+      background: rgba(48, 54, 61, 0.3);
+    }
+    
+    input, textarea, select {
+      background: rgba(13, 17, 23, 0.5);
+      border: 1px solid rgba(48, 54, 61, 0.5);
+      color: #c9d1d9;
+    }
+    
     input:focus, textarea:focus, select:focus {
       outline: none;
       border-color: #58a6ff;
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
     }
-    textarea {
-      min-height: 120px;
-      resize: vertical;
+    
+    .status-idle { background: rgba(48, 54, 61, 0.8); }
+    .status-running { background: rgba(31, 111, 235, 0.2); border: 1px solid rgba(31, 111, 235, 0.5); }
+    .status-success { background: rgba(35, 134, 54, 0.2); border: 1px solid rgba(35, 134, 54, 0.5); }
+    .status-error { background: rgba(218, 54, 51, 0.2); border: 1px solid rgba(218, 54, 51, 0.5); }
+    
+    /* 响应式设计 */
+    @media (max-width: 1024px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
+    
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .main-content {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        position: relative;
+        top: 0;
+      }
+      
+      .table-container {
+        overflow-x: auto;
+      }
+      
+      .hide-on-mobile {
+        display: none;
+      }
+      
+      .mobile-flex-col {
+        flex-direction: column;
+      }
+      
+      .btn-group {
+        flex-wrap: wrap;
+      }
     }
-    .btn-primary {
-      background: #238636;
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: #2ea043;
-    }
-    .btn-secondary {
-      background: #21262d;
-      color: #c9d1d9;
-      border: 1px solid #30363d;
-    }
-    .btn-secondary:hover {
-      background: #30363d;
-    }
-    .btn-danger {
-      background: #da3633;
-      color: #fff;
-    }
-    .btn-danger:hover {
-      background: #f85149;
-    }
-    .btn-group {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .log-container {
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      padding: 15px;
-      max-height: 400px;
-      overflow-y: auto;
-      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-      font-size: 12px;
-      line-height: 1.6;
-    }
-    .log-entry {
-      margin-bottom: 5px;
-    }
-    .log-entry.info { color: #58a6ff; }
-    .log-entry.success { color: #3fb950; }
-    .log-entry.error { color: #f85149; }
-    .log-entry.warn { color: #d29922; }
-    .log-entry .timestamp {
-      color: #6e7681;
-      margin-right: 8px;
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    .stat-item {
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      padding: 15px;
-      text-align: center;
-    }
-    .stat-value {
-      font-size: 28px;
-      font-weight: bold;
-      color: #58a6ff;
-    }
-    .stat-label {
-      font-size: 12px;
-      color: #8b949e;
-      margin-top: 5px;
-    }
-    .progress-bar {
-      height: 8px;
-      background: #21262d;
-      border-radius: 4px;
-      overflow: hidden;
-      margin: 10px 0;
-    }
-    .progress-fill {
-      height: 100%;
-      background: #238636;
-      transition: width 0.3s;
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-    .status-badge.idle { background: #21262d; color: #8b949e; }
-    .status-badge.running { background: #1f6feb; color: #fff; }
-    .status-badge.success { background: #238636; color: #fff; }
-    .status-badge.error { background: #da3633; color: #fff; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    th, td {
-      padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid #30363d;
-    }
-    th {
-      color: #8b949e;
-      font-weight: 600;
-    }
-    .action-btns {
-      display: flex;
-      gap: 5px;
-    }
-    .tab-container {
-      margin-bottom: 20px;
-    }
-    .tab-list {
-      display: flex;
-      gap: 5px;
-      border-bottom: 1px solid #30363d;
-      padding-bottom: 10px;
-    }
-    .tab-btn {
-      padding: 8px 16px;
-      background: transparent;
-      border: none;
-      color: #8b949e;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: all 0.2s;
-    }
-    .tab-btn:hover {
-      background: #21262d;
-    }
-    .tab-btn.active {
-      background: #21262d;
-      color: #f0f6fc;
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .loading {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-    .loading::after {
-      content: '';
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border: 2px solid #58a6ff;
-      border-top-color: transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    
+    @media (max-width: 480px) {
+      .page-padding {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      
+      .modal-content {
+        width: 100%;
+        margin: 1rem;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🔄 GitHub i18n 自动化工具</h1>
+  <div id="app">
+    <!-- Header -->
+    <header class="glass-card sticky top-0 z-50" style="border-radius: 0; border-left: 0; border-right: 0; border-top: 0;">
+      <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-lg">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+                GitHub i18n 自动化工具
+              </h1>
+              <p class="text-sm text-gray-400">v2.0 增强版</p>
+            </div>
+          </div>
+          <div id="connectionStatus" class="status-badge status-idle px-3 py-1 rounded-full flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-gray-500"></span>
+            <span class="text-sm">已连接</span>
+          </div>
+        </div>
+      </div>
+    </header>
 
-    <div class="stats-grid" id="statsGrid">
-      <div class="stat-item">
-        <div class="stat-value" id="totalStrings">-</div>
-        <div class="stat-label">总字符串数</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="totalModules">-</div>
-        <div class="stat-label">模块数</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="pendingTranslations">-</div>
-        <div class="stat-label">待翻译</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="lastUpdated">-</div>
-        <div class="stat-label">最后更新</div>
-      </div>
-    </div>
+    <div class="max-w-7xl mx-auto px-6 py-8 page-padding">
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 stats-grid">
+        <div class="stat-card glass-card rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-400 mb-1">总字符串数</p>
+              <p id="totalStrings" class="text-3xl font-bold text-white">-</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center text-xs text-gray-400">
+            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+            <span>实时更新</span>
+          </div>
+        </div>
 
-    <div class="tab-container">
-      <div class="tab-list">
-        <button class="tab-btn active" data-tab="collect">📥 字符串采集</button>
-        <button class="tab-btn" data-tab="dictionary">📚 词典管理</button>
-        <button class="tab-btn" data-tab="settings">⚙️ 设置</button>
+        <div class="stat-card glass-card rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-400 mb-1">模块数</p>
+              <p id="totalModules" class="text-3xl font-bold text-white">-</p>
+            </div>
+            <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4 text-xs text-gray-400">
+            包含全部词典模块
+          </div>
+        </div>
+
+        <div class="stat-card glass-card rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-400 mb-1">待翻译</p>
+              <p id="pendingTranslations" class="text-3xl font-bold text-yellow-400">-</p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4 text-xs text-gray-400">
+            需要人工翻译
+          </div>
+        </div>
+
+        <div class="stat-card glass-card rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-400 mb-1">最后更新</p>
+              <p id="lastUpdated" class="text-xl font-bold text-white truncate">-</p>
+            </div>
+            <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4 text-xs text-gray-400">
+            <span id="updatesCount">0</span> 次更新
+          </div>
+        </div>
       </div>
 
-      <div id="collectTab" class="tab-content active">
-        <div class="card">
-          <h3>📥 采集新字符串</h3>
-          <div class="form-group">
-            <label>GitHub URL（每行一个）</label>
-            <textarea id="urlsInput" placeholder="https://github.com/facebook/react
+      <!-- Main Content -->
+      <div class="flex flex-col lg:flex-row gap-8 main-content">
+        <!-- Sidebar Navigation -->
+        <div class="lg:w-64 flex-shrink-0 sidebar">
+          <div class="glass-card rounded-xl p-4 sticky top-24">
+            <nav class="space-y-2">
+              <button onclick="switchTab('collect')" id="tab-collect" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                <span>字符串采集</span>
+              </button>
+              <button onclick="switchTab('dictionary')" id="tab-dictionary" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all text-gray-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                <span>词典管理</span>
+              </button>
+              <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all text-gray-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span>设置</span>
+              </button>
+            </nav>
+
+            <div class="mt-6 pt-6 border-t border-gray-700">
+              <h3 class="text-sm font-medium text-gray-400 mb-3">快捷操作</h3>
+              <div class="space-y-2">
+                <button onclick="quickBackup()" class="w-full flex items-center space-x-3 px-3 py-2 text-sm rounded-lg text-gray-400 hover:bg-gray-700/50 hover:text-white transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  <span>快速备份</span>
+                </button>
+                <button onclick="quickOptimize()" class="w-full flex items-center space-x-3 px-3 py-2 text-sm rounded-lg text-gray-400 hover:bg-gray-700/50 hover:text-white transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  <span>优化词典</span>
+                </button>
+                <button onclick="refreshStats()" class="w-full flex items-center space-x-3 px-3 py-2 text-sm rounded-lg text-gray-400 hover:bg-gray-700/50 hover:text-white transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  <span>刷新统计</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1">
+          <!-- Collect Tab -->
+          <div id="collectContent" class="tab-content">
+            <div class="glass-card rounded-xl p-6 mb-6">
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h2 class="text-xl font-bold text-white">字符串采集</h2>
+                  <p class="text-sm text-gray-400 mt-1">从 GitHub 页面自动采集文本字符串</p>
+                </div>
+                <div id="collectStatus" class="status-badge status-idle px-3 py-1 rounded-full flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-gray-500"></span>
+                  <span class="text-sm">空闲</span>
+                </div>
+              </div>
+
+              <div class="space-y-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
+                    GitHub 页面 URL
+                    <span class="text-gray-500 ml-2">（每行一个）</span>
+                  </label>
+                  <textarea id="urlsInput" rows="5" class="w-full px-4 py-3 rounded-lg text-sm" placeholder="https://github.com/facebook/react
 https://github.com/microsoft/vscode
 https://github.com/torvalds/linux"></textarea>
-          </div>
-          <div class="form-group">
-            <label>CSS 选择器（可选，默认为 body）</label>
-            <input type="text" id="selectorsInput" placeholder="h1, h2, h3, p, span, a, button">
-          </div>
-          <div class="btn-group">
-            <button class="btn btn-primary" id="startCollectBtn">🚀 开始采集</button>
-            <button class="btn btn-secondary" id="stopCollectBtn" disabled>⏹ 停止</button>
-          </div>
-        </div>
+                </div>
 
-        <div class="card">
-          <h3>📊 采集进度</h3>
-          <div class="progress-bar">
-            <div class="progress-fill" id="collectProgress" style="width: 0%"></div>
-          </div>
-          <div id="progressText" style="margin-top: 10px; color: #8b949e;">等待开始...</div>
-        </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-2">快速预设</label>
+                  <div class="flex flex-wrap gap-2">
+                    <button onclick="loadPreset('popular')" class="px-3 py-1.5 text-sm bg-gray-700/50 hover:bg-gray-600/50 rounded-lg text-gray-300 transition-colors">热门仓库</button>
+                    <button onclick="loadPreset('core')" class="px-3 py-1.5 text-sm bg-gray-700/50 hover:bg-gray-600/50 rounded-lg text-gray-300 transition-colors">GitHub 核心</button>
+                    <button onclick="loadPreset('orgs')" class="px-3 py-1.5 text-sm bg-gray-700/50 hover:bg-gray-600/50 rounded-lg text-gray-300 transition-colors">组织页面</button>
+                    <button onclick="clearUrls()" class="px-3 py-1.5 text-sm bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors">清空</button>
+                  </div>
+                </div>
 
-        <div class="card">
-          <h3>📋 采集日志</h3>
-          <div class="log-container" id="collectLog"></div>
-        </div>
-      </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
+                    CSS 选择器
+                    <span class="text-gray-500 ml-2">（可选，用于指定采集区域）</span>
+                  </label>
+                  <input type="text" id="selectorsInput" class="w-full px-4 py-3 rounded-lg text-sm" placeholder="body, .container, main">
+                </div>
 
-      <div id="dictionaryTab" class="tab-content">
-        <div class="card">
-          <h3>📚 词典操作</h3>
-          <div class="btn-group">
-            <button class="btn btn-primary" id="exportDictBtn">📤 导出词典</button>
-            <button class="btn btn-primary" id="importDictBtn">📥 导入词典</button>
-            <button class="btn btn-secondary" id="optimizeDictBtn">✨ 优化词典</button>
-            <button class="btn btn-danger" id="backupDictBtn">💾 备份词典</button>
-          </div>
-        </div>
+                <div class="flex items-center space-x-4">
+                  <button id="startCollectBtn" onclick="startCollection()" class="btn-primary flex items-center space-x-2 px-6 py-3 rounded-lg font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>开始采集</span>
+                  </button>
+                  <button id="stopCollectBtn" onclick="stopCollection()" disabled class="btn-secondary flex items-center space-x-2 px-6 py-3 rounded-lg font-medium disabled:opacity-50">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H9a1 1 0 01-1-1v-4z"></path>
+                    </svg>
+                    <span>停止</span>
+                  </button>
+                </div>
+              </div>
+            </div>
 
-        <div class="card">
-          <h3>🔍 词典预览</h3>
-          <div style="margin-bottom: 15px;">
-            <input type="text" id="dictSearchInput" placeholder="搜索字符串...">
-          </div>
-          <div id="dictionaryPreview" style="max-height: 400px; overflow-y: auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th>模块</th>
-                  <th>原文</th>
-                  <th>译文</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody id="dictTableBody">
-                <tr><td colspan="4" style="text-align: center; color: #6e7681;">加载中...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+            <div class="glass-card rounded-xl p-6 mb-6">
+              <h3 class="text-lg font-semibold text-white mb-4">采集进度</h3>
+              <div class="progress-bar rounded-full h-3 mb-4 overflow-hidden">
+                <div id="collectProgress" class="progress-fill h-full rounded-full" style="width: 0%"></div>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <span id="progressText" class="text-gray-400">等待开始...</span>
+                <span id="progressPercent" class="text-blue-400 font-medium">0%</span>
+              </div>
+            </div>
 
-        <div class="card">
-          <h3>📋 操作日志</h3>
-          <div class="log-container" id="dictLog"></div>
-        </div>
-      </div>
+            <div class="glass-card rounded-xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-white">采集日志</h3>
+                <button onclick="clearLog('collectLog')" class="text-sm text-gray-400 hover:text-white transition-colors">清空</button>
+              </div>
+              <div id="collectLog" class="bg-gray-900/50 rounded-lg p-4 h-80 overflow-y-auto font-mono text-sm space-y-1">
+                <div class="text-gray-500">系统就绪，等待采集...</div>
+              </div>
+            </div>
+          </div>
 
-      <div id="settingsTab" class="tab-content">
-        <div class="card">
-          <h3>⚙️ 采集设置</h3>
-          <div class="form-group">
-            <label>请求间隔 (ms)</label>
-            <input type="number" id="requestInterval" value="1000" min="500" max="5000">
-          </div>
-          <div class="form-group">
-            <label>最大重试次数</label>
-            <input type="number" id="maxRetries" value="3" min="0" max="10">
-          </div>
-          <div class="form-group">
-            <label>HTTP 超时 (ms)</label>
-            <input type="number" id="httpTimeout" value="30000" min="5000" max="60000">
-          </div>
-        </div>
+          <!-- Dictionary Tab -->
+          <div id="dictionaryContent" class="tab-content hidden">
+            <div class="glass-card rounded-xl p-6 mb-6">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div>
+                  <h2 class="text-xl font-bold text-white">词典管理</h2>
+                  <p class="text-sm text-gray-400 mt-1">查看和编辑翻译词典</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <button onclick="exportDictionary()" class="btn-secondary flex items-center space-x-2 px-4 py-2 rounded-lg text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                    <span>导出</span>
+                  </button>
+                  <button onclick="importDictionary()" class="btn-secondary flex items-center space-x-2 px-4 py-2 rounded-lg text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    <span>导入</span>
+                  </button>
+                  <button onclick="optimizeDictionary()" class="btn-primary flex items-center space-x-2 px-4 py-2 rounded-lg text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span>优化</span>
+                  </button>
+                </div>
+              </div>
 
-        <div class="card">
-          <h3>💾 保存设置</h3>
-          <div class="btn-group">
-            <button class="btn btn-primary" id="saveSettingsBtn">💾 保存设置</button>
-            <button class="btn btn-secondary" id="resetSettingsBtn">🔄 重置默认</button>
+              <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <div class="flex-1 relative">
+                  <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                  <input type="text" id="dictSearchInput" oninput="filterDictionary()" class="w-full pl-10 pr-4 py-3 rounded-lg text-sm" placeholder="搜索原文或译文...">
+                </div>
+                <select id="moduleFilter" onchange="filterDictionary()" class="px-4 py-3 rounded-lg text-sm">
+                  <option value="">所有模块</option>
+                </select>
+                <select id="statusFilter" onchange="filterDictionary()" class="px-4 py-3 rounded-lg text-sm">
+                  <option value="">所有状态</option>
+                  <option value="pending">待翻译</option>
+                  <option value="translated">已翻译</option>
+                </select>
+              </div>
+              
+              <div class="flex items-center gap-4 mb-4">
+                <button onclick="toggleBulkEdit()" id="bulkEditBtn" class="btn-secondary flex items-center space-x-2 px-4 py-2 rounded-lg text-sm">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span>批量编辑</span>
+                </button>
+                <button onclick="selectAll()" id="selectAllBtn" class="btn-secondary flex items-center space-x-2 px-4 py-2 rounded-lg text-sm hidden">
+                  <span>全选</span>
+                </button>
+                <button onclick="bulkEdit()" id="bulkApplyBtn" class="btn-primary flex items-center space-x-2 px-4 py-2 rounded-lg text-sm hidden">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                  </svg>
+                  <span>批量应用</span>
+                </button>
+                <span id="selectedCount" class="text-sm text-gray-400 hidden"></span>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-xl overflow-hidden">
+              <div class="overflow-x-auto table-container">
+                <table class="w-full">
+                  <thead class="bg-gray-800/50">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider w-12">
+                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" class="hidden">
+                      </th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">模块</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">原文</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">译文</th>
+                      <th class="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dictTableBody" class="divide-y divide-gray-700">
+                    <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">加载中...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="px-6 py-4 border-t border-gray-700 flex items-center justify-between">
+                <div class="text-sm text-gray-400">
+                  显示 <span id="showingFrom">0</span> - <span id="showingTo">0</span> 条，共 <span id="totalEntries">0</span> 条
+                </div>
+                <div class="flex items-center space-x-2">
+                  <button onclick="prevPage()" id="prevBtn" disabled class="px-3 py-1 text-sm bg-gray-700/50 rounded-lg text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600/50">上一页</button>
+                  <span class="text-sm text-gray-400">第 <span id="currentPage">1</span> / <span id="totalPages">1</span> 页</span>
+                  <button onclick="nextPage()" id="nextBtn" disabled class="px-3 py-1 text-sm bg-gray-700/50 rounded-lg text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600/50">下一页</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-xl p-6 mt-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-white">操作日志</h3>
+                <button onclick="clearLog('dictLog')" class="text-sm text-gray-400 hover:text-white transition-colors">清空</button>
+              </div>
+              <div id="dictLog" class="bg-gray-900/50 rounded-lg p-4 h-40 overflow-y-auto font-mono text-sm space-y-1">
+                <div class="text-gray-500">等待操作...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings Tab -->
+          <div id="settingsContent" class="tab-content hidden">
+            <div class="glass-card rounded-xl p-6 mb-6">
+              <h2 class="text-xl font-bold text-white mb-6">设置</h2>
+              
+              <div class="space-y-6">
+                <div>
+                  <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    采集设置
+                  </h3>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-300 mb-2">请求间隔 (ms)</label>
+                      <input type="number" id="requestInterval" value="1000" min="100" max="10000" class="w-full px-4 py-3 rounded-lg text-sm">
+                      <p class="text-xs text-gray-500 mt-1">两次请求之间的等待时间</p>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-300 mb-2">最大重试次数</label>
+                      <input type="number" id="maxRetries" value="3" min="0" max="10" class="w-full px-4 py-3 rounded-lg text-sm">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-300 mb-2">HTTP 超时 (ms)</label>
+                      <input type="number" id="httpTimeout" value="30000" min="5000" max="120000" class="w-full px-4 py-3 rounded-lg text-sm">
+                    </div>
+                    <div class="flex items-end">
+                      <label class="flex items-center space-x-3">
+                        <input type="checkbox" id="autoBackup" checked class="w-5 h-5 rounded bg-gray-700 border-gray-600">
+                        <span class="text-sm text-gray-300">自动备份</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border-t border-gray-700 pt-6">
+                  <h3 class="text-lg font-semibold text-red-400 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    危险操作
+                  </h3>
+                  <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="text-sm font-medium text-red-400">重置所有设置</p>
+                        <p class="text-xs text-gray-500 mt-1">将所有设置恢复为默认值</p>
+                      </div>
+                      <button onclick="resetSettings()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors">重置</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-4 pt-4">
+                  <button onclick="saveSettings()" class="btn-primary flex items-center space-x-2 px-6 py-3 rounded-lg font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>保存设置</span>
+                  </button>
+                  <button onclick="refreshSettings()" class="btn-secondary px-6 py-3 rounded-lg font-medium">刷新</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-xl p-6">
+              <h3 class="text-lg font-semibold text-white mb-4">关于</h3>
+              <div class="space-y-2 text-sm text-gray-400">
+                <p><strong class="text-gray-300">版本：</strong>v2.0.0 增强版</p>
+                <p><strong class="text-gray-300">描述：</strong>GitHub i18n 项目自动化工具，用于字符串采集和词典管理</p>
+                <p><strong class="text-gray-300">特性：</strong></p>
+                <ul class="list-disc list-inside ml-4 space-y-1">
+                  <li>现代化界面设计，玻璃态效果</li>
+                  <li>支持分页查看翻译词典</li>
+                  <li>增强的搜索和筛选功能</li>
+                  <li>实时进度反馈和操作日志</li>
+                  <li>快捷操作栏和 Toast 通知</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Edit Modal -->
+  <div id="editModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/70" onclick="closeEditModal()"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="glass-card rounded-xl p-6 w-full max-w-lg relative">
+        <button onclick="closeEditModal()" class="absolute top-4 right-4 p-1 text-gray-400 hover:text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+        <h3 class="text-xl font-bold text-white mb-6">编辑翻译</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">模块</label>
+            <input type="text" id="editModule" readonly class="w-full px-4 py-3 rounded-lg text-sm text-gray-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">原文</label>
+            <input type="text" id="editKey" readonly class="w-full px-4 py-3 rounded-lg text-sm text-gray-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">译文</label>
+            <textarea id="editValue" rows="4" class="w-full px-4 py-3 rounded-lg text-sm"></textarea>
+          </div>
+        </div>
+        <div class="flex items-center justify-end space-x-3 mt-6">
+          <button onclick="closeEditModal()" class="btn-secondary px-4 py-2 rounded-lg">取消</button>
+          <button onclick="saveEdit()" class="btn-primary px-4 py-2 rounded-lg">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Edit Modal -->
+  <div id="bulkEditModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/70" onclick="closeBulkEditModal()"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="glass-card rounded-xl p-6 w-full max-w-2xl relative">
+        <button onclick="closeBulkEditModal()" class="absolute top-4 right-4 p-1 text-gray-400 hover:text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+        <h3 class="text-xl font-bold text-white mb-6">批量编辑翻译</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">操作类型</label>
+            <select id="bulkOperation" class="w-full px-4 py-3 rounded-lg text-sm">
+              <option value="prefix">添加前缀</option>
+              <option value="suffix">添加后缀</option>
+              <option value="replace">替换文本</option>
+              <option value="set">设置为固定值</option>
+              <option value="clear">清空</option>
+            </select>
+          </div>
+          <div id="bulkValueField">
+            <label class="block text-sm font-medium text-gray-300 mb-2">值</label>
+            <input type="text" id="bulkValue" class="w-full px-4 py-3 rounded-lg text-sm" placeholder="输入值...">
+          </div>
+          <div id="bulkSearchReplaceFields" class="hidden space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">查找</label>
+              <input type="text" id="bulkSearch" class="w-full px-4 py-3 rounded-lg text-sm" placeholder="要查找的文本...">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">替换为</label>
+              <input type="text" id="bulkReplace" class="w-full px-4 py-3 rounded-lg text-sm" placeholder="替换为...">
+            </div>
+          </div>
+          <div class="border-t border-gray-700 pt-4">
+            <p class="text-sm text-gray-400 mb-2">已选择 <span id="bulkSelectedCount">0</span> 条记录</p>
+            <div id="bulkPreview" class="max-h-48 overflow-y-auto bg-gray-900/50 rounded-lg p-4 text-sm font-mono">
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-end space-x-3 mt-6">
+          <button onclick="closeBulkEditModal()" class="btn-secondary px-4 py-2 rounded-lg">取消</button>
+          <button onclick="applyBulkEdit()" class="btn-primary px-4 py-2 rounded-lg">应用</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300">
+    <div class="glass-card rounded-lg px-6 py-4 shadow-2xl flex items-center space-x-3">
+      <div id="toastIcon" class="w-8 h-8 rounded-full flex items-center justify-center"></div>
+      <div>
+        <p id="toastTitle" class="font-medium text-white"></p>
+        <p id="toastMessage" class="text-sm text-gray-400"></p>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_BASE = '/api';
-
+    
     let isCollecting = false;
     let collectController = null;
+    let currentDictionary = {};
+    let filteredDictionary = {};
+    let currentPage = 1;
+    const itemsPerPage = 20;
+    let editingEntry = null;
+    let selectedEntries = new Set();
+    let isBulkEditMode = false;
+
+    const presets = {
+      popular: [
+        'https://github.com/facebook/react',
+        'https://github.com/microsoft/vscode',
+        'https://github.com/torvalds/linux',
+        'https://github.com/tensorflow/tensorflow',
+        'https://github.com/vuejs/vue'
+      ],
+      core: [
+        'https://github.com',
+        'https://github.com/pulls',
+        'https://github.com/issues',
+        'https://github.com/marketplace',
+        'https://github.com/explore'
+      ],
+      orgs: [
+        'https://github.com/github',
+        'https://github.com/microsoft',
+        'https://github.com/google',
+        'https://github.com/facebook',
+        'https://github.com/apache'
+      ]
+    };
 
     function init() {
       loadDictionary();
       loadSettings();
-      setupEventListeners();
-      updateStats();
+      refreshStats();
+      switchTab('collect');
+      setInterval(refreshStats, 30000);
     }
 
-    function setupEventListeners() {
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-          btn.classList.add('active');
-          document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
-        });
+    function switchTab(tab) {
+      document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+        btn.classList.remove('active', 'bg-gray-700/50', 'text-white');
+        btn.classList.add('text-gray-400');
       });
+      document.getElementById(`tab-${tab}`).classList.add('active', 'bg-gray-700/50', 'text-white');
+      document.getElementById(`tab-${tab}`).classList.remove('text-gray-400');
 
-      document.getElementById('startCollectBtn').addEventListener('click', startCollection);
-      document.getElementById('stopCollectBtn').addEventListener('click', stopCollection);
-      document.getElementById('exportDictBtn').addEventListener('click', exportDictionary);
-      document.getElementById('importDictBtn').addEventListener('click', importDictionary);
-      document.getElementById('optimizeDictBtn').addEventListener('click', optimizeDictionary);
-      document.getElementById('backupDictBtn').addEventListener('click', backupDictionary);
-      document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
-      document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
-      document.getElementById('dictSearchInput').addEventListener('input', filterDictionary);
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      document.getElementById(`${tab}Content`).classList.remove('hidden');
+    }
+
+    async function refreshStats() {
+      try {
+        const response = await fetch(`${API_BASE}/stats`);
+        const data = await response.json();
+        
+        document.getElementById('totalStrings').textContent = data.totalStrings?.toLocaleString() || '0';
+        document.getElementById('totalModules').textContent = data.moduleCount || '0';
+        document.getElementById('pendingTranslations').textContent = data.pendingCount || '0';
+        document.getElementById('updatesCount').textContent = data.updates || '0';
+        
+        if (data.lastUpdated) {
+          const date = new Date(data.lastUpdated);
+          document.getElementById('lastUpdated').textContent = date.toLocaleDateString('zh-CN', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+          });
+        } else {
+          document.getElementById('lastUpdated').textContent = '从未';
+        }
+      } catch (error) {
+        console.error('Failed to refresh stats:', error);
+      }
     }
 
     function addLog(containerId, message, level = 'info') {
       const container = document.getElementById(containerId);
       const entry = document.createElement('div');
-      entry.className = `log-entry ${level}`;
+      entry.className = 'log-entry';
+      
       const time = new Date().toLocaleTimeString();
-      entry.innerHTML = `<span class="timestamp">[${time}]</span>${message}`;
+      const colors = {
+        info: 'color: #60a5fa',
+        success: 'color: #4ade80',
+        error: 'color: #f87171',
+        warn: 'color: #facc15'
+      };
+      
+      entry.innerHTML = `<span style="color: #6b7280">[${time}]</span> <span style="${colors[level]}">${escapeHtml(message)}</span>`;
       container.appendChild(entry);
       container.scrollTop = container.scrollHeight;
     }
 
     function clearLog(containerId) {
-      document.getElementById(containerId).innerHTML = '';
+      document.getElementById(containerId).innerHTML = '<div style="color: #6b7280">日志已清空</div>';
     }
 
-    function updateStats() {
-      fetch(`${API_BASE}/stats`)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('totalStrings').textContent = data.totalStrings?.toLocaleString() || '0';
-          document.getElementById('totalModules').textContent = data.moduleCount || '0';
-          document.getElementById('pendingTranslations').textContent = data.pendingCount || '0';
-          document.getElementById('lastUpdated').textContent = data.lastUpdated || '从未';
-        })
-        .catch(() => {
-          document.getElementById('totalStrings').textContent = 'N/A';
-          document.getElementById('totalModules').textContent = 'N/A';
-        });
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function loadPreset(preset) {
+      document.getElementById('urlsInput').value = presets[preset].join('\n');
+      showToast('success', '预设已加载', `已加载 ${presets[preset].length} 个 URL`);
+    }
+
+    function clearUrls() {
+      document.getElementById('urlsInput').value = '';
+      showToast('info', '已清空', 'URL 列表已清空');
     }
 
     async function startCollection() {
@@ -440,13 +810,13 @@ https://github.com/torvalds/linux"></textarea>
       const selectors = document.getElementById('selectorsInput').value.trim() || 'body';
 
       if (!urlsText) {
-        addLog('collectLog', '请输入至少一个 URL', 'error');
+        showToast('error', '错误', '请输入至少一个 URL');
         return;
       }
 
       const urls = urlsText.split('\n').map(u => u.trim()).filter(u => u);
       if (urls.length === 0) {
-        addLog('collectLog', '请输入有效的 URL', 'error');
+        showToast('error', '错误', '请输入有效的 URL');
         return;
       }
 
@@ -454,20 +824,28 @@ https://github.com/torvalds/linux"></textarea>
       collectController = new AbortController();
       document.getElementById('startCollectBtn').disabled = true;
       document.getElementById('stopCollectBtn').disabled = false;
-      document.getElementById('startCollectBtn').classList.add('loading');
+      document.getElementById('startCollectBtn').classList.add('opacity-50');
+      updateCollectStatus('running');
       clearLog('collectLog');
+      addLog('collectLog', `开始采集 ${urls.length} 个页面...`, 'info');
 
       const pages = urls.map((url, index) => ({
         id: `page_${index}`,
-        name: new URL(url).pathname.split('/').pop() || 'unknown',
+        name: new URL(url).pathname.split('/').filter(Boolean).slice(-2).join('/') || 'unknown',
         url,
         selectors: selectors.split(',').map(s => s.trim()),
         enabled: true
       }));
 
-      addLog('collectLog', `开始采集 ${pages.length} 个页面...`, 'info');
-
       try {
+        let completed = 0;
+        const updateProgress = () => {
+          const percent = Math.round((completed / pages.length) * 100);
+          document.getElementById('collectProgress').style.width = `${percent}%`;
+          document.getElementById('progressPercent').textContent = `${percent}%`;
+          document.getElementById('progressText').textContent = `已处理 ${completed}/${pages.length}`;
+        };
+
         const response = await fetch(`${API_BASE}/collect`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -475,39 +853,42 @@ https://github.com/torvalds/linux"></textarea>
           signal: collectController.signal
         });
 
-        // 检查响应是否成功
         if (!response.ok) {
-          throw new Error(`HTTP错误: ${response.status} ${response.statusText}`);
+          throw new Error(`HTTP错误: ${response.status}`);
         }
 
-        // 尝试解析 JSON
-        let result;
-        try {
-          const text = await response.text();
-          result = JSON.parse(text);
-        } catch (jsonError) {
-          throw new Error('服务器返回了无效的 JSON 响应');
-        }
+        const result = await response.json();
         
+        completed = pages.length;
+        updateProgress();
+
         if (result.success) {
           addLog('collectLog', `采集完成! 成功: ${result.summary.successCount}, 失败: ${result.summary.failedCount}`, 'success');
-          addLog('collectLog', `共提取 ${result.summary.totalStrings} 个唯一字符串`, 'success');
+          if (result.newStrings) {
+            addLog('collectLog', `新增 ${result.newStrings} 个字符串`, 'success');
+          }
+          showToast('success', '采集完成', `成功采集 ${result.summary.successCount} 个页面`);
+          refreshStats();
+          loadDictionary();
         } else {
           addLog('collectLog', `采集失败: ${result.error}`, 'error');
+          showToast('error', '采集失败', result.error);
         }
-      } catch (err) {
-        if (err.name === 'AbortError') {
+      } catch (error) {
+        if (error.name === 'AbortError') {
           addLog('collectLog', '采集已停止', 'warn');
+          showToast('warn', '已停止', '采集任务已中断');
         } else {
-          addLog('collectLog', `错误: ${err.message}`, 'error');
-          console.error('采集错误详情:', err);
+          addLog('collectLog', `错误: ${error.message}`, 'error');
+          showToast('error', '错误', error.message);
+          console.error('Collection error:', error);
         }
       } finally {
         isCollecting = false;
         document.getElementById('startCollectBtn').disabled = false;
         document.getElementById('stopCollectBtn').disabled = true;
-        document.getElementById('startCollectBtn').classList.remove('loading');
-        updateStats();
+        document.getElementById('startCollectBtn').classList.remove('opacity-50');
+        updateCollectStatus('success');
       }
     }
 
@@ -515,178 +896,607 @@ https://github.com/torvalds/linux"></textarea>
       if (collectController) {
         collectController.abort();
       }
+      updateCollectStatus('idle');
     }
 
-    function loadDictionary() {
-      fetch(`${API_BASE}/dictionary`)
-        .then(res => res.json())
-        .then(data => {
-          renderDictionary(data);
-        })
-        .catch(() => {
-          document.getElementById('dictTableBody').innerHTML = 
-            '<tr><td colspan="4" style="text-align: center; color: #f85149;">加载失败</td></tr>';
+    function updateCollectStatus(status) {
+      const el = document.getElementById('collectStatus');
+      el.className = 'status-badge px-3 py-1 rounded-full flex items-center gap-2';
+      
+      const configs = {
+        idle: { class: 'status-idle', text: '空闲', dot: 'bg-gray-500' },
+        running: { class: 'status-running', text: '采集中', dot: 'bg-blue-500' },
+        success: { class: 'status-success', text: '完成', dot: 'bg-green-500' },
+        error: { class: 'status-error', text: '错误', dot: 'bg-red-500' }
+      };
+      
+      const config = configs[status];
+      el.classList.add(config.class);
+      el.innerHTML = `<span class="w-2 h-2 rounded-full ${config.dot}"></span><span class="text-sm">${config.text}</span>`;
+    }
+
+    async function loadDictionary() {
+      try {
+        const response = await fetch(`${API_BASE}/dictionary`);
+        currentDictionary = await response.json();
+        
+        const moduleFilter = document.getElementById('moduleFilter');
+        moduleFilter.innerHTML = '<option value="">所有模块</option>';
+        Object.keys(currentDictionary).forEach(module => {
+          moduleFilter.innerHTML += `<option value="${escapeHtml(module)}">${escapeHtml(module)}</option>`;
         });
-    }
-
-    function renderDictionary(data) {
-      const tbody = document.getElementById('dictTableBody');
-      if (!data || Object.keys(data).length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6e7681;">暂无数据</td></tr>';
-        return;
+        
+        filterDictionary();
+      } catch (error) {
+        console.error('Failed to load dictionary:', error);
+        document.getElementById('dictTableBody').innerHTML = 
+          '<tr><td colspan="4" class="px-4 py-8 text-center text-red-400">加载失败</td></tr>';
       }
-
-      let html = '';
-      let count = 0;
-      for (const [module, entries] of Object.entries(data)) {
-        for (const [key, value] of Object.entries(entries)) {
-          if (count >= 100) break;
-          const isPending = value && value.startsWith('待翻译:');
-          html += `<tr>
-            <td>${escapeHtml(module)}</td>
-            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(key)}</td>
-            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(value || '-')}</td>
-            <td>
-              <div class="action-btns">
-                <button class="btn btn-secondary" onclick="editEntry('${escapeHtml(module)}', '${escapeHtml(key)}', '${escapeHtml(value || '')}')">✏️</button>
-              </div>
-            </td>
-          </tr>`;
-          count++;
-        }
-        if (count >= 100) break;
-      }
-      tbody.innerHTML = html || '<tr><td colspan="4" style="text-align: center; color: #6e7681;">暂无数据</td></tr>';
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/[&<>"']/g, m => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      })[m]);
     }
 
     function filterDictionary() {
-      loadDictionary();
+      const search = document.getElementById('dictSearchInput').value.toLowerCase().trim();
+      const moduleFilter = document.getElementById('moduleFilter').value;
+      const statusFilter = document.getElementById('statusFilter').value;
+      
+      filteredDictionary = {};
+      
+      for (const [module, entries] of Object.entries(currentDictionary)) {
+        if (moduleFilter && module !== moduleFilter) continue;
+        
+        const matchedEntries = {};
+        for (const [key, value] of Object.entries(entries)) {
+          if (search) {
+            const matchesKey = key.toLowerCase().includes(search);
+            const matchesValue = value && value.toLowerCase().includes(search);
+            if (!matchesKey && !matchesValue) continue;
+          }
+          
+          if (statusFilter === 'pending' && value && !value.startsWith('待翻译:')) continue;
+          if (statusFilter === 'translated' && (!value || value.startsWith('待翻译:'))) continue;
+          
+          matchedEntries[key] = value;
+        }
+        
+        if (Object.keys(matchedEntries).length > 0) {
+          filteredDictionary[module] = matchedEntries;
+        }
+      }
+      
+      currentPage = 1;
+      renderDictionary();
     }
 
-    function editEntry(module, key, value) {
-      const newValue = prompt(`修改译文 (${module}):`, value);
-      if (newValue !== null) {
-        fetch(`${API_BASE}/dictionary/update`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ module, key, value: newValue })
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              addLog('dictLog', `更新成功: ${key}`, 'success');
-              loadDictionary();
-            } else {
-              addLog('dictLog', `更新失败: ${data.error}`, 'error');
-            }
+    function renderDictionary() {
+      const tbody = document.getElementById('dictTableBody');
+      
+      let allEntries = [];
+      for (const [module, entries] of Object.entries(filteredDictionary)) {
+        for (const [key, value] of Object.entries(entries)) {
+          allEntries.push({ module, key, value });
+        }
+      }
+      
+      const totalEntries = allEntries.length;
+      const totalPages = Math.max(1, Math.ceil(totalEntries / itemsPerPage));
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = Math.min(startIndex + itemsPerPage, totalEntries);
+      const pageEntries = allEntries.slice(startIndex, endIndex);
+      
+      document.getElementById('showingFrom').textContent = totalEntries > 0 ? startIndex + 1 : 0;
+      document.getElementById('showingTo').textContent = endIndex;
+      document.getElementById('totalEntries').textContent = totalEntries;
+      document.getElementById('currentPage').textContent = currentPage;
+      document.getElementById('totalPages').textContent = totalPages;
+      document.getElementById('prevBtn').disabled = currentPage <= 1;
+      document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+      
+      if (pageEntries.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">无数据</td></tr>`;
+        return;
+      }
+      
+      tbody.innerHTML = pageEntries.map(entry => {
+        const isPending = !entry.value || entry.value.startsWith('待翻译:');
+        const entryId = `${entry.module}:${entry.key}`;
+        const isChecked = selectedEntries.has(entryId);
+        
+        return `
+          <tr class="table-row">
+            <td class="px-4 py-3">
+              <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleEntrySelection('${escapeHtml(entry.module)}', '${escapeHtml(entry.key)}')" class="w-4 h-4 rounded bg-gray-700 border-gray-600 ${isBulkEditMode ? '' : 'hidden'}">
+            </td>
+            <td class="px-4 py-3 text-sm">
+              <span class="text-gray-300">${escapeHtml(entry.module)}</span>
+            </td>
+            <td class="px-4 py-3 text-sm max-w-xs">
+              <div class="truncate text-gray-100" title="${escapeHtml(entry.key)}">${escapeHtml(entry.key)}</div>
+            </td>
+            <td class="px-4 py-3 text-sm max-w-xs">
+              <div class="truncate ${isPending ? 'color: #facc15' : 'text-gray-100'}" title="${escapeHtml(entry.value || '')}">${escapeHtml(entry.value || '(空)')}</div>
+            </td>
+            <td class="px-4 py-3 text-sm text-right">
+              <button onclick="editEntry('${escapeHtml(entry.module)}', '${escapeHtml(entry.key)}', '${escapeHtml(entry.value || '')}')" class="p-2 hover:bg-gray-700/50 rounded-lg text-gray-400 hover:text-white">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function toggleBulkEdit() {
+      isBulkEditMode = !isBulkEditMode;
+      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+      const selectAllBtn = document.getElementById('selectAllBtn');
+      const bulkApplyBtn = document.getElementById('bulkApplyBtn');
+      const selectedCountSpan = document.getElementById('selectedCount');
+      const bulkEditBtn = document.getElementById('bulkEditBtn');
+      
+      if (isBulkEditMode) {
+        selectAllCheckbox.classList.remove('hidden');
+        selectAllBtn.classList.remove('hidden');
+        bulkApplyBtn.classList.remove('hidden');
+        selectedCountSpan.classList.remove('hidden');
+        bulkEditBtn.innerHTML = `
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          <span>退出批量</span>
+        `;
+        bulkEditBtn.classList.add('bg-red-500/20', 'text-red-400');
+        updateSelectedCount();
+      } else {
+        selectAllCheckbox.classList.add('hidden');
+        selectAllBtn.classList.add('hidden');
+        bulkApplyBtn.classList.add('hidden');
+        selectedCountSpan.classList.add('hidden');
+        bulkEditBtn.innerHTML = `
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>批量编辑</span>
+        `;
+        bulkEditBtn.classList.remove('bg-red-500/20', 'text-red-400');
+        selectedEntries.clear();
+      }
+      renderDictionary();
+    }
+
+    function toggleEntrySelection(module, key) {
+      const entryId = `${module}:${key}`;
+      if (selectedEntries.has(entryId)) {
+        selectedEntries.delete(entryId);
+      } else {
+        selectedEntries.add(entryId);
+      }
+      updateSelectedCount();
+    }
+
+    function toggleSelectAll() {
+      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+      let allEntries = [];
+      for (const [module, entries] of Object.entries(filteredDictionary)) {
+        for (const [key, value] of Object.entries(entries)) {
+          allEntries.push({ module, key });
+        }
+      }
+      
+      if (selectAllCheckbox.checked) {
+        allEntries.forEach(entry => {
+          selectedEntries.add(`${entry.module}:${entry.key}`);
+        });
+      } else {
+        selectedEntries.clear();
+      }
+      updateSelectedCount();
+      renderDictionary();
+    }
+
+    function selectAll() {
+      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+      selectAllCheckbox.checked = true;
+      toggleSelectAll();
+    }
+
+    function updateSelectedCount() {
+      const selectedCountSpan = document.getElementById('selectedCount');
+      selectedCountSpan.textContent = `已选择 ${selectedEntries.size} 条`;
+    }
+
+    function bulkEdit() {
+      if (selectedEntries.size === 0) {
+        showToast('error', '请先选择条目', '请选择要编辑的条目');
+        return;
+      }
+      
+      document.getElementById('bulkEditModal').classList.remove('hidden');
+      document.getElementById('bulkSelectedCount').textContent = selectedEntries.size;
+      
+      // 初始化操作类型变化事件
+      const bulkOperation = document.getElementById('bulkOperation');
+      bulkOperation.onchange = updateBulkEditPreview;
+      document.getElementById('bulkValue').oninput = updateBulkEditPreview;
+      document.getElementById('bulkSearch').oninput = updateBulkEditPreview;
+      document.getElementById('bulkReplace').oninput = updateBulkEditPreview;
+      
+      updateBulkEditPreview();
+    }
+
+    function updateBulkEditPreview() {
+      const operation = document.getElementById('bulkOperation').value;
+      const bulkValue = document.getElementById('bulkValue').value;
+      const bulkSearch = document.getElementById('bulkSearch').value;
+      const bulkReplace = document.getElementById('bulkReplace').value;
+      const bulkValueField = document.getElementById('bulkValueField');
+      const bulkSearchReplaceFields = document.getElementById('bulkSearchReplaceFields');
+      const bulkPreview = document.getElementById('bulkPreview');
+      
+      // 显示/隐藏字段
+      if (operation === 'replace') {
+        bulkValueField.classList.add('hidden');
+        bulkSearchReplaceFields.classList.remove('hidden');
+      } else if (operation === 'clear') {
+        bulkValueField.classList.add('hidden');
+        bulkSearchReplaceFields.classList.add('hidden');
+      } else {
+        bulkValueField.classList.remove('hidden');
+        bulkSearchReplaceFields.classList.add('hidden');
+      }
+      
+      // 生成预览
+      let previewHtml = '';
+      let previewCount = 0;
+      selectedEntries.forEach(entryId => {
+        if (previewCount >= 10) return;
+        const [module, key] = entryId.split(':');
+        const currentValue = currentDictionary[module]?.[key] || '';
+        let newValue = currentValue;
+        
+        switch (operation) {
+          case 'prefix':
+            newValue = bulkValue + currentValue;
+            break;
+          case 'suffix':
+            newValue = currentValue + bulkValue;
+            break;
+          case 'replace':
+            newValue = currentValue.replace(new RegExp(bulkSearch, 'g'), bulkReplace);
+            break;
+          case 'set':
+            newValue = bulkValue;
+            break;
+          case 'clear':
+            newValue = '';
+            break;
+        }
+        
+        previewHtml += `<div class="py-1 ${previewCount % 2 === 0 ? 'text-gray-300' : 'text-gray-400'}">
+          <span class="text-blue-400">${escapeHtml(module)}</span>:
+          <span class="text-green-400">"${escapeHtml(currentValue)}</span>"
+          →
+          <span class="text-yellow-400">"${escapeHtml(newValue)}"</span>
+        </div>`;
+        previewCount++;
+      });
+      
+      if (selectedEntries.size > 10) {
+        previewHtml += `<div class="py-1 text-gray-500">...还有 ${selectedEntries.size - 10} 条</div>`;
+      }
+      
+      bulkPreview.innerHTML = previewHtml || '<div class="text-gray-500">请选择操作并输入值</div>';
+    }
+
+    async function applyBulkEdit() {
+      const operation = document.getElementById('bulkOperation').value;
+      const bulkValue = document.getElementById('bulkValue').value;
+      const bulkSearch = document.getElementById('bulkSearch').value;
+      const bulkReplace = document.getElementById('bulkReplace').value;
+      
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (const entryId of selectedEntries) {
+        const [module, key] = entryId.split(':');
+        const currentValue = currentDictionary[module]?.[key] || '';
+        let newValue = currentValue;
+        
+        switch (operation) {
+          case 'prefix':
+            newValue = bulkValue + currentValue;
+            break;
+          case 'suffix':
+            newValue = currentValue + bulkValue;
+            break;
+          case 'replace':
+            newValue = currentValue.replace(new RegExp(bulkSearch, 'g'), bulkReplace);
+            break;
+          case 'set':
+            newValue = bulkValue;
+            break;
+          case 'clear':
+            newValue = '';
+            break;
+        }
+        
+        try {
+          const response = await fetch(`${API_BASE}/dictionary/update`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ module, key, value: newValue })
           });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            successCount++;
+          } else {
+            errorCount++;
+          }
+        } catch (error) {
+          errorCount++;
+        }
+      }
+      
+      closeBulkEditModal();
+      addLog('dictLog', `批量编辑完成: 成功 ${successCount} 条, 失败 ${errorCount} 条`, successCount > 0 ? 'success' : 'error');
+      showToast(successCount > 0 ? 'success' : 'error', '批量编辑', `成功 ${successCount} 条, 失败 ${errorCount} 条`);
+      loadDictionary();
+      refreshStats();
+      selectedEntries.clear();
+      toggleBulkEdit();
+    }
+
+    function closeBulkEditModal() {
+      document.getElementById('bulkEditModal').classList.add('hidden');
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        renderDictionary();
       }
     }
 
-    function exportDictionary() {
-      addLog('dictLog', '正在导出词典...', 'info');
-      fetch(`${API_BASE}/export`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            addLog('dictLog', `导出成功，共 ${data.stringCount} 个字符串`, 'success');
-          } else {
-            addLog('dictLog', `导出失败: ${data.error}`, 'error');
-          }
-        })
-        .catch(err => addLog('dictLog', `导出失败: ${err.message}`, 'error'));
+    function nextPage() {
+      const totalCount = Object.values(filteredDictionary).reduce((sum, m) => sum + Object.keys(m).length, 0);
+      const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderDictionary();
+      }
     }
 
-    function importDictionary() {
-      addLog('dictLog', '正在导入词典...', 'info');
-      fetch(`${API_BASE}/import`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            addLog('dictLog', '导入成功', 'success');
-            loadDictionary();
-            updateStats();
-          } else {
-            addLog('dictLog', `导入失败: ${data.error}`, 'error');
-          }
-        })
-        .catch(err => addLog('dictLog', `导入失败: ${err.message}`, 'error'));
+    function editEntry(module, key, value) {
+      editingEntry = { module, key };
+      document.getElementById('editModule').value = module;
+      document.getElementById('editKey').value = key;
+      document.getElementById('editValue').value = value;
+      document.getElementById('editModal').classList.remove('hidden');
     }
 
-    function optimizeDictionary() {
-      addLog('dictLog', '正在优化词典...', 'info');
-      fetch(`${API_BASE}/optimize`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            addLog('dictLog', `优化完成，原始 ${data.originalCount} 个字符串，优化后 ${data.optimizedCount} 个`, 'success');
-            loadDictionary();
-            updateStats();
-          } else {
-            addLog('dictLog', `优化失败: ${data.error}`, 'error');
-          }
-        })
-        .catch(err => addLog('dictLog', `优化失败: ${err.message}`, 'error'));
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      editingEntry = null;
     }
 
-    function backupDictionary() {
-      addLog('dictLog', '正在备份词典...', 'info');
-      fetch(`${API_BASE}/backup`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            addLog('dictLog', `备份成功: ${data.path}`, 'success');
-          } else {
-            addLog('dictLog', `备份失败: ${data.error}`, 'error');
-          }
-        })
-        .catch(err => addLog('dictLog', `备份失败: ${err.message}`, 'error'));
-    }
-
-    function loadSettings() {
-      fetch(`${API_BASE}/settings`)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('requestInterval').value = data.requestInterval || 1000;
-          document.getElementById('maxRetries').value = data.maxRetries || 3;
-          document.getElementById('httpTimeout').value = data.httpTimeout || 30000;
+    async function saveEdit() {
+      if (!editingEntry) return;
+      
+      const value = document.getElementById('editValue').value;
+      
+      try {
+        const response = await fetch(`${API_BASE}/dictionary/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            module: editingEntry.module,
+            key: editingEntry.key,
+            value: value
+          })
         });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          addLog('dictLog', `更新成功: ${editingEntry.key}`, 'success');
+          showToast('success', '成功', '翻译已更新');
+          closeEditModal();
+          loadDictionary();
+          refreshStats();
+        } else {
+          addLog('dictLog', `更新失败: ${result.error}`, 'error');
+          showToast('error', '失败', result.error);
+        }
+      } catch (error) {
+        addLog('dictLog', `更新失败: ${error.message}`, 'error');
+        showToast('error', '错误', error.message);
+      }
     }
 
-    function saveSettings() {
+    async function exportDictionary() {
+      addLog('dictLog', '正在导出词典...', 'info');
+      try {
+        const response = await fetch(`${API_BASE}/dictionary/export`);
+        const result = await response.json();
+        
+        if (result.success) {
+          addLog('dictLog', `导出成功，共 ${result.stringCount} 个字符串`, 'success');
+          showToast('success', '导出成功', `共 ${result.stringCount} 个字符串`);
+        } else {
+          addLog('dictLog', `导出失败: ${result.error}`, 'error');
+          showToast('error', '导出失败', result.error);
+        }
+      } catch (error) {
+        addLog('dictLog', `导出失败: ${error.message}`, 'error');
+        showToast('error', '错误', error.message);
+      }
+    }
+
+    async function importDictionary() {
+      addLog('dictLog', '正在导入词典...', 'info');
+      try {
+        const response = await fetch(`${API_BASE}/dictionary/import`);
+        const result = await response.json();
+        
+        if (result.success) {
+          addLog('dictLog', '导入成功', 'success');
+          showToast('success', '导入成功', '');
+          loadDictionary();
+          refreshStats();
+        } else {
+          addLog('dictLog', `导入失败: ${result.error}`, 'error');
+          showToast('error', '导入失败', result.error);
+        }
+      } catch (error) {
+        addLog('dictLog', `导入失败: ${error.message}`, 'error');
+        showToast('error', '错误', error.message);
+      }
+    }
+
+    async function optimizeDictionary() {
+      addLog('dictLog', '正在优化词典...', 'info');
+      try {
+        const response = await fetch(`${API_BASE}/dictionary/optimize`, { method: 'POST' });
+        const result = await response.json();
+        
+        if (result.success) {
+          addLog('dictLog', `优化完成，原始 ${result.originalCount} 个，优化后 ${result.optimizedCount} 个`, 'success');
+          showToast('success', '优化完成', `移除 ${result.removed} 个重复项`);
+          loadDictionary();
+          refreshStats();
+        } else {
+          addLog('dictLog', `优化失败: ${result.error}`, 'error');
+          showToast('error', '优化失败', result.error);
+        }
+      } catch (error) {
+        addLog('dictLog', `优化失败: ${error.message}`, 'error');
+        showToast('error', '错误', error.message);
+      }
+    }
+
+    function quickOptimize() {
+      optimizeDictionary();
+      switchTab('dictionary');
+    }
+
+    async function quickBackup() {
+      addLog('dictLog', '正在备份词典...', 'info');
+      try {
+        const response = await fetch(`${API_BASE}/backup`);
+        const result = await response.json();
+        
+        if (result.success) {
+          addLog('dictLog', `备份成功: ${result.path || ''}`, 'success');
+          showToast('success', '备份成功', '');
+        } else {
+          addLog('dictLog', `备份失败: ${result.error}`, 'error');
+          showToast('error', '备份失败', result.error);
+        }
+      } catch (error) {
+        addLog('dictLog', `备份失败: ${error.message}`, 'error');
+        showToast('error', '错误', error.message);
+      }
+    }
+
+    async function loadSettings() {
+      try {
+        const response = await fetch(`${API_BASE}/settings`);
+        const settings = await response.json();
+        
+        document.getElementById('requestInterval').value = settings.requestInterval || 1000;
+        document.getElementById('maxRetries').value = settings.maxRetries || 3;
+        document.getElementById('httpTimeout').value = settings.httpTimeout || 30000;
+        document.getElementById('autoBackup').checked = settings.autoBackup !== false;
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+      }
+    }
+
+    function refreshSettings() {
+      loadSettings();
+      showToast('info', '已刷新', '');
+    }
+
+    async function saveSettings() {
       const settings = {
         requestInterval: parseInt(document.getElementById('requestInterval').value),
         maxRetries: parseInt(document.getElementById('maxRetries').value),
-        httpTimeout: parseInt(document.getElementById('httpTimeout').value)
+        httpTimeout: parseInt(document.getElementById('httpTimeout').value),
+        autoBackup: document.getElementById('autoBackup').checked
       };
-      fetch(`${API_BASE}/settings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings)
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            addLog('dictLog', '设置已保存', 'success');
-          }
+
+      try {
+        const response = await fetch(`${API_BASE}/settings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings)
         });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showToast('success', '保存成功', '设置已更新');
+        } else {
+          showToast('error', '保存失败', result.error);
+        }
+      } catch (error) {
+        showToast('error', '错误', error.message);
+      }
     }
 
-    function resetSettings() {
-      document.getElementById('requestInterval').value = 1000;
-      document.getElementById('maxRetries').value = 3;
-      document.getElementById('httpTimeout').value = 30000;
-      saveSettings();
+    async function resetSettings() {
+      if (!confirm('确定要重置所有设置为默认值吗？')) return;
+
+      try {
+        const response = await fetch(`${API_BASE}/settings/reset`, { method: 'POST' });
+        const result = await response.json();
+
+        if (result.success) {
+          loadSettings();
+          showToast('success', '已重置', '设置已恢复为默认值');
+        } else {
+          showToast('error', '重置失败', result.error);
+        }
+      } catch (error) {
+        showToast('error', '错误', error.message);
+      }
+    }
+
+    function showToast(type, title, message) {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toastIcon');
+      const toastTitle = document.getElementById('toastTitle');
+      const toastMessage = document.getElementById('toastMessage');
+
+      const configs = {
+        success: { bg: 'bg-green-500/20', icon: '<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' },
+        error: { bg: 'bg-red-500/20', icon: '<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>' },
+        warn: { bg: 'bg-yellow-500/20', icon: '<svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>' },
+        info: { bg: 'bg-blue-500/20', icon: '<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' }
+      };
+
+      const config = configs[type] || configs.info;
+      icon.className = `w-8 h-8 rounded-full flex items-center justify-center ${config.bg}`;
+      icon.innerHTML = config.icon;
+      toastTitle.textContent = title;
+      toastMessage.textContent = message;
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 4000);
     }
 
     init();
   </script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </body>
 </html>

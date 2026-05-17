@@ -402,6 +402,15 @@ app.post('/api/settings', async (req, res) => {
   }
 });
 
+app.post('/api/settings/reset', async (req, res) => {
+  try {
+    await saveSettings({ ...CONFIG.defaultSettings });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
